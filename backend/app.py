@@ -101,7 +101,20 @@ def token_required(f):
     return decorated
 
 
-# Healthcheck Endpoint
+# Root Healthcheck Endpoint for Render Scanner & Uptime Monitoring
+@app.route("/", methods=["GET", "HEAD"])
+def root_check():
+    mongo_status = "connected" if db is not None else "disconnected"
+    return jsonify({
+        "status": "online",
+        "service": "HiveMind 2026 MongoDB REST API",
+        "mongodb": mongo_status,
+        "database": db.name if db is not None else "local_fallback",
+        "timestamp": datetime.datetime.utcnow().isoformat()
+    }), 200
+
+
+# API Healthcheck Endpoint
 @app.route("/api/health", methods=["GET"])
 def health_check():
     mongo_status = "connected" if db is not None else "disconnected"
