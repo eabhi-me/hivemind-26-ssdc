@@ -1,0 +1,6 @@
+import { TOTAL_PRIZE_POOL_DISPLAY, TOTAL_PRIZE_POOL_NUMERIC } from './events';
+
+export const PRIZE_VAULT_CONFIG = {
+  totalDisplay: TOTAL_PRIZE_POOL_DISPLAY,
+  totalNumeric: TOTAL_PRIZE_POOL_NUMERIC,
+};
