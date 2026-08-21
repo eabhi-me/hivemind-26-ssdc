@@ -24,6 +24,7 @@ export const Navbar: React.FC = () => {
     { name: 'HIVEMIND 2026', path: '/#hero', isHash: true },
     { name: 'EVENTS', path: '/events', isHash: false },
     { name: 'TIMELINE', path: '/#timeline', isHash: true },
+    { name: 'ORGANIZERS', path: '/organizers', isHash: false },
     { name: 'PRIZES', path: '/#prizes', isHash: true },
     ...(isLoggedIn
       ? [{ name: 'DASHBOARD', path: '/dashboard', isHash: false }]

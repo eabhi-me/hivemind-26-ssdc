@@ -96,7 +96,7 @@ export const Admin: React.FC = () => {
       });
 
       if (res && res.success) {
-        setNoticeSuccess('Notice published live to MongoDB Atlas!');
+        setNoticeSuccess('Notice published live to HiveMind Portal Feed!');
         setNoticeTitle('');
         setNoticeContent('');
         await loadNotices();
@@ -163,7 +163,7 @@ export const Admin: React.FC = () => {
       });
 
       if (res && res.success) {
-        setPublishSuccess(`Results for ${eventObj?.title || publishEventId} published to MongoDB Atlas!`);
+        setPublishSuccess(`Results for ${eventObj?.title || publishEventId} published live to Portal Feed!`);
         setTimeout(() => {
           setShowResultModal(false);
           setPublishSuccess(null);
@@ -185,7 +185,7 @@ export const Admin: React.FC = () => {
           <SectionHeader
             sysLabel="ORGANIZER // ADMIN_PORTAL"
             title="SSDC ADMIN CONTROL CENTER"
-            subtitle="Manage registrations stored in MongoDB Atlas, filter entries, download CSV exports, and publish event winners."
+            subtitle="Manage registrations stored in the HiveMind Cloud Vault, filter entries, download CSV/Excel exports, and publish event winners."
           />
 
           <div className="shrink-0 flex flex-wrap gap-3">
@@ -274,7 +274,7 @@ export const Admin: React.FC = () => {
           <div className="p-4 bg-cyber-black border-b border-cyber-cyan/30 flex items-center justify-between font-mono text-xs text-cyber-cyan font-bold">
             <span className="flex items-center gap-2">
               <Database className="w-4 h-4" />
-              <span>MONGODB ATLAS RECORD REGISTRY</span>
+              <span>HIVEMIND CLOUD RECORD REGISTRY</span>
             </span>
             <span>TOTAL ROWS: {registrations.length}</span>
           </div>
@@ -282,7 +282,7 @@ export const Admin: React.FC = () => {
           {isLoading ? (
             <div className="py-16 text-center text-cyber-cyan flex items-center justify-center gap-3">
               <Loader2 className="w-6 h-6 animate-spin" />
-              <span className="font-mono text-xs font-bold uppercase">QUERYING MONGODB DATABASE...</span>
+              <span className="font-mono text-xs font-bold uppercase">QUERYING CLOUD DATABASE...</span>
             </div>
           ) : registrations.length === 0 ? (
             <div className="py-16 text-center text-cyber-muted font-mono text-xs">
@@ -431,7 +431,7 @@ export const Admin: React.FC = () => {
                   {isPublishing ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>PUBLISHING TO MONGODB ATLAS...</span>
+                      <span>PUBLISHING LIVE...</span>
                     </>
                   ) : (
                     <>
@@ -561,7 +561,7 @@ export const Admin: React.FC = () => {
                   {isPublishingNotice ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>PUBLISHING TO MONGODB ATLAS...</span>
+                      <span>PUBLISHING LIVE...</span>
                     </>
                   ) : (
                     <>

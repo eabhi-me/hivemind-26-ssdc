@@ -54,7 +54,7 @@ export interface NoticeRecord {
 class ApiService {
   private baseUrl = SITE_CONFIG.flaskBackendUrl;
 
-  // 1. Participant Login (Queries MongoDB Atlas & returns user + all registered events)
+  // 1. Participant Login (Queries HiveMind Cloud Core & returns user + all registered events)
   async participantLogin(email: string, key?: string) {
     try {
       const response = await fetch(`${this.baseUrl}/api/auth/login`, {
@@ -70,7 +70,7 @@ class ApiService {
       const localRegsStr = localStorage.getItem('hivemind_local_regs');
       let localRegs: RegistrationRecord[] = [];
       if (localRegsStr) {
-        try { localRegs = JSON.parse(localRegsStr); } catch (e) {}
+        try { localRegs = JSON.parse(localRegsStr); } catch (e) { }
       }
 
       const inputLow = email.toLowerCase().trim();
@@ -106,7 +106,7 @@ class ApiService {
     return data;
   }
 
-  // 3. Direct Event Registration (Strict Flask REST API -> MongoDB Atlas)
+  // 3. Direct Event Registration (Strict Flask REST API -> Cloud Vault)
   async registerForEvent(payload: Record<string, string>): Promise<{ success: boolean; submissionId: string; message: string; registration?: RegistrationRecord }> {
     const response = await fetch(`${this.baseUrl}/api/register`, {
       method: 'POST',
@@ -119,11 +119,11 @@ class ApiService {
     return data;
   }
 
-  // 4. Pre-flight check for duplicate registrations in MongoDB Atlas
-  async checkDuplicate(emailId: string, phoneNumber: string, selectedEvent?: string): Promise<{ isDuplicate: boolean; message?: string }> {
+  // 4. Pre-flight check for duplicate registrations in Cloud Vault
+  async checkDuplicate(emailId: string, phoneNumber: string, selectedEvent?: string, regNo?: string): Promise<{ isDuplicate: boolean; message?: string }> {
     try {
       const response = await fetch(
-        `${this.baseUrl}/api/registrations/check?emailId=${encodeURIComponent(emailId)}&phoneNumber=${encodeURIComponent(phoneNumber)}&selectedEvent=${encodeURIComponent(selectedEvent || '')}`
+        `${this.baseUrl}/api/registrations/check?emailId=${encodeURIComponent(emailId)}&phoneNumber=${encodeURIComponent(phoneNumber)}&selectedEvent=${encodeURIComponent(selectedEvent || '')}&regNo=${encodeURIComponent(regNo || '')}`
       );
       return await response.json();
     } catch (err) {
@@ -131,7 +131,7 @@ class ApiService {
     }
   }
 
-  // 5. Admin: Get Filtered Registrations List from MongoDB Atlas
+  // 5. Admin: Get Filtered Registrations List from Cloud Vault
   async getAdminRegistrations(eventFilter: string = '', searchQuery: string = ''): Promise<{ count: number; registrations: RegistrationRecord[] }> {
     const response = await fetch(
       `${this.baseUrl}/api/admin/registrations?event=${encodeURIComponent(eventFilter)}&search=${encodeURIComponent(searchQuery)}`
@@ -150,7 +150,7 @@ class ApiService {
     return `${this.baseUrl}/api/admin/export/excel?event=${encodeURIComponent(eventFilter)}`;
   }
 
-  // 7. Admin: Publish Event Results & Winners to MongoDB Atlas
+  // 7. Admin: Publish Event Results & Winners to Cloud Core
   async publishEventResults(payload: Partial<EventResultRecord>) {
     const response = await fetch(`${this.baseUrl}/api/admin/results`, {
       method: 'POST',
@@ -162,7 +162,7 @@ class ApiService {
     return data;
   }
 
-  // 8. Public: Read Published Event Results from MongoDB Atlas
+  // 8. Public: Read Published Event Results from Cloud Core
   async getPublishedResults(): Promise<{ count: number; results: EventResultRecord[] }> {
     try {
       const response = await fetch(`${this.baseUrl}/api/results`);
@@ -204,7 +204,7 @@ class ApiService {
     }
   }
 
-  // Fetch User Profile & Registrations from MongoDB Atlas
+  // Fetch User Profile & Registrations from Cloud Core
   async fetchUserProfile(_token?: string): Promise<{ user: UserProfile; registrations: RegistrationRecord[] }> {
     try {
       const storedUser = localStorage.getItem('hivemind_user');
@@ -213,7 +213,7 @@ class ApiService {
         try {
           const parsed = JSON.parse(storedUser);
           email = parsed.email;
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (email) {
@@ -225,7 +225,7 @@ class ApiService {
           };
         }
       }
-    } catch (err) {}
+    } catch (err) { }
 
     const saved = localStorage.getItem('hivemind_local_regs');
     const regs = saved ? JSON.parse(saved) : [];

@@ -23,7 +23,7 @@ export const Login: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'participant' | 'admin'>(
     tabParam === 'admin' ? 'admin' : 'participant'
   );
-  
+
   // Participant Login State
   const [email, setEmail] = useState('');
   const [submissionKey, setSubmissionKey] = useState('');
@@ -92,7 +92,7 @@ export const Login: React.FC = () => {
   return (
     <div className="pt-28 pb-20 relative z-10 min-h-screen">
       <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <Link
           to="/"
           className="inline-flex items-center gap-2 font-mono text-xs text-cyber-cyan hover:text-cyber-cyan-bright mb-6 transition-colors group"
@@ -111,11 +111,10 @@ export const Login: React.FC = () => {
         <div className="flex border-b-2 border-cyber-cyan/30 mb-8 bg-cyber-charcoal p-1 clip-chamfer">
           <button
             onClick={() => { setActiveTab('participant'); setErrorMessage(null); }}
-            className={`flex-1 py-3 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all clip-chamfer ${
-              activeTab === 'participant'
+            className={`flex-1 py-3 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all clip-chamfer ${activeTab === 'participant'
                 ? 'bg-cyber-cyan text-cyber-black shadow-[0_0_15px_rgba(0,207,255,0.4)]'
                 : 'text-cyber-muted hover:text-cyber-white'
-            }`}
+              }`}
           >
             <User className="w-4 h-4" />
             <span>PARTICIPANT LOGIN</span>
@@ -123,11 +122,10 @@ export const Login: React.FC = () => {
 
           <button
             onClick={() => { setActiveTab('admin'); setErrorMessage(null); }}
-            className={`flex-1 py-3 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all clip-chamfer ${
-              activeTab === 'admin'
+            className={`flex-1 py-3 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all clip-chamfer ${activeTab === 'admin'
                 ? 'bg-cyber-cyan text-cyber-black shadow-[0_0_15px_rgba(0,207,255,0.4)]'
                 : 'text-cyber-muted hover:text-cyber-white'
-            }`}
+              }`}
           >
             <Shield className="w-4 h-4" />
             <span>ORGANIZER ADMIN</span>
@@ -136,7 +134,7 @@ export const Login: React.FC = () => {
 
         {/* Login Box */}
         <div className="bg-cyber-charcoal border-2 border-cyber-cyan/50 p-6 sm:p-8 clip-chamfer-lg relative overflow-hidden shadow-[0_0_35px_rgba(0,207,255,0.15)]">
-          
+
           {errorMessage && (
             <div className="p-4 bg-cyber-pink/10 border-2 border-cyber-pink clip-chamfer text-cyber-pink text-xs font-mono flex items-start gap-3 mb-6 animate-shake">
               <AlertCircle className="w-5 h-5 shrink-0 text-cyber-pink" />
@@ -187,7 +185,7 @@ export const Login: React.FC = () => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>AUTHENTICATING WITH MONGODB...</span>
+                    <span>AUTHENTICATING CREDENTIALS...</span>
                   </>
                 ) : (
                   <>

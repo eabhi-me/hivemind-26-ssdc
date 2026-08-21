@@ -65,51 +65,108 @@ export const Register: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     document.title = 'Registration | HiveMind 2026';
     window.scrollTo(0, 0);
   }, []);
 
+  const validateForm = (data: FormDataState): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    if (!data.name.trim()) {
+      errors.name = 'Full Name is required';
+    }
+
+    if (!data.emailId.trim()) {
+      errors.emailId = 'Personal Email ID is required';
+    } else if (!emailRegex.test(data.emailId.trim())) {
+      errors.emailId = 'Invalid email format (e.g. participant@domain.com)';
+    }
+
+    if (data.collegeEmailId.trim() && !emailRegex.test(data.collegeEmailId.trim())) {
+      errors.collegeEmailId = 'Invalid college email format (e.g. student@sliet.ac.in)';
+    }
+
+    const cleanPhone = data.phoneNumber.replace(/[\s\-\+]/g, '').slice(-10);
+    if (!data.phoneNumber.trim()) {
+      errors.phoneNumber = 'Phone Number is required';
+    } else if (!phoneRegex.test(cleanPhone)) {
+      errors.phoneNumber = 'Must be a valid 10-digit Indian mobile number (e.g. 9876543210)';
+    }
+
+    if (!data.regNo.trim()) {
+      errors.regNo = 'Registration / Roll Number is required';
+    } else if (data.regNo.trim().length < 3) {
+      errors.regNo = 'Roll Number must be at least 3 characters';
+    }
+
+    return errors;
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    const updatedForm = { ...formData, [name]: value };
+    setFormData(updatedForm);
+
+    // Real-time single field validation error clearance/update
+    const errors = validateForm(updatedForm);
+    setFieldErrors((prev) => ({
+      ...prev,
+      [name]: errors[name] || '',
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setErrorMessage(null);
 
+    // 1. Client-Side Format Validation
+    const errors = validateForm(formData);
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      const firstErr = Object.values(errors)[0];
+      setErrorMessage(`FORM VALIDATION ERROR: ${firstErr}`);
+      return;
+    }
+
+    setIsSubmitting(true);
     const generatedId = 'HM26-' + Math.floor(100000 + Math.random() * 900000);
 
     try {
-      // 1. Pre-flight Live Duplicate Check in MongoDB Atlas
-      const checkRes = await apiService.checkDuplicate(formData.emailId, formData.phoneNumber, formData.selectedEvent);
+      // 2. Pre-flight Live Duplicate Check in MongoDB Atlas (Email, Phone, Roll No)
+      const checkRes = await apiService.checkDuplicate(
+        formData.emailId,
+        formData.phoneNumber,
+        formData.selectedEvent,
+        formData.regNo
+      );
+
       if (checkRes && checkRes.isDuplicate) {
         setIsSubmitting(false);
         setErrorMessage(
-          `DUPLICATE REGISTRATION: ${
-            checkRes.message ||
-            'A participant with this Email ID or Phone Number has already registered for this event.'
+          `DUPLICATE REGISTRATION DETECTED: ${checkRes.message ||
+          'A participant with this Email ID, Phone Number, or Roll Number is already registered for this event.'
           }`
         );
         return;
       }
 
-      // 2. Transmit registration payload strictly to Flask Backend (MongoDB Atlas)
+      // 3. Transmit registration payload strictly to Flask Backend (MongoDB Atlas)
       const payload: Record<string, string> = {
-        name: formData.name,
-        emailId: formData.emailId,
-        collegeEmailId: formData.collegeEmailId,
-        regNo: formData.regNo,
+        name: formData.name.trim(),
+        emailId: formData.emailId.trim().toLowerCase(),
+        collegeEmailId: formData.collegeEmailId.trim().toLowerCase(),
+        regNo: formData.regNo.trim(),
         trade: formData.trade,
-        phoneNumber: formData.phoneNumber,
-        college: formData.college,
+        phoneNumber: formData.phoneNumber.replace(/[\s\-\+]/g, '').slice(-10),
+        college: formData.college.trim(),
         degree: formData.degree,
         batchYear: formData.batchYear,
         selectedEvent: formData.selectedEvent,
@@ -151,7 +208,7 @@ export const Register: React.FC = () => {
   return (
     <div className="pt-28 pb-20 relative z-10 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Back Navigation */}
         <Link
           to="/"
@@ -162,9 +219,9 @@ export const Register: React.FC = () => {
         </Link>
 
         <SectionHeader
-          sysLabel="REGISTRATION // MONGODB_ATLAS_NODE"
+          sysLabel="REGISTRATION // SECURE_CLOUD_NODE"
           title="HIVEMIND 2026 REGISTRATION"
-          subtitle="Fill in your participant credentials to register for challenges. Form data is recorded directly to MongoDB Atlas database."
+          subtitle="Fill in your participant credentials to register for challenges. Form data is recorded directly to the official HiveMind Cloud Vault."
         />
 
         {/* Registration Form Box */}
@@ -191,7 +248,7 @@ export const Register: React.FC = () => {
               </h2>
 
               <p className="text-cyber-muted text-sm max-w-lg mb-6 font-body">
-                Your credentials have been logged in the official HiveMind 2026 database (MongoDB Atlas).
+                Your credentials have been verified and secured in the official HiveMind 2026 Central Registry.
               </p>
 
               <div className="bg-cyber-black border border-cyber-cyan p-3 px-6 clip-chamfer mb-8 font-mono text-center">
@@ -215,7 +272,7 @@ export const Register: React.FC = () => {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                  
+
                   {/* WhatsApp Group & QR Code Card */}
                   <div className="bg-cyber-charcoal border border-cyber-cyan/40 p-5 clip-chamfer flex flex-col items-center text-center relative group hover:border-cyber-cyan transition-all">
                     <div className="flex items-center gap-2 font-mono text-xs text-cyber-cyan font-bold uppercase mb-3">
@@ -369,8 +426,14 @@ export const Register: React.FC = () => {
                     onChange={handleChange}
                     placeholder="Enter full name"
                     required
-                    className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40"
+                    className={`w-full bg-cyber-black border ${fieldErrors.name ? 'border-cyber-pink' : 'border-cyber-cyan/40'
+                      } text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40`}
                   />
+                  {fieldErrors.name && (
+                    <span className="font-mono text-[11px] text-cyber-pink mt-1 block">
+                      ⚠ {fieldErrors.name}
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -385,8 +448,14 @@ export const Register: React.FC = () => {
                     onChange={handleChange}
                     placeholder="e.g. 24103001"
                     required
-                    className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40"
+                    className={`w-full bg-cyber-black border ${fieldErrors.regNo ? 'border-cyber-pink' : 'border-cyber-cyan/40'
+                      } text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40`}
                   />
+                  {fieldErrors.regNo && (
+                    <span className="font-mono text-[11px] text-cyber-pink mt-1 block">
+                      ⚠ {fieldErrors.regNo}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -404,8 +473,14 @@ export const Register: React.FC = () => {
                     onChange={handleChange}
                     placeholder="name@gmail.com"
                     required
-                    className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40"
+                    className={`w-full bg-cyber-black border ${fieldErrors.emailId ? 'border-cyber-pink' : 'border-cyber-cyan/40'
+                      } text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40`}
                   />
+                  {fieldErrors.emailId && (
+                    <span className="font-mono text-[11px] text-cyber-pink mt-1 block">
+                      ⚠ {fieldErrors.emailId}
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -420,8 +495,14 @@ export const Register: React.FC = () => {
                     onChange={handleChange}
                     placeholder="student@sliet.ac.in"
                     required
-                    className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40"
+                    className={`w-full bg-cyber-black border ${fieldErrors.collegeEmailId ? 'border-cyber-pink' : 'border-cyber-cyan/40'
+                      } text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40`}
                   />
+                  {fieldErrors.collegeEmailId && (
+                    <span className="font-mono text-[11px] text-cyber-pink mt-1 block">
+                      ⚠ {fieldErrors.collegeEmailId}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -437,10 +518,16 @@ export const Register: React.FC = () => {
                     name="phoneNumber"
                     value={formData.phoneNumber}
                     onChange={handleChange}
-                    placeholder="+91 98765 43210"
+                    placeholder="9876543210"
                     required
-                    className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40"
+                    className={`w-full bg-cyber-black border ${fieldErrors.phoneNumber ? 'border-cyber-pink' : 'border-cyber-cyan/40'
+                      } text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40`}
                   />
+                  {fieldErrors.phoneNumber && (
+                    <span className="font-mono text-[11px] text-cyber-pink mt-1 block">
+                      ⚠ {fieldErrors.phoneNumber}
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -527,7 +614,7 @@ export const Register: React.FC = () => {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-6 h-6 animate-spin" />
-                      <span>SAVING TO MONGODB ATLAS...</span>
+                      <span>SAVING TO SECURE CLOUD VAULT...</span>
                     </>
                   ) : (
                     <>
@@ -537,7 +624,7 @@ export const Register: React.FC = () => {
                   )}
                 </button>
                 <p className="text-center font-mono text-[10px] text-cyber-muted mt-3">
-                  STRICT MONGODB ATLAS REST API BACKEND INTEGRATION
+                  DIRECT HIVEMIND SECURE CLOUD INTEGRATION
                 </p>
               </div>
 

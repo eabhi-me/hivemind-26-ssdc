@@ -112,8 +112,8 @@ Ensure `backend/.env` contains your MongoDB Atlas URI:
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.w2y0s.mongodb.net/?retryWrites=true&w=majority
 JWT_SECRET=hivemind_super_secret_jwt_key_2026_ssdc
 PORT=5000
-ADMIN_USERNAME=ssdc.sliet.hivemind
-ADMIN_PASSWORD=!ssdc@hive@admin420
+ADMIN_USERNAME=usename
+ADMIN_PASSWORD=password
 ```
 
 Start the Flask Backend:

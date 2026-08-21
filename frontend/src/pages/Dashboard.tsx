@@ -128,7 +128,7 @@ export const Dashboard: React.FC = () => {
       title: 'REGISTRATION & COMMUNITY VERIFICATION',
       date: 'ACTIVE NOW',
       status: 'COMPLETED',
-      description: 'Your registration credentials are verified in MongoDB Atlas. Join official SSDC WhatsApp community for real-time announcements.',
+      description: 'Your registration credentials are verified in the HiveMind Portal Core. Join official SSDC WhatsApp community for real-time announcements.',
       actionText: 'JOIN WHATSAPP COMMUNITY',
       actionUrl: whatsappGroupUrl,
       isExternal: true,
@@ -590,7 +590,7 @@ export const Dashboard: React.FC = () => {
                   {isRegistering ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>SAVING TO MONGODB ATLAS...</span>
+                      <span>SAVING TO SECURE CLOUD VAULT...</span>
                     </>
                   ) : (
                     <>

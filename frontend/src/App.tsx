@@ -10,6 +10,7 @@ import { Register } from './pages/Register';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Admin } from './pages/Admin';
+import { OrganizersPage } from './pages/OrganizersPage';
 import { NotFound } from './pages/NotFound';
 
 function ScrollToTop() {
@@ -42,6 +43,7 @@ export const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/events" element={<Events />} />
             <Route path="/events/:eventId" element={<EventDetails />} />
+            <Route path="/organizers" element={<OrganizersPage />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />

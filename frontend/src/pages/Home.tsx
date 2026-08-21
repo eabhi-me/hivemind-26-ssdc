@@ -9,6 +9,7 @@ import { PrizeVault } from '../components/PrizeVault';
 import { HowItWorks } from '../components/HowItWorks';
 import { OneHiveSection } from '../components/OneHiveSection';
 import { FAQ } from '../components/FAQ';
+import { Organizers } from '../components/Organizers';
 import { DiscordCTA } from '../components/DiscordCTA';
 import { SectionDivider } from '../components/SectionDivider';
 
@@ -32,6 +33,8 @@ export const Home: React.FC = () => {
       <PrizeVault />
       <SectionDivider label="NODE // WORKFLOW" />
       <HowItWorks />
+      <SectionDivider label="NODE // ORGANIZERS_TEAM" />
+      <Organizers />
       <SectionDivider label="NODE // COMMUNITY" />
       <OneHiveSection />
       <SectionDivider label="NODE // FAQS" />

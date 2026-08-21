@@ -1,6 +1,7 @@
 import os
 import csv
 import io
+import re
 import random
 import datetime
 from functools import wraps
@@ -44,7 +45,7 @@ try:
 
     # Test server connection ping
     client.admin.command("ping")
-    print(f"✅ Connected to MongoDB Atlas Database: '{db.name}'")
+    print(f"✅ Connected to HiveMind Cloud Core Database: '{db.name}'")
 
     # Ensure indexes & Upsert Admin Account from .env
     try:
@@ -53,7 +54,7 @@ try:
         db.results.create_index([("eventId", 1)], unique=True)
         db.admin_users.create_index([("username", 1)], unique=True)
 
-        # Upsert admin account in MongoDB Atlas
+        # Upsert admin account in Cloud Vault
         db.admin_users.update_one(
             {"username": ADMIN_USERNAME},
             {"$set": {
@@ -64,14 +65,14 @@ try:
             }},
             upsert=True
         )
-        print(f"👑 Admin Account Synced to MongoDB Atlas `admin_users`: {ADMIN_USERNAME}")
+        print(f"👑 Admin Account Synced to Cloud Vault `admin_users`: {ADMIN_USERNAME}")
     except Exception as idx_err:
         print(f"Index/Admin notice: {idx_err}")
 
 except Exception as err:
     mongo_error_msg = str(err)
-    print(f"⚠️ MongoDB Connection Notice: {err}")
-    print("ℹ️ Operating with automatic local store fallback until MongoDB Atlas connects.")
+    print(f"⚠️ Database Connection Notice: {err}")
+    print("ℹ️ Operating with automatic local store fallback until Cloud Vault connects.")
     db = None
 
 
@@ -104,11 +105,11 @@ def token_required(f):
 # Root Healthcheck Endpoint for Render Scanner & Uptime Monitoring
 @app.route("/", methods=["GET", "HEAD"])
 def root_check():
-    mongo_status = "connected" if db is not None else "disconnected"
+    db_status = "connected" if db is not None else "disconnected"
     return jsonify({
         "status": "online",
-        "service": "HiveMind 2026 MongoDB REST API",
-        "mongodb": mongo_status,
+        "service": "HiveMind 2026 REST API",
+        "database_status": db_status,
         "database": db.name if db is not None else "local_fallback",
         "timestamp": datetime.datetime.utcnow().isoformat()
     }), 200
@@ -117,13 +118,13 @@ def root_check():
 # API Healthcheck Endpoint
 @app.route("/api/health", methods=["GET"])
 def health_check():
-    mongo_status = "connected" if db is not None else "disconnected"
+    db_status = "connected" if db is not None else "disconnected"
     return jsonify({
         "status": "online",
-        "service": "HiveMind 2026 MongoDB REST API",
-        "mongodb": mongo_status,
+        "service": "HiveMind 2026 REST API",
+        "database_status": db_status,
         "database": db.name if db is not None else "local_fallback",
-        "mongo_error": mongo_error_msg,
+        "db_error": mongo_error_msg,
         "registrationsCount": db.registrations.count_documents({}) if db is not None else len(LOCAL_REGISTRATIONS),
         "timestamp": datetime.datetime.utcnow().isoformat()
     }), 200
@@ -269,6 +270,21 @@ def register_event():
         if not name or not personal_email or not phone_number or not reg_no:
             return jsonify({"error": "Required fields missing: Full Name, Email, Roll No, Phone Number"}), 400
 
+        # Backend Validation
+        email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_regex, personal_email):
+            return jsonify({"error": f"Invalid Personal Email format: '{personal_email}'"}), 400
+
+        if college_email and not re.match(email_regex, college_email):
+            return jsonify({"error": f"Invalid College Email format: '{college_email}'"}), 400
+
+        phone_regex = r"^[6-9]\d{9}$"
+        if not re.match(phone_regex, phone_number):
+            return jsonify({"error": f"Invalid Phone Number '{phone_number}'. Must be a valid 10-digit Indian mobile number."}), 400
+
+        if len(reg_no) < 3:
+            return jsonify({"error": "Invalid Roll/Registration Number. Must be at least 3 characters."}), 400
+
         submission_id = data.get("submissionId") or f"HM26-{random.randint(100000, 999999)}"
 
         registration_doc = {
@@ -289,7 +305,7 @@ def register_event():
 
         if db is not None:
             # Duplicate check 1: Personal Email or College Email for SAME event
-            existing_event = db.registrations.find_one({
+            existing_email = db.registrations.find_one({
                 "selectedEvent": selected_event,
                 "$or": [
                     {"emailId": personal_email},
@@ -299,12 +315,12 @@ def register_event():
                 ]
             })
 
-            if existing_event:
+            if existing_email:
                 return jsonify({
-                    "error": f"DUPLICATE REGISTRATION: Email ({personal_email}) is already registered for '{selected_event}' (Submission ID: {existing_event.get('submissionId')})."
+                    "error": f"DUPLICATE REGISTRATION: Email ({personal_email}) is already registered for '{selected_event}' (Submission ID: {existing_email.get('submissionId')})."
                 }), 409
 
-            # Duplicate check 2: Phone number for same event
+            # Duplicate check 2: Phone number for SAME event
             existing_phone = db.registrations.find_one({
                 "selectedEvent": selected_event,
                 "phoneNumber": phone_number
@@ -314,12 +330,31 @@ def register_event():
                     "error": f"DUPLICATE REGISTRATION: Phone Number ({phone_number}) is already registered for '{selected_event}'."
                 }), 409
 
+            # Duplicate check 3: Roll Number (regNo) for SAME event
+            existing_regno = db.registrations.find_one({
+                "selectedEvent": selected_event,
+                "regNo": reg_no
+            })
+            if existing_regno:
+                return jsonify({
+                    "error": f"DUPLICATE REGISTRATION: Roll / Reg No ({reg_no}) is already registered for '{selected_event}'."
+                }), 409
+
             # Insert registration document into MongoDB Atlas
             db.registrations.insert_one(registration_doc)
             print(f"📥 [MongoDB Atlas] New Registration Saved! Name: {name} | Email: {personal_email} | Event: {selected_event} | ID: {submission_id}")
             registration_doc.pop("_id", None)
         else:
             # Save to Local Fallback Store
+            for r in LOCAL_REGISTRATIONS:
+                if r.get("selectedEvent") == selected_event:
+                    if r.get("emailId") == personal_email or r.get("collegeEmailId") == personal_email:
+                        return jsonify({"error": f"DUPLICATE REGISTRATION: Email ({personal_email}) is already registered."}), 409
+                    if r.get("phoneNumber") == phone_number:
+                        return jsonify({"error": f"DUPLICATE REGISTRATION: Phone ({phone_number}) is already registered."}), 409
+                    if r.get("regNo") == reg_no:
+                        return jsonify({"error": f"DUPLICATE REGISTRATION: Roll No ({reg_no}) is already registered."}), 409
+
             LOCAL_REGISTRATIONS.append(registration_doc)
             print(f"📥 [Local Store] New Registration Saved! Name: {name} | Email: {personal_email} | Event: {selected_event} | ID: {submission_id}")
 
@@ -340,10 +375,12 @@ def check_registrations():
     try:
         email = request.args.get("emailId") or request.args.get("email") or ""
         phone = request.args.get("phoneNumber") or request.args.get("phone") or ""
+        reg_no = request.args.get("regNo") or ""
         event = request.args.get("selectedEvent") or ""
 
         email = email.strip().lower()
         phone = phone.strip()
+        reg_no = reg_no.strip()
         event = event.strip()
 
         if db is not None:
@@ -359,6 +396,11 @@ def check_registrations():
                 match = db.registrations.find_one({"selectedEvent": event, "phoneNumber": phone}, {"_id": 0})
                 if match:
                     return jsonify({"isDuplicate": True, "message": f"Phone Number ({phone}) is already registered for '{event}'."})
+
+            if reg_no and event:
+                match = db.registrations.find_one({"selectedEvent": event, "regNo": reg_no}, {"_id": 0})
+                if match:
+                    return jsonify({"isDuplicate": True, "message": f"Roll No ({reg_no}) is already registered for '{event}'."})
         else:
             for r in LOCAL_REGISTRATIONS:
                 if event and r.get("selectedEvent") == event:
@@ -366,6 +408,8 @@ def check_registrations():
                         return jsonify({"isDuplicate": True, "message": f"Email ({email}) is already registered for '{event}'."})
                     if phone and r.get("phoneNumber") == phone:
                         return jsonify({"isDuplicate": True, "message": f"Phone Number ({phone}) is already registered for '{event}'."})
+                    if reg_no and r.get("regNo") == reg_no:
+                        return jsonify({"isDuplicate": True, "message": f"Roll No ({reg_no}) is already registered for '{event}'."})
 
         return jsonify({"isDuplicate": False}), 200
 
@@ -654,5 +698,5 @@ def get_all_notices():
 
 
 if __name__ == "__main__":
-    print(f"🚀 Starting HiveMind 2026 MongoDB REST API on http://localhost:{PORT}")
+    print(f"🚀 Starting HiveMind 2026 REST API on http://localhost:{PORT}")
     app.run(host="0.0.0.0", port=PORT, debug=True)
