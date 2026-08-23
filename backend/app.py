@@ -22,6 +22,8 @@ ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://hivemind-2026.vercel.app",
     "https://hivemind2026.vercel.app",
+    "https://hivemind-ssdc.vercel.app",
+    "*",
 ]
 CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS}})
 
