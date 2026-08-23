@@ -112,8 +112,8 @@ export const Login: React.FC = () => {
           <button
             onClick={() => { setActiveTab('participant'); setErrorMessage(null); }}
             className={`flex-1 py-3 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all clip-chamfer ${activeTab === 'participant'
-                ? 'bg-cyber-cyan text-cyber-black shadow-[0_0_15px_rgba(0,207,255,0.4)]'
-                : 'text-cyber-muted hover:text-cyber-white'
+              ? 'bg-cyber-cyan text-cyber-black shadow-[0_0_15px_rgba(0,207,255,0.4)]'
+              : 'text-cyber-muted hover:text-cyber-white'
               }`}
           >
             <User className="w-4 h-4" />
@@ -123,8 +123,8 @@ export const Login: React.FC = () => {
           <button
             onClick={() => { setActiveTab('admin'); setErrorMessage(null); }}
             className={`flex-1 py-3 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all clip-chamfer ${activeTab === 'admin'
-                ? 'bg-cyber-cyan text-cyber-black shadow-[0_0_15px_rgba(0,207,255,0.4)]'
-                : 'text-cyber-muted hover:text-cyber-white'
+              ? 'bg-cyber-cyan text-cyber-black shadow-[0_0_15px_rgba(0,207,255,0.4)]'
+              : 'text-cyber-muted hover:text-cyber-white'
               }`}
           >
             <Shield className="w-4 h-4" />
@@ -151,13 +151,13 @@ export const Login: React.FC = () => {
               <div>
                 <label className="block font-mono text-xs font-bold text-cyber-cyan uppercase mb-2 flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  <span>REGISTERED EMAIL ID OR ROLL NO <span className="text-cyber-pink">*</span></span>
+                  <span>REGISTERED EMAIL ID OR PHONE NO <span className="text-cyber-pink">*</span></span>
                 </label>
                 <input
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter Email (name@gmail.com) or Roll No (24103001)"
+                  placeholder="name@gmail.com or 9876543210"
                   required
                   className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none"
                 />
@@ -166,13 +166,14 @@ export const Login: React.FC = () => {
               <div>
                 <label className="block font-mono text-xs font-bold text-cyber-cyan uppercase mb-2 flex items-center gap-2">
                   <KeyRound className="w-4 h-4" />
-                  <span>SUBMISSION ID (OPTIONAL)</span>
+                  <span>SUBMISSION ID OR ROLL NO <span className="text-cyber-pink">*</span></span>
                 </label>
                 <input
                   type="text"
                   value={submissionKey}
                   onChange={(e) => setSubmissionKey(e.target.value)}
-                  placeholder="e.g. HM26-805458"
+                  placeholder="e.g. HM26-805458 or 24103001"
+                  required
                   className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none"
                 />
               </div>

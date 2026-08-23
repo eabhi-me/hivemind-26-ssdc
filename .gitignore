@@ -50,3 +50,4 @@ backend/import_events.py
 backend/init_db.py
 backend/refactor.py
 backend/events_data.json
+docs/*

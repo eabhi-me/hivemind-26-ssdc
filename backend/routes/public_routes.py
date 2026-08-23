@@ -132,6 +132,36 @@ def register_event():
         batch_year = (data.get("batchYear") or "").strip()
         selected_event = (data.get("selectedEvent") or "EVENT_01 — Web Craft").strip()
 
+        # Check if the requested event is open for registration
+        target_ev = None
+        if db is not None:
+            for ev in db.events.find({}):
+                if (selected_event.lower() == ev.get("id", "").lower() or 
+                    selected_event.lower() == ev.get("title", "").lower() or 
+                    ev.get("title", "").lower() in selected_event.lower() or
+                    ev.get("id", "").lower() in selected_event.lower()):
+                    target_ev = ev
+                    break
+                    
+        if not target_ev:
+            for ev in LOCAL_EVENTS:
+                if (selected_event.lower() == ev.get("id", "").lower() or 
+                    selected_event.lower() == ev.get("title", "").lower() or 
+                    ev.get("title", "").lower() in selected_event.lower() or
+                    ev.get("id", "").lower() in selected_event.lower()):
+                    target_ev = ev
+                    break
+                    
+        if target_ev:
+            now = datetime.datetime.now(datetime.timezone.utc)
+            end_dt = _parse_iso(target_ev.get("isoEndDate", ""))
+            is_open = target_ev.get("registrationOpen", False) and target_ev.get("isOnline", False)
+            if end_dt and now > end_dt:
+                is_open = False
+            
+            if not is_open:
+                return jsonify({"error": f"Registration is currently closed for '{selected_event}'."}), 403
+
         if not name or not personal_email or not phone_number or not reg_no:
             return jsonify({"error": "Required fields missing: Full Name, Email, Roll No, Phone Number"}), 400
 

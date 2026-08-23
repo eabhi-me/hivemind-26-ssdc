@@ -36,6 +36,10 @@ def init_database():
         print("✅ Database Indexes Initialized.")
 
         # 2. Upsert Admin User in MongoDB Atlas from .env
+        # First drop existing to ensure no old credentials remain
+        db.admin_users.drop()
+        db.admin_users.create_index([("username", 1)], unique=True)
+        
         admin_doc = {
             "username": ADMIN_USERNAME.lower(),
             "password": ADMIN_PASSWORD,

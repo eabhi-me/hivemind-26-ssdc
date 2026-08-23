@@ -14,48 +14,42 @@ def _safe_regex(user_input):
     return re.escape(user_input)
 
 
-# 1. Participant Login Endpoint (Email + Submission ID or Roll No)
+# 1. Participant Login Endpoint (Email/Phone + Submission ID/Roll No)
 @auth_bp.route("/api/auth/login", methods=["POST"])
 def participant_login():
     try:
         data = request.get_json() or {}
-        input_val = (data.get("email") or data.get("emailId") or data.get("submissionId") or "").strip()
+        input_val = (data.get("email") or data.get("emailId") or "").strip()
         key = (data.get("submissionId") or data.get("regNo") or "").strip()
 
-        if not input_val and not key:
-            return jsonify({"error": "Please enter your registered Email ID, Submission ID, or Roll Number"}), 400
+        if not input_val or not key:
+            return jsonify({"error": "Please provide both Email/Phone AND Submission ID/Roll No."}), 400
 
         regs = []
 
         if db is not None:
             user_doc = None
             
-            # Check if login is via submissionId in registrations
             safe_input = _safe_regex(input_val)
-            reg = db.registrations.find_one({"submissionId": {"$regex": f"^{safe_input}$", "$options": "i"}})
-            if reg and "userId" in reg:
-                user_doc = db.users.find_one({"_id": reg["userId"]})
-            elif key:
-                safe_key = _safe_regex(key)
-                reg_key = db.registrations.find_one({"submissionId": {"$regex": f"^{safe_key}$", "$options": "i"}})
-                if reg_key and "userId" in reg_key:
-                    user_doc = db.users.find_one({"_id": reg_key["userId"]})
+            input_rx = {"$regex": f"^{safe_input}$", "$options": "i"}
+            safe_key = _safe_regex(key)
+            key_rx = {"$regex": f"^{safe_key}$", "$options": "i"}
 
-            # If not found by submissionId, search users by email, regNo, phone
+            # First, check if key is a submissionId
+            reg = db.registrations.find_one({"submissionId": key_rx})
+            if reg and "userId" in reg:
+                # verify user matches input_val (email/phone)
+                user_doc = db.users.find_one({
+                    "_id": reg["userId"],
+                    "$or": [{"emailId": input_rx}, {"collegeEmailId": input_rx}, {"phoneNumber": input_rx}]
+                })
+            
+            # If not found via submissionId, try key as regNo
             if not user_doc:
-                search_terms = [t for t in [input_val, key] if t]
-                or_conditions = []
-                for term in search_terms:
-                    safe_term = _safe_regex(term)
-                    rx = {"$regex": f"^{safe_term}$", "$options": "i"}
-                    or_conditions.extend([
-                        {"emailId": rx},
-                        {"collegeEmailId": rx},
-                        {"regNo": rx},
-                        {"phoneNumber": rx}
-                    ])
-                if or_conditions:
-                    user_doc = db.users.find_one({"$or": or_conditions})
+                user_doc = db.users.find_one({
+                    "regNo": key_rx,
+                    "$or": [{"emailId": input_rx}, {"collegeEmailId": input_rx}, {"phoneNumber": input_rx}]
+                })
 
             if user_doc:
                 user_regs = list(db.registrations.find({"userId": user_doc["_id"]}, {"_id": 0}))
@@ -72,24 +66,31 @@ def participant_login():
             search_low = input_val.lower()
             key_low = key.lower()
             
-            # Find in local users
             local_user = None
+            # Find user by email/phone AND regNo
             for u in LOCAL_USERS:
                 em = u.get("emailId", "").lower()
                 cem = u.get("collegeEmailId", "").lower()
-                rg = u.get("regNo", "").lower()
                 ph = u.get("phoneNumber", "").lower()
+                rg = u.get("regNo", "").lower()
                 
-                if search_low in (em, cem, rg, ph) or (key_low and key_low == rg):
+                if (search_low in (em, cem, ph)) and (key_low == rg):
                     local_user = u
                     break
             
-            # Find by submissionId in local registrations
+            # Find by email/phone AND submissionId
             if not local_user:
                 for r in LOCAL_REGISTRATIONS:
-                    if r.get("submissionId", "").lower() in (search_low, key_low):
+                    if r.get("submissionId", "").lower() == key_low:
                         user_id = r.get("userId")
-                        local_user = next((u for u in LOCAL_USERS if u.get("id") == user_id), None)
+                        # verify user matches email/phone
+                        u = next((usr for usr in LOCAL_USERS if usr.get("id") == user_id), None)
+                        if u:
+                            em = u.get("emailId", "").lower()
+                            cem = u.get("collegeEmailId", "").lower()
+                            ph = u.get("phoneNumber", "").lower()
+                            if search_low in (em, cem, ph):
+                                local_user = u
                         break
 
             if local_user:
