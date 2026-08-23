@@ -3,16 +3,35 @@ import { SectionHeader } from '../components/SectionHeader';
 import { EventCard } from '../components/EventCard';
 import { OFFICIAL_EVENTS } from '../data/events';
 import { SectionDivider } from '../components/SectionDivider';
+import { apiService } from '../services/api';
 
 export const Events: React.FC = () => {
   const [filter, setFilter] = useState<'ALL' | 'UPCOMING' | 'ACTIVE'>('ALL');
+  const [events, setEvents] = useState<any[]>(() => {
+    const cached = localStorage.getItem('hivemind_events');
+    return cached ? JSON.parse(cached) : OFFICIAL_EVENTS;
+  });
 
   useEffect(() => {
     document.title = 'Events Arena | HiveMind 2026';
     window.scrollTo(0, 0);
+
+    const loadEvents = async () => {
+      try {
+        const response = await apiService.getEvents();
+        const liveEvents = response.events;
+        if (liveEvents && liveEvents.length > 0) {
+          setEvents(liveEvents);
+          localStorage.setItem('hivemind_events', JSON.stringify(liveEvents));
+        }
+      } catch (err) {
+        console.error('Failed to load live events:', err);
+      }
+    };
+    loadEvents();
   }, []);
 
-  const filteredEvents = OFFICIAL_EVENTS.filter((event) => {
+  const filteredEvents = events.filter((event) => {
     if (filter === 'ALL') return true;
     return event.status === filter;
   });
@@ -39,7 +58,7 @@ export const Events: React.FC = () => {
                     : 'text-cyber-muted hover:text-cyber-white'
                 }`}
               >
-                {mode} [{OFFICIAL_EVENTS.filter((e) => mode === 'ALL' || e.status === mode).length}]
+                {mode} [{events.filter((e) => mode === 'ALL' || e.status === mode).length}]
               </button>
             ))}
           </div>

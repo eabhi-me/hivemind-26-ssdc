@@ -312,7 +312,7 @@ export const Admin: React.FC = () => {
   };
 
   return (
-    <div className="pt-28 pb-20 relative z-10 min-h-screen">
+    <div className="pt-28 pb-40 relative z-10 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Bar */}

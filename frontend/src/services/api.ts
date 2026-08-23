@@ -91,6 +91,8 @@ class ApiService {
     return data;
   }
 
+
+
   // 1. Participant Login (Queries HiveMind Cloud Core & returns user + all registered events)
   async participantLogin(email: string, key?: string) {
     try {
