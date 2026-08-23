@@ -154,17 +154,6 @@ export const Dashboard: React.FC = () => {
       isExternal: true,
       badgeColor: 'bg-cyber-cyan text-cyber-black',
     },
-    {
-      step: '02',
-      title: 'PROBLEM STATEMENT & RULEBOOK RELEASE',
-      date: 'OCTOBER 10, 2026',
-      status: 'LIVE NOW',
-      description: 'Review official challenge specifications, evaluation rubrics, and codebase starter templates for your registered events.',
-      actionText: 'EXPLORE CHALLENGES & RULES',
-      actionUrl: '/events',
-      isExternal: false,
-      badgeColor: 'bg-cyber-yellow text-cyber-black',
-    },
   ];
 
   return (

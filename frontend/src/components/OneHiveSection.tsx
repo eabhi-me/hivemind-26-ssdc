@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { SectionHeader } from './SectionHeader';
-import { Hexagon } from './Hexagon';
 import { Palette, Code2, ShieldAlert, Cpu, Sparkles } from 'lucide-react';
 
 export const OneHiveSection: React.FC = () => {
