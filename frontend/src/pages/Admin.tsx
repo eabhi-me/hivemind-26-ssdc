@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { apiService, RegistrationRecord, NoticeRecord, UserRecord } from '../services/api';
-import { OFFICIAL_EVENTS } from '../data/events';
+import { useEvents } from '../context/EventsContext';
 import { SectionHeader } from '../components/SectionHeader';
 import { SectionDivider } from '../components/SectionDivider';
 import {
@@ -45,7 +45,8 @@ export const Admin: React.FC = () => {
 
   // Results Publishing Form State
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
-  const [publishEventId, setPublishEventId] = useState<string>(OFFICIAL_EVENTS[0].id);
+  const { events } = useEvents();
+  const [publishEventId, setPublishEventId] = useState<string>(events[0]?.id || '');
   const [winner1st, setWinner1st] = useState<string>('');
   const [winner2nd, setWinner2nd] = useState<string>('');
   const [winner3rd, setWinner3rd] = useState<string>('');
@@ -65,7 +66,7 @@ export const Admin: React.FC = () => {
   const [activeNotices, setActiveNotices] = useState<NoticeRecord[]>([]);
 
   // Managed Events State
-  const [managedEvents, setManagedEvents] = useState<any[]>(OFFICIAL_EVENTS);
+  const [managedEvents, setManagedEvents] = useState<any[]>(events);
   const [editingEvent, setEditingEvent] = useState<any | null>(null);
   const [isSavingEvent, setIsSavingEvent] = useState<boolean>(false);
   const [eventSaveSuccess, setEventSaveSuccess] = useState<string | null>(null);
@@ -283,7 +284,7 @@ export const Admin: React.FC = () => {
     setIsPublishing(true);
     setPublishSuccess(null);
 
-    const eventObj = OFFICIAL_EVENTS.find((ev) => ev.id === publishEventId);
+    const eventObj = events.find((ev) => ev.id === publishEventId);
 
     try {
       const res = await apiService.publishEventResults({
@@ -413,7 +414,7 @@ export const Admin: React.FC = () => {
             >
               <option value="ALL">ALL EVENTS / ALL REGISTRATIONS ({registrations.length})</option>
               <option value="General Pass">ALL EVENTS / GENERAL FESTIVAL PASS</option>
-              {OFFICIAL_EVENTS.map((ev) => (
+              {events.map((ev) => (
                 <option key={ev.id} value={ev.title}>
                   {ev.number} — {ev.title}
                 </option>
@@ -643,7 +644,7 @@ export const Admin: React.FC = () => {
                     onChange={(e) => setPublishEventId(e.target.value)}
                     className="w-full bg-cyber-black border border-cyber-yellow/40 text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-yellow focus:outline-none"
                   >
-                    {OFFICIAL_EVENTS.map((ev) => (
+                    {events.map((ev) => (
                       <option key={ev.id} value={ev.id}>
                         {ev.number} — {ev.title} ({ev.tagline})
                       </option>
@@ -798,7 +799,7 @@ export const Admin: React.FC = () => {
                       className="w-full bg-cyber-black border border-cyber-pink/40 text-cyber-white p-3 clip-chamfer font-mono text-xs focus:border-cyber-pink focus:outline-none"
                     >
                       <option value="ALL EVENTS">ALL EVENTS</option>
-                      {OFFICIAL_EVENTS.map((ev) => (
+                      {events.map((ev) => (
                         <option key={ev.id} value={`${ev.number} — ${ev.title}`}>
                           {ev.title}
                         </option>

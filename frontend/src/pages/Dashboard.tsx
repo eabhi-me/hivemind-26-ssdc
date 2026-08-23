@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { apiService, EventResultRecord, NoticeRecord } from '../services/api';
-import { OFFICIAL_EVENTS } from '../data/events';
+import { useEvents } from '../context/EventsContext';
 import { SectionHeader } from '../components/SectionHeader';
 import { SectionDivider } from '../components/SectionDivider';
 import {
@@ -26,14 +26,15 @@ import {
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, registeredEvents, logout, refreshUserRegistrations } = useAuth();
+  const { events } = useEvents();
   const [publishedResults, setPublishedResults] = useState<EventResultRecord[]>([]);
   const [activeNotices, setActiveNotices] = useState<NoticeRecord[]>([]);
-  const [liveEvents, setLiveEvents] = useState<any[]>(OFFICIAL_EVENTS);
+  const [liveEvents, setLiveEvents] = useState<any[]>(events);
 
   // Quick Event Registration Modal State
   const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
   const [selectedEventToRegister, setSelectedEventToRegister] = useState<string>(
-    `${OFFICIAL_EVENTS[0].number} — ${OFFICIAL_EVENTS[0].title}`
+    `${events[0].number} — ${events[0].title}`
   );
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
@@ -349,7 +350,7 @@ export const Dashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
             <h3 className="font-display text-2xl font-bold italic uppercase tracking-wider text-cyber-white flex items-center gap-2">
               <Zap className="w-6 h-6 text-cyber-cyan" />
-              <span>AVAILABLE FESTIVAL CHALLENGES ({OFFICIAL_EVENTS.length})</span>
+              <span>AVAILABLE FESTIVAL CHALLENGES ({liveEvents.length})</span>
             </h3>
             <span className="font-mono text-xs text-cyber-cyan font-bold tracking-wider uppercase">
               // REGISTER ONE-BY-ONE FOR INDIVIDUAL EVENTS
@@ -616,7 +617,7 @@ export const Dashboard: React.FC = () => {
                     onChange={(e) => setSelectedEventToRegister(e.target.value)}
                     className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none"
                   >
-                    {OFFICIAL_EVENTS.map((ev) => (
+                    {liveEvents.map((ev) => (
                       <option key={ev.id} value={`${ev.number} — ${ev.title}`}>
                         {ev.number} — {ev.title} ({ev.tagline})
                       </option>

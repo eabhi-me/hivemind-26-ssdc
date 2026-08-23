@@ -67,6 +67,14 @@ export interface NoticeRecord {
 class ApiService {
   private baseUrl = SITE_CONFIG.flaskBackendUrl;
 
+  private adminHeaders(): Record<string, string> {
+    const token = localStorage.getItem('hivemind_jwt_token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  }
+
   // Track Page Visit & Render Keep-Alive
   async recordPageVisit() {
     try {
@@ -173,7 +181,8 @@ class ApiService {
   // 5. Admin: Get Filtered Registrations List from Cloud Vault
   async getAdminRegistrations(eventFilter: string = '', searchQuery: string = ''): Promise<{ count: number; registrations: RegistrationRecord[] }> {
     const response = await fetch(
-      `${this.baseUrl}/api/admin/registrations?event=${encodeURIComponent(eventFilter)}&search=${encodeURIComponent(searchQuery)}`
+      `${this.baseUrl}/api/admin/registrations?event=${encodeURIComponent(eventFilter)}&search=${encodeURIComponent(searchQuery)}`,
+      { headers: this.adminHeaders() }
     );
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Failed to fetch admin registrations');
@@ -183,7 +192,8 @@ class ApiService {
   // 5a. Admin: Get Users List from Cloud Vault
   async getAdminUsers(searchQuery: string = ''): Promise<{ count: number; users: UserRecord[] }> {
     const response = await fetch(
-      `${this.baseUrl}/api/admin/users?search=${encodeURIComponent(searchQuery)}`
+      `${this.baseUrl}/api/admin/users?search=${encodeURIComponent(searchQuery)}`,
+      { headers: this.adminHeaders() }
     );
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Failed to fetch admin users');
@@ -194,6 +204,7 @@ class ApiService {
   async deleteAdminRegistration(submissionId: string) {
     const response = await fetch(`${this.baseUrl}/api/admin/registrations/${encodeURIComponent(submissionId)}`, {
       method: 'DELETE',
+      headers: this.adminHeaders(),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Failed to delete registration');
@@ -204,7 +215,7 @@ class ApiService {
   async updateAdminRegistrationStatus(submissionId: string, status: string) {
     const response = await fetch(`${this.baseUrl}/api/admin/registrations/${encodeURIComponent(submissionId)}/status`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.adminHeaders(),
       body: JSON.stringify({ status }),
     });
     const data = await response.json();
@@ -222,11 +233,11 @@ class ApiService {
     }
   }
 
-  // 5e. Admin: Create or Update Event Details & Schedule
+  // 5e. Admin: Save / Update Event Details & Schedule
   async saveAdminEvent(eventId: string, payload: any) {
     const response = await fetch(`${this.baseUrl}/api/admin/events/${encodeURIComponent(eventId)}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.adminHeaders(),
       body: JSON.stringify(payload),
     });
     const data = await response.json();
@@ -247,7 +258,7 @@ class ApiService {
   async publishEventResults(payload: Partial<EventResultRecord>) {
     const response = await fetch(`${this.baseUrl}/api/admin/results`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.adminHeaders(),
       body: JSON.stringify(payload),
     });
     const data = await response.json();
@@ -269,7 +280,7 @@ class ApiService {
   async publishNotice(payload: Partial<NoticeRecord>) {
     const response = await fetch(`${this.baseUrl}/api/admin/notices`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.adminHeaders(),
       body: JSON.stringify(payload),
     });
     const data = await response.json();
@@ -281,6 +292,7 @@ class ApiService {
   async deleteNotice(noticeId: string) {
     const response = await fetch(`${this.baseUrl}/api/admin/notices/${encodeURIComponent(noticeId)}`, {
       method: 'DELETE',
+      headers: this.adminHeaders(),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Failed to delete notice');

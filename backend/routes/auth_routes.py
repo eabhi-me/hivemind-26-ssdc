@@ -1,15 +1,18 @@
 import datetime
-import random
 import re
-import csv
-import io
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify
 import jwt
 
-from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, LOCAL_RESULTS, LOCAL_NOTICES, LOCAL_EVENTS, ADMIN_USERNAME, ADMIN_PASSWORD, mongo_error_msg
-from auth import token_required, JWT_SECRET
+from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, ADMIN_USERNAME, ADMIN_PASSWORD
+from auth import JWT_SECRET
 
 auth_bp = Blueprint('auth', __name__)
+
+
+def _safe_regex(user_input):
+    """Escape user input for safe use in MongoDB $regex queries."""
+    return re.escape(user_input)
+
 
 # 1. Participant Login Endpoint (Email + Submission ID or Roll No)
 @auth_bp.route("/api/auth/login", methods=["POST"])
@@ -28,11 +31,13 @@ def participant_login():
             user_doc = None
             
             # Check if login is via submissionId in registrations
-            reg = db.registrations.find_one({"submissionId": {"$regex": f"^{input_val}$", "$options": "i"}})
+            safe_input = _safe_regex(input_val)
+            reg = db.registrations.find_one({"submissionId": {"$regex": f"^{safe_input}$", "$options": "i"}})
             if reg and "userId" in reg:
                 user_doc = db.users.find_one({"_id": reg["userId"]})
             elif key:
-                reg_key = db.registrations.find_one({"submissionId": {"$regex": f"^{key}$", "$options": "i"}})
+                safe_key = _safe_regex(key)
+                reg_key = db.registrations.find_one({"submissionId": {"$regex": f"^{safe_key}$", "$options": "i"}})
                 if reg_key and "userId" in reg_key:
                     user_doc = db.users.find_one({"_id": reg_key["userId"]})
 
@@ -41,7 +46,8 @@ def participant_login():
                 search_terms = [t for t in [input_val, key] if t]
                 or_conditions = []
                 for term in search_terms:
-                    rx = {"$regex": f"^{term}$", "$options": "i"}
+                    safe_term = _safe_regex(term)
+                    rx = {"$regex": f"^{safe_term}$", "$options": "i"}
                     or_conditions.extend([
                         {"emailId": rx},
                         {"collegeEmailId": rx},
@@ -105,7 +111,7 @@ def participant_login():
         participant_name = regs[0].get("name", "Participant")
 
         # Create JWT token
-        expiration = datetime.datetime.utcnow() + datetime.timedelta(days=30)
+        expiration = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=30)
         token = jwt.encode({
             "email": participant_email,
             "name": participant_name,
@@ -125,7 +131,8 @@ def participant_login():
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ participant_login error: {err}")
+        return jsonify({"error": "Login failed. Please try again."}), 500
 
 
 # 2. Admin Login Endpoint (Queries MongoDB Atlas `admin_users` Collection)
@@ -151,7 +158,7 @@ def admin_login():
             is_valid = True
 
         if is_valid:
-            expiration = datetime.datetime.utcnow() + datetime.timedelta(days=7)
+            expiration = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
             token = jwt.encode({
                 "username": username,
                 "role": "admin",
@@ -168,6 +175,5 @@ def admin_login():
             return jsonify({"error": "Invalid Admin Username or Password"}), 401
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
-
-
+        print(f"❌ admin_login error: {err}")
+        return jsonify({"error": "Admin login failed."}), 500

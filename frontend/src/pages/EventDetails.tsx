@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { OFFICIAL_EVENTS } from '../data/events';
 import { ArrowLeft, Calendar, Clock, Trophy, ExternalLink, ShieldCheck, Award } from 'lucide-react';
 import { SectionDivider } from '../components/SectionDivider';
 import { useAuth } from '../context/AuthContext';
-import { apiService } from '../services/api';
+import { useEvents } from '../context/EventsContext';
 
 export const EventDetails: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
-  const [events, setEvents] = useState<any[]>(() => {
-    const cached = localStorage.getItem('hivemind_events');
-    return cached ? JSON.parse(cached) : OFFICIAL_EVENTS;
-  });
+  const { events } = useEvents();
 
   const isLoggedIn = Boolean(user || localStorage.getItem('hivemind_jwt_token'));
   
@@ -39,21 +34,7 @@ export const EventDetails: React.FC = () => {
     window.scrollTo(0, 0);
   }, [event]);
 
-  useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        const response = await apiService.getEvents();
-        const liveEvents = response.events;
-        if (liveEvents && liveEvents.length > 0) {
-          setEvents(liveEvents);
-          localStorage.setItem('hivemind_events', JSON.stringify(liveEvents));
-        }
-      } catch (err) {
-        console.error('Failed to load live events:', err);
-      }
-    };
-    loadEvents();
-  }, []);
+
 
   if (!event) {
     return (
@@ -183,7 +164,7 @@ export const EventDetails: React.FC = () => {
           </h3>
 
           <div className="bg-cyber-charcoal border border-cyber-cyan/30 p-6 md:p-8 clip-chamfer space-y-4">
-            {event.rules.map((rule: string, idx: number) => (
+            {(event.rules || []).map((rule: string, idx: number) => (
               <div key={idx} className="flex items-start gap-4 p-3 bg-cyber-black/60 border border-cyber-cyan/15 clip-chamfer">
                 <span className="font-mono text-sm font-bold text-cyber-cyan shrink-0">
                   0{idx + 1}

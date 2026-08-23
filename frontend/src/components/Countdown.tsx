@@ -2,7 +2,7 @@ import React from 'react';
 import { useCountdown } from '../hooks/useCountdown';
 import { padZero } from '../utils/formatDate';
 import { Clock, Zap } from 'lucide-react';
-import { OFFICIAL_EVENTS } from '../data/events';
+import { useEvents } from '../context/EventsContext';
 import { Link } from 'react-router-dom';
 
 interface CountdownProps {
@@ -15,7 +15,8 @@ export const Countdown: React.FC<CountdownProps> = ({
   title = 'THE HIVE OPENS IN',
 }) => {
   const { days, hours, minutes, seconds, isExpired } = useCountdown(targetDate);
-  const activeEvent = OFFICIAL_EVENTS[0]; // First active event
+  const { events } = useEvents();
+  const activeEvent = events[0]; // First active event
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 my-8 relative z-20">

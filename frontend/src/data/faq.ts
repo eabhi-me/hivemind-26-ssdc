@@ -23,7 +23,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'team-or-individual',
     question: 'Are events individual or team-based?',
     answer:
-      'Event formats vary: Bad UI, Reverse AI, Mind Over Majority, and Algo-Arena are individual contests. Pseudo-Breach CTF allows solo or small teams (up to 2 participants). Check individual event rules for details.',
+      'Event formats vary: Bad UI, Reverse AI, Mind Over Majority, and Algo-Arena are individual contests. Check individual event rules for details.',
   },
   {
     id: 'where-registrations',

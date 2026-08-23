@@ -1,14 +1,29 @@
 import datetime
-import random
 import re
-import csv
-import io
-from flask import Blueprint, request, jsonify, Response
+import random
+from flask import Blueprint, request, jsonify
 
-from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, LOCAL_RESULTS, LOCAL_NOTICES, LOCAL_EVENTS, ADMIN_USERNAME, ADMIN_PASSWORD, mongo_error_msg
-from auth import token_required, JWT_SECRET
+from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, LOCAL_RESULTS, LOCAL_NOTICES, LOCAL_EVENTS
 
 public_bp = Blueprint('public', __name__)
+
+
+def _safe_regex(user_input):
+    """Escape user input for safe use in MongoDB $regex queries."""
+    return re.escape(user_input)
+
+
+def _parse_iso(iso_str):
+    """Safely parse an ISO date string to a datetime object, or return None."""
+    if not iso_str:
+        return None
+    try:
+        # Handle both Z suffix and +00:00
+        cleaned = iso_str.replace("Z", "+00:00")
+        return datetime.datetime.fromisoformat(cleaned)
+    except (ValueError, TypeError):
+        return None
+
 
 # Root Healthcheck Endpoint for Render Scanner & Uptime Monitoring
 @public_bp.route("/", methods=["GET", "HEAD"])
@@ -19,7 +34,7 @@ def root_check():
         "service": "HiveMind 2026 REST API",
         "database_status": db_status,
         "database": db.name if db is not None else "local_fallback",
-        "timestamp": datetime.datetime.utcnow().isoformat()
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }), 200
 
 
@@ -32,9 +47,8 @@ def health_check():
         "service": "HiveMind 2026 REST API",
         "database_status": db_status,
         "database": db.name if db is not None else "local_fallback",
-        "db_error": mongo_error_msg,
         "registrationsCount": db.registrations.count_documents({}) if db is not None else len(LOCAL_REGISTRATIONS),
-        "timestamp": datetime.datetime.utcnow().isoformat()
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }), 200
 
 
@@ -53,7 +67,52 @@ def record_visit():
             count = result.get("count", 0) if result else 0
         return jsonify({"success": True, "visits": count}), 200
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ record_visit error: {err}")
+        return jsonify({"error": "Failed to record visit."}), 500
+
+
+# 5d. Public & Participant: Get All Events with Dynamic Online / Offline Schedule Check
+@public_bp.route("/api/events", methods=["GET"])
+def get_events():
+    try:
+        events = []
+        if db is not None:
+            cursor = db.events.find({}, {"_id": 0})
+            events = list(cursor)
+            if not events:
+                events = list(LOCAL_EVENTS)
+        else:
+            events = list(LOCAL_EVENTS)
+
+        now = datetime.datetime.now(datetime.timezone.utc)
+
+        for ev in events:
+            start_dt = _parse_iso(ev.get("isoStartDate", ""))
+            end_dt = _parse_iso(ev.get("isoEndDate", ""))
+
+            if start_dt and end_dt:
+                if now < start_dt:
+                    ev["scheduleStatus"] = "SCHEDULED_UPCOMING"
+                elif now > end_dt:
+                    ev["scheduleStatus"] = "SCHEDULED_CLOSED"
+                    ev["registrationOpen"] = False
+                    ev["isOnline"] = False
+                else:
+                    ev["scheduleStatus"] = "SCHEDULED_LIVE"
+
+            if ev.get("registrationOpen") and ev.get("isOnline"):
+                ev["liveStatus"] = "ONLINE"
+            else:
+                ev["liveStatus"] = "OFFLINE"
+
+        return jsonify({
+            "count": len(events),
+            "events": events
+        }), 200
+
+    except Exception as err:
+        print(f"❌ get_events error: {err}")
+        return jsonify({"error": "Failed to fetch events."}), 500
 
 
 # 3. Direct Event Registration Endpoint (Saves to MongoDB Atlas & Local Store)
@@ -106,7 +165,7 @@ def register_event():
             "batchYear": batch_year,
             "selectedEvent": selected_event,
             "status": "CONFIRMED",
-            "registeredAt": datetime.datetime.utcnow().isoformat()
+            "registeredAt": datetime.datetime.now(datetime.timezone.utc).isoformat()
         }
 
         if db is not None:
@@ -131,7 +190,7 @@ def register_event():
                 db.users.update_one({"_id": existing_user["_id"]}, {"$set": user_payload})
                 user_id = existing_user["_id"]
             else:
-                user_payload["createdAt"] = datetime.datetime.utcnow().isoformat()
+                user_payload["createdAt"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
                 result = db.users.insert_one(user_payload)
                 user_id = result.inserted_id
 
@@ -152,7 +211,7 @@ def register_event():
                 "selectedEvent": selected_event,
                 "submissionId": submission_id,
                 "status": "CONFIRMED",
-                "registeredAt": datetime.datetime.utcnow().isoformat()
+                "registeredAt": datetime.datetime.now(datetime.timezone.utc).isoformat()
             }
             db.registrations.insert_one(registration_doc)
             print(f"📥 [MongoDB Atlas] New Registration Saved! Name: {name} | Email: {personal_email} | Event: {selected_event} | ID: {submission_id}")
@@ -197,7 +256,7 @@ def register_event():
                 "selectedEvent": selected_event,
                 "submissionId": submission_id,
                 "status": "CONFIRMED",
-                "registeredAt": datetime.datetime.utcnow().isoformat()
+                "registeredAt": datetime.datetime.now(datetime.timezone.utc).isoformat()
             }
             LOCAL_REGISTRATIONS.append(registration_doc)
             print(f"📥 [Local Store] New Registration Saved! Name: {name} | Email: {personal_email} | Event: {selected_event} | ID: {submission_id}")
@@ -212,7 +271,8 @@ def register_event():
         }), 201
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ register_event error: {err}")
+        return jsonify({"error": "Registration failed. Please try again."}), 500
 
 
 # 4. Check Registrations Endpoint
@@ -247,9 +307,6 @@ def check_registrations():
         else:
             for r in LOCAL_REGISTRATIONS:
                 if event and r.get("selectedEvent") == event:
-                    # In local fallback, the user fields are merged into registration_doc for convenience,
-                    # or we can look up LOCAL_USERS. Since we merged local_user into r in the register route,
-                    # we can check r directly.
                     if email and (r.get("emailId") == email or r.get("collegeEmailId") == email):
                         return jsonify({"isDuplicate": True, "message": f"Email ({email}) is already registered for '{event}'."})
                     if phone and r.get("phoneNumber") == phone:
@@ -260,7 +317,9 @@ def check_registrations():
         return jsonify({"isDuplicate": False}), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ check_registrations error: {err}")
+        return jsonify({"error": "Failed to check registrations."}), 500
+
 
 # 11. Public & Participant Endpoint: Read All Active Official Notices
 @public_bp.route("/api/notices", methods=["GET"])
@@ -279,6 +338,5 @@ def get_all_notices():
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
-
-
+        print(f"❌ get_all_notices error: {err}")
+        return jsonify({"error": "Failed to fetch notices."}), 500

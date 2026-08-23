@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { SectionHeader } from './SectionHeader';
-import { TIMELINE_MILESTONES } from '../data/timeline';
+import { useEvents } from '../context/EventsContext';
 import { Calendar, Sparkles, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Timeline: React.FC = () => {
-  const [selectedMilestone, setSelectedMilestone] = useState(TIMELINE_MILESTONES[0]);
+  const { events } = useEvents();
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
+
+  React.useEffect(() => {
+    if (!selectedEventId && events && events.length > 0) {
+      setSelectedEventId(events[0].id);
+    }
+  }, [events, selectedEventId]);
+
+  const selectedEvent = events?.find((e) => e.id === selectedEventId) || events?.[0];
+
+  if (!events || events.length === 0 || !selectedEvent) {
+    return null;
+  }
 
   return (
     <section id="timeline" className="py-20 bg-cyber-charcoal/40 border-y border-cyber-cyan/20 relative z-10">
@@ -23,16 +36,16 @@ export const Timeline: React.FC = () => {
           <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-cyber-cyan/30 -translate-y-1/2 z-0" />
 
           <div className="grid grid-cols-5 gap-4 relative z-10">
-            {TIMELINE_MILESTONES.map((item, idx) => {
-              const isSelected = selectedMilestone.title === item.title;
+            {events.map((item, idx) => {
+              const isSelected = selectedEventId === item.id;
               return (
                 <button
-                  key={item.title}
-                  onClick={() => setSelectedMilestone(item)}
+                  key={item.id}
+                  onClick={() => setSelectedEventId(item.id)}
                   className="flex flex-col items-center group text-center focus:outline-none"
                 >
                   <span className="font-mono text-xs font-bold text-cyber-cyan mb-3 group-hover:text-cyber-cyan-bright">
-                    0{idx + 1} // {item.date}
+                    0{idx + 1} // {item.startDate === 'To Be Announced' ? 'TBA' : item.startDate}
                   </span>
 
                   <div
@@ -56,62 +69,66 @@ export const Timeline: React.FC = () => {
 
         {/* Mobile Vertical Timeline */}
         <div className="lg:hidden space-y-4 mb-8 relative pl-6 border-l-2 border-cyber-cyan/40">
-          {TIMELINE_MILESTONES.map((item, idx) => (
+          {events.map((item, idx) => (
             <div
-              key={item.title}
-              onClick={() => setSelectedMilestone(item)}
-              className={`p-4 bg-cyber-black border clip-chamfer cursor-pointer transition-all ${
-                item.title === selectedMilestone.title
-                  ? 'border-cyber-cyan shadow-[0_0_15px_rgba(0,207,255,0.3)]'
-                  : 'border-cyber-cyan/20'
+              key={item.id}
+              className={`relative pl-4 py-3 cursor-pointer transition-colors ${
+                selectedEventId === item.id ? 'bg-cyber-cyan/10 border-l-2 border-cyber-cyan' : 'border-l-2 border-transparent'
               }`}
+              onClick={() => setSelectedEventId(item.id)}
             >
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-cyber-cyan">
-                  EVENT 0{idx + 1} // {item.date}
+                <span className="font-mono text-xs font-bold text-cyber-cyan block mb-1">
+                  0{idx + 1} // {item.startDate === 'To Be Announced' ? 'TBA' : item.startDate}
                 </span>
               </div>
               <h4 className="font-display text-lg font-bold italic uppercase text-cyber-white mt-1">
                 {item.title}
               </h4>
-              <p className="text-cyber-muted text-xs font-body mt-1">{item.description}</p>
             </div>
           ))}
         </div>
 
         {/* Milestone Detail Card Display */}
-        <motion.div
-          key={selectedMilestone.title}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="bg-cyber-black border-2 border-cyber-cyan p-6 md:p-8 clip-chamfer-lg relative overflow-hidden shadow-[0_0_25px_rgba(0,207,255,0.2)]"
-        >
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="bg-cyber-black/80 border border-cyber-cyan/30 p-6 md:p-8 mt-4 clip-chamfer min-h-[160px] flex items-center shadow-[0_0_20px_rgba(0,207,255,0.05)]">
+          <motion.div
+            key={selectedEvent.id}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 w-full"
+          >
             <div>
-              <div className="inline-flex items-center gap-2 font-mono text-xs text-cyber-cyan font-bold tracking-widest mb-1">
-                <Sparkles className="w-4 h-4" />
-                <span>SELECTED EVENT // DATE: {selectedMilestone.date}</span>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="inline-flex items-center gap-2 font-mono text-xs text-cyber-cyan font-bold tracking-widest">
+                  <Sparkles className="w-4 h-4" />
+                  <span>SELECTED EVENT // {selectedEvent.startDate}</span>
+                </div>
+                {selectedEvent.isFeatured && (
+                  <span className="px-2 py-1 bg-cyber-pink/20 text-cyber-pink font-mono text-[10px] font-bold border border-cyber-pink/30 clip-chamfer">
+                    HIGHLIGHT
+                  </span>
+                )}
               </div>
-              <h3 className="font-display text-3xl font-extrabold italic uppercase text-cyber-white">
-                {selectedMilestone.title}
-              </h3>
-              <p className="text-cyber-muted text-sm font-body mt-2 max-w-2xl">
-                {selectedMilestone.description}
+              <h4 className="font-display text-2xl md:text-3xl font-bold uppercase text-cyber-white tracking-wider">
+                {selectedEvent.title}
+              </h4>
+              <p className="text-cyber-muted font-body text-sm md:text-base leading-relaxed max-w-2xl mt-2">
+                {selectedEvent.description}
               </p>
             </div>
 
-            {selectedMilestone.eventId && (
+            {selectedEvent.id && (
               <Link
-                to={`/events/${selectedMilestone.eventId}`}
+                to={`/events/${selectedEvent.id}`}
                 className="px-6 py-3 bg-cyber-cyan text-cyber-black font-display font-bold italic text-sm tracking-wider clip-chamfer hover:bg-cyber-cyan-bright transition-all uppercase flex items-center gap-2 whitespace-nowrap"
               >
                 <span>VIEW EVENT SPECS</span>
                 <ChevronRight className="w-4 h-4" />
               </Link>
             )}
-          </div>
         </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,18 +1,26 @@
 import datetime
-import random
 import re
 import csv
 import io
+import html
+import uuid
 from flask import Blueprint, request, jsonify, Response
 
-from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, LOCAL_RESULTS, LOCAL_NOTICES, LOCAL_EVENTS, ADMIN_USERNAME, ADMIN_PASSWORD, mongo_error_msg
-from auth import token_required, JWT_SECRET
+from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, LOCAL_RESULTS, LOCAL_NOTICES, LOCAL_EVENTS, ADMIN_USERNAME, ADMIN_PASSWORD
+from auth import admin_required
 
 admin_bp = Blueprint('admin', __name__)
 
+
+def _safe_regex(user_input):
+    """Escape user input for safe use in MongoDB $regex queries."""
+    return re.escape(user_input)
+
+
 # Admin Metrics Endpoint
 @admin_bp.route("/api/admin/metrics", methods=["GET"])
-def admin_get_metrics():
+@admin_required
+def admin_get_metrics(current_user):
     try:
         page_visits = 0
         if db is not None:
@@ -24,12 +32,14 @@ def admin_get_metrics():
             "page_visits": page_visits
         }), 200
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_get_metrics error: {err}")
+        return jsonify({"error": "Failed to fetch metrics."}), 500
 
 
 # 4b. Admin: Fetch All Users
 @admin_bp.route("/api/admin/users", methods=["GET"])
-def admin_get_users():
+@admin_required
+def admin_get_users(current_user):
     try:
         search_query = request.args.get("search", "").strip()
 
@@ -37,11 +47,12 @@ def admin_get_users():
         if db is not None:
             query = {}
             if search_query:
+                safe_q = _safe_regex(search_query)
                 query["$or"] = [
-                    {"name": {"$regex": search_query, "$options": "i"}},
-                    {"emailId": {"$regex": search_query, "$options": "i"}},
-                    {"regNo": {"$regex": search_query, "$options": "i"}},
-                    {"phoneNumber": {"$regex": search_query, "$options": "i"}},
+                    {"name": {"$regex": safe_q, "$options": "i"}},
+                    {"emailId": {"$regex": safe_q, "$options": "i"}},
+                    {"regNo": {"$regex": safe_q, "$options": "i"}},
+                    {"phoneNumber": {"$regex": safe_q, "$options": "i"}},
                 ]
 
             cursor = db.users.find(query, {"_id": 0}).sort("name", 1)
@@ -64,10 +75,14 @@ def admin_get_users():
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_get_users error: {err}")
+        return jsonify({"error": "Failed to fetch users."}), 500
+
+
 # 5. Admin: Fetch All Registrations with Event Filter
 @admin_bp.route("/api/admin/registrations", methods=["GET"])
-def admin_get_registrations():
+@admin_required
+def admin_get_registrations(current_user):
     try:
         event_filter = request.args.get("event") or ""
         search_query = request.args.get("search") or ""
@@ -102,15 +117,16 @@ def admin_get_registrations():
             
             match_stage = {}
             if event_filter and event_filter != "ALL":
-                match_stage["selectedEvent"] = {"$regex": event_filter, "$options": "i"}
+                match_stage["selectedEvent"] = {"$regex": _safe_regex(event_filter), "$options": "i"}
                 
             if search_query:
+                safe_sq = _safe_regex(search_query)
                 match_stage["$or"] = [
-                    {"name": {"$regex": search_query, "$options": "i"}},
-                    {"emailId": {"$regex": search_query, "$options": "i"}},
-                    {"regNo": {"$regex": search_query, "$options": "i"}},
-                    {"phoneNumber": {"$regex": search_query, "$options": "i"}},
-                    {"submissionId": {"$regex": search_query, "$options": "i"}},
+                    {"name": {"$regex": safe_sq, "$options": "i"}},
+                    {"emailId": {"$regex": safe_sq, "$options": "i"}},
+                    {"regNo": {"$regex": safe_sq, "$options": "i"}},
+                    {"phoneNumber": {"$regex": safe_sq, "$options": "i"}},
+                    {"submissionId": {"$regex": safe_sq, "$options": "i"}},
                 ]
             
             if match_stage:
@@ -139,15 +155,19 @@ def admin_get_registrations():
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_get_registrations error: {err}")
+        return jsonify({"error": "Failed to fetch registrations."}), 500
 
 
 # 5b. Admin: Delete Registration Record
 @admin_bp.route("/api/admin/registrations/<submission_id>", methods=["DELETE"])
-def admin_delete_registration(submission_id):
+@admin_required
+def admin_delete_registration(current_user, submission_id):
     try:
         if db is not None:
-            db.registrations.delete_many({"submissionId": submission_id})
+            result = db.registrations.delete_one({"submissionId": submission_id})
+            if result.deleted_count == 0:
+                return jsonify({"error": f"Registration '{submission_id}' not found."}), 404
 
         global LOCAL_REGISTRATIONS
         LOCAL_REGISTRATIONS = [r for r in LOCAL_REGISTRATIONS if r.get("submissionId") != submission_id]
@@ -158,12 +178,14 @@ def admin_delete_registration(submission_id):
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_delete_registration error: {err}")
+        return jsonify({"error": "Failed to delete registration."}), 500
 
 
 # 5c. Admin: Ban / Suspend or Update Registration Status
 @admin_bp.route("/api/admin/registrations/<submission_id>/status", methods=["PUT", "POST"])
-def admin_update_registration_status(submission_id):
+@admin_required
+def admin_update_registration_status(current_user, submission_id):
     try:
         data = request.get_json() or {}
         new_status = (data.get("status") or "CONFIRMED").upper().strip()
@@ -197,58 +219,15 @@ def admin_update_registration_status(submission_id):
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
-
-
-# 5d. Public & Participant: Get All Events with Dynamic Online / Offline Schedule Check
-@admin_bp.route("/api/events", methods=["GET"])
-def get_events():
-    try:
-        events = []
-        if db is not None:
-            cursor = db.events.find({}, {"_id": 0})
-            events = list(cursor)
-            if not events:
-                events = list(LOCAL_EVENTS)
-        else:
-            events = list(LOCAL_EVENTS)
-
-        now_iso = datetime.datetime.utcnow().isoformat() + "Z"
-
-        for ev in events:
-            reg_open = ev.get("registrationOpen", True)
-            is_online = ev.get("isOnline", True)
-            start_iso = ev.get("isoStartDate", "")
-            end_iso = ev.get("isoEndDate", "")
-
-            if start_iso and end_iso:
-                if now_iso < start_iso:
-                    ev["scheduleStatus"] = "SCHEDULED_UPCOMING"
-                elif now_iso > end_iso:
-                    ev["scheduleStatus"] = "SCHEDULED_CLOSED"
-                    ev["registrationOpen"] = False
-                    ev["isOnline"] = False
-                else:
-                    ev["scheduleStatus"] = "SCHEDULED_LIVE"
-
-            if ev.get("registrationOpen") and ev.get("isOnline"):
-                ev["liveStatus"] = "ONLINE"
-            else:
-                ev["liveStatus"] = "OFFLINE"
-
-        return jsonify({
-            "count": len(events),
-            "events": events
-        }), 200
-
-    except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_update_registration_status error: {err}")
+        return jsonify({"error": "Failed to update registration status."}), 500
 
 
 # 5e. Admin: Create or Update Event Details & Schedule
 @admin_bp.route("/api/admin/events/<event_id>", methods=["PUT", "POST"])
 @admin_bp.route("/api/admin/events", methods=["POST"])
-def admin_save_event(event_id=None):
+@admin_required
+def admin_save_event(current_user, event_id=None):
     try:
         data = request.get_json() or {}
         target_id = event_id or data.get("id")
@@ -273,7 +252,7 @@ def admin_save_event(event_id=None):
             "registrationOpen": bool(data.get("registrationOpen", True)),
             "isOnline": bool(data.get("isOnline", True)),
             "status": data.get("status") or "ACTIVE",
-            "updatedAt": datetime.datetime.utcnow().isoformat()
+            "updatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat()
         }
 
         if db is not None:
@@ -295,13 +274,15 @@ def admin_save_event(event_id=None):
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_save_event error: {err}")
+        return jsonify({"error": "Failed to save event."}), 500
 
 
 # 6. Admin: Export Registrations Data to CSV / Excel Spreadsheet
 @admin_bp.route("/api/admin/export", methods=["GET"])
 @admin_bp.route("/api/admin/export/excel", methods=["GET"])
-def admin_export_data():
+@admin_required
+def admin_export_data(current_user):
     try:
         event_filter = request.args.get("event") or ""
         export_format = (request.args.get("format") or "").lower()
@@ -337,7 +318,7 @@ def admin_export_data():
             
             match_stage = {}
             if event_filter and event_filter != "ALL":
-                match_stage["selectedEvent"] = {"$regex": event_filter, "$options": "i"}
+                match_stage["selectedEvent"] = {"$regex": _safe_regex(event_filter), "$options": "i"}
             if match_stage:
                 pipeline.append({"$match": match_stage})
                 
@@ -368,7 +349,7 @@ def admin_export_data():
         ]
 
         if is_excel:
-            # Generate MS Excel XML / HTML Spreadsheet
+            # Generate MS Excel XML / HTML Spreadsheet (with XSS-safe escaping)
             html_rows = []
             html_rows.append('<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">')
             html_rows.append('<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Registrations</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>')
@@ -377,10 +358,10 @@ def admin_export_data():
             # Header row
             html_rows.append('<tr style="background-color:#00cfff; color:#0d1117; font-weight:bold; text-align:center;">')
             for h in headers:
-                html_rows.append(f'<th style="padding:8px 12px; border:1px solid #000000;">{h}</th>')
+                html_rows.append(f'<th style="padding:8px 12px; border:1px solid #000000;">{html.escape(h)}</th>')
             html_rows.append('</tr>')
 
-            # Data rows
+            # Data rows (XSS-safe)
             for r in regs:
                 html_rows.append('<tr>')
                 vals = [
@@ -399,13 +380,13 @@ def admin_export_data():
                     r.get("registeredAt", "")
                 ]
                 for v in vals:
-                    html_rows.append(f'<td style="padding:6px 10px; border:1px solid #cccccc;">{v}</td>')
+                    html_rows.append(f'<td style="padding:6px 10px; border:1px solid #cccccc;">{html.escape(str(v))}</td>')
                 html_rows.append('</tr>')
 
             html_rows.append('</table></body></html>')
             excel_content = "\n".join(html_rows)
 
-            filename = f"HiveMind_Registrations_{event_filter or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.xls"
+            filename = f"HiveMind_Registrations_{_safe_regex(event_filter) or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.xls"
             return Response(
                 excel_content,
                 mimetype="application/vnd.ms-excel",
@@ -434,7 +415,7 @@ def admin_export_data():
                     r.get("registeredAt", "")
                 ])
 
-            filename = f"HiveMind_Registrations_{event_filter or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.csv"
+            filename = f"HiveMind_Registrations_{_safe_regex(event_filter) or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.csv"
             return Response(
                 output.getvalue(),
                 mimetype="text/csv",
@@ -442,12 +423,14 @@ def admin_export_data():
             )
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_export_data error: {err}")
+        return jsonify({"error": "Failed to export data."}), 500
 
 
 # 7. Admin: Publish & Update Event Results / Winners in MongoDB Atlas
 @admin_bp.route("/api/admin/results", methods=["POST"])
-def admin_publish_results():
+@admin_required
+def admin_publish_results(current_user):
     try:
         data = request.get_json() or {}
         event_id = data.get("eventId")
@@ -471,7 +454,7 @@ def admin_publish_results():
             "specialMentions": special_mentions,
             "announcementNotes": announcement_notes,
             "eventStatus": event_status,
-            "publishedAt": datetime.datetime.utcnow().isoformat()
+            "publishedAt": datetime.datetime.now(datetime.timezone.utc).isoformat()
         }
 
         if db is not None:
@@ -493,12 +476,14 @@ def admin_publish_results():
         }), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_publish_results error: {err}")
+        return jsonify({"error": "Failed to publish results."}), 500
 
 
 # 9. Admin: Post & Publish Official Notices / Event News to MongoDB Atlas
 @admin_bp.route("/api/admin/notices", methods=["POST"])
-def admin_publish_notice():
+@admin_required
+def admin_publish_notice(current_user):
     try:
         data = request.get_json() or {}
         title = (data.get("title") or "").strip()
@@ -510,7 +495,7 @@ def admin_publish_notice():
         if not title or not content:
             return jsonify({"error": "Title and Content are required for a Notice"}), 400
 
-        notice_id = f"NOTICE-{random.randint(1000, 9999)}"
+        notice_id = f"NOTICE-{uuid.uuid4().hex[:8].upper()}"
         notice_doc = {
             "noticeId": notice_id,
             "title": title,
@@ -518,7 +503,7 @@ def admin_publish_notice():
             "targetEvent": target_event,
             "content": content,
             "priority": priority,
-            "publishedAt": datetime.datetime.utcnow().isoformat()
+            "publishedAt": datetime.datetime.now(datetime.timezone.utc).isoformat()
         }
 
         if db is not None:
@@ -537,12 +522,14 @@ def admin_publish_notice():
         }), 201
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
+        print(f"❌ admin_publish_notice error: {err}")
+        return jsonify({"error": "Failed to publish notice."}), 500
 
 
 # 10. Admin: Delete a Published Notice
 @admin_bp.route("/api/admin/notices/<notice_id>", methods=["DELETE"])
-def admin_delete_notice(notice_id):
+@admin_required
+def admin_delete_notice(current_user, notice_id):
     try:
         if db is not None:
             db.notices.delete_one({"noticeId": notice_id})
@@ -553,6 +540,5 @@ def admin_delete_notice(notice_id):
         return jsonify({"success": True, "message": f"Notice {notice_id} deleted."}), 200
 
     except Exception as err:
-        return jsonify({"error": str(err)}), 500
-
-
+        print(f"❌ admin_delete_notice error: {err}")
+        return jsonify({"error": "Failed to delete notice."}), 500
