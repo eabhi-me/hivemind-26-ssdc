@@ -3,10 +3,26 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { OFFICIAL_EVENTS } from '../data/events';
 import { ArrowLeft, Calendar, Clock, Trophy, ExternalLink, ShieldCheck, Award } from 'lucide-react';
 import { SectionDivider } from '../components/SectionDivider';
+import { useAuth } from '../context/AuthContext';
 
 export const EventDetails: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const isLoggedIn = Boolean(user || localStorage.getItem('hivemind_jwt_token'));
+  
+  let isAdmin = false;
+  const storedUserStr = localStorage.getItem('hivemind_user');
+  if (user?.role === 'admin') {
+    isAdmin = true;
+  } else if (storedUserStr) {
+    try {
+      const parsed = JSON.parse(storedUserStr);
+      if (parsed.role === 'admin') isAdmin = true;
+    } catch (e) {}
+  }
+  const dashboardPath = isAdmin ? '/admin' : '/dashboard';
 
   const event = OFFICIAL_EVENTS.find((e) => e.id === eventId);
 
@@ -161,15 +177,15 @@ export const EventDetails: React.FC = () => {
         {/* REGISTER CTA BUTTON */}
         <div className="text-center">
           <Link
-            to={`/register?event=${encodeURIComponent(event.number + ' — ' + event.title)}`}
+            to={isLoggedIn ? dashboardPath : `/register?event=${encodeURIComponent(event.number + ' — ' + event.title)}`}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-12 py-5 bg-cyber-cyan text-cyber-black font-display font-black text-2xl italic tracking-wider clip-chamfer hover:bg-cyber-cyan-bright transition-all duration-300 shadow-[0_0_30px_rgba(0,207,255,0.6)] hover:shadow-[0_0_50px_rgba(0,207,255,0.9)] uppercase group"
           >
-            <span>[ REGISTER NOW FOR {event.title} ]</span>
+            <span>{isLoggedIn ? `[ OPEN DASHBOARD FOR ${event.title} ]` : `[ REGISTER NOW FOR ${event.title} ]`}</span>
             <ExternalLink className="w-6 h-6 group-hover:scale-110 transition-transform" />
           </Link>
 
           <p className="mt-4 font-mono text-xs text-cyber-muted">
-            DIRECT LIVE REGISTRATION VIA SSDC PORTAL
+            {isLoggedIn ? "PROCEED TO DASHBOARD" : "DIRECT LIVE REGISTRATION VIA SSDC PORTAL"}
           </p>
         </div>
 

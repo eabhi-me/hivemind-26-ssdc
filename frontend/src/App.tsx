@@ -30,7 +30,14 @@ function ScrollToTop() {
   return null;
 }
 
+import { apiService } from './services/api';
+
 export const App: React.FC = () => {
+  useEffect(() => {
+    // Record page visit and keep Render backend alive
+    apiService.recordPageVisit();
+  }, []);
+
   return (
     <Router>
       <ScrollToTop />

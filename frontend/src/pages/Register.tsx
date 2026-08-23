@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useSearchParams } from 'react-router-dom';
-import { OFFICIAL_EVENTS } from '../data/events';
+import { Link, useNavigate } from 'react-router-dom';
 import { SITE_CONFIG } from '../data/config';
 import { SectionHeader } from '../components/SectionHeader';
 import { SectionDivider } from '../components/SectionDivider';
@@ -41,8 +40,7 @@ interface FormDataState {
 }
 
 export const Register: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const eventParam = searchParams.get('event');
+  const navigate = useNavigate();
   const { addRegistrationLocally } = useAuth();
 
   const whatsappGroupUrl = 'https://chat.whatsapp.com/BsDg3RV0N2A6zpeRSfHhwT?s=qt&p=a&ilr=4';
@@ -59,7 +57,7 @@ export const Register: React.FC = () => {
     college: SITE_CONFIG.defaultCollege,
     degree: SITE_CONFIG.degrees[0],
     batchYear: '2026',
-    selectedEvent: eventParam || 'All Events / General Pass',
+    selectedEvent: 'GENERAL_MEMBERSHIP',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,7 +68,17 @@ export const Register: React.FC = () => {
   useEffect(() => {
     document.title = 'Registration | HiveMind 2026';
     window.scrollTo(0, 0);
-  }, []);
+
+    const storedUser = localStorage.getItem('hivemind_user');
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        if (parsed.role === 'admin') {
+          navigate('/admin');
+        }
+      } catch (e) {}
+    }
+  }, [navigate]);
 
   const validateForm = (data: FormDataState): Record<string, string> => {
     const errors: Record<string, string> = {};
@@ -391,25 +399,15 @@ export const Register: React.FC = () => {
                 </div>
               )}
 
-              {/* Event Selection Dropdown */}
-              <div>
-                <label className="block font-mono text-xs font-bold text-cyber-cyan uppercase mb-2">
-                  SELECTED EVENT / PASS <span className="text-cyber-pink">*</span>
-                </label>
-                <select
-                  name="selectedEvent"
-                  value={formData.selectedEvent}
-                  onChange={handleChange}
-                  className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none"
-                  required
-                >
-                  <option value="All Events / General Pass">ALL EVENTS / GENERAL FESTIVAL PASS</option>
-                  {OFFICIAL_EVENTS.map((event) => (
-                    <option key={event.id} value={`${event.number} — ${event.title}`}>
-                      {event.number} — {event.title} ({event.tagline})
-                    </option>
-                  ))}
-                </select>
+              {/* Participant Account Profile Info Badge */}
+              <div className="p-4 bg-cyber-black/80 border-2 border-cyber-cyan/40 clip-chamfer text-xs font-mono space-y-1">
+                <div className="text-cyber-cyan font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-cyber-cyan" />
+                  <span>HIVEMIND PARTICIPANT ACCOUNT PROFILE</span>
+                </div>
+                <p className="text-cyber-muted font-body text-xs">
+                  Registering your official participant profile for HiveMind 2026. Once registered and logged in, you can enroll for live festival challenges directly from your Participant Dashboard!
+                </p>
               </div>
 
               {/* Row 1: Name & Registration Number */}

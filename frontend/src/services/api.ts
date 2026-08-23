@@ -13,6 +13,19 @@ export interface UserProfile {
   batchYear?: string;
 }
 
+export interface UserRecord {
+  name: string;
+  emailId: string;
+  collegeEmailId?: string;
+  regNo: string;
+  trade: string;
+  phoneNumber: string;
+  college: string;
+  degree: string;
+  batchYear: string;
+  registeredAt?: string;
+}
+
 export interface RegistrationRecord {
   submissionId: string;
   name: string;
@@ -53,6 +66,30 @@ export interface NoticeRecord {
 
 class ApiService {
   private baseUrl = SITE_CONFIG.flaskBackendUrl;
+
+  // Track Page Visit & Render Keep-Alive
+  async recordPageVisit() {
+    try {
+      await fetch(`${this.baseUrl}/api/visit`, {
+        method: 'POST',
+      });
+    } catch (err) {
+      // Ignore errors for metrics
+    }
+  }
+
+  // Admin Metrics
+  async getAdminMetrics() {
+    const token = localStorage.getItem('hivemind_jwt_token');
+    const response = await fetch(`${this.baseUrl}/api/admin/metrics`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch metrics');
+    return data;
+  }
 
   // 1. Participant Login (Queries HiveMind Cloud Core & returns user + all registered events)
   async participantLogin(email: string, key?: string) {
@@ -138,6 +175,60 @@ class ApiService {
     );
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Failed to fetch admin registrations');
+    return data;
+  }
+
+  // 5a. Admin: Get Users List from Cloud Vault
+  async getAdminUsers(searchQuery: string = ''): Promise<{ count: number; users: UserRecord[] }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/admin/users?search=${encodeURIComponent(searchQuery)}`
+    );
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch admin users');
+    return data;
+  }
+
+  // 5b. Admin: Delete Participant Registration
+  async deleteAdminRegistration(submissionId: string) {
+    const response = await fetch(`${this.baseUrl}/api/admin/registrations/${encodeURIComponent(submissionId)}`, {
+      method: 'DELETE',
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to delete registration');
+    return data;
+  }
+
+  // 5c. Admin: Update Participant Status (BAN / UNBAN)
+  async updateAdminRegistrationStatus(submissionId: string, status: string) {
+    const response = await fetch(`${this.baseUrl}/api/admin/registrations/${encodeURIComponent(submissionId)}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to update registration status');
+    return data;
+  }
+
+  // 5d. Public & Participant: Get All Events with Dynamic Schedules
+  async getEvents(): Promise<{ count: number; events: any[] }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/events`);
+      return await response.json();
+    } catch (err) {
+      return { count: 0, events: [] };
+    }
+  }
+
+  // 5e. Admin: Create or Update Event Details & Schedule
+  async saveAdminEvent(eventId: string, payload: any) {
+    const response = await fetch(`${this.baseUrl}/api/admin/events/${encodeURIComponent(eventId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to save event details');
     return data;
   }
 

@@ -6,7 +6,6 @@ import {
   Code,
   Github,
   Linkedin,
-  Mail,
   Shield,
   Terminal,
   Award,
@@ -15,24 +14,13 @@ import {
   Cpu,
   Building,
 } from 'lucide-react';
+import {
+  FACULTY_MENTORS,
+  OFFICIAL_ORGANIZERS,
+  OrganizerMember,
+} from '../data/organizers';
 
-export interface OrganizerMember {
-  id: string;
-  name: string;
-  role: string;
-  title: string;
-  category: 'FACULTY' | 'MENTOR' | 'STUDENT_LEAD';
-  specialty: string;
-  assignedEvent: string;
-  image?: string;
-  githubUrl?: string;
-  linkedinUrl?: string;
-  emailUrl?: string;
-}
-
-export const FACULTY_MENTORS: OrganizerMember[] = [];
-
-export const STUDENT_ORGANIZERS: OrganizerMember[] = [];
+export type { OrganizerMember };
 
 export const Organizers: React.FC = () => {
   return (
@@ -43,7 +31,7 @@ export const Organizers: React.FC = () => {
         <SectionHeader
           sysLabel="SSDC_CREW // CREATORS_AND_LEADS"
           title="FESTIVAL ORGANIZERS & TEAM"
-          subtitle="Powered by the Software Development Club (SSDC), Department of Computer Science & Engineering, SLIET Longowal."
+          subtitle="Meet the official team behind HiveMind 2026. Powered by the Software Development Club (SSDC), Department of Computer Science & Engineering, SLIET Longowal."
         />
 
         {/* ABOUT SSDC CLUB HIGHLIGHT CARD */}
@@ -142,70 +130,58 @@ export const Organizers: React.FC = () => {
           <div className="flex items-center gap-2 mb-6">
             <Shield className="w-6 h-6 text-cyber-yellow" />
             <h3 className="font-display text-2xl font-bold italic uppercase tracking-wider text-cyber-white">
-              FACULTY ADVISORS & MENTORS
+              FACULTY ADVISORS & PATRONS
             </h3>
           </div>
 
-          {FACULTY_MENTORS.length === 0 ? (
-            <div className="bg-cyber-charcoal border-2 border-cyber-yellow/40 p-8 clip-chamfer text-center relative overflow-hidden">
-              <span className="font-mono text-xs font-bold text-cyber-yellow uppercase tracking-widest block mb-2">
-                ROSTER UPDATE PENDING
-              </span>
-              <h4 className="font-display text-2xl font-bold italic uppercase text-cyber-white mb-2">
-                FACULTY ADVISORS & MENTOR ROSTER ANNOUNCEMENT COMING SOON
-              </h4>
-              <p className="font-body text-xs text-cyber-muted max-w-xl mx-auto">
-                Official faculty patron & mentor assignments for HiveMind 2026 are being finalized by the department.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {FACULTY_MENTORS.map((member) => (
-                <motion.div
-                  key={member.id}
-                  whileHover={{ y: -4 }}
-                  className="bg-cyber-charcoal border-2 border-cyber-yellow/40 p-5 clip-chamfer relative overflow-hidden group hover:border-cyber-yellow transition-all shadow-[0_0_15px_rgba(255,215,0,0.1)]"
-                >
-                  <div className="w-12 h-12 bg-cyber-black border border-cyber-yellow/60 clip-chamfer flex items-center justify-center text-cyber-yellow font-display font-bold text-xl mb-4 group-hover:scale-105 transition-transform">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {FACULTY_MENTORS.map((member) => (
+              <motion.div
+                key={member.id}
+                whileHover={{ y: -4 }}
+                className="bg-cyber-charcoal border-2 border-cyber-yellow/40 p-6 clip-chamfer relative overflow-hidden group hover:border-cyber-yellow transition-all shadow-[0_0_15px_rgba(255,215,0,0.1)]"
+              >
+                <div className="flex items-center justify-between mb-4 border-b border-cyber-yellow/20 pb-3">
+                  <div className="w-12 h-12 bg-cyber-black border border-cyber-yellow/60 clip-chamfer flex items-center justify-center text-cyber-yellow font-display font-bold text-xl group-hover:scale-105 transition-transform">
                     {member.name.charAt(4) || member.name.charAt(0)}
                   </div>
 
-                  <span className="font-mono text-[10px] text-cyber-yellow font-bold uppercase tracking-widest block mb-1">
+                  <span className="font-mono text-[10px] text-cyber-yellow bg-cyber-yellow/10 px-2.5 py-1 border border-cyber-yellow/40 clip-chamfer uppercase font-bold">
                     {member.role}
                   </span>
+                </div>
 
-                  <h4 className="font-display text-lg font-bold italic uppercase text-cyber-white mb-1 group-hover:text-cyber-yellow transition-colors">
-                    {member.name}
-                  </h4>
+                <h4 className="font-display text-xl font-bold italic uppercase text-cyber-white mb-1 group-hover:text-cyber-yellow transition-colors">
+                  {member.name}
+                </h4>
 
-                  <p className="font-mono text-xs text-cyber-muted mb-3">
-                    {member.title}
-                  </p>
+                <p className="font-mono text-xs text-cyber-muted mb-4">
+                  {member.title}
+                </p>
 
-                  <div className="p-2.5 bg-cyber-black/70 border border-cyber-yellow/20 clip-chamfer font-mono text-[11px] text-cyber-muted space-y-1">
-                    <div>
-                      <span className="text-cyber-yellow font-bold">SPECIALTY:</span> {member.specialty}
-                    </div>
-                    <div>
-                      <span className="text-cyber-yellow font-bold">RESPONSIBILITY:</span> {member.assignedEvent}
-                    </div>
+                <div className="p-3 bg-cyber-black/70 border border-cyber-yellow/20 clip-chamfer font-mono text-xs text-cyber-muted space-y-1">
+                  <div>
+                    <span className="text-cyber-yellow font-bold">DEPARTMENT:</span> {member.trade}
                   </div>
+                  <div>
+                    <span className="text-cyber-yellow font-bold">RESPONSIBILITY:</span> {member.assignedEvent}
+                  </div>
+                </div>
 
-                  {member.linkedinUrl && (
-                    <a
-                      href={member.linkedinUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] text-cyber-yellow hover:underline"
-                    >
-                      <Linkedin className="w-3.5 h-3.5" />
-                      <span>CONNECT ON LINKEDIN</span>
-                    </a>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          )}
+                {member.linkedinUrl && (
+                  <a
+                    href={member.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] text-cyber-yellow hover:underline"
+                  >
+                    <Linkedin className="w-3.5 h-3.5" />
+                    <span>SLIET FACULTY LINKEDIN</span>
+                  </a>
+                )}
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {/* STUDENT ORGANIZERS & TEAM CREW GRID */}
@@ -213,99 +189,69 @@ export const Organizers: React.FC = () => {
           <div className="flex items-center gap-2 mb-6">
             <Cpu className="w-6 h-6 text-cyber-cyan" />
             <h3 className="font-display text-2xl font-bold italic uppercase tracking-wider text-cyber-white">
-              CORE EVENT ORGANIZERS & TEAM LEADS
+              SSDC STUDENT COORDINATORS & HEADS
             </h3>
           </div>
 
-          {STUDENT_ORGANIZERS.length === 0 ? (
-            <div className="bg-cyber-charcoal border-2 border-cyber-cyan/40 p-8 clip-chamfer text-center relative overflow-hidden">
-              <span className="font-mono text-xs font-bold text-cyber-cyan uppercase tracking-widest block mb-2">
-                ROSTER UPDATE PENDING
-              </span>
-              <h4 className="font-display text-2xl font-bold italic uppercase text-cyber-white mb-2">
-                STUDENT COORDINATORS & EVENT HEADS ANNOUNCEMENT COMING SOON
-              </h4>
-              <p className="font-body text-xs text-cyber-muted max-w-xl mx-auto">
-                The updated list of student leads and event conveners for HiveMind 2026 will be revealed shorty. Stay tuned!
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {STUDENT_ORGANIZERS.map((member) => (
-                <motion.div
-                  key={member.id}
-                  whileHover={{ y: -5 }}
-                  className="bg-cyber-charcoal border-2 border-cyber-cyan/50 p-6 clip-chamfer relative overflow-hidden group hover:border-cyber-cyan transition-all shadow-[0_0_20px_rgba(0,207,255,0.15)]"
-                >
-                  <div className="flex items-center justify-between mb-4 border-b border-cyber-cyan/20 pb-3">
-                    <div className="w-12 h-12 bg-cyber-cyan text-cyber-black clip-chamfer flex items-center justify-center font-display font-black text-2xl shadow-[0_0_15px_rgba(0,207,255,0.4)]">
-                      {member.name.charAt(0)}
-                    </div>
-
-                    <span className="font-mono text-[10px] text-cyber-cyan bg-cyber-cyan/10 px-2.5 py-1 border border-cyber-cyan/40 clip-chamfer uppercase font-bold">
-                      {member.role}
-                    </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {OFFICIAL_ORGANIZERS.map((member) => (
+              <motion.div
+                key={member.id}
+                whileHover={{ y: -5 }}
+                className="bg-cyber-charcoal border-2 border-cyber-cyan/50 p-6 clip-chamfer relative overflow-hidden group hover:border-cyber-cyan transition-all shadow-[0_0_20px_rgba(0,207,255,0.15)]"
+              >
+                <div className="flex items-center justify-between mb-4 border-b border-cyber-cyan/20 pb-3">
+                  <div className="w-12 h-12 bg-cyber-cyan text-cyber-black clip-chamfer flex items-center justify-center font-display font-black text-2xl shadow-[0_0_15px_rgba(0,207,255,0.4)]">
+                    {member.name.charAt(0)}
                   </div>
 
-                  <h4 className="font-display text-2xl font-extrabold italic uppercase text-cyber-white mb-1 group-hover:text-cyber-cyan transition-colors">
-                    {member.name}
-                  </h4>
+                  <span className="font-mono text-[10px] text-cyber-cyan bg-cyber-cyan/10 px-2.5 py-1 border border-cyber-cyan/40 clip-chamfer uppercase font-bold">
+                    {member.role}
+                  </span>
+                </div>
 
-                  <p className="font-mono text-xs text-cyber-muted mb-4">
-                    {member.title}
-                  </p>
+                <h4 className="font-display text-2xl font-extrabold italic uppercase text-cyber-white mb-3 group-hover:text-cyber-cyan transition-colors">
+                  {member.name}
+                </h4>
 
-                  <div className="p-3 bg-cyber-black/70 border border-cyber-cyan/30 clip-chamfer font-mono text-xs text-cyber-muted space-y-1.5 mb-4">
-                    <div>
-                      <span className="text-cyber-cyan font-bold block text-[10px]">DOMAIN / TECH STACK</span>
-                      <span>{member.specialty}</span>
-                    </div>
-                    <div>
-                      <span className="text-cyber-cyan font-bold block text-[10px]">EVENT RESPONSIBILITY</span>
-                      <span className="text-cyber-white">{member.assignedEvent}</span>
-                    </div>
+                <div className="p-3 bg-cyber-black/70 border border-cyber-cyan/30 clip-chamfer font-mono text-xs text-cyber-muted space-y-1 mb-4">
+                  <div>
+                    <span className="text-cyber-cyan font-bold block text-[10px]">DEPARTMENT / BRANCH</span>
+                    <span className="text-cyber-white">{member.trade}</span>
                   </div>
+                </div>
 
-                  {/* Social Actions */}
-                  <div className="flex items-center gap-3 pt-2 border-t border-cyber-cyan/20">
-                    {member.githubUrl && (
-                      <a
-                        href={member.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 bg-cyber-black border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-cyber-black clip-chamfer transition-all"
-                        title="GitHub Profile"
-                      >
-                        <Github className="w-4 h-4" />
-                      </a>
-                    )}
+                {/* Social Actions */}
+                <div className="flex items-center gap-3 pt-3 border-t border-cyber-cyan/20">
+                  {member.socials.linkedin && (
+                    <a
+                      href={member.socials.linkedin.startsWith('http') ? member.socials.linkedin : `https://${member.socials.linkedin}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2 bg-cyber-black border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-cyber-black clip-chamfer transition-all flex items-center justify-center gap-1.5 font-mono text-xs font-bold"
+                      title="LinkedIn Profile"
+                    >
+                      <Linkedin className="w-3.5 h-3.5" />
+                      <span>LINKEDIN</span>
+                    </a>
+                  )}
 
-                    {member.linkedinUrl && (
-                      <a
-                        href={member.linkedinUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 bg-cyber-black border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-cyber-black clip-chamfer transition-all"
-                        title="LinkedIn Profile"
-                      >
-                        <Linkedin className="w-4 h-4" />
-                      </a>
-                    )}
-
-                    {member.emailUrl && (
-                      <a
-                        href={member.emailUrl}
-                        className="p-2 bg-cyber-black border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-cyber-black clip-chamfer transition-all"
-                        title="Contact Email"
-                      >
-                        <Mail className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
+                  {member.socials.github && (
+                    <a
+                      href={member.socials.github.startsWith('http') ? member.socials.github : `https://${member.socials.github}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2 bg-cyber-black border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-cyber-black clip-chamfer transition-all flex items-center justify-center gap-1.5 font-mono text-xs font-bold"
+                      title="GitHub Profile"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                      <span>GITHUB</span>
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         <SectionDivider label="END OF ORGANIZERS NODE" />

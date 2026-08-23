@@ -26,9 +26,11 @@ def init_database():
         print(f"✅ Connected to MongoDB Atlas: '{db.name}'")
 
         # 1. Create Indexes
-        db.registrations.create_index([("emailId", 1)])
-        db.registrations.create_index([("phoneNumber", 1)])
-        db.registrations.create_index([("submissionId", 1)])
+        db.users.create_index([("emailId", 1)], unique=True)
+        db.users.create_index([("regNo", 1)])
+        db.users.create_index([("phoneNumber", 1)])
+        db.registrations.create_index([("userId", 1)])
+        db.registrations.create_index([("submissionId", 1)], unique=True)
         db.results.create_index([("eventId", 1)], unique=True)
         db.admin_users.create_index([("username", 1)], unique=True)
         print("✅ Database Indexes Initialized.")
@@ -49,6 +51,14 @@ def init_database():
         print(f"👑 Admin Account Saved in MongoDB Atlas `admin_users` collection!")
         print(f"   Username: {ADMIN_USERNAME}")
         print(f"   Role: admin")
+
+        # 3. Seed events from database.py
+        from database import DEFAULT_EVENTS
+        if db.events.count_documents({}) == 0:
+            db.events.insert_many(DEFAULT_EVENTS)
+            print("🏆 Seeded official events into MongoDB Atlas `events` collection.")
+        else:
+            print("ℹ️ Events collection already contains documents, skipping seed.")
 
         print("🎉 Database Setup Complete!")
         return True

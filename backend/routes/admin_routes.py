@@ -1,0 +1,558 @@
+import datetime
+import random
+import re
+import csv
+import io
+from flask import Blueprint, request, jsonify, Response
+
+from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, LOCAL_RESULTS, LOCAL_NOTICES, LOCAL_EVENTS, ADMIN_USERNAME, ADMIN_PASSWORD, mongo_error_msg
+from auth import token_required, JWT_SECRET
+
+admin_bp = Blueprint('admin', __name__)
+
+# Admin Metrics Endpoint
+@admin_bp.route("/api/admin/metrics", methods=["GET"])
+def admin_get_metrics():
+    try:
+        page_visits = 0
+        if db is not None:
+            result = db.metrics.find_one({"type": "page_visits"})
+            page_visits = result.get("count", 0) if result else 0
+        
+        return jsonify({
+            "success": True,
+            "page_visits": page_visits
+        }), 200
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 4b. Admin: Fetch All Users
+@admin_bp.route("/api/admin/users", methods=["GET"])
+def admin_get_users():
+    try:
+        search_query = request.args.get("search", "").strip()
+
+        users = []
+        if db is not None:
+            query = {}
+            if search_query:
+                query["$or"] = [
+                    {"name": {"$regex": search_query, "$options": "i"}},
+                    {"emailId": {"$regex": search_query, "$options": "i"}},
+                    {"regNo": {"$regex": search_query, "$options": "i"}},
+                    {"phoneNumber": {"$regex": search_query, "$options": "i"}},
+                ]
+
+            cursor = db.users.find(query, {"_id": 0}).sort("name", 1)
+            users = list(cursor)
+        else:
+            for u in LOCAL_USERS:
+                if search_query:
+                    sq = search_query.lower()
+                    if sq not in u.get("name", "").lower() and \
+                       sq not in u.get("emailId", "").lower() and \
+                       sq not in u.get("regNo", "").lower() and \
+                       sq not in u.get("phoneNumber", "").lower():
+                        continue
+                users.append(u)
+            users.sort(key=lambda x: x.get("name", ""))
+
+        return jsonify({
+            "count": len(users),
+            "users": users
+        }), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+# 5. Admin: Fetch All Registrations with Event Filter
+@admin_bp.route("/api/admin/registrations", methods=["GET"])
+def admin_get_registrations():
+    try:
+        event_filter = request.args.get("event") or ""
+        search_query = request.args.get("search") or ""
+
+        regs = []
+        if db is not None:
+            pipeline = [
+                {
+                    "$lookup": {
+                        "from": "users",
+                        "localField": "userId",
+                        "foreignField": "_id",
+                        "as": "user"
+                    }
+                },
+                {"$unwind": {"path": "$user", "preserveNullAndEmptyArrays": True}},
+                {
+                    "$addFields": {
+                        "name": "$user.name",
+                        "emailId": "$user.emailId",
+                        "collegeEmailId": "$user.collegeEmailId",
+                        "regNo": "$user.regNo",
+                        "trade": "$user.trade",
+                        "phoneNumber": "$user.phoneNumber",
+                        "college": "$user.college",
+                        "degree": "$user.degree",
+                        "batchYear": "$user.batchYear"
+                    }
+                },
+                {"$project": {"user": 0, "userId": 0, "_id": 0}}
+            ]
+            
+            match_stage = {}
+            if event_filter and event_filter != "ALL":
+                match_stage["selectedEvent"] = {"$regex": event_filter, "$options": "i"}
+                
+            if search_query:
+                match_stage["$or"] = [
+                    {"name": {"$regex": search_query, "$options": "i"}},
+                    {"emailId": {"$regex": search_query, "$options": "i"}},
+                    {"regNo": {"$regex": search_query, "$options": "i"}},
+                    {"phoneNumber": {"$regex": search_query, "$options": "i"}},
+                    {"submissionId": {"$regex": search_query, "$options": "i"}},
+                ]
+            
+            if match_stage:
+                pipeline.append({"$match": match_stage})
+                
+            pipeline.append({"$sort": {"registeredAt": -1}})
+            
+            cursor = db.registrations.aggregate(pipeline)
+            regs = list(cursor)
+        else:
+            for r in LOCAL_REGISTRATIONS:
+                if event_filter and event_filter != "ALL" and event_filter.lower() not in r.get("selectedEvent", "").lower():
+                    continue
+                if search_query:
+                    sq = search_query.lower()
+                    if sq not in r.get("name", "").lower() and sq not in r.get("emailId", "").lower() and \
+                       sq not in r.get("regNo", "").lower() and sq not in r.get("phoneNumber", "").lower() and \
+                       sq not in r.get("submissionId", "").lower():
+                        continue
+                regs.append(r)
+            regs.sort(key=lambda x: x.get("registeredAt", ""), reverse=True)
+
+        return jsonify({
+            "count": len(regs),
+            "registrations": regs
+        }), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 5b. Admin: Delete Registration Record
+@admin_bp.route("/api/admin/registrations/<submission_id>", methods=["DELETE"])
+def admin_delete_registration(submission_id):
+    try:
+        if db is not None:
+            db.registrations.delete_many({"submissionId": submission_id})
+
+        global LOCAL_REGISTRATIONS
+        LOCAL_REGISTRATIONS = [r for r in LOCAL_REGISTRATIONS if r.get("submissionId") != submission_id]
+
+        return jsonify({
+            "success": True,
+            "message": f"Registration '{submission_id}' deleted successfully."
+        }), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 5c. Admin: Ban / Suspend or Update Registration Status
+@admin_bp.route("/api/admin/registrations/<submission_id>/status", methods=["PUT", "POST"])
+def admin_update_registration_status(submission_id):
+    try:
+        data = request.get_json() or {}
+        new_status = (data.get("status") or "CONFIRMED").upper().strip()
+
+        if db is not None:
+            matched_reg = db.registrations.find_one({"submissionId": submission_id})
+            if matched_reg:
+                user_id = matched_reg.get("userId")
+                if user_id:
+                    db.registrations.update_many({"userId": user_id}, {"$set": {"status": new_status}})
+                else:
+                    db.registrations.update_many({"submissionId": submission_id}, {"$set": {"status": new_status}})
+            else:
+                db.registrations.update_many({"submissionId": submission_id}, {"$set": {"status": new_status}})
+
+        for r in LOCAL_REGISTRATIONS:
+            if r.get("submissionId") == submission_id:
+                user_id = r.get("userId")
+                if user_id:
+                    for r2 in LOCAL_REGISTRATIONS:
+                        if r2.get("userId") == user_id:
+                            r2["status"] = new_status
+                else:
+                    r["status"] = new_status
+
+        return jsonify({
+            "success": True,
+            "submissionId": submission_id,
+            "newStatus": new_status,
+            "message": f"Status updated to '{new_status}' for '{submission_id}'."
+        }), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 5d. Public & Participant: Get All Events with Dynamic Online / Offline Schedule Check
+@admin_bp.route("/api/events", methods=["GET"])
+def get_events():
+    try:
+        events = []
+        if db is not None:
+            cursor = db.events.find({}, {"_id": 0})
+            events = list(cursor)
+            if not events:
+                events = list(LOCAL_EVENTS)
+        else:
+            events = list(LOCAL_EVENTS)
+
+        now_iso = datetime.datetime.utcnow().isoformat() + "Z"
+
+        for ev in events:
+            reg_open = ev.get("registrationOpen", True)
+            is_online = ev.get("isOnline", True)
+            start_iso = ev.get("isoStartDate", "")
+            end_iso = ev.get("isoEndDate", "")
+
+            if start_iso and end_iso:
+                if now_iso < start_iso:
+                    ev["scheduleStatus"] = "SCHEDULED_UPCOMING"
+                elif now_iso > end_iso:
+                    ev["scheduleStatus"] = "SCHEDULED_CLOSED"
+                    ev["registrationOpen"] = False
+                    ev["isOnline"] = False
+                else:
+                    ev["scheduleStatus"] = "SCHEDULED_LIVE"
+
+            if ev.get("registrationOpen") and ev.get("isOnline"):
+                ev["liveStatus"] = "ONLINE"
+            else:
+                ev["liveStatus"] = "OFFLINE"
+
+        return jsonify({
+            "count": len(events),
+            "events": events
+        }), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 5e. Admin: Create or Update Event Details & Schedule
+@admin_bp.route("/api/admin/events/<event_id>", methods=["PUT", "POST"])
+@admin_bp.route("/api/admin/events", methods=["POST"])
+def admin_save_event(event_id=None):
+    try:
+        data = request.get_json() or {}
+        target_id = event_id or data.get("id")
+
+        if not target_id:
+            return jsonify({"error": "Event ID is required"}), 400
+
+        payload = {
+            "id": target_id,
+            "number": data.get("number") or "EVENT",
+            "title": data.get("title", ""),
+            "tagline": data.get("tagline", ""),
+            "description": data.get("description", ""),
+            "format": data.get("format", ""),
+            "duration": data.get("duration", ""),
+            "startDate": data.get("startDate", ""),
+            "endDate": data.get("endDate", ""),
+            "isoStartDate": data.get("isoStartDate", ""),
+            "isoEndDate": data.get("isoEndDate", ""),
+            "prizePool": data.get("prizePool", "₹0"),
+            "prizeAmountNumeric": int(data.get("prizeAmountNumeric") or 0),
+            "registrationOpen": bool(data.get("registrationOpen", True)),
+            "isOnline": bool(data.get("isOnline", True)),
+            "status": data.get("status") or "ACTIVE",
+            "updatedAt": datetime.datetime.utcnow().isoformat()
+        }
+
+        if db is not None:
+            db.events.update_one({"id": target_id}, {"$set": payload}, upsert=True)
+
+        found = False
+        for i, ev in enumerate(LOCAL_EVENTS):
+            if ev.get("id") == target_id:
+                LOCAL_EVENTS[i].update(payload)
+                found = True
+                break
+        if not found:
+            LOCAL_EVENTS.append(payload)
+
+        return jsonify({
+            "success": True,
+            "event": payload,
+            "message": f"Event '{payload.get('title')}' saved successfully in HiveMind Central Registry."
+        }), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 6. Admin: Export Registrations Data to CSV / Excel Spreadsheet
+@admin_bp.route("/api/admin/export", methods=["GET"])
+@admin_bp.route("/api/admin/export/excel", methods=["GET"])
+def admin_export_data():
+    try:
+        event_filter = request.args.get("event") or ""
+        export_format = (request.args.get("format") or "").lower()
+        is_excel = "excel" in request.path or export_format == "excel" or export_format == "xlsx"
+
+        regs = []
+        if db is not None:
+            pipeline = [
+                {
+                    "$lookup": {
+                        "from": "users",
+                        "localField": "userId",
+                        "foreignField": "_id",
+                        "as": "user"
+                    }
+                },
+                {"$unwind": {"path": "$user", "preserveNullAndEmptyArrays": True}},
+                {
+                    "$addFields": {
+                        "name": "$user.name",
+                        "emailId": "$user.emailId",
+                        "collegeEmailId": "$user.collegeEmailId",
+                        "regNo": "$user.regNo",
+                        "trade": "$user.trade",
+                        "phoneNumber": "$user.phoneNumber",
+                        "college": "$user.college",
+                        "degree": "$user.degree",
+                        "batchYear": "$user.batchYear"
+                    }
+                },
+                {"$project": {"user": 0, "userId": 0, "_id": 0}}
+            ]
+            
+            match_stage = {}
+            if event_filter and event_filter != "ALL":
+                match_stage["selectedEvent"] = {"$regex": event_filter, "$options": "i"}
+            if match_stage:
+                pipeline.append({"$match": match_stage})
+                
+            pipeline.append({"$sort": {"registeredAt": -1}})
+            cursor = db.registrations.aggregate(pipeline)
+            regs = list(cursor)
+        else:
+            for r in LOCAL_REGISTRATIONS:
+                if event_filter and event_filter != "ALL" and event_filter.lower() not in r.get("selectedEvent", "").lower():
+                    continue
+                regs.append(r)
+            regs.sort(key=lambda x: x.get("registeredAt", ""), reverse=True)
+
+        headers = [
+            "Submission ID",
+            "Full Name",
+            "Personal Email",
+            "College Email",
+            "Registration / Roll No",
+            "Trade / Branch",
+            "Phone Number",
+            "College Name",
+            "Degree Program",
+            "Batch Year",
+            "Selected Event",
+            "Status",
+            "Registered Timestamp"
+        ]
+
+        if is_excel:
+            # Generate MS Excel XML / HTML Spreadsheet
+            html_rows = []
+            html_rows.append('<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">')
+            html_rows.append('<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Registrations</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>')
+            html_rows.append('<body><table border="1" style="border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px;">')
+            
+            # Header row
+            html_rows.append('<tr style="background-color:#00cfff; color:#0d1117; font-weight:bold; text-align:center;">')
+            for h in headers:
+                html_rows.append(f'<th style="padding:8px 12px; border:1px solid #000000;">{h}</th>')
+            html_rows.append('</tr>')
+
+            # Data rows
+            for r in regs:
+                html_rows.append('<tr>')
+                vals = [
+                    r.get("submissionId", ""),
+                    r.get("name", ""),
+                    r.get("emailId", ""),
+                    r.get("collegeEmailId", ""),
+                    r.get("regNo", ""),
+                    r.get("trade", ""),
+                    r.get("phoneNumber", ""),
+                    r.get("college", ""),
+                    r.get("degree", ""),
+                    r.get("batchYear", ""),
+                    r.get("selectedEvent", ""),
+                    r.get("status", "CONFIRMED"),
+                    r.get("registeredAt", "")
+                ]
+                for v in vals:
+                    html_rows.append(f'<td style="padding:6px 10px; border:1px solid #cccccc;">{v}</td>')
+                html_rows.append('</tr>')
+
+            html_rows.append('</table></body></html>')
+            excel_content = "\n".join(html_rows)
+
+            filename = f"HiveMind_Registrations_{event_filter or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.xls"
+            return Response(
+                excel_content,
+                mimetype="application/vnd.ms-excel",
+                headers={"Content-disposition": f"attachment; filename={filename}"}
+            )
+        else:
+            # Generate Standard CSV
+            output = io.StringIO()
+            writer = csv.writer(output)
+            writer.writerow(headers)
+
+            for r in regs:
+                writer.writerow([
+                    r.get("submissionId", ""),
+                    r.get("name", ""),
+                    r.get("emailId", ""),
+                    r.get("collegeEmailId", ""),
+                    r.get("regNo", ""),
+                    r.get("trade", ""),
+                    r.get("phoneNumber", ""),
+                    r.get("college", ""),
+                    r.get("degree", ""),
+                    r.get("batchYear", ""),
+                    r.get("selectedEvent", ""),
+                    r.get("status", "CONFIRMED"),
+                    r.get("registeredAt", "")
+                ])
+
+            filename = f"HiveMind_Registrations_{event_filter or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.csv"
+            return Response(
+                output.getvalue(),
+                mimetype="text/csv",
+                headers={"Content-disposition": f"attachment; filename={filename}"}
+            )
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 7. Admin: Publish & Update Event Results / Winners in MongoDB Atlas
+@admin_bp.route("/api/admin/results", methods=["POST"])
+def admin_publish_results():
+    try:
+        data = request.get_json() or {}
+        event_id = data.get("eventId")
+        event_title = data.get("eventTitle")
+        winner_1st = data.get("winner1st") or ""
+        winner_2nd = data.get("winner2nd") or ""
+        winner_3rd = data.get("winner3rd") or ""
+        special_mentions = data.get("specialMentions") or ""
+        announcement_notes = data.get("announcementNotes") or ""
+        event_status = data.get("eventStatus") or "RESULTS ANNOUNCED"
+
+        if not event_id or not event_title:
+            return jsonify({"error": "Missing eventId or eventTitle"}), 400
+
+        result_doc = {
+            "eventId": event_id,
+            "eventTitle": event_title,
+            "winner1st": winner_1st,
+            "winner2nd": winner_2nd,
+            "winner3rd": winner_3rd,
+            "specialMentions": special_mentions,
+            "announcementNotes": announcement_notes,
+            "eventStatus": event_status,
+            "publishedAt": datetime.datetime.utcnow().isoformat()
+        }
+
+        if db is not None:
+            db.results.update_one(
+                {"eventId": event_id},
+                {"$set": result_doc},
+                upsert=True
+            )
+            print(f"🏆 [MongoDB Atlas] Results Published for {event_title}! Winner: {winner_1st}")
+            result_doc.pop("_id", None)
+        else:
+            LOCAL_RESULTS.append(result_doc)
+            print(f"🏆 [Local Store] Results Published for {event_title}! Winner: {winner_1st}")
+
+        return jsonify({
+            "success": True,
+            "message": f"Results for '{event_title}' published successfully!",
+            "result": result_doc
+        }), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 9. Admin: Post & Publish Official Notices / Event News to MongoDB Atlas
+@admin_bp.route("/api/admin/notices", methods=["POST"])
+def admin_publish_notice():
+    try:
+        data = request.get_json() or {}
+        title = (data.get("title") or "").strip()
+        category = (data.get("category") or "GENERAL NOTICE").strip()
+        target_event = (data.get("targetEvent") or "ALL EVENTS").strip()
+        content = (data.get("content") or "").strip()
+        priority = (data.get("priority") or "NORMAL").strip().upper()
+
+        if not title or not content:
+            return jsonify({"error": "Title and Content are required for a Notice"}), 400
+
+        notice_id = f"NOTICE-{random.randint(1000, 9999)}"
+        notice_doc = {
+            "noticeId": notice_id,
+            "title": title,
+            "category": category,
+            "targetEvent": target_event,
+            "content": content,
+            "priority": priority,
+            "publishedAt": datetime.datetime.utcnow().isoformat()
+        }
+
+        if db is not None:
+            db.notices.insert_one(notice_doc)
+            print(f"📢 [MongoDB Atlas] Notice Published: '{title}' ({category})")
+            notice_doc.pop("_id", None)
+        else:
+            LOCAL_NOTICES.append(notice_doc)
+            print(f"📢 [Local Store] Notice Published: '{title}' ({category})")
+
+        return jsonify({
+            "success": True,
+            "noticeId": notice_id,
+            "message": "Notice published successfully!",
+            "notice": notice_doc
+        }), 201
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+
+# 10. Admin: Delete a Published Notice
+@admin_bp.route("/api/admin/notices/<notice_id>", methods=["DELETE"])
+def admin_delete_notice(notice_id):
+    try:
+        if db is not None:
+            db.notices.delete_one({"noticeId": notice_id})
+        else:
+            global LOCAL_NOTICES
+            LOCAL_NOTICES = [n for n in LOCAL_NOTICES if n.get("noticeId") != notice_id]
+
+        return jsonify({"success": True, "message": f"Notice {notice_id} deleted."}), 200
+
+    except Exception as err:
+        return jsonify({"error": str(err)}), 500
+
+

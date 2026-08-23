@@ -49,26 +49,6 @@ export const OneHiveSection: React.FC = () => {
           })}
         </div>
 
-        {/* Hexagonal Interactive Node Grid */}
-        <div className="bg-cyber-charcoal/40 border border-cyber-cyan/20 p-8 clip-chamfer-lg relative overflow-hidden flex flex-col items-center">
-          <div className="font-mono text-xs text-cyber-cyan mb-6 tracking-widest uppercase">
-            CONNECTIVITY MATRIX // ALL DOMAINS ACTIVE
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 max-w-3xl">
-            {['DESIGN', 'PROMPTING', 'SECURITY', 'GAME THEORY', 'ALGORITHMS', 'DEVELOPMENT'].map(
-              (label) => (
-                <div key={label} className="animate-float">
-                  <Hexagon size={110} glow>
-                    <span className="font-mono text-xs font-bold text-cyber-cyan text-center">
-                      {label}
-                    </span>
-                  </Hexagon>
-                </div>
-              )
-            )}
-          </div>
-        </div>
       </div>
     </section>
   );

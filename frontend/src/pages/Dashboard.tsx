@@ -12,7 +12,6 @@ import {
   Trophy,
   LogOut,
   BookOpen,
-  Sparkles,
   Zap,
   PlusCircle,
   Loader2,
@@ -29,6 +28,7 @@ export const Dashboard: React.FC = () => {
   const { user, registeredEvents, logout, refreshUserRegistrations } = useAuth();
   const [publishedResults, setPublishedResults] = useState<EventResultRecord[]>([]);
   const [activeNotices, setActiveNotices] = useState<NoticeRecord[]>([]);
+  const [liveEvents, setLiveEvents] = useState<any[]>(OFFICIAL_EVENTS);
 
   // Quick Event Registration Modal State
   const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
@@ -53,9 +53,33 @@ export const Dashboard: React.FC = () => {
       return;
     }
 
+    let isAdmin = false;
+    if (user?.role === 'admin') isAdmin = true;
+    else if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        if (parsed.role === 'admin') isAdmin = true;
+      } catch (e) {}
+    }
+
+    if (isAdmin) {
+      navigate('/admin');
+      return;
+    }
+
     loadPublishedResults();
     loadNotices();
+    loadEvents();
   }, []);
+
+  const loadEvents = async () => {
+    try {
+      const res = await apiService.getEvents();
+      if (res && res.events && res.events.length > 0) {
+        setLiveEvents(res.events);
+      }
+    } catch (e) {}
+  };
 
   const loadNotices = async () => {
     try {
@@ -75,11 +99,7 @@ export const Dashboard: React.FC = () => {
     } catch (err) { }
   };
 
-  const hasAllEventsPass = registeredEvents.some(
-    (r) =>
-      r.selectedEvent.toLowerCase().includes('all events') ||
-      r.selectedEvent.toLowerCase().includes('general pass')
-  );
+
 
   const handleQuickRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,84 +204,29 @@ export const Dashboard: React.FC = () => {
                 <h2 className="font-display text-2xl sm:text-3xl font-extrabold italic uppercase text-cyber-white leading-none">
                   {user.name}
                 </h2>
-                <p className="font-mono text-xs text-cyber-muted mt-1">
-                  {user.email}
+                <p className="font-mono text-xs text-cyber-muted mt-1 opacity-50 italic">
+                  [ EMAIL OBSCURED FOR PRIVACY ]
                 </p>
               </div>
             </div>
 
-            <div>
-              {hasAllEventsPass ? (
-                <div className="px-5 py-3 bg-cyber-yellow/10 border-2 border-cyber-yellow text-cyber-yellow font-mono text-xs font-bold tracking-wider clip-chamfer flex items-center gap-2 uppercase">
-                  <CheckCircle2 className="w-4 h-4 text-cyber-yellow" />
-                  <span>ALL EVENTS PASS ACTIVE — FULL ACCESS UNLOCKED</span>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => setShowRegisterModal(true)}
-                    className="px-6 py-3 bg-cyber-cyan text-cyber-black font-display font-bold italic tracking-wider clip-chamfer hover:bg-cyber-cyan-bright transition-all uppercase text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(0,207,255,0.4)]"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                    <span>+ REGISTER PARTICULAR EVENT</span>
-                  </button>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => setShowRegisterModal(true)}
+                className="px-6 py-3 bg-cyber-cyan text-cyber-black font-display font-bold italic tracking-wider clip-chamfer hover:bg-cyber-cyan-bright transition-all uppercase text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(0,207,255,0.4)]"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>+ REGISTER FOR EVENT</span>
+              </button>
 
-                  <Link
-                    to="/register"
-                    className="px-5 py-3 bg-cyber-black border border-cyber-cyan/50 text-cyber-white font-display font-bold italic tracking-wider clip-chamfer hover:border-cyber-cyan transition-all uppercase text-sm"
-                  >
-                    FULL FORM
-                  </Link>
-                </div>
-              )}
+              <Link
+                to="/events"
+                className="px-5 py-3 bg-cyber-black border border-cyber-cyan/50 text-cyber-white font-display font-bold italic tracking-wider clip-chamfer hover:border-cyber-cyan transition-all uppercase text-sm"
+              >
+                EXPLORE ALL EVENTS
+              </Link>
             </div>
           </div>
-        )}
-
-        {/* ALL EVENTS GENERAL FESTIVAL PASS BANNER (If Opted All Events) */}
-        {hasAllEventsPass && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-cyber-black border-2 border-cyber-yellow p-6 clip-chamfer-lg mb-10 relative overflow-hidden shadow-[0_0_35px_rgba(255,215,0,0.25)]"
-          >
-            <div className="absolute top-0 right-0 w-48 h-48 bg-cyber-yellow/10 blur-2xl pointer-events-none" />
-
-            <div className="flex items-center gap-3 mb-2">
-              <Sparkles className="w-6 h-6 text-cyber-yellow animate-pulse" />
-              <span className="font-mono text-xs font-bold uppercase tracking-widest text-cyber-yellow">
-                ALL EVENTS GENERAL PASS UNLOCKED
-              </span>
-            </div>
-
-            <h3 className="font-display text-3xl font-black italic uppercase text-cyber-white mb-2">
-              VIP GENERAL FESTIVAL ACCESS ENGAGED
-            </h3>
-
-            <p className="text-cyber-muted text-xs font-body max-w-2xl mb-6">
-              You are registered with the **All Events / General Festival Pass**. You have full eligible access to participate in all 10 official festival challenges:
-            </p>
-
-            {/* UNLOCKED CHALLENGES GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {OFFICIAL_EVENTS.map((ev) => (
-                <div
-                  key={ev.id}
-                  className="bg-cyber-charcoal border border-cyber-yellow/40 p-4 clip-chamfer flex items-center justify-between group hover:border-cyber-yellow transition-all"
-                >
-                  <div>
-                    <span className="font-mono text-[10px] text-cyber-yellow font-bold block mb-0.5">
-                      {ev.number} — UNLOCKED
-                    </span>
-                    <h4 className="font-display text-lg font-bold italic uppercase text-cyber-white group-hover:text-cyber-yellow transition-colors">
-                      {ev.title}
-                    </h4>
-                  </div>
-                  <Zap className="w-5 h-5 text-cyber-yellow shrink-0" />
-                </div>
-              ))}
-            </div>
-          </motion.div>
         )}
 
         {/* LIVE ANNOUNCEMENTS & OFFICIAL NOTICES FEED */}
@@ -324,15 +289,13 @@ export const Dashboard: React.FC = () => {
               <span>MY REGISTERED CHALLENGES ({registeredEvents.length})</span>
             </h3>
 
-            {!hasAllEventsPass && (
-              <button
-                onClick={() => setShowRegisterModal(true)}
-                className="px-4 py-2 bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan font-mono text-xs font-bold clip-chamfer hover:bg-cyber-cyan hover:text-cyber-black transition-all flex items-center gap-1.5 uppercase"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>ADD EVENT</span>
-              </button>
-            )}
+            <button
+              onClick={() => setShowRegisterModal(true)}
+              className="px-4 py-2 bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan font-mono text-xs font-bold clip-chamfer hover:bg-cyber-cyan hover:text-cyber-black transition-all flex items-center gap-1.5 uppercase"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>ADD EVENT</span>
+            </button>
           </div>
 
           {registeredEvents.length === 0 ? (
@@ -376,7 +339,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-cyber-cyan block text-[10px]">ROLL NO</span>
-                      <span>{reg.regNo}</span>
+                      <span className="opacity-50">[ HIDDEN ]</span>
                     </div>
                   </div>
 
@@ -390,6 +353,102 @@ export const Dashboard: React.FC = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* ALL AVAILABLE CHALLENGES — ONE-BY-ONE REGISTRATION GRID */}
+        <div className="mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+            <h3 className="font-display text-2xl font-bold italic uppercase tracking-wider text-cyber-white flex items-center gap-2">
+              <Zap className="w-6 h-6 text-cyber-cyan" />
+              <span>AVAILABLE FESTIVAL CHALLENGES ({OFFICIAL_EVENTS.length})</span>
+            </h3>
+            <span className="font-mono text-xs text-cyber-cyan font-bold tracking-wider uppercase">
+              // REGISTER ONE-BY-ONE FOR INDIVIDUAL EVENTS
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {liveEvents.map((ev) => {
+              const eventFullName = `${ev.number} — ${ev.title}`;
+              const existingReg = registeredEvents.find(
+                (r) =>
+                  r.selectedEvent.toLowerCase().includes(ev.title.toLowerCase()) ||
+                  r.selectedEvent.toLowerCase().includes(ev.number.toLowerCase())
+              );
+              const isEventOnline = (ev.isOnline !== false) && (ev.registrationOpen !== false) && (ev.liveStatus !== 'OFFLINE');
+
+              return (
+                <div
+                  key={ev.id}
+                  className={`bg-cyber-charcoal border-2 ${
+                    existingReg
+                      ? 'border-cyber-cyan/40'
+                      : !isEventOnline
+                      ? 'border-cyber-pink/30 opacity-80'
+                      : 'border-cyber-cyan/30 hover:border-cyber-cyan'
+                  } p-6 clip-chamfer relative overflow-hidden group transition-all flex flex-col justify-between shadow-[0_0_15px_rgba(0,207,255,0.05)]`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3 border-b border-cyber-cyan/20 pb-2">
+                      <span className="font-mono text-xs text-cyber-cyan font-bold tracking-widest bg-cyber-black px-2.5 py-0.5 border border-cyber-cyan/30 clip-chamfer">
+                        {ev.number}
+                      </span>
+                      {existingReg ? (
+                        <span className="font-mono text-[10px] text-cyber-cyan bg-cyber-cyan/10 px-2 py-0.5 border border-cyber-cyan/40 clip-chamfer uppercase font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-cyber-cyan" />
+                          <span>REGISTERED</span>
+                        </span>
+                      ) : !isEventOnline ? (
+                        <span className="font-mono text-[10px] text-cyber-pink bg-cyber-pink/10 px-2 py-0.5 border border-cyber-pink/40 clip-chamfer uppercase font-bold">
+                          🔴 REGISTRATION CLOSED
+                        </span>
+                      ) : (
+                        <span className="font-mono text-[10px] text-cyber-yellow bg-cyber-yellow/10 px-2 py-0.5 border border-cyber-yellow/40 clip-chamfer uppercase font-bold">
+                          🟢 OPEN FOR REGISTRATION
+                        </span>
+                      )}
+                    </div>
+
+                    <h4 className="font-display text-2xl font-extrabold italic uppercase text-cyber-white mb-1 group-hover:text-cyber-cyan transition-colors">
+                      {ev.title}
+                    </h4>
+
+                    <p className="font-display italic text-xs text-cyber-cyan-bright uppercase font-semibold mb-3">
+                      {ev.tagline}
+                    </p>
+
+                    <p className="text-cyber-muted text-xs font-body mb-4 line-clamp-2">
+                      {ev.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-cyber-cyan/20">
+                    {existingReg ? (
+                      <div className="p-2.5 bg-cyber-black/80 border border-cyber-cyan/40 clip-chamfer font-mono text-xs text-cyber-cyan text-center font-bold flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-cyber-cyan" />
+                        <span>ID: {existingReg.submissionId}</span>
+                      </div>
+                    ) : !isEventOnline ? (
+                      <div className="p-2.5 bg-cyber-pink/10 border border-cyber-pink/40 clip-chamfer font-mono text-xs text-cyber-pink text-center font-bold">
+                        REGISTRATION OFFLINE
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setSelectedEventToRegister(eventFullName);
+                          setShowRegisterModal(true);
+                        }}
+                        className="w-full py-2.5 bg-cyber-cyan hover:bg-cyber-cyan-bright text-cyber-black font-display font-bold italic text-sm tracking-wider clip-chamfer transition-all flex items-center justify-center gap-2 uppercase shadow-[0_0_15px_rgba(0,207,255,0.3)]"
+                      >
+                        <PlusCircle className="w-4 h-4" />
+                        <span>REGISTER THIS EVENT</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* PARTICIPANT TIMELINE & ACTION ITEMS */}
@@ -568,7 +627,6 @@ export const Dashboard: React.FC = () => {
                     onChange={(e) => setSelectedEventToRegister(e.target.value)}
                     className="w-full bg-cyber-black border border-cyber-cyan/40 text-cyber-white p-3 clip-chamfer font-mono text-sm focus:border-cyber-cyan focus:outline-none"
                   >
-                    <option value="All Events / General Pass">ALL EVENTS / GENERAL FESTIVAL PASS</option>
                     {OFFICIAL_EVENTS.map((ev) => (
                       <option key={ev.id} value={`${ev.number} — ${ev.title}`}>
                         {ev.number} — {ev.title} ({ev.tagline})
@@ -579,7 +637,7 @@ export const Dashboard: React.FC = () => {
 
                 <div className="p-4 bg-cyber-black/70 border border-cyber-cyan/20 clip-chamfer font-mono text-xs text-cyber-muted space-y-1">
                   <div><span className="text-cyber-cyan font-bold">NAME:</span> {user?.name}</div>
-                  <div><span className="text-cyber-cyan font-bold">EMAIL:</span> {user?.email}</div>
+                  <div><span className="text-cyber-cyan font-bold">EMAIL:</span> <span className="opacity-50">[ HIDDEN ]</span></div>
                 </div>
 
                 <button

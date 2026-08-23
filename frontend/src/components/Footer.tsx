@@ -1,6 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Instagram, Linkedin, Globe, Users, ArrowUp } from 'lucide-react';
+import {
+  Terminal,
+  Instagram,
+  Linkedin,
+  Globe,
+  Users,
+  ArrowUp,
+  Mail,
+  Code2,
+} from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const scrollToTop = () => {
@@ -28,9 +37,23 @@ export const Footer: React.FC = () => {
               </div>
             </Link>
 
-            <p className="text-cyber-muted text-sm font-body max-w-sm mb-6">
+            <p className="text-cyber-muted text-sm font-body max-w-sm mb-4 leading-relaxed">
               HiveMind 2026 is a month-long digital challenge festival organized by the Software Development Club at Sant Longowal Institute of Engineering & Technology (SLIET).
             </p>
+
+            {/* Official Email Contact Block */}
+            <div className="w-full max-w-sm p-3 bg-cyber-charcoal/80 border border-cyber-cyan/30 clip-chamfer mb-4 space-y-1">
+              <div className="font-mono text-[10px] text-cyber-cyan font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-cyber-yellow" />
+                <span>OFFICIAL CONTACT EMAIL</span>
+              </div>
+              <a
+                href="mailto:contact.ssdc.sliet@gmail.com"
+                className="font-mono text-xs text-cyber-white hover:text-cyber-cyan transition-colors block font-semibold hover:underline"
+              >
+                contact.ssdc.sliet@gmail.com
+              </a>
+            </div>
 
             <span className="font-mono text-xs text-cyber-cyan/70">
               SYS // HIVEMIND_2026_PRODUCTION
@@ -51,6 +74,11 @@ export const Footer: React.FC = () => {
               <li>
                 <Link to="/events" className="hover:text-cyber-cyan transition-colors">
                   EVENTS ARENA
+                </Link>
+              </li>
+              <li>
+                <Link to="/organizers" className="hover:text-cyber-cyan transition-colors">
+                  ORGANIZERS & CREW
                 </Link>
               </li>
               <li>
@@ -77,6 +105,14 @@ export const Footer: React.FC = () => {
               CONNECT WITH SSDC
             </h4>
             <div className="flex flex-col space-y-3 font-mono text-xs">
+              <a
+                href="mailto:contact.ssdc.sliet@gmail.com"
+                className="p-3 bg-cyber-charcoal border border-cyber-yellow/40 hover:border-cyber-yellow text-cyber-white hover:text-cyber-yellow clip-chamfer flex items-center gap-3 transition-all"
+              >
+                <Mail className="w-4 h-4 text-cyber-yellow shrink-0" />
+                <span>EMAIL // contact.ssdc.sliet@gmail.com</span>
+              </a>
+
               <a
                 href="https://www.instagram.com/ssdc.sliet/"
                 target="_blank"
@@ -123,8 +159,23 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-cyber-cyan/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="font-mono text-xs text-cyber-muted">
+          <div className="font-mono text-xs text-cyber-muted text-center sm:text-left">
             © 2026 SLIET Software Development Club (SSDC). All rights reserved.
+          </div>
+
+          {/* Subtle Developer Credit */}
+          <div className="font-mono text-[10px] text-cyber-muted/30 flex items-center gap-1.5 opacity-40 hover:opacity-100 transition-opacity">
+            <Code2 className="w-3 h-3 text-cyber-muted/40" />
+            <span>Dev:</span>
+            <a
+              href="https://github.com/eabhi-me"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-cyber-cyan transition-colors font-medium"
+              title="GitHub: eabhi-me"
+            >
+              abhi (@eabhi-me)
+            </a>
           </div>
 
           <button

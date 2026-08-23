@@ -3,8 +3,26 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Cpu, LayoutGrid, ShieldAlert, BrainCircuit, Terminal } from 'lucide-react';
 import { CircuitBackground } from './CircuitBackground';
+import { useAuth } from '../context/AuthContext';
 
 export const Hero: React.FC = () => {
+  const { user } = useAuth();
+  const isLoggedIn = Boolean(user || localStorage.getItem('hivemind_jwt_token'));
+  
+  let isAdmin = false;
+  const storedUserStr = localStorage.getItem('hivemind_user');
+  if (user?.role === 'admin') {
+    isAdmin = true;
+  } else if (storedUserStr) {
+    try {
+      const parsed = JSON.parse(storedUserStr);
+      if (parsed.role === 'admin') isAdmin = true;
+    } catch (e) {}
+  }
+  
+  const dashboardPath = isAdmin ? '/admin' : '/dashboard';
+  const dashboardLabel = isAdmin ? '[ ADMIN CONTROL ]' : '[ MY DASHBOARD ]';
+
   const nodes = [
     {
       id: '01',
@@ -111,10 +129,10 @@ export const Hero: React.FC = () => {
               </a>
 
               <Link
-                to="/register"
+                to={isLoggedIn ? dashboardPath : "/register"}
                 className="w-full sm:w-auto px-8 py-4 bg-cyber-charcoal hover:bg-cyber-charcoal-light text-cyber-white border border-cyber-cyan/50 font-display font-bold text-lg italic tracking-wider clip-chamfer transition-all duration-300 flex items-center justify-center gap-2 uppercase hover:border-cyber-cyan"
               >
-                [ REGISTER NOW ]
+                {isLoggedIn ? dashboardLabel : '[ REGISTER NOW ]'}
               </Link>
             </div>
 

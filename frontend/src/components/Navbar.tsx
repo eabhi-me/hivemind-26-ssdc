@@ -12,6 +12,20 @@ export const Navbar: React.FC = () => {
 
   const isLoggedIn = Boolean(user || localStorage.getItem('hivemind_jwt_token'));
 
+  const storedUserStr = localStorage.getItem('hivemind_user');
+  let isAdmin = false;
+  if (user?.role === 'admin') {
+    isAdmin = true;
+  } else if (storedUserStr) {
+    try {
+      const parsed = JSON.parse(storedUserStr);
+      if (parsed.role === 'admin') isAdmin = true;
+    } catch (e) {}
+  }
+
+  const dashboardPath = isAdmin ? '/admin' : '/dashboard';
+  const dashboardLabel = isAdmin ? 'ADMIN PORTAL' : 'DASHBOARD';
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -27,7 +41,7 @@ export const Navbar: React.FC = () => {
     { name: 'ORGANIZERS', path: '/organizers', isHash: false },
     { name: 'PRIZES', path: '/#prizes', isHash: true },
     ...(isLoggedIn
-      ? [{ name: 'DASHBOARD', path: '/dashboard', isHash: false }]
+      ? [{ name: dashboardLabel, path: dashboardPath, isHash: false }]
       : [
           { name: 'DASHBOARD', path: '/dashboard', isHash: false },
           { name: 'LOGIN', path: '/login', isHash: false },
@@ -114,11 +128,11 @@ export const Navbar: React.FC = () => {
           {isLoggedIn ? (
             <div className="flex items-center gap-3">
               <Link
-                to="/dashboard"
+                to={dashboardPath}
                 className="px-4 py-2 bg-cyber-cyan/10 hover:bg-cyber-cyan text-cyber-cyan hover:text-cyber-black border border-cyber-cyan font-mono text-xs font-bold clip-chamfer transition-all flex items-center gap-1.5"
               >
                 <UserCheck className="w-3.5 h-3.5" />
-                <span>MY DASHBOARD</span>
+                <span>{isAdmin ? 'ADMIN CONTROL' : 'MY DASHBOARD'}</span>
               </Link>
 
               <button
@@ -139,14 +153,26 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile Toggle Button */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden p-2 text-cyber-cyan border border-cyber-cyan/40 bg-cyber-charcoal clip-chamfer focus:outline-none"
-          aria-label="Toggle navigation menu"
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        {/* Mobile Controls (Profile + Toggle) */}
+        <div className="flex md:hidden items-center gap-3">
+          {isLoggedIn && (
+            <Link
+              to={dashboardPath}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 text-cyber-cyan border border-cyber-cyan/40 bg-cyber-charcoal clip-chamfer focus:outline-none"
+              aria-label="Dashboard"
+            >
+              <UserCheck className="w-6 h-6" />
+            </Link>
+          )}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-cyber-cyan border border-cyber-cyan/40 bg-cyber-charcoal clip-chamfer focus:outline-none"
+            aria-label="Toggle navigation menu"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Drawer */}
@@ -182,11 +208,11 @@ export const Navbar: React.FC = () => {
             {isLoggedIn ? (
               <div className="flex flex-col gap-2">
                 <Link
-                  to="/dashboard"
+                  to={dashboardPath}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full text-center py-3 bg-cyber-cyan text-cyber-black font-mono text-xs font-bold tracking-widest clip-chamfer block uppercase"
                 >
-                  [ MY DASHBOARD ]
+                  [ {isAdmin ? 'ADMIN CONTROL' : 'MY DASHBOARD'} ]
                 </Link>
                 <button
                   onClick={handleLogout}

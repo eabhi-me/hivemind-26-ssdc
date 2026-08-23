@@ -35,7 +35,7 @@ export const OFFICIAL_EVENTS: EventItem[] = [
   {
     id: 'reverse-ai',
     number: 'EVENT_02',
-    title: 'REVERSE AI-NGINEERING',
+    title: 'PROMPT INVERSION',
     tagline: 'PROMPT THE IMPOSSIBLE.',
     description:
       'A fast-paced live prompt-engineering battle. Participants are shown complex AI-generated images or short videos and must replicate the media as closely as possible using a single text prompt.',
@@ -59,7 +59,7 @@ export const OFFICIAL_EVENTS: EventItem[] = [
       'No pre-written scripts or automated prompt-guessing bots allowed.',
     ],
     icon: 'Cpu',
-    accent: 'cyan',
+    accent: 'pink',
     status: 'UPCOMING',
   },
   {

@@ -44,3 +44,9 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
+
+# Scripts and scratch files not meant for version control
+backend/import_events.py
+backend/init_db.py
+backend/refactor.py
+backend/events_data.json
