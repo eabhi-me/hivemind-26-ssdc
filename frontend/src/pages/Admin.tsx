@@ -125,6 +125,44 @@ export const Admin: React.FC = () => {
     }
   };
 
+  const handleDeleteUser = async (userId: string | undefined, userName: string) => {
+    if (!userId) return;
+    if (!window.confirm(`CRITICAL WARNING:\nAre you sure you want to PERMANENTLY DELETE user '${userName}' and ALL their registrations? This cannot be undone.`)) {
+      return;
+    }
+    try {
+      const res = await apiService.deleteUser(userId);
+      if (res.success) {
+        setUsers(users.filter(u => u._id !== userId));
+        // Also refresh metrics and registrations to reflect the deletion
+        loadMetrics();
+        loadRegistrations();
+      } else {
+        alert(`Failed to delete user: ${res.error}`);
+      }
+    } catch (err: any) {
+      alert(`Error deleting user: ${err.message}`);
+    }
+  };
+
+  const handleToggleBanUser = async (userId: string | undefined, currentBanStatus: boolean, userName: string) => {
+    if (!userId) return;
+    const action = currentBanStatus ? 'UNBAN' : 'BAN';
+    if (!window.confirm(`Are you sure you want to ${action} user '${userName}'?`)) {
+      return;
+    }
+    try {
+      const res = await apiService.toggleUserBan(userId, !currentBanStatus);
+      if (res.success) {
+        setUsers(users.map(u => u._id === userId ? { ...u, isBanned: !currentBanStatus } : u));
+      } else {
+        alert(`Failed to ${action.toLowerCase()} user: ${res.error}`);
+      }
+    } catch (err: any) {
+      alert(`Error toggling ban status: ${err.message}`);
+    }
+  };
+
   const loadEvents = async () => {
     try {
       const res = await apiService.getEvents();
@@ -269,14 +307,22 @@ export const Admin: React.FC = () => {
     }
   };
 
-  const handleCsvExport = () => {
-    const exportUrl = apiService.getAdminCsvExportUrl(selectedEventFilter);
-    window.open(exportUrl, '_blank');
+  const handleCsvExport = async () => {
+    setIsLoading(true);
+    const res = await apiService.exportAdminData('csv', selectedEventFilter);
+    setIsLoading(false);
+    if (!res.success) {
+      alert(`Export failed: ${res.error}`);
+    }
   };
 
-  const handleExcelExport = () => {
-    const exportUrl = apiService.getAdminExcelExportUrl(selectedEventFilter);
-    window.open(exportUrl, '_blank');
+  const handleExcelExport = async () => {
+    setIsLoading(true);
+    const res = await apiService.exportAdminData('excel', selectedEventFilter);
+    setIsLoading(false);
+    if (!res.success) {
+      alert(`Export failed: ${res.error}`);
+    }
   };
 
   const handlePublishResults = async (e: React.FormEvent) => {
@@ -582,6 +628,7 @@ export const Admin: React.FC = () => {
                         <th className="p-3.5">PHONE</th>
                         <th className="p-3.5">COURSE/TRADE</th>
                         <th className="p-3.5">JOINED</th>
+                        <th className="p-3.5 text-right">ACTIONS</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-cyber-cyan/10">
@@ -595,6 +642,34 @@ export const Admin: React.FC = () => {
                           <td className="p-3.5 text-cyber-white">{row.degree} {row.trade} {row.batchYear ? `(${row.batchYear})` : ''}</td>
                           <td className="p-3.5 text-cyber-muted">
                             {row.registeredAt ? new Date(row.registeredAt).toLocaleDateString() : '-'}
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {row.isBanned ? (
+                                <button
+                                  onClick={() => handleToggleBanUser(row._id, true, row.name)}
+                                  className="text-xs bg-cyber-pink/20 text-cyber-pink border border-cyber-pink/40 px-2 py-1 clip-chamfer hover:bg-cyber-pink hover:text-cyber-black transition-colors"
+                                  title="Unban User"
+                                >
+                                  UNBAN
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleToggleBanUser(row._id, false, row.name)}
+                                  className="text-xs bg-cyber-black text-cyber-yellow border border-cyber-yellow/40 px-2 py-1 clip-chamfer hover:bg-cyber-yellow hover:text-cyber-black transition-colors"
+                                  title="Ban User"
+                                >
+                                  BAN
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteUser(row._id, row.name)}
+                                className="text-cyber-pink hover:text-cyber-pink-bright transition-colors p-1"
+                                title="Permanently Delete User"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

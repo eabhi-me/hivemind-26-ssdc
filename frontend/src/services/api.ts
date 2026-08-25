@@ -14,6 +14,8 @@ export interface UserProfile {
 }
 
 export interface UserRecord {
+  _id?: string;
+  isBanned?: boolean;
   name: string;
   emailId: string;
   collegeEmailId?: string;
@@ -223,6 +225,44 @@ class ApiService {
     return data;
   }
 
+  async deleteUser(userId: string) {
+    try {
+      const token = localStorage.getItem('hivemind_jwt_token');
+      const response = await fetch(`${this.baseUrl}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        return { success: true };
+      }
+      return { success: false, error: 'Failed to delete user' };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  async toggleUserBan(userId: string, isBanned: boolean) {
+    try {
+      const token = localStorage.getItem('hivemind_jwt_token');
+      const response = await fetch(`${this.baseUrl}/api/admin/users/${userId}/ban`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ isBanned })
+      });
+      if (response.ok) {
+        return { success: true };
+      }
+      return { success: false, error: 'Failed to update ban status' };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
   // 5d. Public & Participant: Get All Events with Dynamic Schedules
   async getEvents(): Promise<{ count: number; events: any[] }> {
     try {
@@ -245,13 +285,37 @@ class ApiService {
     return data;
   }
 
-  // 6. Admin: Get CSV & Excel Download Export URLs
-  getAdminCsvExportUrl(eventFilter: string = ''): string {
-    return `${this.baseUrl}/api/admin/export?event=${encodeURIComponent(eventFilter)}`;
-  }
-
-  getAdminExcelExportUrl(eventFilter: string = ''): string {
-    return `${this.baseUrl}/api/admin/export/excel?event=${encodeURIComponent(eventFilter)}`;
+  async exportAdminData(format: 'csv' | 'excel', eventFilter: string = '') {
+    try {
+      const endpoint = format === 'excel' ? '/api/admin/export/excel' : '/api/admin/export';
+      const token = localStorage.getItem('hivemind_jwt_token');
+      const response = await fetch(`${this.baseUrl}${endpoint}?event=${encodeURIComponent(eventFilter)}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+      
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      const extension = format === 'excel' ? 'xlsx' : 'csv';
+      const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      link.download = `HiveMind_Registrations_${eventFilter || 'ALL'}_${dateStr}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
   }
 
   // 7. Admin: Publish Event Results & Winners to Cloud Core
@@ -312,6 +376,25 @@ class ApiService {
   // Fetch User Profile & Registrations from Cloud Core
   async fetchUserProfile(_token?: string): Promise<{ user: UserProfile; registrations: RegistrationRecord[] }> {
     try {
+      const storedToken = _token || localStorage.getItem('hivemind_jwt_token');
+      if (storedToken && storedToken !== 'active_token') {
+        const response = await fetch(`${this.baseUrl}/api/auth/profile`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+        if (response.ok) {
+          const res = await response.json();
+          return {
+            user: res.user || { email: '', name: 'Participant', role: 'participant' },
+            registrations: res.registrations || [],
+          };
+        }
+      }
+
+      // Fallback for edge cases where token might not exist but email does locally
       const storedUser = localStorage.getItem('hivemind_user');
       let email = '';
       if (storedUser) {
@@ -320,16 +403,11 @@ class ApiService {
           email = parsed.email;
         } catch (e) { }
       }
-
-      if (email) {
-        const res = await this.participantLogin(email);
-        if (res && res.registrations) {
-          return {
-            user: res.user || { email, name: 'Participant' },
-            registrations: res.registrations,
-          };
-        }
-      }
+      
+      return {
+        user: { email, name: 'Participant', role: 'participant' },
+        registrations: [],
+      };
     } catch (err) { }
 
     const saved = localStorage.getItem('hivemind_local_regs');

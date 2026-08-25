@@ -74,9 +74,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setRegisteredEvents(data.registrations);
         localStorage.setItem('hivemind_local_regs', JSON.stringify(data.registrations));
       }
-      if (data.user && data.user.email) {
+      if (data.user && (data.user.email || data.user.role === 'admin')) {
         setUser((prev) => {
-          if (!prev || prev.email !== data.user.email || prev.name !== data.user.name) {
+          const isSameEmail = data.user.email && prev?.email === data.user.email;
+          const isSameAdmin = data.user.role === 'admin' && prev?.role === 'admin';
+          if (!prev || (!isSameEmail && !isSameAdmin) || prev.name !== data.user.name) {
             localStorage.setItem('hivemind_user', JSON.stringify(data.user));
             return { ...prev, ...data.user };
           }

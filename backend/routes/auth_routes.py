@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 import jwt
 
 from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, ADMIN_USERNAME, ADMIN_PASSWORD
-from auth import JWT_SECRET
+from auth import JWT_SECRET, token_required
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -52,6 +52,8 @@ def participant_login():
                 })
 
             if user_doc:
+                if user_doc.get("isBanned"):
+                    return jsonify({"error": "ACCOUNT BANNED: Your account has been banned or suspended by HiveMind Admin."}), 403
                 user_regs = list(db.registrations.find({"userId": user_doc["_id"]}, {"_id": 0}))
                 for r in user_regs:
                     if "userId" in r:
@@ -134,6 +136,58 @@ def participant_login():
     except Exception as err:
         print(f"❌ participant_login error: {err}")
         return jsonify({"error": "Login failed. Please try again."}), 500
+
+@auth_bp.route("/api/auth/profile", methods=["GET"])
+@token_required
+def participant_profile(current_user):
+    try:
+        if current_user.get("role") == "admin":
+            return jsonify({
+                "success": True,
+                "user": current_user,
+                "registrations": []
+            }), 200
+
+        email = current_user.get("email")
+        if not email:
+            return jsonify({"error": "Invalid token payload"}), 400
+            
+        regs = []
+        if db is not None:
+            safe_email = _safe_regex(email)
+            rx = {"$regex": f"^{safe_email}$", "$options": "i"}
+            user_doc = db.users.find_one({"$or": [{"emailId": rx}, {"collegeEmailId": rx}, {"phoneNumber": rx}]})
+            if user_doc:
+                if user_doc.get("isBanned"):
+                    return jsonify({"error": "ACCOUNT BANNED: Your account has been banned or suspended by HiveMind Admin."}), 403
+                user_regs = list(db.registrations.find({"userId": user_doc["_id"]}, {"_id": 0}))
+                for r in user_regs:
+                    if "userId" in r:
+                        r["userId"] = str(r["userId"])
+                    merged = dict(user_doc)
+                    merged.pop("_id", None)
+                    merged.update(r)
+                    regs.append(merged)
+                    
+        if not regs and LOCAL_USERS:
+            search_low = email.lower()
+            local_user = next((u for u in LOCAL_USERS if search_low in (u.get("emailId", "").lower(), u.get("collegeEmailId", "").lower(), u.get("phoneNumber", "").lower())), None)
+            if local_user:
+                for r in LOCAL_REGISTRATIONS:
+                    if r.get("userId") == local_user.get("id"):
+                        merged = dict(local_user)
+                        merged.update(r)
+                        regs.append(merged)
+                        
+        return jsonify({
+            "success": True,
+            "user": current_user,
+            "registrations": regs
+        }), 200
+    except Exception as err:
+        print(f"❌ participant_profile error: {err}")
+        return jsonify({"error": "Failed to fetch profile."}), 500
+
 
 
 # 2. Admin Login Endpoint (Queries MongoDB Atlas `admin_users` Collection)

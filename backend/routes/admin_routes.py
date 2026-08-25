@@ -4,7 +4,8 @@ import csv
 import io
 import html
 import uuid
-from flask import Blueprint, request, jsonify, Response
+import openpyxl
+from flask import Blueprint, request, jsonify, Response, send_file
 
 from database import db, LOCAL_USERS, LOCAL_REGISTRATIONS, LOCAL_RESULTS, LOCAL_NOTICES, LOCAL_EVENTS, ADMIN_USERNAME, ADMIN_PASSWORD
 from auth import admin_required
@@ -55,18 +56,16 @@ def admin_get_users(current_user):
                     {"phoneNumber": {"$regex": safe_q, "$options": "i"}},
                 ]
 
-            cursor = db.users.find(query, {"_id": 0}).sort("name", 1)
-            users = list(cursor)
+            cursor = db.users.find(query).sort("name", 1)
+            for user in cursor:
+                user["_id"] = str(user["_id"])
+                users.append(user)
         else:
-            for u in LOCAL_USERS:
-                if search_query:
-                    sq = search_query.lower()
-                    if sq not in u.get("name", "").lower() and \
-                       sq not in u.get("emailId", "").lower() and \
-                       sq not in u.get("regNo", "").lower() and \
-                       sq not in u.get("phoneNumber", "").lower():
-                        continue
-                users.append(u)
+            if search_query:
+                q = search_query.lower()
+                users = [u for u in LOCAL_USERS if q in u.get("name", "").lower() or q in u.get("emailId", "").lower() or q in u.get("regNo", "").lower()]
+            else:
+                users = LOCAL_USERS
             users.sort(key=lambda x: x.get("name", ""))
 
         return jsonify({
@@ -77,6 +76,52 @@ def admin_get_users(current_user):
     except Exception as err:
         print(f"❌ admin_get_users error: {err}")
         return jsonify({"error": "Failed to fetch users."}), 500
+
+
+# 4c. Admin: Delete User (Cascading)
+@admin_bp.route("/api/admin/users/<user_id>", methods=["DELETE"])
+@admin_required
+def admin_delete_user(current_user, user_id):
+    try:
+        from bson.objectid import ObjectId
+        if db is not None:
+            # 1. Delete the user
+            user_res = db.users.delete_one({"_id": ObjectId(user_id)})
+            if user_res.deleted_count == 0:
+                return jsonify({"error": "User not found."}), 404
+                
+            # 2. Delete all their registrations (cascading)
+            db.registrations.delete_many({"userId": ObjectId(user_id)})
+            
+            return jsonify({"success": True, "message": "User and associated registrations deleted."}), 200
+        else:
+            return jsonify({"error": "Cannot delete local users."}), 400
+    except Exception as err:
+        print(f"❌ admin_delete_user error: {err}")
+        return jsonify({"error": "Failed to delete user."}), 500
+
+
+# 4d. Admin: Toggle User Ban
+@admin_bp.route("/api/admin/users/<user_id>/ban", methods=["PUT"])
+@admin_required
+def admin_toggle_user_ban(current_user, user_id):
+    try:
+        from bson.objectid import ObjectId
+        data = request.get_json() or {}
+        is_banned = data.get("isBanned", False)
+        
+        if db is not None:
+            res = db.users.update_one({"_id": ObjectId(user_id)}, {"$set": {"isBanned": is_banned}})
+            if res.matched_count == 0:
+                return jsonify({"error": "User not found."}), 404
+            
+            status_msg = "banned" if is_banned else "unbanned"
+            return jsonify({"success": True, "message": f"User successfully {status_msg}."}), 200
+        else:
+            return jsonify({"error": "Cannot ban local users."}), 400
+    except Exception as err:
+        print(f"❌ admin_toggle_user_ban error: {err}")
+        return jsonify({"error": "Failed to update ban status."}), 500
 
 
 # 5. Admin: Fetch All Registrations with Event Filter
@@ -349,22 +394,16 @@ def admin_export_data(current_user):
         ]
 
         if is_excel:
-            # Generate MS Excel XML / HTML Spreadsheet (with XSS-safe escaping)
-            html_rows = []
-            html_rows.append('<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">')
-            html_rows.append('<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Registrations</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>')
-            html_rows.append('<body><table border="1" style="border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px;">')
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "Registrations"
             
             # Header row
-            html_rows.append('<tr style="background-color:#00cfff; color:#0d1117; font-weight:bold; text-align:center;">')
-            for h in headers:
-                html_rows.append(f'<th style="padding:8px 12px; border:1px solid #000000;">{html.escape(h)}</th>')
-            html_rows.append('</tr>')
-
-            # Data rows (XSS-safe)
+            ws.append(headers)
+            
+            # Data rows
             for r in regs:
-                html_rows.append('<tr>')
-                vals = [
+                ws.append([
                     r.get("submissionId", ""),
                     r.get("name", ""),
                     r.get("emailId", ""),
@@ -378,19 +417,18 @@ def admin_export_data(current_user):
                     r.get("selectedEvent", ""),
                     r.get("status", "CONFIRMED"),
                     r.get("registeredAt", "")
-                ]
-                for v in vals:
-                    html_rows.append(f'<td style="padding:6px 10px; border:1px solid #cccccc;">{html.escape(str(v))}</td>')
-                html_rows.append('</tr>')
-
-            html_rows.append('</table></body></html>')
-            excel_content = "\n".join(html_rows)
-
-            filename = f"HiveMind_Registrations_{_safe_regex(event_filter) or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.xls"
-            return Response(
-                excel_content,
-                mimetype="application/vnd.ms-excel",
-                headers={"Content-disposition": f"attachment; filename={filename}"}
+                ])
+                
+            output = io.BytesIO()
+            wb.save(output)
+            output.seek(0)
+            
+            filename = f"HiveMind_Registrations_{_safe_regex(event_filter) or 'ALL'}_{datetime.date.today().strftime('%Y%m%d')}.xlsx"
+            return send_file(
+                output,
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                as_attachment=True,
+                download_name=filename
             )
         else:
             # Generate Standard CSV

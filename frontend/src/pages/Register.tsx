@@ -22,9 +22,10 @@ import {
   Users,
   QrCode,
   ExternalLink,
+  KeyRound,
 } from 'lucide-react';
 
-import { useAuth } from '../context/AuthContext';
+
 
 interface FormDataState {
   name: string;
@@ -41,7 +42,6 @@ interface FormDataState {
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { addRegistrationLocally } = useAuth();
 
   const whatsappGroupUrl = 'https://chat.whatsapp.com/BsDg3RV0N2A6zpeRSfHhwT?s=qt&p=a&ilr=4';
   const googleGroupUrl = 'https://groups.google.com/g/ssdc-sliet';
@@ -95,8 +95,13 @@ export const Register: React.FC = () => {
       errors.emailId = 'Invalid email format (e.g. participant@domain.com)';
     }
 
-    if (data.collegeEmailId.trim() && !emailRegex.test(data.collegeEmailId.trim())) {
-      errors.collegeEmailId = 'Invalid college email format (e.g. student@sliet.ac.in)';
+    if (data.collegeEmailId.trim()) {
+      const emailVal = data.collegeEmailId.trim().toLowerCase();
+      if (!emailRegex.test(emailVal)) {
+        errors.collegeEmailId = 'Invalid college email format';
+      } else if (!emailVal.endsWith('@sliet.ac.in')) {
+        errors.collegeEmailId = 'College email must end with @sliet.ac.in';
+      }
     }
 
     const cleanPhone = data.phoneNumber.replace(/[\s\-\+]/g, '').slice(-10);
@@ -185,21 +190,6 @@ export const Register: React.FC = () => {
       const result = await apiService.registerForEvent(payload);
 
       if (result && result.success) {
-        const regDoc: any = result.registration || {
-          submissionId: result.submissionId || generatedId,
-          name: formData.name,
-          emailId: formData.emailId,
-          collegeEmailId: formData.collegeEmailId,
-          regNo: formData.regNo,
-          trade: formData.trade,
-          phoneNumber: formData.phoneNumber,
-          college: formData.college,
-          degree: formData.degree,
-          batchYear: formData.batchYear,
-          selectedEvent: formData.selectedEvent,
-          registeredAt: new Date().toISOString(),
-        };
-        addRegistrationLocally(regDoc);
         setIsSubmitting(false);
         setSubmissionSuccess(result.submissionId || generatedId);
       } else {
@@ -259,9 +249,22 @@ export const Register: React.FC = () => {
                 Your credentials have been verified and secured in the official HiveMind 2026 Central Registry.
               </p>
 
-              <div className="bg-cyber-black border border-cyber-cyan p-3 px-6 clip-chamfer mb-8 font-mono text-center">
+              <div className="bg-cyber-black border border-cyber-cyan p-3 px-6 clip-chamfer mb-4 font-mono text-center">
                 <span className="text-cyber-muted text-[10px] block mb-0.5">YOUR SUBMISSION ID</span>
                 <span className="text-cyber-cyan text-2xl font-bold tracking-wider">{submissionSuccess}</span>
+              </div>
+
+              <div className="bg-cyber-pink/10 border border-cyber-pink/40 p-4 clip-chamfer mb-8 font-body text-center max-w-lg">
+                <p className="text-cyber-pink font-bold text-sm mb-1 uppercase">⚠ Save your Submission ID</p>
+                <p className="text-cyber-white text-xs mb-4">You will need this ID along with your Email to log into your dashboard.</p>
+                
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-2 bg-cyber-pink text-cyber-black px-6 py-2.5 clip-chamfer font-mono text-sm font-bold hover:bg-cyber-pink-bright transition-all"
+                >
+                  <KeyRound className="w-4 h-4" />
+                  <span>PROCEED TO LOGIN</span>
+                </Link>
               </div>
 
               {/* COMMUNITY JOIN HUB: WHATSAPP GROUP + QR SCANNER + GOOGLE GROUP */}
@@ -484,7 +487,7 @@ export const Register: React.FC = () => {
                 <div>
                   <label className="block font-mono text-xs font-bold text-cyber-cyan uppercase mb-2 flex items-center gap-2">
                     <Mail className="w-3.5 h-3.5" />
-                    <span>COLLEGE EMAIL ID <span className="text-cyber-pink">*</span></span>
+                    <span>COLLEGE EMAIL ID (OPTIONAL)</span>
                   </label>
                   <input
                     type="email"
@@ -492,7 +495,6 @@ export const Register: React.FC = () => {
                     value={formData.collegeEmailId}
                     onChange={handleChange}
                     placeholder="student@sliet.ac.in"
-                    required
                     className={`w-full bg-cyber-black border ${fieldErrors.collegeEmailId ? 'border-cyber-pink' : 'border-cyber-cyan/40'
                       } text-cyber-white p-3 clip-chamfer font-body text-sm focus:border-cyber-cyan focus:outline-none placeholder:text-cyber-muted/40`}
                   />
