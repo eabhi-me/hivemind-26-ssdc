@@ -156,7 +156,7 @@ The repository contains ready-to-use configuration files ([`backend/Procfile`](f
 
 ## 📢 Community & Contact
 
-- **WhatsApp Community**: [Join SSDC WhatsApp Group](https://chat.whatsapp.com/BsDg3RV0N2A6zpeRSfHhwT?s=qt&p=a&ilr=4)
+- **WhatsApp Community**: [Join SSDC WhatsApp Group](https://chat.whatsapp.com/BHnOIUo4o590lzCRALg0z8?s=sh&p=a&ilr=4)
 - **Instagram**: [@ssdc.sliet](https://www.instagram.com/ssdc.sliet/)
 - **LinkedIn**: [SLIET Software Development Club](https://www.linkedin.com/company/sliet-software-developement-club/)
 - **Official Website**: [https://ssdc.web.app](https://ssdc.web.app)

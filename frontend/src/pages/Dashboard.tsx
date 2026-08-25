@@ -40,7 +40,7 @@ export const Dashboard: React.FC = () => {
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
   const [registerError, setRegisterError] = useState<string | null>(null);
 
-  const whatsappGroupUrl = 'https://chat.whatsapp.com/BsDg3RV0N2A6zpeRSfHhwT?s=qt&p=a&ilr=4';
+  const whatsappGroupUrl = 'https://chat.whatsapp.com/BHnOIUo4o590lzCRALg0z8?s=sh&p=a&ilr=4';
 
   useEffect(() => {
     document.title = 'Participant Dashboard | HiveMind 2026';

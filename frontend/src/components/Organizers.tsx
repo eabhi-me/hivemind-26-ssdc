@@ -90,7 +90,7 @@ export const Organizers: React.FC = () => {
 
               <div className="flex flex-col gap-2">
                 <a
-                  href="https://chat.whatsapp.com/BsDg3RV0N2A6zpeRSfHhwT?s=qt&p=a&ilr=4"
+                  href="https://chat.whatsapp.com/BHnOIUo4o590lzCRALg0z8?s=sh&p=a&ilr=4"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-2.5 bg-cyber-cyan text-cyber-black font-display font-bold italic text-xs clip-chamfer hover:bg-cyber-cyan-bright transition-all flex items-center justify-center gap-2 uppercase"

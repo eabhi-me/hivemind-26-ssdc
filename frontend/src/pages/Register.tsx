@@ -43,7 +43,7 @@ interface FormDataState {
 export const Register: React.FC = () => {
   const navigate = useNavigate();
 
-  const whatsappGroupUrl = 'https://chat.whatsapp.com/BsDg3RV0N2A6zpeRSfHhwT?s=qt&p=a&ilr=4';
+  const whatsappGroupUrl = 'https://chat.whatsapp.com/BHnOIUo4o590lzCRALg0z8?s=sh&p=a&ilr=4';
   const googleGroupUrl = 'https://groups.google.com/g/ssdc-sliet';
   const whatsappQrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(whatsappGroupUrl)}&color=00cfff&bcolor=0d1117`;
 
@@ -76,7 +76,7 @@ export const Register: React.FC = () => {
         if (parsed.role === 'admin') {
           navigate('/admin');
         }
-      } catch (e) {}
+      } catch (e) { }
     }
   }, [navigate]);
 
@@ -257,7 +257,7 @@ export const Register: React.FC = () => {
               <div className="bg-cyber-pink/10 border border-cyber-pink/40 p-4 clip-chamfer mb-8 font-body text-center max-w-lg">
                 <p className="text-cyber-pink font-bold text-sm mb-1 uppercase">⚠ Save your Submission ID</p>
                 <p className="text-cyber-white text-xs mb-4">You will need this ID along with your Email to log into your dashboard.</p>
-                
+
                 <Link
                   to="/login"
                   className="inline-flex items-center gap-2 bg-cyber-pink text-cyber-black px-6 py-2.5 clip-chamfer font-mono text-sm font-bold hover:bg-cyber-pink-bright transition-all"
