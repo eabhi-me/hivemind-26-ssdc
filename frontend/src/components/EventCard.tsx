@@ -50,9 +50,6 @@ export const EventCard: React.FC<EventCardProps> = ({ event, featured = false })
           <span className="font-mono text-xs text-cyber-cyan font-bold tracking-widest bg-cyber-black px-2.5 py-1 border border-cyber-cyan/30 clip-chamfer">
             {event.number}
           </span>
-          <span className="font-mono text-[10px] tracking-widest text-cyber-cyan-bright bg-cyber-cyan/10 px-2 py-0.5 border border-cyber-cyan/30 uppercase">
-            STATUS // {event.status}
-          </span>
         </div>
 
         {/* Header Icon + Title */}

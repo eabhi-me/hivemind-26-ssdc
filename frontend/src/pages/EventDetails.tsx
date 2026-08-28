@@ -157,25 +157,7 @@ export const EventDetails: React.FC = () => {
           </div>
         </div>
 
-        {/* RULES LIST */}
-        <div className="mb-12">
-          <h3 className="font-display text-2xl font-bold italic uppercase tracking-wider text-cyber-white mb-4">
-            RULES & GUIDELINES
-          </h3>
 
-          <div className="bg-cyber-charcoal border border-cyber-cyan/30 p-6 md:p-8 clip-chamfer space-y-4">
-            {(event.rules || []).map((rule: string, idx: number) => (
-              <div key={idx} className="flex items-start gap-4 p-3 bg-cyber-black/60 border border-cyber-cyan/15 clip-chamfer">
-                <span className="font-mono text-sm font-bold text-cyber-cyan shrink-0">
-                  0{idx + 1}
-                </span>
-                <p className="text-cyber-muted text-sm font-body leading-relaxed">
-                  {rule}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* REGISTER CTA BUTTON */}
         <div className="text-center">

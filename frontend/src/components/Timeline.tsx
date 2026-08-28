@@ -29,6 +29,18 @@ export const Timeline: React.FC = () => {
           title="EVENT TIMELINE"
           subtitle="A complete roadmap of all 5 HiveMind 2026 events. Exact dates to be announced soon."
         />
+        
+        <div className="flex justify-center mb-8">
+          <a
+            href="https://drive.google.com/file/d/1wZuQO_4pljrbM37wtZXbuDPsKbilgDS-/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-cyber-pink hover:bg-cyber-pink-bright text-cyber-black font-display font-black text-lg italic tracking-widest clip-chamfer transition-all shadow-[0_0_20px_rgba(255,0,85,0.4)] hover:shadow-[0_0_35px_rgba(255,0,85,0.8)] uppercase group"
+          >
+            <span>📄 OFFICIAL BROCHURE</span>
+            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </a>
+        </div>
 
         {/* Desktop Horizontal Timeline - 5 Core Events */}
         <div className="hidden lg:block relative py-8 mb-10">
