@@ -12,6 +12,8 @@ import { Dashboard } from './pages/Dashboard';
 import { Admin } from './pages/Admin';
 import { OrganizersPage } from './pages/OrganizersPage';
 import { NotFound } from './pages/NotFound';
+import { WinnersHub } from './pages/WinnersHub';
+import { EventWinners } from './pages/EventWinners';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -55,6 +57,8 @@ export const App: React.FC = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/winners" element={<WinnersHub />} />
+            <Route path="/winners/:eventId" element={<EventWinners />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

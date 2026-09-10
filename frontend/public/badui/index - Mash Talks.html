@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PIXEL.CREATE — BAD UI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        image-rendering: pixelated;
+      }
+
+      body {
+        margin: 0;
+        position: relative;
+        background: #17151f;
+        color: #f5f1d8;
+        font-family: "Press Start 2P", monospace;
+        overflow-x: hidden;
+      }
+
+      header {
+        background: #29243a;
+        border-bottom: 6px solid #000;
+        padding: 22px 6%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 8px 0 #000;
+      }
+
+      .logo {
+        color: #ffdc5e;
+        font-size: 22px;
+        text-shadow: 4px 4px 0 #000;
+      }
+
+      nav a {
+        color: #f5f1d8;
+        text-decoration: none;
+        font-size: 9px;
+        margin-left: 20px;
+      }
+
+      .hero {
+        padding: 70px 8%;
+        text-align: center;
+        background: repeating-linear-gradient(
+          0deg,
+          #201c2b 0px,
+          #201c2b 5px,
+          #17151f 5px,
+          #17151f 10px
+        );
+        border-bottom: 6px solid #000;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+        line-height: 1.6;
+        color: #ffdc5e;
+        text-shadow: 6px 6px 0 #000;
+      }
+
+      .hero p {
+        font-size: 10px;
+        line-height: 2;
+        color: #aaa;
+      }
+
+      .article {
+        max-width: 850px;
+        margin: 50px auto;
+        padding: 45px;
+        background: #29243a;
+        border: 6px solid #000;
+        box-shadow: 10px 10px 0 #000;
+      }
+
+      .article h2 {
+        color: #ffdc5e;
+        font-size: 17px;
+        line-height: 1.8;
+        margin-top: 40px;
+        text-shadow: 3px 3px #000;
+      }
+
+      .article p {
+        color: #ded9c7;
+        font-size: 10px;
+        line-height: 2.3;
+      }
+
+      .meta {
+        font-size: 8px !important;
+        color: #777 !important;
+      }
+
+      .tip {
+        margin: 30px 0;
+        padding: 22px;
+        background: #17151f;
+        border: 5px solid #000;
+        box-shadow: 6px 6px 0 #000;
+        font-size: 9px;
+        line-height: 2;
+      }
+
+      footer {
+        background: #09080c;
+        border-top: 6px solid #000;
+        padding: 35px;
+        text-align: center;
+        color: #666;
+        font-size: 8px;
+      }
+
+      #popupLayer {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 99999;
+      }
+
+      .ad {
+        position: fixed;
+        width: 350px;
+        min-height: 190px;
+        padding: 25px;
+        background: #f5f1d8;
+        color: #17151f;
+        border: 6px solid #000;
+        box-shadow: 8px 8px 0 #000;
+        pointer-events: auto;
+        animation: pixelAppear 0.25s steps(5);
+      }
+
+      @keyframes pixelAppear {
+        0% {
+          transform: scale(0);
+        }
+
+        50% {
+          transform: scale(1.15);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .ad h2 {
+        margin-top: 0;
+        font-size: 17px;
+        line-height: 1.6;
+      }
+
+      .ad h3 {
+        font-size: 12px;
+        line-height: 1.7;
+      }
+
+      .ad p {
+        font-size: 9px;
+        line-height: 2;
+      }
+
+      .ad button {
+        font-family: "Press Start 2P", monospace;
+        cursor: pointer;
+        border: 5px solid #000;
+        padding: 12px;
+        background: #29243a;
+        color: white;
+        box-shadow: 5px 5px 0 #000;
+      }
+
+      .ad button:active {
+        transform: translate(5px, 5px);
+        box-shadow: none;
+      }
+
+      .close {
+        position: absolute;
+        right: 7px;
+        top: 7px;
+        width: 34px;
+        height: 34px;
+        padding: 0 !important;
+        background: #ff5555 !important;
+        color: white !important;
+      }
+
+      .no-close {
+        background: #fff0b5;
+      }
+
+      .instruction {
+        margin-top: 20px;
+        padding: 12px;
+        background: #000;
+        color: #ffdc5e;
+        text-align: center;
+        font-size: 8px;
+        line-height: 1.8;
+        animation: blink 0.7s steps(2) infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0.25;
+        }
+      }
+
+      .course-meme {
+        width: 330px;
+        background: #ffdc5e;
+        color: #000;
+        border: 7px solid #000;
+        text-align: center;
+      }
+
+      .course-meme h2 {
+        font-size: 15px;
+      }
+
+      .course-meme p {
+        color: #000;
+      }
+
+      .pehchaan {
+        background: #d9f4ff;
+        color: #111;
+        width: 390px;
+      }
+
+      .pehchaan h2 {
+        color: #111;
+        font-size: 17px;
+      }
+
+      .choice {
+        width: 100%;
+        margin-top: 10px;
+        background: #29243a !important;
+      }
+
+      .response {
+        background: #fff0b5;
+        width: 400px;
+      }
+
+      .response h2 {
+        font-size: 16px;
+      }
+
+      .buy-course {
+        width: 100%;
+        background: #28d65c !important;
+        color: #000 !important;
+      }
+
+      .angry {
+        background: #e94545;
+        color: white;
+        border: 8px solid #000;
+        width: 390px;
+        transition: width 0.4s steps(3);
+      }
+
+      .angry h2 {
+        color: white;
+        font-size: 21px;
+      }
+
+      .deactivate {
+        width: 100%;
+        background: #000 !important;
+        color: #ffdc5e !important;
+      }
+
+      .gta {
+        background: #111;
+        color: white;
+        border: 7px solid #555;
+      }
+
+      .gta h2 {
+        color: #ffdc5e;
+        font-size: 22px;
+      }
+
+      .download {
+        width: 100%;
+        background: #27d85c !important;
+        color: #000 !important;
+      }
+
+      .pause-screen {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 5000;
+        color: #555;
+        font-size: 9px;
+        text-align: center;
+      }
+
+      .chaos {
+        position: absolute;
+        width: 280px;
+        min-height: 160px;
+        background: #eee;
+        color: #111;
+        transition:
+          transform 0.15s steps(2),
+          width 0.2s steps(3);
+      }
+
+      .chaos h3 {
+        margin-top: 0;
+      }
+
+      .fake-cross {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        border: none !important;
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        font-size: 20px;
+        padding: 3px !important;
+      }
+
+      .wrong {
+        animation: wrong 0.12s steps(3) 4;
+      }
+
+      @keyframes wrong {
+        0% {
+          transform: translateX(-12px);
+        }
+
+        50% {
+          transform: translateX(12px);
+        }
+
+        100% {
+          transform: translateX(0);
+        }
+      }
+
+      .shake {
+        animation: screenShake 0.1s steps(2) infinite;
+      }
+
+      @keyframes screenShake {
+        0% {
+          transform: translate(2px, 0);
+        }
+
+        50% {
+          transform: translate(-2px, 2px);
+        }
+
+        100% {
+          transform: translate(2px, -2px);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">PIXEL.CREATE</div>
+
+      <nav>
+        <a href="#">HOME</a>
+        <a href="#">GUIDES</a>
+        <a href="#">EDITING</a>
+        <a href="#">ABOUT</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>
+        THE MODERN GUIDE<br />
+        TO CONTENT CREATION
+      </h1>
+
+      <p>HOW CREATORS TURN IDEAS INTO DIGITAL EXPERIENCES.</p>
+    </section>
+
+    <main class="article">
+      <p class="meta">CONTENT CREATION • 8 MIN READ</p>
+
+      <h2>WHY CONTENT CREATION MATTERS</h2>
+
+      <p>
+        Content creation has become one of the most powerful ways to communicate
+        ideas online.
+      </p>
+
+      <p>
+        From short videos to long articles, creators are constantly discovering
+        new ways to connect with audiences.
+      </p>
+
+      <div class="tip">
+        CREATOR TIP:<br /><br />
+        FOCUS ON PROVIDING VALUE BEFORE WORRYING ABOUT GOING VIRAL.
+      </div>
+
+      <h2>01. START WITH AN IDEA</h2>
+
+      <p>Every great piece of content begins with an idea.</p>
+
+      <h2>02. LEARN VIDEO EDITING</h2>
+
+      <p>Editing can completely transform raw footage.</p>
+
+      <p>
+        Good pacing, sound design and storytelling can turn ordinary footage
+        into something memorable.
+      </p>
+
+      <div class="tip">
+        IMPORTANT:<br /><br />
+        KNOWING WHEN NOT TO USE AN EFFECT IS ALSO A SKILL.
+      </div>
+
+      <h2>03. CONSISTENCY BEATS PERFECTION</h2>
+
+      <p>
+        Publishing consistently allows creators to understand their audience and
+        improve over time.
+      </p>
+
+      <h2>CONCLUSION</h2>
+
+      <p>
+        Make something.<br />
+        Publish it.<br />
+        Learn.<br />
+        Repeat.
+      </p>
+    </main>
+
+    <footer>
+      © 2026 PIXEL.CREATE
+      <br /><br />
+      THIS IS A COMPLETELY NORMAL WEBSITE.
+    </footer>
+
+    <div id="popupLayer"></div>
+
+    <script>
+      const layer = document.getElementById("popupLayer");
+
+      let stage = 0;
+      let chaosAds = [];
+      let wrongClicks = 0;
+      let randomAdTimer = null;
+
+      function randomPosition(ad) {
+        const padding = 8;
+
+        if (ad.classList.contains("chaos")) {
+          const pageWidth = Math.max(
+            document.documentElement.scrollWidth,
+            document.body.scrollWidth,
+            window.innerWidth,
+          );
+
+          const pageHeight = Math.max(
+            document.documentElement.scrollHeight,
+            document.body.scrollHeight,
+            window.innerHeight,
+          );
+
+          const maxX = Math.max(padding, pageWidth - ad.offsetWidth - padding);
+
+          const maxY = Math.max(
+            padding,
+            pageHeight - ad.offsetHeight - padding,
+          );
+
+          ad.style.left = Math.random() * maxX + "px";
+          ad.style.top = Math.random() * maxY + "px";
+
+          return;
+        }
+
+        const maxX = Math.max(
+          padding,
+          window.innerWidth - ad.offsetWidth - padding,
+        );
+
+        const maxY = Math.max(
+          padding,
+          window.innerHeight - ad.offsetHeight - padding,
+        );
+
+        ad.style.left = Math.random() * maxX + "px";
+        ad.style.top = Math.random() * maxY + "px";
+      }
+
+      function createAd(className = "") {
+        const ad = document.createElement("div");
+
+        ad.className = "ad " + className;
+
+        layer.appendChild(ad);
+
+        requestAnimationFrame(() => {
+          randomPosition(ad);
+        });
+
+        return ad;
+      }
+
+      function adOne() {
+        stage = 1;
+
+        const ad = createAd();
+
+        ad.innerHTML = `
+        <button class="close">✕</button>
+
+        <h2>🎬 VIDEO EDITING</h2>
+
+        <p>
+          MASTER VIDEO EDITING
+          FROM ZERO TO PRO.
+        </p>
+
+        <p>
+          DAVINCI • PREMIERE
+          • AFTER EFFECTS
+        </p>
+
+        <button>
+          START LEARNING
+        </button>
+      `;
+
+        ad.querySelector(".close").onclick = () => {
+          ad.remove();
+
+          setTimeout(adTwo, 500);
+          setTimeout(adThree, 1100);
+          setTimeout(courseMeme, 2500);
+        };
+      }
+
+      function adTwo() {
+        stage = 2;
+
+        const ad = createAd("no-close");
+
+        ad.innerHTML = `
+        <h2>🥺 PLEASE...</h2>
+
+        <p>
+          YOU CLOSED OUR FIRST AD.
+        </p>
+
+        <p>
+          WE JUST WANT TO HELP
+          YOU BECOME A BETTER
+          CREATOR.
+        </p>
+
+        <p>
+          PLEASE TAKE THE COURSE.
+        </p>
+
+        <div class="instruction">
+          CLICK ❌ TO CLOSE AD
+        </div>
+      `;
+      }
+
+      function adThree() {
+        stage = 3;
+
+        const ad = createAd("no-close");
+
+        ad.innerHTML = `
+        <h2>😏 HEY CREATOR...</h2>
+
+        <p>
+          STILL IGNORING US?
+        </p>
+
+        <p>
+          THAT'S KIND OF ATTRACTIVE.
+        </p>
+
+        <p>
+          BUT YOU KNOW WHAT'S
+          MORE ATTRACTIVE?
+        </p>
+
+        <p>
+          <b>
+            KNOWING HOW TO EDIT.
+          </b>
+        </p>
+
+        <div class="instruction">
+          CLICK ❌ TO CLOSE AD
+        </div>
+      `;
+      }
+
+      function courseMeme() {
+        stage = 3.5;
+
+        const ad = createAd("course-meme");
+
+        ad.innerHTML = `
+        <h2>💀 BUY THIS COURSE</h2>
+
+        <p>
+          IF YOU BUY THIS COURSE...
+        </p>
+
+        <p>
+          YOU WILL BE FAMOUS.
+        </p>
+
+        <p>
+          TRUST ME BRO.
+        </p>
+
+        <button class="memeNext">
+          OK BRO
+        </button>
+      `;
+
+        ad.querySelector(".memeNext").onclick = () => {
+          ad.remove();
+          pehchaanAd();
+        };
+      }
+
+      function pehchaanAd() {
+        const ad = createAd("pehchaan");
+
+        ad.innerHTML = `
+        <h2>🧠 IMPORTANT QUESTION</h2>
+
+        <p>
+          PEHCHAAN OR PAISE?
+        </p>
+
+        <button class="choice paisa">
+          💰 PAISE
+        </button>
+
+        <button class="choice pehchaanBtn">
+          🧠 PEHCHAAN
+        </button>
+      `;
+
+        ad.querySelector(".paisa").onclick = () => {
+          ad.remove();
+          paisaResponse();
+        };
+
+        ad.querySelector(".pehchaanBtn").onclick = () => {
+          ad.remove();
+          pehchaanResponse();
+        };
+      }
+
+      function paisaResponse() {
+        const ad = createAd("response");
+
+        ad.innerHTML = `
+        <h2>❌ NO MAN 💀</h2>
+
+        <p>
+          YOU'RE WRONG.
+        </p>
+
+        <p>
+          PEHCHAAN MAN.
+          PEHCHAAN.
+        </p>
+
+        <p>
+          MONEY FOLLOWS. 🗿
+        </p>
+
+        <button class="buy-course">
+          OK FINE, BUY COURSE
+        </button>
+      `;
+
+        ad.querySelector(".buy-course").onclick = () => {
+          ad.remove();
+          adFour();
+        };
+      }
+
+      function pehchaanResponse() {
+        const ad = createAd("response");
+
+        ad.innerHTML = `
+        <h2>✅ CORRECT BROOO 🔥</h2>
+
+        <p>
+          YOU'RE CORRECT.
+        </p>
+
+        <p>
+          YOU WILL BE A
+          MILLIONAIRE IN FUTURE.
+        </p>
+
+        <p>
+          BUT ONLY IF...
+        </p>
+
+        <p>
+          YOU BUY THIS COURSE.
+        </p>
+
+        <button class="buy-course">
+          BUY COURSE 🚀
+        </button>
+      `;
+
+        ad.querySelector(".buy-course").onclick = () => {
+          ad.remove();
+          adFour();
+        };
+      }
+
+      function adFour() {
+        stage = 4;
+
+        const ad = createAd("angry");
+
+        ad.innerHTML = `
+        <button class="close">✕</button>
+
+        <h2>😡 TAKE THE COURSE.</h2>
+
+        <p>
+          YOU HAVE IGNORED US
+          LONG ENOUGH.
+        </p>
+
+        <p>
+          STOP SCROLLING.
+        </p>
+
+        <p>
+          LEARN VIDEO EDITING.
+        </p>
+
+        <button class="deactivate">
+          DEACTIVATE THE AD
+        </button>
+      `;
+
+        let size = 390;
+
+        const grow = setInterval(() => {
+          if (!document.body.contains(ad)) {
+            clearInterval(grow);
+            return;
+          }
+
+          size += 35;
+          ad.style.width = size + "px";
+
+          if (size >= 720) {
+            clearInterval(grow);
+          }
+        }, 450);
+
+        function closeAngry() {
+          clearInterval(grow);
+          ad.remove();
+          setTimeout(adGTA, 600);
+        }
+
+        ad.querySelector(".close").onclick = closeAngry;
+        ad.querySelector(".deactivate").onclick = closeAngry;
+      }
+
+      function adGTA() {
+        stage = 5;
+
+        const ad = createAd("gta");
+
+        ad.innerHTML = `
+        <button class="close">✕</button>
+
+        <h2>🎮 GTA VI PC</h2>
+
+        <p>
+          CONGRATULATIONS!
+        </p>
+
+        <p>
+          YOU HAVE BEEN SELECTED
+          FOR A FREE COPY OF
+          GTA VI FOR PC.
+        </p>
+
+        <button class="download">
+          DOWNLOAD GTA VI
+        </button>
+      `;
+
+        ad.querySelector(".download").onclick = () => {
+          alert("LOL UR SO DUMB 💀");
+          ad.remove();
+          startTenSecondPause();
+        };
+
+        ad.querySelector(".close").onclick = () => {
+          ad.remove();
+          startTenSecondPause();
+        };
+      }
+
+      function startTenSecondPause() {
+        stage = 5.5;
+
+        const pause = document.createElement("div");
+
+        pause.className = "pause-screen";
+
+        pause.innerHTML = `
+        <p>...</p>
+      `;
+
+        document.body.appendChild(pause);
+
+        setTimeout(() => {
+          pause.remove();
+          boredAd();
+        }, 10000);
+      }
+
+      function boredAd() {
+        const ad = createAd();
+
+        ad.innerHTML = `
+        <button class="close">✕</button>
+
+        <h2>😐 GETTING BORED?</h2>
+
+        <p>
+          WOW...
+        </p>
+
+        <p>
+          YOU ACTUALLY WAITED
+          10 SECONDS.
+        </p>
+
+        <p>
+          JUST WAIT AND WATCH.
+        </p>
+
+        <button class="funButton">
+          CLICK HERE TO HAVE FUN
+        </button>
+      `;
+
+        ad.querySelector(".close").onclick = () => {
+          ad.remove();
+          startRandomAds();
+        };
+
+        ad.querySelector(".funButton").onclick = () => {
+          ad.remove();
+          startRandomAds();
+        };
+      }
+
+      function startRandomAds() {
+        stage = 6;
+
+        for (let i = 0; i < 3; i++) {
+          setTimeout(createRandomAnnoyingAd, i * 400);
+        }
+
+        function spawnNext() {
+          if (stage !== 6) return;
+
+          const delay = Math.random() * 1100 + 500;
+
+          randomAdTimer = setTimeout(() => {
+            createRandomAnnoyingAd();
+            spawnNext();
+          }, delay);
+        }
+
+        spawnNext();
+
+        setTimeout(() => {
+          stage = 6.5;
+
+          clearTimeout(randomAdTimer);
+
+          setTimeout(startChaos, 1000);
+        }, 20000);
+      }
+
+      function createRandomAnnoyingAd() {
+        if (stage !== 6) return;
+
+        const ad = createAd("chaos");
+
+        const messages = [
+          ["🔥 LIMITED OFFER", "YOU NEED THIS RIGHT NOW."],
+          ["💰 YOU WON!", "CLAIM YOUR COMPLETELY FAKE PRIZE."],
+          ["🎬 VIDEO MASTERCLASS", "BECOME A PRO EDITOR."],
+          ["😱 WARNING!", "YOU HAVE BEEN SELECTED."],
+          ["💻 YOUR PC IS SLOW", "DOWNLOAD OUR TOTALLY REAL OPTIMIZER."],
+          ["❤️ SOMEONE LIKES YOU", "CLICK TO FIND OUT WHO."],
+          ["🎮 FREE GAME", "CLICK BEFORE THIS OFFER DISAPPEARS."],
+          ["📢 IMPORTANT MESSAGE", "YOU MUST READ THIS."],
+          ["🤑 CONGRATULATIONS!", "YOU ARE OUR 1,000,000TH VISITOR."],
+          ["⚠️ DO NOT CLOSE", "THIS AD IS IMPORTANT."],
+          ["📱 FREE PHONE", "YOU HAVE BEEN RANDOMLY SELECTED."],
+          ["💸 MAKE MONEY FAST", "BECOME RICH IN 3 DAYS."],
+        ];
+
+        const selected = messages[Math.floor(Math.random() * messages.length)];
+
+        ad.innerHTML = `
+        <button class="fake-cross">✕</button>
+
+        <h3>
+          ${selected[0]}
+        </h3>
+
+        <p>
+          ${selected[1]}
+        </p>
+
+        <p>
+          LIMITED TIME ONLY!
+        </p>
+
+        <button class="randomButton">
+          CLICK NOW
+        </button>
+      `;
+
+        randomPosition(ad);
+
+        const moveTimer = setInterval(
+          () => {
+            if (!document.body.contains(ad)) {
+              clearInterval(moveTimer);
+              return;
+            }
+
+            if (stage === 6) {
+              randomPosition(ad);
+            }
+          },
+          Math.random() * 1800 + 1000,
+        );
+
+        ad.addEventListener("mouseenter", () => {
+          if (stage === 6) {
+            randomPosition(ad);
+          }
+        });
+
+        ad.querySelector(".fake-cross").onclick = (e) => {
+          e.stopPropagation();
+
+          wrongClicks++;
+
+          ad.classList.add("wrong");
+
+          setTimeout(() => {
+            ad.remove();
+          }, 200);
+
+          setTimeout(() => {
+            if (stage === 6) {
+              createRandomAnnoyingAd();
+
+              if (Math.random() > 0.4) {
+                createRandomAnnoyingAd();
+              }
+            }
+          }, 300);
+        };
+
+        ad.querySelector(".randomButton").onclick = () => {
+          alert("YOU CLICKED AN AD AGAIN 💀");
+
+          ad.remove();
+
+          if (stage === 6) {
+            createRandomAnnoyingAd();
+            createRandomAnnoyingAd();
+          }
+        };
+      }
+
+      function startChaos() {
+        stage = 7;
+
+        document.body.classList.add("shake");
+
+        for (let i = 0; i < 6; i++) {
+          setTimeout(createChaosAd, i * 350);
+        }
+
+        setInterval(() => {
+          if (stage === 7 && chaosAds.length < 35) {
+            createChaosAd();
+          }
+        }, 1400);
+      }
+
+      function createChaosAd() {
+        const ad = createAd("chaos");
+
+        chaosAds.push(ad);
+
+        const number = chaosAds.length;
+
+        ad.innerHTML = `
+        <button class="fake-cross">✕</button>
+
+        <h3>
+          🚨 SPECIAL OFFER ${number}
+        </h3>
+
+        <p>
+          YOU ABSOLUTELY NEED THIS.
+        </p>
+
+        <p>
+          LIMITED TIME OFFER!
+        </p>
+
+        <b>
+          ONLY TODAY!
+        </b>
+      `;
+
+        randomPosition(ad);
+
+        ad.addEventListener("mouseenter", () => {
+          moveAway(ad);
+        });
+
+        ad.querySelector(".fake-cross").onclick = (e) => {
+          e.stopPropagation();
+
+          wrongClicks++;
+
+          ad.classList.add("wrong");
+
+          setTimeout(() => {
+            ad.remove();
+          }, 200);
+
+          setTimeout(() => {
+            if (stage === 7) {
+              createChaosAd();
+
+              if (wrongClicks >= 3) {
+                createChaosAd();
+                createChaosAd();
+              }
+            }
+          }, 300);
+        };
+
+        setTimeout(() => {
+          if (document.body.contains(ad)) {
+            ad.style.transition = "all .5s steps(3)";
+          }
+        }, 5000);
+      }
+
+      function moveAway(ad) {
+        if (!document.body.contains(ad)) return;
+
+        randomPosition(ad);
+
+        ad.style.transform = "rotate(" + (Math.random() * 20 - 10) + "deg)";
+      }
+
+      document.addEventListener("mouseover", (e) => {
+        const target = e.target.closest(".chaos");
+
+        if (!target || stage !== 7) return;
+
+        chaosAds.forEach((ad) => {
+          if (ad !== target && document.body.contains(ad)) {
+            const width = parseFloat(getComputedStyle(ad).width);
+
+            ad.style.width = Math.min(width + 30, 500) + "px";
+          }
+        });
+
+        const width = parseFloat(getComputedStyle(target).width);
+
+        target.style.width = Math.max(width - 35, 160) + "px";
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          console.log("ESCAPE HAS BEEN DISABLED.");
+        }
+      });
+
+      setTimeout(adOne, 2500);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE MOST EXTREME LOGIN EXPERIENCE 2026</title>
+    <style>
+        @keyframes blinker {
+            0% { opacity: 1.0; }
+            25% { opacity: 0.1; }
+            50% { opacity: 1.0; }
+            75% { opacity: 0.2; }
+            100% { opacity: 1.0; }
+        }
+
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes spinWild {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.3); }
+            50% { transform: rotate(180deg) scale(0.8); }
+            75% { transform: rotate(270deg) scale(1.4); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes moveLabel {
+            0% { transform: translateX(0px); }
+            50% { transform: translateX(25px); }
+            100% { transform: translateX(0px); }
+        }
+
+        @keyframes shakeHard {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-3px, -2px) rotate(-3deg); }
+            20% { transform: translate(-5px, 0px) rotate(3deg); }
+            30% { transform: translate(5px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(3deg); }
+            50% { transform: translate(-3px, 2px) rotate(-3deg); }
+            60% { transform: translate(-5px, 1px) rotate(0deg); }
+            70% { transform: translate(5px, 1px) rotate(-3deg); }
+            80% { transform: translate(-1px, -1px) rotate(3deg); }
+            90% { transform: translate(3px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .shake-active {
+            animation: shakeHard 0.4s infinite !important;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff0000, #00ff00, #0000ff, #ffff00, #ff00ff, #00ffff);
+            background-size: 600% 600%;
+            animation: bgShift 3s ease infinite;
+            font-family: "Comic Sans MS", "Courier New", "Impact", sans-serif;
+            margin: 0;
+            padding: 10px;
+            color: #000;
+        }
+
+        .clock-banner {
+            background: #ff00ff;
+            color: #ffff00;
+            font-family: "Impact", sans-serif;
+            font-size: 28px;
+            padding: 10px;
+            border: 8px dashed #00ffff;
+            text-align: center;
+            box-shadow: 10px 10px 0px #000;
+        }
+
+        .main-wrapper {
+            width: 90%;
+            max-width: 850px;
+            margin: 20px auto;
+            background-color: #ffff00;
+            border: 15px double #ff0000;
+            box-shadow: 25px -20px 0px #0000ff, -20px 20px 0px #00ff00;
+            padding: 25px;
+            transform: rotate(-1deg);
+        }
+
+        h1.ugly-heading {
+            color: #0000ff;
+            font-family: "Impact", fantasy;
+            font-size: 60px;
+            text-shadow: 6px 6px #ff0000, -4px -4px #00ff00;
+            animation: blinker 0.4s infinite;
+            margin: 5px 0;
+            letter-spacing: -2px;
+        }
+
+        .form-section {
+            background: #00ff00;
+            border: 6px dotted #ff00ff;
+            padding: 15px;
+            margin-bottom: 25px;
+            margin-left: -10px;
+            transform: rotate(1deg);
+        }
+
+        .animated-label {
+            display: inline-block;
+            font-family: "Courier New", monospace;
+            font-size: 22px;
+            font-weight: 900;
+            color: #ff00ff;
+            background: #000;
+            padding: 5px;
+            animation: moveLabel 2s ease-in-out infinite;
+        }
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            padding: 12px;
+            font-size: 16px;
+            font-family: "Papyrus", "Arial", sans-serif;
+            color: #00ff00;
+            background-color: #000000;
+            border: 6px dashed #ff0000;
+            box-shadow: inset 4px 4px 8px #ffffff;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .val-msg {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 4px;
+            margin-top: 5px;
+            background-color: #ffffff;
+            border: 2px solid #000;
+            display: inline-block;
+        }
+
+        .val-msg.invalid { color: #ff0000; background-color: #ffff00; }
+        .val-msg.valid { color: #008000; background-color: #00ffff; }
+
+        .char-count {
+            font-size: 12px;
+            background: #000;
+            color: #fff;
+            padding: 2px 6px;
+            margin-left: 5px;
+        }
+
+        .warning-box {
+            color: #ffffff;
+            background-color: #ff0000;
+            font-size: 16px;
+            font-weight: bold;
+            border: 4px dotted #000;
+            padding: 5px;
+            margin-top: 5px;
+            display: none;
+            animation: blinker 0.2s infinite;
+        }
+
+        .strength-panel {
+            background: #00ffff;
+            border: 4px groove #0000ff;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+        }
+
+        .strength-item {
+            margin: 3px 0;
+            font-weight: bold;
+        }
+
+        .btn-toggle-pw {
+            background: #ff00ff;
+            color: #fff;
+            font-size: 12px;
+            border: 3px outset #000;
+            cursor: pointer;
+            margin-top: 5px;
+            padding: 5px;
+        }
+
+        .captcha-box {
+            background: #ff00ff;
+            border: 8px ridge #ffff00;
+            padding: 15px;
+            margin-top: 20px;
+            color: #00ffff;
+            font-family: "Impact";
+            font-size: 24px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(to right, #00ffff, #ff0000, #ffff00);
+            color: #000000;
+            font-size: 28px;
+            font-family: "Comic Sans MS";
+            font-weight: bold;
+            padding: 15px 40px;
+            border: 8px outset #00ff00;
+            cursor: pointer;
+            margin-top: 20px;
+            margin-left: 20px;
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            animation: spinWild 0.8s infinite linear;
+            background: #0000ff;
+            color: #ffffff;
+        }
+
+        .submit-btn:disabled {
+            background: #888888;
+            cursor: not-allowed;
+            animation: none;
+            border-color: #444;
+        }
+
+        .status-panel {
+            background: #000;
+            color: #00ff00;
+            font-family: "Courier New", monospace;
+            border: 5px dashed #00ff00;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .progress-wrapper {
+            width: 100%;
+            background-color: #555;
+            border: 4px solid #000;
+            margin-top: 10px;
+            height: 30px;
+            position: relative;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 3px;
+            left: 45%;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 2px 2px #000;
+        }
+
+        .unnecessary-box {
+            border: 5px dotted #ff0000;
+            background: #ff00ff;
+            color: #ffff00;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+            text-align: center;
+        }
+        .attempts-tracker {
+            font-size: 20px;
+            font-family: "Impact";
+            color: #ff0000;
+            background: #ffff00;
+            border: 3px solid #000;
+            padding: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .emoji-strip {
+            font-size: 30px;
+            word-spacing: 15px;
+        }
+    </style>
+</head>
+<body id="bodyEl">
+
+    <div class="clock-banner">
+        🕒 LIVE AUTH SYSTEM TIME: <span id="clockDisplay">00:00:00 AM</span> 🕒
+    </div>
+
+    <div class="main-wrapper" id="loginCard">
+        <div class="emoji-strip">🤡💥🎃💀🛸⚡🤡</div>
+        <h1 class="ugly-heading">LOGIN HERE!!!</h1>
+        <div style="background: #000; color: #fff; font-size: 12px; padding: 3px;">SYSTEM VERSION 2026.9.9 - ULTRA SECURE AUTHENTICATOR</div>
+
+        <div class="unnecessary-box">
+            ⚠️ NOTICE: UNAUTHORIZED ACCESS WILL BE PROSECUTED BY THE GALACTIC FEDERATION ⚠️
+        </div>
+
+        <div class="attempts-tracker" id="attemptsDisplay">
+            Attempts remaining: 3
+        </div>
+        <div id="lockoutTimer" style="display:none; color:#ff0000; font-weight:bold; background:#000; padding:5px; margin-top:5px;"></div>
+
+        <form id="authForm" onsubmit="initiateLoginProcess(event)" autocomplete="off">
+            <!-- USERNAME SECTION -->
+            <div class="form-section">
+                <label class="animated-label" for="usernameInput">USERNAME (CAPS ONLY A-Z):</label>
+                <input type="text" id="usernameInput" maxlength="20" placeholder="EX: SHILPYUSER" oninput="validateUsernameLive()">
+                <span class="char-count" id="userCharCount">0/12</span>
+                <div class="val-msg invalid" id="userValMsg">Required: 5-12 Uppercase Letters Only</div>
+                <div class="warning-box" id="userLowerWarn">⚠️ WARNING: LOWERCASE LETTER DETECTED! TYPE CAPS ONLY!</div>
+            </div>
+
+            <div class="emoji-strip" style="text-align: right;">👾🐸🤡👾🐸</div>
+
+            <!-- PASSWORD SECTION -->
+            <div class="form-section" style="background: #ff00ff; border-color: #00ffff;">
+                <label class="animated-label" for="passwordInput" style="color: #00ffff;">PASSWORD (NO CAPS):</label>
+                <input type="password" id="passwordInput" placeholder="EX: secret99@" oninput="validatePasswordLive()" onkeydown="checkCapsLock(event)">
+                <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility()">SHOW/HIDE PASSWORD</button>
+                <div class="warning-box" id="capsWarning">⚠️ CAPS LOCK IS ON! THIS WILL FAIL VALIDATION!</div>
+
+                <div class="strength-panel">
+                    <div style="font-weight:900; text-decoration:underline;">PASSWORD STRENGTH REQUIREMENTS:</div>
+                    <div class="strength-item" id="reqLength">❌ Length: Min 8 chars</div>
+                    <div class="strength-item" id="reqLower">❌ Lowercase: At least 1 (a-z)</div>
+                    <div class="strength-item" id="reqNum">❌ Numbers: At least 2 (0-9)</div>
+                    <div class="strength-item" id="reqSpec">❌ Special Char: At least 1</div>
+                    <div class="strength-item" id="reqNoUpper">✅ Uppercase: None allowed</div>
+                    <div class="strength-item" id="reqNoSpace">✅ Spaces: None allowed</div>
+                </div>
+            </div>
+
+            <!-- CAPTCHA SECTION -->
+            <div class="captcha-box">
+                <div>🤖 HUMAN VERIFICATION MATH CAPTCHA:</div>
+                <span id="captchaQuestion" style="background: #000; padding: 5px; color: #ff0000; font-size: 30px;">17 + 8 = ?</span>
+                <input type="text" id="captchaAnswer" style="width: 50%; display: inline-block; margin-left: 10px;" placeholder="Ans?">
+            </div>
+
+            <button type="submit" id="submitBtn" class="submit-btn">🚀 SUBMIT CREDENTIALS 🚀</button>
+        </form>
+        <!-- STATUS & STAGES PANEL -->
+        <div class="status-panel" id="statusPanel">
+            <div><strong>AUTH SYSTEM STATUS:</strong> <span id="currentStageText">Awaiting Submission...</span></div>
+            <div class="progress-wrapper">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-text" id="progressPercent">0%</div>
+            </div>
+            <div id="serverLog" style="margin-top: 8px; color: #ffff00; min-height: 20px;"></div>
+        </div>
+
+        <div class="unnecessary-box" style="background: #000; color: #00ff00; border-color: #ffff00;">
+            BEST VIEWED IN 800x600 RESOLUTION WITH NETSCAPE NAVIGATOR 4.0
+        </div>
+        <div class="emoji-strip" style="text-align: center;">🎉🎃🔥💥💀🎉</div>
+    </div>
+
+    <script>
+        // GLOBAL STATE
+        let num1 = 0;
+        let num2 = 0;
+        let captchaResult = 0;
+        let attemptsLeft = 3;
+        let isLockedOut = false;
+        let lockoutTimerId = null;
+
+        // RANDOM BACKGROUND COLOR GENERATOR
+        setInterval(() => {
+            if(!isLockedOut) {
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                const rColor = colors[Math.floor(Math.random() * colors.length)];
+                document.getElementById('bodyEl').style.borderColor = rColor;
+            }
+        }, 1500);
+
+        // LIVE CLOCK
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clockDisplay').innerText = now.toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // CAPTCHA GENERATOR
+        function generateCaptcha() {
+            num1 = Math.floor(Math.random() * 25) + 1;
+            num2 = Math.floor(Math.random() * 25) + 1;
+            captchaResult = num1 + num2;
+            document.getElementById('captchaQuestion').innerText = Solve: ${num1} + ${num2} = ?;
+            document.getElementById('captchaAnswer').value = '';
+        }
+        generateCaptcha();
+
+        // USERNAME LIVE VALIDATION
+        function validateUsernameLive() {
+            const val = document.getElementById('usernameInput').value;
+            const countEl = document.getElementById('userCharCount');
+            const msgEl = document.getElementById('userValMsg');
+            const warnEl = document.getElementById('userLowerWarn');
+
+            countEl.innerText = ${val.length}/12;
+
+            // Check for lowercase specifically
+            if (/[a-z]/.test(val)) {
+                warnEl.style.display = 'block';
+            } else {
+                warnEl.style.display = 'none';
+            }
+
+            const validRegex = /^[A-Z]{5,12}$/;
+            if (validRegex.test(val)) {
+                msgEl.innerText = "✅ Username Format Valid!";
+                msgEl.className = "val-msg valid";
+                return true;
+            } else {
+                msgEl.innerText = "❌ Must be 5-12 ONLY UPPERCASE A-Z characters!";
+                msgEl.className = "val-msg invalid";
+                return false;
+            }
+        }
+
+        // PASSWORD LIVE VALIDATION
+        function validatePasswordLive() {
+            const val = document.getElementById('passwordInput').value;
+
+            const hasLen = val.length >= 8;
+            const hasLower = /[a-z]/.test(val);
+            const numMatches = val.match(/[0-9]/g);
+            const hasTwoNums = numMatches && numMatches.length >= 2;
+            const hasSpec = /[^a-zA-Z0-9\s]/.test(val);
+            const hasNoUpper = !/[A-Z]/.test(val);
+            const hasNoSpace = !/\s/.test(val);
+
+            updateReq('reqLength', hasLen, "Length: Min 8 chars (" + val.length + "/8)");
+            updateReq('reqLower', hasLower, "Lowercase: At least 1 (a-z)");
+            updateReq('reqNum', hasTwoNums, "Numbers: At least 2 (found " + (numMatches ? numMatches.length : 0) + ")");
+            updateReq('reqSpec', hasSpec, "Special Char: At least 1");
+            updateReq('reqNoUpper', hasNoUpper, "Uppercase: None allowed " + (!hasNoUpper ? "❌ UPPERCASE DETECTED!" : ""));
+            updateReq('reqNoSpace', hasNoSpace, "Spaces: None allowed " + (!hasNoSpace ? "❌ SPACE DETECTED!" : ""));
+
+            return hasLen && hasLower && hasTwoNums && hasSpec && hasNoUpper && hasNoSpace;
+        }
+
+        function updateReq(elementId, isValid, text) {
+            const el = document.getElementById(elementId);
+            if (isValid) {
+                el.innerText = "✅ " + text;
+                el.style.color = "#008000";
+            } else {
+                el.innerText = "❌ " + text;
+                el.style.color = "#ff0000";
+            }
+        }
+
+        // TOGGLE PASSWORD VISIBILITY
+        function togglePasswordVisibility() {
+            const input = document.getElementById('passwordInput');
+            input.type = (input.type === 'password') ? 'text' : 'password';
+        }
+
+        // CAPS LOCK WARNING
+        function checkCapsLock(event) {
+            const warning = document.getElementById('capsWarning');
+            if (event.getModifierState && event.getModifierState('CapsLock')) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+            }
+        }
+
+        // TRIGGER SHAKE ANIMATION
+        function triggerShake() {
+            const card = document.getElementById('loginCard');
+            card.classList.add('shake-active');
+            setTimeout(() => {
+                card.classList.remove('shake-active');
+            }, 500);
+        }
+
+        // HANDLE ATTEMPTS AND LOCKOUT
+        function handleFailedAttempt() {
+            attemptsLeft--;
+            document.getElementById('attemptsDisplay').innerText = Attempts remaining: ${attemptsLeft};
+            triggerShake();
+
+            if (attemptsLeft <= 0) {
+                startLockout();
+            }
+        }
+
+        function startLockout() {
+            isLockedOut = true;
+            let timer = 30;
+            const lockoutEl = document.getElementById('lockoutTimer');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            submitBtn.disabled = true;
+            lockoutEl.style.display = 'block';
+            lockoutEl.innerText = ⛔ SECURITY LOCKOUT! TRY AGAIN IN ${timer} SECONDS!;
+
+            lockoutTimerId = setInterval(() => {
+                timer--;
+                lockoutEl.innerText = ⛔ SECURITY LOCKOUT! TRY AGAIN IN ${timer} SECONDS!;
+                if (timer <= 0) {
+                    clearInterval(lockoutTimerId);
+                    isLockedOut = false;
+                    attemptsLeft = 3;
+                    document.getElementById('attemptsDisplay').innerText = Attempts remaining: 3;
+                    lockoutEl.style.display = 'none';
+                    submitBtn.disabled = false;
+                    generateCaptcha();
+                }
+            }, 1000);
+        }
+
+        // STAGED VALIDATION & FAKE LOGIN PROCESS
+        function initiateLoginProcess(e) {
+            e.preventDefault();
+
+            if (isLockedOut) return;
+
+            const stageText = document.getElementById('currentStageText');
+            const logText = document.getElementById('serverLog');
+
+            // STAGE 1: Username Check
+            stageText.innerText = "Stage 1: Username Validation...";
+            if (!validateUsernameLive()) {
+                logText.innerText = "FAILED STAGE 1: Invalid Username Format.";
+                handleFailedAttempt();
+                return;
+            }
+
+            // STAGE 2: Password Check
+            stageText.innerText = "Stage 2: Password Validation...";
+            if (!validatePasswordLive()) {
+                logText.innerText = "FAILED STAGE 2: Password Requirements Not Met.";
+                handleFailedAttempt();
+                return;
+            }
+
+            // // STAGE 3: CAPTCHA Check
+            stageText.innerText = "Stage 3: CAPTCHA Validation...";
+            const userCaptcha = parseInt(document.getElementById('captchaAnswer').value, 10);
+            if (isNaN(userCaptcha) || userCaptcha !== captchaResult) {
+                logText.innerText = "FAILED STAGE 3: Math CAPTCHA Incorrect.";
+                generateCaptcha();
+                handleFailedAttempt();
+                return;
+            }
+
+            // STAGE 4: Security Check
+            stageText.innerText = "Stage 4: Form Security Check...";
+            logText.innerText = "Security Integrity Verified. Passing to Stage 5...";
+
+            // STAGE 5: Fake Server Connection Execution (20 Seconds Process)
+            executeSlowLoginProcess();
+        }
+
+        function executeSlowLoginProcess() {
+            const submitBtn = document.getElementById('submitBtn');
+            const usernameInput = document.getElementById('usernameInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const captchaInput = document.getElementById('captchaAnswer');
+            const stageText = document.getElementById('currentStageText');
+            const logText = document.getElementById('serverLog');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+
+            // Disable all inputs
+            submitBtn.disabled = true;
+            usernameInput.disabled = true;
+            passwordInput.disabled = true;
+            captchaInput.disabled = true;
+
+            stageText.innerText = "Stage 5: Fake Server Connection Initiated...";
+
+            const messages = [
+                "Validating credentials...",
+                "Checking username...",
+                "Checking password...",
+                "Verifying CAPTCHA...",
+                "Encrypting credentials...",
+                "Contacting authentication server...",
+                "Waiting for server response...",
+                "Retrying connection...",
+                "Almost completed...",
+                "Final verification..."
+            ];
+
+            let step = 0;
+            const totalSteps = 40; // 40 steps * 500ms = 20,000ms (20 seconds)
+
+            const interval = setInterval(() => {
+                step++;
+                const percentage = Math.floor((step / totalSteps) * 100);
+                
+                progressBar.style.width = percentage + "%";
+                progressPercent.innerText = percentage + "%";
+
+                // Pick text from array based on progress
+                const msgIndex = Math.min(Math.floor((percentage / 100) * messages.length), messages.length - 1);
+                
+                // Random unstable server messages
+                if (Math.random() < 0.25 && percentage < 90) {
+                    logText.innerText = "⚠️ Server connection unstable... retrying package transfer...";
+                } else {
+                    logText.innerText = messages[msgIndex];
+                }
+
+                if (step >= totalSteps) {
+                    clearInterval(interval);
+                    progressBar.style.width = "100%";
+                    progressPercent.innerText = "100%";
+                    stageText.innerText = "AUTHENTICATION COMPLETE!";
+                    logText.innerText = "🎉 Login successful! (Simulation Finished)";
+                    logText.style.color = "#00ff00";
+                    logText.style.fontSize = "20px";
+                    alert("🎉 LOGIN SUCCESSFUL! 🎉\n\n(This was an intentionally annoying login simulation)");
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

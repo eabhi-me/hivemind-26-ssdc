@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAD UI - Login Page</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background: #00ff00;
+        color: #ff00ff;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        overflow-x: hidden;
+    }
+
+    .header {
+        margin: 20px;
+        padding: 25px;
+        text-align: center;
+        background: yellow;
+        border: 10px dashed red;
+        transform: rotate(-2deg);
+    }
+
+    .header h1 {
+        margin: 0;
+        color: blue;
+        font-size: 52px;
+        text-shadow: 7px 7px red;
+    }
+
+    .header p {
+        display: inline-block;
+        margin: 15px 0 0;
+        padding: 10px;
+        background: orange;
+        color: purple;
+        font-size: 20px;
+    }
+
+    .login-box {
+        width: 430px;
+        max-width: 90%;
+        margin: 70px auto;
+        padding: 25px;
+        background: #ff9900;
+        border: 15px double blue;
+        box-shadow: 22px 22px 0 red;
+        transform: rotate(3deg);
+    }
+
+    .login-box h2 {
+        margin-top: 0;
+        padding: 15px;
+        text-align: center;
+        color: red;
+        background: cyan;
+        border: 5px dotted black;
+        font-size: 30px;
+    }
+
+    label.field-label {
+        display: block;
+        margin-top: 25px;
+        padding: 8px;
+        background: pink;
+        color: black;
+        font-size: 19px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 16px;
+        border: 7px solid purple;
+        background: #ffff99;
+        font-size: 17px;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+    }
+
+    input:focus {
+        outline: 7px dotted blue;
+        background: white;
+    }
+
+    .remember {
+        margin: 25px 0;
+        padding: 10px;
+        background: lime;
+        color: black;
+    }
+
+    .remember input {
+        transform: scale(1.5);
+        margin-right: 10px;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 20px;
+        background: red;
+        color: yellow;
+        border: 9px outset yellow;
+        font-size: 28px;
+        font-weight: bold;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        cursor: pointer;
+    }
+
+    .login-btn:hover {
+        background: blue;
+        color: lime;
+        transform: rotate(-3deg) scale(1.05);
+    }
+
+    .forgot {
+        margin-top: 22px;
+        text-align: right;
+    }
+
+    .forgot a {
+        padding: 5px;
+        background: white;
+        color: blue;
+    }
+
+    .warning {
+        margin-top: 28px;
+        padding: 14px;
+        text-align: center;
+        background: black;
+        color: yellow;
+        border: 7px dashed white;
+    }
+
+    .footer {
+        margin-top: 100px;
+        padding: 30px;
+        text-align: center;
+        background: purple;
+        color: yellow;
+        border-top: 12px solid orange;
+        border-bottom: 12px solid cyan;
+    }
+
+    .popup {
+        display: none;
+        position: fixed;
+        top: 18%;
+        left: 50%;
+        width: 350px;
+        max-width: 90%;
+        padding: 25px;
+        transform: translateX(-50%) rotate(-5deg);
+        background: yellow;
+        border: 10px solid red;
+        box-shadow: 15px 15px 0 black;
+        text-align: center;
+        z-index: 1000;
+    }
+
+    .popup h3 {
+        color: red;
+        font-size: 28px;
+    }
+
+    .popup button {
+        padding: 12px 20px;
+        background: blue;
+        color: white;
+        border: 5px solid yellow;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+        .header h1 { font-size: 34px; }
+        .login-box { margin-top: 45px; }
+    }
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <h1>🔥 SUPER BAD LOGIN 🔥</h1>
+    <p>WELCOME TO THE WORST LOGIN PAGE EVER!!!</p>
+</header>
+
+<main class="login-box">
+    <h2>LOGIN HERE!!! 😵</h2>
+
+    <form id="loginForm">
+        <label class="field-label" for="username">USERNAME (obviously)</label>
+        <input type="text" id="username" placeholder="Type something..." required>
+
+        <label class="field-label" for="password">PASSWORD (secret 🤫)</label>
+        <input type="password" id="password" placeholder="Your password..." required>
+
+        <div class="remember">
+            <input type="checkbox" id="remember">
+            <label for="remember">Remember me forever 😈</label>
+        </div>
+
+        <button class="login-btn" type="submit">LOGIN NOW!!! 🚀</button>
+
+        <div class="forgot">
+            <a href="#" id="forgot">Forgot Password???</a>
+        </div>
+    </form>
+
+    <div class="warning">
+        ⚠️ WARNING ⚠️<br>
+        This website has absolutely terrible UI.
+    </div>
+</main>
+
+<div class="popup" id="popup">
+    <h3>🎉 CONGRATULATIONS!!! 🎉</h3>
+    <p>You have won absolutely NOTHING!</p>
+    <button id="closePopup">OK I GUESS 😐</button>
+</div>
+
+<footer class="footer">
+    © 2026 BAD UI Corporation™<br>
+    We make websites worse since 2026.
+</footer>
+
+<script>
+    const form = document.getElementById("loginForm");
+    const popup = document.getElementById("popup");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+        popup.style.display = "block";
+    });
+
+    document.getElementById("closePopup").addEventListener("click", function() {
+        popup.style.display = "none";
+        alert("Login successful... probably 🤷");
+    });
+
+    document.getElementById("forgot").addEventListener("click", function(event) {
+        event.preventDefault();
+        alert("Oops! We forgot your password too 😂");
+    });
+</script>
+
+</body>
+</html>

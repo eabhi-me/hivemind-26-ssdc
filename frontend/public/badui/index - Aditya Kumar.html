@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humanity Check™</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,"Segoe UI",system-ui,sans-serif;background:#f1f3f4;color:#202124;display:flex;justify-content:center;padding:40px 16px;min-height:100vh}
+.page{width:100%;max-width:420px;text-align:center}
+h1{font-weight:400;font-size:24px;margin:0 0 6px}
+.sub{color:#5f6368;font-size:14px;margin:0 0 24px}
+.card{position:relative;background:#fff;border:1px solid #d3d3d3;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.15);padding:14px 16px 18px;text-align:left;transition:transform .5s}
+.card-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#5f6368;margin-bottom:8px}
+.brand{font-weight:600;color:#1a73e8;letter-spacing:.3px}
+.sus{height:6px;background:#e8eaed;border-radius:3px;overflow:hidden;margin-bottom:4px}
+.sus .bar{height:100%;width:0;background:#34a853;transition:width .4s,background .4s}
+.sustext{font-size:11px;color:#5f6368;margin-bottom:14px}
+.q{font-size:15px;margin:0 0 4px}
+.hint{font-size:12px;color:#5f6368;margin:0 0 12px}
+.center{text-align:center}
+.msg{min-height:18px;font-size:12px;margin-top:12px}
+.msg.err{color:#d93025}.msg.ok{color:#188038}.msg.warn{color:#b06000}
+.btn{background:#1a73e8;color:#fff;border:0;border-radius:4px;padding:8px 18px;font-size:14px;cursor:pointer;margin-top:12px}
+.btn:disabled{background:#9aa0a6;cursor:not-allowed}
+.footer{font-size:11px;color:#5f6368;margin-top:14px}
+.footer a{color:#5f6368;margin:0 6px;cursor:pointer;text-decoration:underline}
+
+/* stage 1: draw */
+#dc{display:block;margin:6px auto;border:2px dashed #9aa0a6;background:#fff;cursor:crosshair;touch-action:none}
+.drawlabel{display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;margin-top:8px}
+
+/* stage 2: grid */
+.grid{display:grid;grid-template-columns:repeat(4,64px);gap:4px;width:max-content;margin:8px auto;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.tile{width:64px;height:64px;background:#f8f9fa;border:1px solid #dadce0;display:flex;align-items:center;justify-content:center;font-size:20px;filter:blur(1.3px);cursor:pointer;position:relative;user-select:none}
+.tile:hover{filter:none}
+.tile.sel{border-color:#c6dafc}
+.tile.sel::after{content:'';position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#1a73e8}
+
+/* stage 3: drums */
+@keyframes spin{to{transform:rotate(360deg)}}
+.capwrap{height:110px;display:flex;align-items:center;justify-content:center}
+.capwrap canvas{animation:spin 24s linear infinite;border:1px solid #dadce0}
+.drums{display:flex;gap:8px;justify-content:center;margin:10px 0 4px}
+.drum{width:44px;height:84px;border:1px solid #dadce0;border-radius:6px;background:linear-gradient(#e8eaed,#fff 30%,#fff 70%,#e8eaed);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:monospace;cursor:ns-resize;user-select:none;touch-action:none;transition:background .3s}
+.drum .side{font-size:11px;color:#bdc1c6}
+.drum .cur{font-size:24px;font-weight:700;line-height:1.3}
+.drum.drift{background:#fef7e0;border-color:#fbbc04}
+
+/* stage 4: slider */
+.track{position:relative;height:44px;background:#e8eaed;border-radius:22px;margin:16px 0 8px;touch-action:none;cursor:grab}
+.gap{position:absolute;top:6px;width:32px;height:32px;border-radius:50%;border:2px dashed #1a73e8;transform:translateX(-50%)}
+.knob{position:absolute;top:4px;width:36px;height:36px;border-radius:50%;background:#1a73e8;transform:translateX(-50%);box-shadow:0 1px 3px rgba(0,0,0,.3);pointer-events:none}
+
+/* stage 5: hold */
+.hold{position:relative;overflow:hidden;padding:10px 26px}
+.ring{position:absolute;left:0;bottom:0;height:4px;width:0;background:#fff;opacity:.9}
+
+/* success */
+.success{text-align:center}
+.bigcheck{font-size:48px;color:#188038}
+.success h2{font-weight:400;margin:4px 0 8px}
+code{background:#f1f3f4;padding:2px 6px;border-radius:3px}
+
+/* overlay */
+.overlay{position:absolute;inset:0;background:rgba(255,255,255,.88);display:none;flex-direction:column;align-items:center;justify-content:center;font-size:13px;color:#5f6368;border-radius:4px;z-index:5}
+.overlay .pb{width:60%;height:4px;background:#e8eaed;margin-top:10px;border-radius:2px;overflow:hidden}
+.overlay .pb i{display:block;height:100%;background:#1a73e8;width:0;transition:width 1.6s cubic-bezier(.1,.9,.2,1)}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Sign in to continue</h1>
+  <p class="sub">Before we let you in, please complete a quick security check.</p>
+
+  <div class="card" id="card">
+    <div class="card-head"><span class="brand">Humanity Check™</span><span id="stepLabel">Step 1 of 3</span></div>
+    <div class="sus"><div class="bar" id="susBar"></div></div>
+    <div class="sustext" id="susText">Robot suspicion: 0%</div>
+    <div id="stage"></div>
+    <div class="msg" id="msg"></div>
+    <div class="overlay" id="overlay"><span id="ovText">Analysing behaviour…</span><div class="pb"><i id="ovBar"></i></div></div>
+  </div>
+
+  <div class="footer">
+    <a id="audio">Audio challenge</a> · <a title="Because you might be a robot.">Why is this so hard?</a> · <a title="No.">Skip</a>
+  </div>
+</div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const $stage=$('#stage'), $msg=$('#msg'), $step=$('#stepLabel'), $bar=$('#susBar'),
+      $susText=$('#susText'), $card=$('#card'), $overlay=$('#overlay'),
+      $ovText=$('#ovText'), $ovBar=$('#ovBar');
+const rand = n => Math.floor(Math.random()*n);
+const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=rand(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+let stageIdx=0, suspicion=0, fails=0, cleanup=null;
+
+function buzz(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    buzz.ctx=buzz.ctx||new AC();
+    const ctx=buzz.ctx, o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='square'; o.frequency.value=110; g.gain.value=0.04;
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.15);
+  }catch(e){}
+}
+function updateSus(){
+  $bar.style.width=suspicion+'%';
+  $bar.style.background=`hsl(${Math.max(0,120-suspicion*1.2)},70%,45%)`;
+  $susText.textContent=`Robot suspicion: ${suspicion}%`;
+}
+function setMsg(t,type){ $msg.textContent=t; $msg.className='msg '+(type||''); }
+function tilt(){ $card.style.transform=`rotate(${Math.min(fails*0.7,6)}deg)`; }
+
+/* returns true if a full restart was triggered */
+function fail(text){
+  fails++; suspicion=Math.min(100,suspicion+17); updateSus(); buzz(); tilt(); setMsg(text,'err');
+  if(suspicion>=100){
+    setTimeout(()=>{ suspicion=40; updateSus(); stageIdx=0; render();
+      setMsg('Suspicion critical. Verification restarted from the beginning.','err'); },1200);
+    return true;
+  }
+  return false;
+}
+function pass(text){
+  setMsg(text,'ok'); stageIdx++;
+  const msgs=['Analysing behaviour…','Consulting the algorithm…','Almost there…','Re-analysing, just in case…'];
+  let i=0; $ovText.textContent=msgs[0]; $ovBar.style.width='0'; $overlay.style.display='flex';
+  requestAnimationFrame(()=>{ $ovBar.style.width='93%'; });
+  const iv=setInterval(()=>{ i++; if(i<msgs.length) $ovText.textContent=msgs[i]; },500);
+  setTimeout(()=>{ clearInterval(iv); $ovBar.style.width='100%';
+    setTimeout(()=>{ $overlay.style.display='none'; setMsg(''); render(); },300); },2000);
+}
+function render(){
+  if(cleanup){ try{cleanup();}catch(e){} cleanup=null; }
+  $stage.innerHTML='';
+  const done = stageIdx>=STAGES.length;
+  $step.textContent=`Step ${stageIdx+1} of ${done?stageIdx+1:stageIdx+3}`;
+  cleanup=(STAGES[stageIdx]||stageSuccess)($stage)||null;
+}
+
+/* ---------- Stage 1: draw your own checkmark ---------- */
+function avgDev(pts,a,b){
+  const dx=b.x-a.x, dy=b.y-a.y, L=Math.hypot(dx,dy)||1; let s=0;
+  for(const p of pts) s+=Math.abs(dy*p.x-dx*p.y+b.x*a.y-b.y*a.x)/L;
+  return s/pts.length;
+}
+function stageDraw(root){
+  const size=Math.max(64,130-fails*8);
+  root.innerHTML=`<p class="q">Confirm you are not a robot.</p>
+    <p class="hint">Pre-made checkboxes can be clicked by bots. Please draw your own <b>✓</b> inside the box, left to right. Robots can't draw.</p>
+    <canvas id="dc" width="${size}" height="${size}"></canvas>
+    <div class="drawlabel">↑ I'm not a robot</div>`;
+  const c=root.querySelector('#dc'), ctx=c.getContext('2d');
+  let pts=[], drawing=false, t0=0;
+  const pos=e=>{ const r=c.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; };
+  c.addEventListener('pointerdown',e=>{
+    drawing=true; pts=[pos(e)]; t0=performance.now();
+    ctx.clearRect(0,0,size,size); ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
+    ctx.strokeStyle='#1a73e8'; ctx.lineWidth=3; ctx.lineCap='round'; ctx.lineJoin='round';
+    c.setPointerCapture(e.pointerId);
+  });
+  c.addEventListener('pointermove',e=>{
+    if(!drawing) return; const p=pos(e);
+    if(p.x<0||p.y<0||p.x>size||p.y>size){ drawing=false; ctx.clearRect(0,0,size,size); fail('You left the box. Please stay inside the box.'); return; }
+    pts.push(p); ctx.lineTo(p.x,p.y); ctx.stroke();
+  });
+  c.addEventListener('pointerup',()=>{ if(!drawing) return; drawing=false; evaluate(); });
+  function evaluate(){
+    const dt=performance.now()-t0;
+    const clear=()=>ctx.clearRect(0,0,size,size);
+    if(pts.length<10){ clear(); return fail('That is a dot, not a checkmark.'); }
+    let bi=0; pts.forEach((p,i)=>{ if(p.y>pts[bi].y) bi=i; });
+    const a=pts[0], b=pts[bi], z=pts[pts.length-1];
+    if(bi<3||bi>pts.length-4){ clear(); return fail("That doesn't look like a ✓. Go down, then up."); }
+    if(!(b.y-a.y>size*0.12&&b.y-z.y>size*0.28)){ clear(); return fail('Not enough ✓ shape. Down, then up. Higher.'); }
+    if(!(b.x>a.x&&z.x>b.x)){ clear(); return fail('Checkmarks go left to right. Left. To. Right.'); }
+    if(dt<900){ clear(); return fail(`Drawn in ${dt|0} ms. Too fast. Robots are fast.`); }
+    if(dt>7000){ clear(); return fail(`Drawn in ${(dt/1000).toFixed(1)} s. Too slow. Robots stall to seem human.`); }
+    const dev=avgDev(pts.slice(0,bi+1),a,b)+avgDev(pts.slice(bi),b,z);
+    if(dev<0.8){ clear(); return fail('Too precise. Humans wobble.'); }
+    pass('Acceptable checkmark. Barely.');
+  }
+}
+
+/* ---------- Stage 2: rotating blurred image grid ---------- */
+const SETS=[
+  {name:'bicycle',t:'🚲',d:['🏍️','🛵','🛴','🦽','🛞','🚗']},
+  {name:'sailboat',t:'⛵',d:['🚤','🛶','🛥️','🚢','⛴️','🏄']},
+  {name:'bus',t:'🚌',d:['🚐','🚚','🚋','🚑','🚛','🚕']},
+  {name:'traffic light',t:'🚦',d:['🏮','🔦','🚨','🪔','💡','🕯️']}
+];
+function stageGrid(root){
+  const set=SETS[rand(SETS.length)], count=3+rand(3);
+  const cells=[]; for(let i=0;i<16;i++) cells.push(i<count?{e:set.t,t:1}:{e:set.d[rand(set.d.length)],t:0});
+  shuffle(cells);
+  root.innerHTML=`<p class="q">Select all squares containing a <b>${set.name}</b>.</p>
+    <p class="hint">Please inspect every image before verifying. <span id="insp">Inspected 0/16</span></p>
+    <div class="grid" id="grid"></div>
+    <div class="center"><button class="btn" id="gverify" disabled>Verify</button></div>`;
+  const grid=root.querySelector('#grid'), insp=root.querySelector('#insp'), btn=root.querySelector('#gverify');
+  const seen=new Set(); let rot=0;
+  const mark=i=>{ seen.add(i); insp.textContent=`Inspected ${seen.size}/16`; if(seen.size===16) btn.disabled=false; };
+  cells.forEach((c,i)=>{
+    const d=document.createElement('div'); d.className='tile'; d.textContent=c.e; d.dataset.i=i;
+    d.addEventListener('pointerenter',()=>mark(i));
+    d.addEventListener('click',()=>{ mark(i); d.classList.toggle('sel'); rot+=90; grid.style.transform=`rotate(${rot}deg)`; });
+    grid.appendChild(d);
+  });
+  btn.addEventListener('click',()=>{
+    let wrong=0;
+    grid.querySelectorAll('.tile').forEach(d=>{ if((d.classList.contains('sel')?1:0)!==cells[+d.dataset.i].t) wrong++; });
+    if(wrong===0) pass('Images accepted.');
+    else if(!fail(`Incorrect. ${wrong} square${wrong>1?'s':''} misidentified. New images loaded.`)) render();
+  });
+}
+
+/* ---------- Stage 3: scroll-wheel drums ---------- */
+const CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function stageDrum(root){
+  const code=Array.from({length:5},()=>CHARS[rand(CHARS.length)]).join('');
+  root.innerHTML=`<p class="q">Enter the characters shown.</p>
+    <p class="hint">Keyboard input is disabled for your security. Scroll over a wheel (or click it) to change its character. Wheels recalibrate periodically.</p>
+    <div class="capwrap"><canvas id="cap" width="220" height="70"></canvas></div>
+    <div class="drums" id="drums"></div>
+    <div class="center"><button class="btn" id="dcheck">Check</button></div>`;
+  const cv=root.querySelector('#cap'), ctx=cv.getContext('2d');
+  ctx.fillStyle='#f8f9fa'; ctx.fillRect(0,0,220,70);
+  for(let i=0;i<6;i++){ ctx.strokeStyle=`hsla(${rand(360)},50%,50%,.5)`; ctx.beginPath();
+    ctx.moveTo(rand(220),rand(70)); ctx.bezierCurveTo(rand(220),rand(70),rand(220),rand(70),rand(220),rand(70)); ctx.stroke(); }
+  [...code].forEach((ch,i)=>{ ctx.save(); ctx.translate(30+i*40,44+(rand(16)-8)); ctx.rotate((rand(50)-25)*Math.PI/180);
+    ctx.font=`${28+rand(10)}px Georgia, serif`; ctx.fillStyle=`hsl(${rand(360)},40%,30%)`; ctx.textAlign='center'; ctx.fillText(ch,0,0); ctx.restore(); });
+
+  const vals=[0,0,0,0,0], els=[]; let hovered=-1;
+  const drums=root.querySelector('#drums');
+  const draw=i=>{ const s=els[i].children;
+    s[0].textContent=CHARS[(vals[i]-1+CHARS.length)%CHARS.length]; s[1].textContent=CHARS[vals[i]]; s[2].textContent=CHARS[(vals[i]+1)%CHARS.length]; };
+  vals.forEach((_,i)=>{
+    const d=document.createElement('div'); d.className='drum';
+    d.innerHTML='<span class="side"></span><span class="cur"></span><span class="side"></span>';
+    d.addEventListener('wheel',e=>{ e.preventDefault(); vals[i]=(vals[i]+(e.deltaY>0?1:-1)+CHARS.length)%CHARS.length; draw(i); },{passive:false});
+    d.addEventListener('click',()=>{ vals[i]=(vals[i]+1)%CHARS.length; draw(i); });
+    d.addEventListener('pointerenter',()=>hovered=i);
+    d.addEventListener('pointerleave',()=>{ if(hovered===i) hovered=-1; });
+    drums.appendChild(d); els.push(d);
+  });
+  vals.forEach((_,i)=>draw(i));
+  const iv=setInterval(()=>{
+    let i=rand(5); if(i===hovered) i=(i+1)%5;
+    vals[i]=(vals[i]+1)%CHARS.length; draw(i);
+    els[i].classList.add('drift'); setTimeout(()=>els[i].classList.remove('drift'),600);
+    setMsg(`Wheel ${i+1} recalibrated for accuracy.`,'warn');
+  },5500);
+  root.querySelector('#dcheck').addEventListener('click',()=>{
+    const typed=vals.map(v=>CHARS[v]).join('');
+    if(typed===code){ clearInterval(iv); pass('Characters accepted.'); }
+    else if(!fail(`"${typed}" is incorrect. New characters generated.`)) render();
+  });
+  return ()=>clearInterval(iv);
+}
+
+/* ---------- Stage 4: slider on a very long cable ---------- */
+function stageSlider(root){
+  root.innerHTML=`<p class="q">Drag the piece into the dashed slot, then release.</p>
+    <p class="hint">Note: the handle is connected via a very long cable. Expect latency.</p>
+    <div class="track" id="track"><div class="gap" id="gap"></div><div class="knob" id="knob"></div></div>
+    <p class="hint">Latency: 1200 ms (within normal range)</p>`;
+  const track=root.querySelector('#track'), gap=root.querySelector('#gap'), knob=root.querySelector('#knob');
+  const LAG=1200; let samples=[], dragging=false, knobX=6, target=60, raf; const t0=performance.now();
+  knob.style.left=knobX+'%';
+  const xOf=e=>{ const r=track.getBoundingClientRect(); return Math.max(4,Math.min(96,(e.clientX-r.left)/r.width*100)); };
+  track.addEventListener('pointerdown',e=>{ dragging=true; samples=[{t:performance.now(),x:xOf(e)}]; track.setPointerCapture(e.pointerId); track.style.cursor='grabbing'; });
+  track.addEventListener('pointermove',e=>{ if(dragging) samples.push({t:performance.now(),x:xOf(e)}); });
+  const end=()=>{
+    if(!dragging) return; dragging=false; samples=[]; track.style.cursor='grab';
+    const d=Math.abs(knobX-target);
+    if(d<=3) pass('Piece aligned. Eventually.');
+    else fail(`Released ${d.toFixed(1)}% away from the slot. Remember the cable.`);
+  };
+  track.addEventListener('pointerup',end); track.addEventListener('pointercancel',end);
+  function loop(){
+    const now=performance.now();
+    target=60+6*Math.sin((now-t0)/1500); gap.style.left=target+'%';
+    if(dragging){
+      const t=now-LAG; let s=null;
+      for(const smp of samples){ if(smp.t<=t) s=smp; else break; }
+      if(s){ knobX=s.x; knob.style.left=knobX+'%'; }
+      while(samples.length>1&&samples[1].t<=t) samples.shift();
+    }
+    raf=requestAnimationFrame(loop);
+  }
+  loop();
+  return ()=>cancelAnimationFrame(raf);
+}
+
+/* ---------- Stage 5: hover without twitching ---------- */
+function stageHold(root){
+  root.innerHTML=`<p class="q">Final step: hover over <b>Verify</b> for 3 seconds without moving.</p>
+    <p class="hint">Robots twitch. Humans do not. Do not click; clicking is a robot behaviour.</p>
+    <div class="center"><button class="btn hold" id="hold">Verify<span class="ring" id="ring"></span></button></div>
+    <p class="hint center" id="hstat">Waiting for hover…</p>`;
+  const btn=root.querySelector('#hold'), ring=root.querySelector('#ring'), stat=root.querySelector('#hstat');
+  let start=null, sx=0, sy=0, raf=null, twitches=0;
+  const begin=e=>{ start=performance.now(); sx=e.clientX; sy=e.clientY; stat.textContent='Holding… stay perfectly still.'; };
+  const reset=why=>{ start=null; ring.style.width='0'; if(why){ twitches++; stat.textContent=`${why} (${twitches}). Timer reset.`; buzz(); } };
+  btn.addEventListener('pointerenter',begin);
+  btn.addEventListener('pointermove',e=>{ if(start!==null&&Math.hypot(e.clientX-sx,e.clientY-sy)>3) reset('Twitch detected'); });
+  btn.addEventListener('pointerleave',()=>reset(start!==null?'You left':null));
+  btn.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse') reset('Click detected. Very robotic'); else begin(e); });
+  btn.addEventListener('pointerup',e=>{ if(e.pointerType!=='mouse') reset('Released too early'); });
+  function loop(){
+    if(start!==null){
+      const p=Math.min(1,(performance.now()-start)/3000);
+      ring.style.width=(p*100)+'%'; stat.textContent=`Holding… ${(3-p*3).toFixed(1)} s`;
+      if(p>=1){ start=null; pass('Stillness confirmed.'); return; }
+    }
+    raf=requestAnimationFrame(loop);
+  }
+  loop();
+  return ()=>cancelAnimationFrame(raf);
+}
+
+/* ---------- Success ---------- */
+function stageSuccess(root){
+  const token='HUMAN-'+Math.random().toString(36).slice(2,8).toUpperCase();
+  root.innerHTML=`<div class="success"><div class="bigcheck" id="big">✓</div><h2>You are human.</h2>
+    <p>Confidence: ${51+rand(9)}%</p>
+    <p class="hint">Verification token: <code>${token}</code></p>
+    <p class="hint" id="expline">This verification expires in <span id="exp">60</span> s.</p>
+    <button class="btn" id="again">Verify again</button></div>`;
+  let n=60; const exp=root.querySelector('#exp');
+  const iv=setInterval(()=>{ n--; exp.textContent=n;
+    if(n<=0){ clearInterval(iv); root.querySelector('#expline').textContent='Verification expired. You are unverified again.'; root.querySelector('#big').textContent='?'; } },1000);
+  root.querySelector('#again').addEventListener('click',()=>{ clearInterval(iv); stageIdx=0; suspicion=0; fails=0; updateSus(); tilt(); setMsg(''); render(); });
+  return ()=>clearInterval(iv);
+}
+
+const STAGES=[stageDraw,stageGrid,stageDrum,stageSlider,stageHold];
+
+/* fake audio challenge */
+let audioWait=0, audioIv=null;
+$('#audio').addEventListener('click',()=>{
+  if(audioIv) return;
+  audioWait=120; const a=$('#audio');
+  audioIv=setInterval(()=>{ audioWait--; a.textContent=`Audio challenge unavailable (retry in ${audioWait}s)`;
+    if(audioWait<=0){ clearInterval(audioIv); audioIv=null; a.textContent='Audio challenge'; } },1000);
+  a.textContent=`Audio challenge unavailable (retry in ${audioWait}s)`;
+});
+
+updateSus(); render()

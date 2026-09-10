@@ -1,0 +1,1307 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tri-Phase Adversarial Verification Portal</title>
+    <style>
+      :root {
+        --bg: #030305;
+        --card: #0f172a;
+        --border: #334155;
+        --text: #f8fafc;
+        --subtext: #94a3b8;
+        --accent: #2563eb;
+        --danger: #ff0055;
+        --warning: #ffaa00;
+        --success: #00ff66;
+        --cyan: #00e5ff;
+      }
+
+      * {
+        box-sizing: border-box;
+        user-select: none;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace,
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at center, #111119 0%, #000 100%);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      .stage {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      .stage.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ================= STAGE 1: HELLISH LOGIN ================= */
+      .login-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+        width: 450px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 1;
+      }
+      .login-card h2 {
+        margin-top: 0;
+        font-size: 1.35rem;
+        color: #38bdf8;
+      }
+      p.sub {
+        font-size: 0.8rem;
+        color: var(--subtext);
+        margin-bottom: 18px;
+      }
+      .form-group {
+        margin-bottom: 14px;
+        position: relative;
+      }
+      label {
+        display: block;
+        font-size: 0.78rem;
+        margin-bottom: 4px;
+        color: #cbd5e1;
+      }
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 9px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: #0b1120;
+        color: #fff;
+        outline: none;
+      }
+      .rules {
+        font-size: 0.68rem;
+        color: #f43f5e;
+        margin-top: 6px;
+        line-height: 1.35;
+      }
+      .rule.pass {
+        color: #10b981;
+      }
+      .captcha-box {
+        background: #0b1120;
+        border: 1px dashed var(--border);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+      .slider-container {
+        margin-top: 6px;
+      }
+      input[type="range"] {
+        width: 100%;
+        accent-color: #38bdf8;
+      }
+      .btn-wrapper {
+        height: 70px;
+        position: relative;
+      }
+      #submit-btn {
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding: 10px 20px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          left 0.12s ease,
+          top 0.12s ease;
+      }
+
+      /* Disguised Terms Modal */
+      .terms-wrap {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .terms-wrap input[type="checkbox"] {
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+
+      /* Pop-up Ad */
+      .ad-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 320px;
+        background: #facc15;
+        color: #000;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        z-index: 100;
+        display: none;
+        text-align: center;
+      }
+      .ad-popup h3 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+      }
+      .ad-popup p {
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+      }
+      .fake-close {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        color: #000;
+      }
+      .real-close {
+        font-size: 0.55rem;
+        color: #854d0e;
+        text-decoration: underline;
+        cursor: pointer;
+        display: block;
+        margin-top: 10px;
+      }
+
+      /* ================= STAGE 2: BIKE CAPTCHA ================= */
+      .captcha-card {
+        background: #18181b;
+        border: 1px solid #27272a;
+        border-radius: 12px;
+        width: 380px;
+        padding: 18px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      }
+      .banner {
+        background: #1d4ed8;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+      }
+      .banner span {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.8;
+      }
+      .banner h3 {
+        font-size: 1.15rem;
+        margin-top: 2px;
+      }
+      .timer-bar-wrap {
+        height: 4px;
+        background: #27272a;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 12px;
+      }
+      .timer-bar {
+        height: 100%;
+        width: 100%;
+        background: #ef4444;
+        transition: width 0.1s linear;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .tile {
+        aspect-ratio: 1;
+        background: #27272a;
+        border-radius: 6px;
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+        border: 3px solid transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition:
+          opacity 0.2s ease,
+          transform 0.1s ease;
+      }
+      .tile.selected {
+        border-color: #38bdf8;
+      }
+      .tile.fading {
+        opacity: 0.15;
+        pointer-events: none;
+      }
+      .tile svg {
+        width: 70%;
+        height: 70%;
+      }
+      .tile.selected::after {
+        content: "✓";
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: #38bdf8;
+        color: #000;
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        font-weight: 900;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .notice {
+        font-size: 0.72rem;
+        color: #a1a1aa;
+        margin-bottom: 14px;
+        min-height: 18px;
+        line-height: 1.3;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #27272a;
+        padding-top: 12px;
+      }
+      .action-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+      #verify-btn {
+        background: #2563eb;
+        color: white;
+        transition: transform 0.08s ease;
+      }
+      #skip-btn {
+        background: #27272a;
+        color: #a1a1aa;
+      }
+
+      /* ================= STAGE 3: FRICTION CAPTCHA ================= */
+      .panel {
+        width: 490px;
+        background: #0d0d11;
+        border: 1px solid #22222b;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 0 60px rgba(0, 0, 0, 0.95);
+        position: relative;
+        font-family: "SF Mono", Monaco, Consolas, monospace;
+      }
+      .glitch-active {
+        animation: screenGlitch 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+          infinite;
+      }
+      @keyframes screenGlitch {
+        0% {
+          transform: translate(0);
+          filter: hue-rotate(0deg);
+        }
+        25% {
+          transform: translate(-3px, 2px);
+          filter: invert(0.8);
+        }
+        50% {
+          transform: translate(3px, -2px);
+          filter: contrast(2);
+        }
+        75% {
+          transform: translate(-2px, -1px);
+        }
+        100% {
+          transform: translate(0);
+        }
+      }
+      .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #22222b;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+      }
+      .top-bar h1 {
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        margin: 0;
+        color: var(--cyan);
+        text-transform: uppercase;
+      }
+      .badge {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+        border-radius: 3px;
+        background: #181822;
+        color: #71717a;
+        font-weight: bold;
+      }
+      .instructions {
+        font-size: 0.68rem;
+        color: #71717a;
+        line-height: 1.4;
+        margin-bottom: 14px;
+      }
+      .track-canvas-container {
+        position: relative;
+        margin-bottom: 16px;
+        border: 2px solid #333344;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      #surface-canvas {
+        display: block;
+        width: 100%;
+        height: 60px;
+        background: #121218;
+        cursor: crosshair;
+      }
+      .gauge-wrapper {
+        margin-bottom: 16px;
+      }
+      .gauge-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.65rem;
+        margin-bottom: 4px;
+      }
+      .gauge-housing {
+        width: 100%;
+        height: 18px;
+        background: #060608;
+        border: 1px solid #22222b;
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+      }
+      .gauge-core {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--cyan),
+          var(--warning),
+          var(--danger)
+        );
+        transition: width 0.05s ease-out;
+      }
+      .target-aperture {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        background: rgba(0, 255, 102, 0.25);
+        border-left: 2px solid var(--success);
+        border-right: 2px solid var(--success);
+        z-index: 2;
+      }
+      .arena {
+        width: 100%;
+        height: 130px;
+        background: #060608;
+        border: 1px solid #22222b;
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+      }
+      .arena-grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(#14141e 1px, transparent 1px),
+          linear-gradient(90deg, #14141e 1px, transparent 1px);
+        background-size: 16px 16px;
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .evasive-target {
+        width: 28px;
+        height: 28px;
+        background: #111118;
+        border: 2px solid #3f3f50;
+        border-radius: 4px;
+        position: absolute;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 900;
+        color: #000;
+        z-index: 10;
+        transform-origin: center;
+      }
+      .evasive-target.hot {
+        border-color: var(--success);
+        background: #003311;
+        box-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
+      }
+      .evasive-target.locked {
+        background: var(--success);
+        border-color: var(--success);
+      }
+      .terminal {
+        margin-top: 12px;
+        font-size: 0.68rem;
+        color: var(--danger);
+        min-height: 18px;
+        text-align: center;
+      }
+
+      #final-screen {
+        display: none;
+        text-align: center;
+        background: #0f172a;
+        border: 2px solid var(--success);
+        border-radius: 12px;
+        padding: 36px;
+        box-shadow: 0 0 50px rgba(0, 255, 102, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage active" id="stage-1">
+      <div class="login-card">
+        <h2>Stage 1: Identity Handshake</h2>
+        <p class="sub">Standard security protocols apply. Good luck.</p>
+
+        <div class="form-group">
+          <label>Username (Strictly 7 chars, vowels converted to 'x')</label>
+          <input
+            type="text"
+            id="username"
+            placeholder="Type username..."
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter password" />
+          <div class="rules">
+            <div id="rule-len" class="rule">✕ At least 14 characters</div>
+            <div id="rule-roman" class="rule">
+              ✕ Must contain a Roman numeral (I, V, X, L, C, D, M)
+            </div>
+            <div id="rule-prime" class="rule">
+              ✕ Must contain a single-digit prime number (2, 3, 5, 7)
+            </div>
+            <div id="rule-contradict" class="rule">
+              ✕ Must contain the word "CONFIRM" in lowercase
+            </div>
+            <div id="rule-day" class="rule">
+              ✕ Must contain the current day of the week
+            </div>
+          </div>
+        </div>
+
+        <div class="captcha-box">
+          <label id="captcha-label"
+            >Inverted Precision Dial: Hold at <strong>63%</strong>:</label
+          >
+          <div class="slider-container">
+            <input type="range" id="slider" min="0" max="100" value="0" />
+          </div>
+          <div
+            id="captcha-status"
+            style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px"
+          >
+            Current: 100%
+          </div>
+        </div>
+
+        <div class="terms-wrap">
+          <input type="checkbox" id="terms-box" />
+          <label for="terms-box" style="margin: 0; cursor: pointer"
+            >I agree to revoke standard input compliance rights</label
+          >
+        </div>
+
+        <div class="btn-wrapper" id="btn-wrapper">
+          <button type="button" id="submit-btn">Authorize Phase 1</button>
+        </div>
+      </div>
+
+      <div class="ad-popup" id="ad-popup">
+        <span class="fake-close" id="fake-close">✕</span>
+        <h3>🔥 YOU WON A PRIZE! 🔥</h3>
+        <p>Claim your mandatory identity tokens before authenticating.</p>
+        <button
+          style="
+            padding: 8px 16px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+          "
+          onclick="spawnAnotherAd()"
+        >
+          Claim Free Tokens
+        </button>
+        <span class="real-close" id="real-close"
+          >Skip advertisement (0.01mm clickzone)</span
+        >
+      </div>
+    </div>
+
+    <div class="stage" id="stage-2">
+      <div class="captcha-card">
+        <div class="banner">
+          <span
+            >Stage 2: Vision Analysis (Round
+            <span id="attempt-count">1</span>/?)</span
+          >
+          <h3>Select all squares containing Bicycles</h3>
+        </div>
+
+        <div class="timer-bar-wrap">
+          <div class="timer-bar" id="timer-bar"></div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="notice" id="notice-text">
+          Click images to select. If new images appear, verify those as well.
+        </div>
+
+        <div class="footer">
+          <button class="action-btn" id="skip-btn">Skip</button>
+          <button class="action-btn" id="verify-btn">Verify</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage" id="stage-3">
+      <div class="panel" id="panel">
+        <div class="top-bar">
+          <h1>Stage 3: Thermal Resonance Lock</h1>
+          <span class="badge" id="state-badge">COLD CORE</span>
+        </div>
+
+        <div class="instructions">
+          • Scrape track horizontally to heat core. Depleted zones reduce
+          output.<br />
+          • Velocity limit: <strong>14px/tick</strong> (Slip penalty active).<br />
+          • Synchronize temperature and click the erratic node to complete.
+        </div>
+
+        <div class="track-canvas-container">
+          <canvas id="surface-canvas" width="440" height="60"></canvas>
+        </div>
+
+        <div class="gauge-wrapper">
+          <div class="gauge-labels">
+            <span>Thermal Resonance</span>
+            <span id="temp-display">20.0°C</span>
+          </div>
+          <div class="gauge-housing">
+            <div class="target-aperture" id="target-window"></div>
+            <div class="gauge-core" id="gauge-core"></div>
+          </div>
+        </div>
+
+        <div class="arena" id="arena">
+          <div class="arena-grid"></div>
+          <div class="evasive-target" id="target-node"></div>
+        </div>
+
+        <div class="terminal" id="term-log">
+          > Kinetic initialization offline...
+        </div>
+      </div>
+    </div>
+
+    <div id="final-screen">
+      <h2 style="color: var(--success); margin-bottom: 8px">
+        ALL PROTOCOLS SATISFIED
+      </h2>
+      <p style="color: #94a3b8; font-size: 0.9rem">
+        You somehow endured all three phases.
+      </p>
+    </div>
+
+    <script>
+      let stage3Interval = null;
+      let stage3MotionInterval = null;
+
+      function resetStage1() {
+        userInput.value = "";
+        pwd.value = "";
+        pwdValid = false;
+        updateRule("rule-len", false, "At least 14 characters");
+        updateRule(
+          "rule-roman",
+          false,
+          "Must contain a Roman numeral (I, V, X, L, C, D, M)",
+        );
+        updateRule(
+          "rule-prime",
+          false,
+          "Must contain a single-digit prime number (2, 3, 5, 7)",
+        );
+        updateRule(
+          "rule-contradict",
+          false,
+          'Must contain the word "CONFIRM" in lowercase',
+        );
+        updateRule("rule-day", false, `Must contain current day (${today})`);
+
+        slider.value = 0;
+        balanced = false;
+        status.textContent = "Current: 100%";
+        status.style.color = "#94a3b8";
+
+        document.getElementById("terms-box").checked = false;
+
+        btn.style.left = "0px";
+        btn.style.top = "0px";
+
+        ad.style.display = "block";
+      }
+
+      function advanceTo(stageNum) {
+        document
+          .querySelectorAll(".stage")
+          .forEach((el) => el.classList.remove("active"));
+        const next = document.getElementById(`stage-${stageNum}`);
+        if (next) {
+          next.classList.add("active");
+          if (stageNum === 1) resetStage1();
+          if (stageNum === 2) initStage2();
+          if (stageNum === 3) initStage3();
+        } else {
+          document.getElementById("final-screen").style.display = "block";
+        }
+      }
+
+      /* -------------------------------------------------------------
+        STAGE 1: HIGHLY IRRITATING LOGIN MECHANICS
+      ------------------------------------------------------------- */
+      const userInput = document.getElementById("username");
+      // Block pasting
+      userInput.addEventListener("paste", (e) => {
+        e.preventDefault();
+        alert(
+          "Clipboard operations strictly prohibited for security compliance.",
+        );
+      });
+
+      // Vowel Replacement Trap: forces vowels to turn into 'x'
+      userInput.addEventListener("input", () => {
+        const start = userInput.selectionStart;
+        const oldVal = userInput.value;
+        const newVal = oldVal.replace(/[aeiou]/gi, "x");
+        if (oldVal !== newVal) {
+          userInput.value = newVal;
+          userInput.setSelectionRange(start, start);
+        }
+      });
+
+      const pwd = document.getElementById("password");
+      pwd.addEventListener("paste", (e) => {
+        e.preventDefault();
+        alert("Pasting passwords triggers an automatic fraud flag.");
+      });
+
+      const days = [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+      ];
+      const today = days[new Date().getDay()];
+
+      let pwdValid = false;
+      pwd.addEventListener("input", () => {
+        const val = pwd.value;
+        const passLen = val.length >= 14;
+        const passRoman = /[IVXLCDM]/i.test(val);
+        const passPrime = /[2357]/.test(val);
+        const passContradict = val.includes("confirm");
+        const passDay = val.toLowerCase().includes(today);
+
+        updateRule("rule-len", passLen, "At least 14 characters");
+        updateRule(
+          "rule-roman",
+          passRoman,
+          "Must contain a Roman numeral (I, V, X, L, C, D, M)",
+        );
+        updateRule(
+          "rule-prime",
+          passPrime,
+          "Must contain a single-digit prime number (2, 3, 5, 7)",
+        );
+        updateRule(
+          "rule-contradict",
+          passContradict,
+          'Must contain the word "CONFIRM" in lowercase',
+        );
+        updateRule("rule-day", passDay, `Must contain current day (${today})`);
+
+        pwdValid =
+          passLen && passRoman && passPrime && passContradict && passDay;
+      });
+
+      function updateRule(id, passed, label) {
+        const el = document.getElementById(id);
+        el.textContent = `${passed ? "✓" : "✕"} ${label}`;
+        el.classList.toggle("pass", passed);
+      }
+
+      // Inverted slider: right decreases value + decay
+      const slider = document.getElementById("slider");
+      const status = document.getElementById("captcha-status");
+      let balanced = false;
+
+      slider.addEventListener("input", () => {
+        const inverted = 100 - parseInt(slider.value, 10);
+        status.textContent = `Current: ${inverted}%`;
+        if (inverted === 63) {
+          balanced = true;
+          status.textContent = "✓ Verified at 63%";
+          status.style.color = "#10b981";
+        } else {
+          balanced = false;
+          status.style.color = "#94a3b8";
+        }
+      });
+
+      // Constant background drift
+      setInterval(() => {
+        if (!balanced && slider.value > 0) {
+          slider.value = Math.max(
+            0,
+            parseInt(slider.value, 10) - (Math.floor(Math.random() * 8) + 2),
+          );
+          const inverted = 100 - parseInt(slider.value, 10);
+          status.textContent = `Current: ${inverted}%`;
+        }
+      }, 1000);
+
+      // Evasive Submit Button
+      const btn = document.getElementById("submit-btn");
+      const wrapper = document.getElementById("btn-wrapper");
+
+      btn.addEventListener("mouseenter", () => {
+        const maxLeft = wrapper.clientWidth - btn.clientWidth;
+        const maxTop = wrapper.clientHeight - btn.clientHeight + 25;
+        btn.style.left = `${Math.floor(Math.random() * Math.max(0, maxLeft))}px`;
+        btn.style.top = `${Math.floor(Math.random() * Math.max(0, maxTop))}px`;
+      });
+
+      // Invasive Pop-up Ad logic
+      const ad = document.getElementById("ad-popup");
+      const fakeClose = document.getElementById("fake-close");
+      const realClose = document.getElementById("real-close");
+      setTimeout(() => {
+        ad.style.display = "block";
+      }, 1800);
+
+      fakeClose.addEventListener("click", () => {
+        alert("Failed to close: Cookie consent renewal required.");
+      });
+      realClose.addEventListener("click", () => {
+        ad.style.display = "none";
+      });
+      function spawnAnotherAd() {
+        alert(
+          "Error 409: Verification server unreachable. Please claim tokens again.",
+        );
+      }
+
+      // Submit checks
+      btn.addEventListener("click", () => {
+        const user = userInput.value;
+        const termsChecked = document.getElementById("terms-box").checked;
+
+        if (user.length !== 7) {
+          alert("Error: Username must be EXACTLY 7 characters.");
+          return;
+        }
+        if (!pwdValid) {
+          alert("Error: Password does not meet security criteria.");
+          return;
+        }
+        if (!balanced) {
+          alert("Error: Inverted calibration dial is not locked at 63%.");
+          return;
+        }
+        if (!termsChecked) {
+          alert("Error: You must check the compliance acknowledgment box.");
+          return;
+        }
+        advanceTo(2);
+      });
+
+      /* -------------------------------------------------------------
+        STAGE 2 LOGIC
+      ------------------------------------------------------------- */
+      const ICONS = {
+        bicycle: `<svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5L9 6H5m7 11.5 3.5-7h4.5"/></svg>`,
+        scooter: `<svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 16h6l4-10H9m7 0h3"/></svg>`,
+        trike: `<svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="12" cy="7" r="2"/><path d="M12 9v9m-6 0h12"/></svg>`,
+        bus: `<svg viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="14" rx="2"/><path d="M4 10h16M8 18v2M16 18v2"/></svg>`,
+      };
+
+      const grid = document.getElementById("grid");
+      const verifyBtn = document.getElementById("verify-btn");
+      const skipBtn = document.getElementById("skip-btn");
+      const timerBar = document.getElementById("timer-bar");
+      const noticeText = document.getElementById("notice-text");
+      const attemptDisplay = document.getElementById("attempt-count");
+
+      let attempts = 1;
+      let timerInterval = null;
+      let timeLeft = 100;
+      let tilesState = [];
+
+      function resetTimer() {
+        clearInterval(timerInterval);
+        timeLeft = 100;
+        timerInterval = setInterval(() => {
+          timeLeft -= 1.4;
+          timerBar.style.width = `${Math.max(0, timeLeft)}%`;
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            failVerification("Challenge expired. Generating harder set...");
+          }
+        }, 100);
+      }
+
+      function createTile(index) {
+        const isTarget = Math.random() > 0.6;
+        const type = isTarget
+          ? "bicycle"
+          : Math.random() > 0.5
+            ? "scooter"
+            : "trike";
+        return { id: index, type: type, selected: false };
+      }
+
+      function renderStage2Grid() {
+        grid.innerHTML = "";
+        tilesState.forEach((tile) => {
+          const el = document.createElement("div");
+          el.className = `tile ${tile.selected ? "selected" : ""}`;
+          el.innerHTML = ICONS[tile.type];
+
+          el.addEventListener("click", () => {
+            if (tile.type === "bicycle" && !tile.selected) {
+              tile.selected = true;
+              el.classList.add("selected");
+              setTimeout(() => {
+                el.classList.add("fading");
+                setTimeout(() => {
+                  tile.type = Math.random() > 0.4 ? "bicycle" : "scooter";
+                  tile.selected = false;
+                  el.className = "tile";
+                  el.innerHTML = ICONS[tile.type];
+                }, 1000);
+              }, 300);
+            } else {
+              tile.selected = !tile.selected;
+              el.classList.toggle("selected");
+            }
+          });
+          grid.appendChild(el);
+        });
+      }
+
+      function initStage2() {
+        attempts = 1;
+        attemptDisplay.textContent = attempts;
+        tilesState = Array.from({ length: 9 }, (_, i) => createTile(i));
+        if (tilesState.filter((t) => t.type === "bicycle").length < 2) {
+          tilesState[0].type = "bicycle";
+          tilesState[4].type = "bicycle";
+        }
+        renderStage2Grid();
+        resetTimer();
+      }
+
+      function failVerification(msg) {
+        attempts++;
+        attemptDisplay.textContent = attempts;
+        noticeText.style.color = "#f43f5e";
+        noticeText.textContent = msg;
+
+        const card = document.querySelector(".captcha-card");
+        card.style.transform = "translateX(4px)";
+        setTimeout(() => (card.style.transform = "translateX(-4px)"), 50);
+        setTimeout(() => (card.style.transform = "none"), 100);
+
+        setTimeout(() => {
+          noticeText.style.color = "#a1a1aa";
+          noticeText.textContent =
+            "Click images to select. If new images appear, verify those as well.";
+          initStage2();
+        }, 900);
+      }
+
+      verifyBtn.addEventListener("mouseenter", () => {
+        if (attempts >= 2 && Math.random() > 0.4) {
+          verifyBtn.style.transform = `translate(${Math.floor(Math.random() * 30 - 15)}px, ${Math.floor(Math.random() * 20 - 10)}px)`;
+        }
+      });
+
+      verifyBtn.addEventListener("click", () => {
+        verifyBtn.style.transform = "none";
+        const remainingBikes = tilesState.some(
+          (t) => t.type === "bicycle" && !t.selected,
+        );
+        const wrongSelections = tilesState.some(
+          (t) => t.type !== "bicycle" && t.selected,
+        );
+
+        if (wrongSelections) {
+          failVerification(
+            "Verification failed: Scooters and trikes are not bicycles.",
+          );
+        } else if (remainingBikes) {
+          failVerification(
+            "Verification failed: Lingering bicycle segments remain unselected.",
+          );
+        } else if (attempts < 2 && Math.random() > 0.5) {
+          failVerification("Signal noise detected. Secondary round mandated.");
+        } else {
+          clearInterval(timerInterval);
+          advanceTo(3);
+        }
+      });
+
+      skipBtn.addEventListener("click", () => {
+        failVerification("Skipping increases challenge difficulty.");
+      });
+
+      /* -------------------------------------------------------------
+        STAGE 3 LOGIC
+      ------------------------------------------------------------- */
+      let audioCtx = null;
+      function synthScrape(frequency, intensity) {
+        try {
+          if (!audioCtx)
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+          gain.gain.setValueAtTime(intensity * 0.04, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(
+            0.0001,
+            audioCtx.currentTime + 0.05,
+          );
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.05);
+        } catch (e) {}
+      }
+
+      const canvas = document.getElementById("surface-canvas");
+      const ctx = canvas.getContext("2d");
+      const wearMap = new Float32Array(440).fill(1.0);
+      let puckX = 20;
+
+      function renderTrack() {
+        ctx.fillStyle = "#0c0c12";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let x = 0; x < canvas.width; x += 4) {
+          const wear = wearMap[x];
+          ctx.fillStyle = `rgb(${Math.floor(60 * wear + 10)}, ${Math.floor(40 * wear + 10)}, ${Math.floor(20 * wear + 10)})`;
+          ctx.fillRect(x, 0, 4, canvas.height);
+        }
+        ctx.fillStyle = "#ff6600";
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(puckX - 15, 8, 30, 44, 4);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      let thermalCore = 20.0;
+      let thermalMomentum = 0.0;
+      const ambient = 20.0;
+      const maxTemp = 300.0;
+      let isDragging = false;
+      let lastX = 0;
+      let isLockout = false;
+      let isVerified = false;
+      let syncTimer = 0;
+      let stage3Active = false;
+
+      let windowOsc = 0;
+      let windowWidth = 60;
+      let targetMin = 0;
+      let targetMax = 0;
+
+      const gaugeCore = document.getElementById("gauge-core");
+      const tempDisplay = document.getElementById("temp-display");
+      const targetWindow = document.getElementById("target-window");
+      const stateBadge = document.getElementById("state-badge");
+      const termLog = document.getElementById("term-log");
+      const panel = document.getElementById("panel");
+
+      canvas.addEventListener("mousedown", (e) => {
+        if (isLockout || isVerified || !stage3Active) return;
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        if (Math.abs(mouseX - puckX) < 30) {
+          isDragging = true;
+          lastX = e.clientX;
+        }
+      });
+
+      window.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging || isLockout || isVerified || !stage3Active) return;
+        const deltaX = e.clientX - lastX;
+        lastX = e.clientX;
+        const speed = Math.abs(deltaX);
+
+        if (speed > 14) {
+          isDragging = false;
+          puckX = 20;
+          thermalMomentum = 0;
+          thermalCore = Math.max(ambient, thermalCore - 25);
+          renderTrack();
+          termLog.textContent = "> STRIKE SLIPPED: Velocity limit breached!";
+          return;
+        }
+
+        puckX = Math.max(16, Math.min(canvas.width - 16, puckX + deltaX));
+        const idx = Math.floor(puckX);
+        const currentWear = wearMap[idx];
+        wearMap[idx] = Math.max(0.05, wearMap[idx] - 0.08);
+
+        if (speed > 1) {
+          thermalMomentum += speed * currentWear * 0.4;
+          synthScrape(140 + thermalCore * 2.5, currentWear);
+        }
+        renderTrack();
+      });
+
+      function initStage3() {
+        stage3Active = true;
+        isLockout = false;
+        isVerified = false;
+        thermalCore = ambient;
+        thermalMomentum = 0;
+        syncTimer = 0;
+        wearMap.fill(1.0);
+        puckX = 20;
+
+        panel.classList.remove("glitch-active");
+        stateBadge.textContent = "COLD CORE";
+        stateBadge.style.background = "#181822";
+        stateBadge.style.color = "#71717a";
+
+        targetNode.classList.remove("hot", "locked");
+        targetNode.textContent = "";
+
+        renderTrack();
+        termLog.textContent =
+          "> Kinetic system initialized. Scrape the surface.";
+
+        clearInterval(stage3Interval);
+        stage3Interval = setInterval(() => {
+          if (!stage3Active || isVerified) return;
+
+          thermalCore += thermalMomentum * 0.2;
+          thermalMomentum *= 0.82;
+          if (thermalCore > ambient && !isLockout) thermalCore -= 1.3;
+          thermalCore = Math.max(ambient, Math.min(maxTemp, thermalCore));
+
+          const percent = (thermalCore / maxTemp) * 100;
+          gaugeCore.style.width = `${percent}%`;
+          tempDisplay.textContent = `${thermalCore.toFixed(1)}°C`;
+
+          windowOsc += 0.035;
+          windowWidth = Math.max(18, windowWidth - 0.015);
+          const center = 60 + Math.sin(windowOsc) * 22;
+          targetMin = center - windowWidth / 2;
+          targetMax = center + windowWidth / 2;
+
+          targetWindow.style.left = `${targetMin}%`;
+          targetWindow.style.width = `${targetMax - targetMin}%`;
+
+          if (!isLockout) {
+            if (thermalCore >= 285) {
+              triggerMeltdown();
+            } else if (percent >= targetMin && percent <= targetMax) {
+              syncTimer += 50;
+              stateBadge.textContent = "SYNCED";
+              stateBadge.style.background = "var(--success)";
+              stateBadge.style.color = "#000";
+              targetNode.classList.add("hot");
+              termLog.textContent = "> RESONANCE SYNCHRONIZED. CAPTURE NODE!";
+
+              if (syncTimer > 2400) {
+                termLog.textContent =
+                  "> FLASH OVERHEAT: Maintained target band too long without authorization!";
+                triggerMeltdown();
+              }
+            } else {
+              syncTimer = 0;
+              stateBadge.textContent = "UNSTABLE";
+              stateBadge.style.background = "#181822";
+              stateBadge.style.color = "#71717a";
+              targetNode.classList.remove("hot");
+            }
+          }
+        }, 50);
+
+        initTargetMotion();
+      }
+
+      function triggerMeltdown() {
+        isLockout = true;
+        isDragging = false;
+        thermalCore = ambient;
+        thermalMomentum = 0;
+        syncTimer = 0;
+        panel.classList.add("glitch-active");
+        stateBadge.textContent = "MELTDOWN";
+        stateBadge.style.background = "var(--danger)";
+        stateBadge.style.color = "#fff";
+        wearMap.fill(1.0);
+
+        termLog.textContent =
+          "> CRITICAL MELTDOWN! Session integrity lost. Restarting from Step 01...";
+
+        setTimeout(() => {
+          stage3Active = false;
+          clearInterval(stage3Interval);
+          clearInterval(stage3MotionInterval);
+          advanceTo(1);
+        }, 2500);
+      }
+
+      const arena = document.getElementById("arena");
+      const targetNode = document.getElementById("target-node");
+      let nodeX = 200,
+        nodeY = 40;
+      let nodeVx = 1.2,
+        nodeVy = 0.8;
+
+      window.addEventListener("mousemove", (e) => {
+        if (!stage3Active || isVerified) return;
+        const aRect = arena.getBoundingClientRect();
+        const mouseX = e.clientX - aRect.left;
+        const mouseY = e.clientY - aRect.top;
+        const dx = nodeX + 14 - mouseX;
+        const dy = nodeY + 14 - mouseY;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < 85 && dist > 0) {
+          const force = (85 - dist) / 5;
+          nodeVx += (dx / dist) * force * 1.5;
+          nodeVy += (dy / dist) * force * 1.5;
+        }
+      });
+
+      function initTargetMotion() {
+        clearInterval(stage3MotionInterval);
+        stage3MotionInterval = setInterval(() => {
+          if (!stage3Active || isVerified) return;
+          nodeX += nodeVx;
+          nodeY += nodeVy;
+          nodeVx *= 0.91;
+          nodeVy *= 0.91;
+
+          const speed = Math.hypot(nodeVx, nodeVy);
+          if (speed > 16) {
+            nodeVx = (nodeVx / speed) * 16;
+            nodeVy = (nodeVy / speed) * 16;
+          }
+
+          const maxX = arena.clientWidth - 30;
+          const maxY = arena.clientHeight - 30;
+          if (nodeX <= 0) {
+            nodeX = 0;
+            nodeVx = Math.abs(nodeVx) * 1.2;
+          }
+          if (nodeX >= maxX) {
+            nodeX = maxX;
+            nodeVx = -Math.abs(nodeVx) * 1.2;
+          }
+          if (nodeY <= 0) {
+            nodeY = 0;
+            nodeVy = Math.abs(nodeVy) * 1.2;
+          }
+          if (nodeY >= maxY) {
+            nodeY = maxY;
+            nodeVy = -Math.abs(nodeVy) * 1.2;
+          }
+
+          targetNode.style.left = `${nodeX}px`;
+          targetNode.style.top = `${nodeY}px`;
+        }, 20);
+      }
+
+      targetNode.addEventListener("click", () => {
+        if (!stage3Active || isLockout || isVerified) return;
+
+        const percent = (thermalCore / maxTemp) * 100;
+        const isSynced = percent >= targetMin && percent <= targetMax;
+
+        if (!isSynced) {
+          termLog.textContent =
+            "> ERROR: Node captured outside target thermal resonance.";
+          thermalCore = Math.max(ambient, thermalCore - 40);
+          nodeVx = (Math.random() - 0.5) * 20;
+          nodeVy = (Math.random() - 0.5) * 20;
+          return;
+        }
+
+        isVerified = true;
+        targetNode.classList.add("locked");
+        targetNode.textContent = "✓";
+        advanceTo(4);
+      });
+    </script>
+  </body>
+</html>

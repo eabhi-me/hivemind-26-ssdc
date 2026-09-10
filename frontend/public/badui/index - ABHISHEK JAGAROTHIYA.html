@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alex Rowe — Developer</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --bg-panel:#12181f;
+    --line:#232b34;
+    --text:#c9d1d9;
+    --text-dim:#7d8792;
+    --accent:#3fb950;
+    --accent-dim:#2c7a3a;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI', system-ui, sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,.logo,.prompt{
+    font-family:'Courier New', ui-monospace, monospace;
+  }
+
+  /* NAV */
+  nav{
+    position:sticky;
+    top:0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:1rem 2rem;
+    background:var(--bg-panel);
+    border-bottom:1px solid var(--line);
+    z-index:10;
+  }
+  .logo{ color:var(--accent); font-weight:bold; font-size:1.1rem; }
+  nav ul{
+    list-style:none;
+    display:flex;
+    gap:1.75rem;
+  }
+  nav a{
+    color:var(--text-dim);
+    text-decoration:none;
+    font-size:.9rem;
+    transition:color .15s;
+  }
+  nav a:hover{ color:var(--accent); }
+
+  /* HERO */
+  .hero{
+    max-width:760px;
+    margin:0 auto;
+    padding:5rem 2rem 4rem;
+  }
+  .prompt{
+    color:var(--accent-dim);
+    font-size:.85rem;
+    margin-bottom:.75rem;
+  }
+  .prompt::before{ content:"$ "; color:var(--accent); }
+  h1{
+    font-size:2.4rem;
+    color:#fff;
+    margin-bottom:.5rem;
+  }
+  .role{
+    color:var(--accent);
+    font-size:1.1rem;
+    margin-bottom:1.25rem;
+  }
+  .hero p{
+    color:var(--text-dim);
+    max-width:60ch;
+    margin-bottom:2rem;
+  }
+  .btn-row{ display:flex; gap:1rem; }
+  .btn{
+    display:inline-block;
+    padding:.65rem 1.4rem;
+    border-radius:3px;
+    text-decoration:none;
+    font-size:.9rem;
+    border:1px solid var(--line);
+  }
+  .btn.primary{
+    background:var(--accent);
+    color:#08120a;
+    border-color:var(--accent);
+    font-weight:600;
+  }
+  .btn.primary:hover{ background:var(--accent-dim); border-color:var(--accent-dim); }
+  .btn.ghost{ color:var(--text); }
+  .btn.ghost:hover{ border-color:var(--accent); color:var(--accent); }
+
+  /* SECTIONS */
+  section{
+    max-width:760px;
+    margin:0 auto;
+    padding:3.5rem 2rem;
+    border-top:1px solid var(--line);
+  }
+  h2{
+    font-size:.95rem;
+    letter-spacing:.03em;
+    color:var(--text-dim);
+    margin-bottom:1.5rem;
+  }
+  h2::before{ content:"// "; color:var(--accent-dim); }
+
+  .about p{ color:var(--text-dim); max-width:65ch; }
+
+  /* PROJECTS */
+  .project-list{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.25rem;
+  }
+  .project{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    padding:1.25rem 1.4rem;
+    border-radius:4px;
+    transition:border-color .15s, transform .15s;
+  }
+  .project:hover{ border-color:var(--accent-dim); transform:translateY(-2px); }
+  .project h3{
+    font-size:1rem;
+    color:#fff;
+    margin-bottom:.4rem;
+  }
+  .project p{
+    font-size:.87rem;
+    color:var(--text-dim);
+    margin-bottom:.75rem;
+  }
+  .tags{ display:flex; gap:.4rem; flex-wrap:wrap; }
+  .tag{
+    font-size:.72rem;
+    color:var(--accent);
+    border:1px solid var(--accent-dim);
+    padding:.15rem .5rem;
+    border-radius:20px;
+  }
+
+  /* CONTACT */
+  .contact-list{ list-style:none; }
+  .contact-list li{ margin-bottom:.6rem; }
+  .contact-list a{
+    color:var(--text);
+    text-decoration:none;
+    border-bottom:1px solid var(--line);
+  }
+  .contact-list a:hover{ color:var(--accent); border-color:var(--accent); }
+
+  footer{
+    text-align:center;
+    color:var(--text-dim);
+    font-size:.8rem;
+    padding:2rem;
+  }
+
+  @media (max-width:640px){
+    nav ul{ gap:1rem; }
+    h1{ font-size:1.8rem; }
+    .project-list{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">alex.rowe</div>
+  <ul>
+    <li><a href="#about">about</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="prompt">whoami</div>
+  <h1>Alex Rowe</h1>
+  <div class="role">Front-End Developer</div>
+  <p>I build fast, accessible interfaces and enjoy turning rough ideas into clean, working products. Currently focused on performance-minded web apps.</p>
+  <div class="btn-row">
+    <a href="#projects" class="btn primary">View projects</a>
+    <a href="#contact" class="btn ghost">Get in touch</a>
+  </div>
+</div>
+
+<section class="about" id="about">
+  <h2>about</h2>
+  <p>Three years building interfaces for small teams, with a focus on clarity over cleverness. I care about load times, keyboard navigation, and code that's easy for the next person to read.</p>
+</section>
+
+<section id="projects">
+  <h2>projects</h2>
+  <div class="project-list">
+    <div class="project">
+      <h3>Order Tracker</h3>
+      <p>A dashboard for tracking shipments in real time, built for a small logistics startup.</p>
+      <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
+    </div>
+    <div class="project">
+      <h3>Recipe Box</h3>
+      <p>A recipe-saving app with tagging and search, designed mobile-first.</p>
+      <div class="tags"><span class="tag">React</span><span class="tag">CSS</span></div>
+    </div>
+    <div class="project">
+      <h3>Habit Grid</h3>
+      <p>A minimal habit tracker with a GitHub-style contribution grid.</p>
+      <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span></div>
+    </div>
+    <div class="project">
+      <h3>Type Test</h3>
+      <p>A typing speed test with live WPM and accuracy tracking.</p>
+      <div class="tags"><span class="tag">JS</span><span class="tag">CSS</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2>contact</h2>
+  <ul class="contact-list">
+    <li>Email: <a href="mailto:harshkumardlr@gmail.com">harshkumardlr@gmail.com</a></li>
+    <li>GitHub: <a href="https://github.com/">https://github.com/</a></li>
+    <li>LinkedIn: <a href="https://in.linkedin.com/in/abhishek-jagarothiya-854366360">https://in.linkedin.com/in/abhishek-jagarothiya-854366360</a></li>
+  </ul>
+</section>
+
+<footer>&copy; 2026 Alex Rowe. Built with HTML &amp; CSS.</footer>
+
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Frustrating CAPTCHA v2 (Working)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Comic+Neue:wght@700&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 50%, #150024 0%, #030008 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Comic Neue', cursive, sans-serif;
+    overflow: hidden;
+    color: #fff;
+    user-select: none;
+  }
+
+  @keyframes initialShake {
+    0% { transform: translate(0px, 0px) rotate(0deg); }
+    10% { transform: translate(-6px, 5px) rotate(-2deg); }
+    20% { transform: translate(5px, -7px) rotate(2deg); }
+    30% { transform: translate(-5px, -3px) rotate(-1deg); }
+    40% { transform: translate(6px, 6px) rotate(1.5deg); }
+    50% { transform: translate(-5px, 5px) rotate(-1.5deg); }
+    60% { transform: translate(7px, -4px) rotate(2deg); }
+    70% { transform: translate(-4px, -6px) rotate(-2deg); }
+    80% { transform: translate(5px, 4px) rotate(1deg); }
+    90% { transform: translate(-6px, -4px) rotate(-2deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
+  }
+
+  .shake-active {
+    animation: initialShake 0.35s infinite;
+  }
+
+  .bg-glitch {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 0, 128, 0.03) 0px,
+      rgba(0, 255, 255, 0.03) 2px,
+      transparent 3px,
+      transparent 5px
+    );
+    z-index: 1;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 2;
+  }
+
+  .card {
+    width: 560px;
+    max-width: 95vw;
+    background: rgba(18, 12, 32, 0.95);
+    border: 3px solid #ff007f;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 0 35px rgba(255, 0, 127, 0.4), inset 0 0 15px rgba(0, 255, 234, 0.2);
+    text-align: center;
+    position: relative;
+  }
+
+  h1 {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    color: #ffe600;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px #ff0055;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #00ffea;
+    margin-bottom: 16px;
+  }
+
+  .captcha-display {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    background: #090314;
+    border: 2px solid #39ff14;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 20px #000;
+  }
+
+  .captcha-chars-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .captcha-char-pair {
+    position: relative;
+    width: 48px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .char-main {
+    position: absolute;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 44px;
+    font-weight: 900;
+    color: #ffff00;
+    text-shadow: 0 0 10px #ff0055, 2px 2px 0px #000;
+    transition: transform 0.1s ease;
+    z-index: 5;
+  }
+
+  .char-decoy {
+    position: absolute;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 34px;
+    font-weight: bold;
+    color: #00ffff;
+    opacity: 0.6;
+    text-shadow: 0 0 6px #00ffff;
+    transition: transform 0.1s ease;
+    z-index: 4;
+  }
+
+  .strike-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 8;
+  }
+
+  .input-section {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .target-hint {
+    font-size: 13px;
+    color: #ff99bb;
+    min-height: 18px;
+    font-weight: bold;
+  }
+
+  input[type="text"] {
+    width: 80%;
+    padding: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 6px;
+    border: 2px solid #ff007f;
+    border-radius: 8px;
+    background: #000;
+    color: #39ff14;
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+    transition: transform 0.05s ease;
+  }
+
+  input[type="text"]:focus {
+    border-color: #00ffff;
+  }
+
+  .btn-area {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    min-height: 55px;
+    margin-top: 4px;
+  }
+
+  button {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 800;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.15s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  }
+
+  .btn-verify {
+    background: linear-gradient(45deg, #ff007f, #ffaa00);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 0, 127, 0.5);
+  }
+
+  .btn-refresh {
+    background: #19142b;
+    color: #00ffea;
+    border: 1px solid #00ffea;
+  }
+
+  .next-section {
+    display: none;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px dashed #00ffea;
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+
+  .verified-badge {
+    color: #39ff14;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px #39ff14;
+  }
+
+  .dodge-counter {
+    font-size: 13px;
+    color: #ffaa00;
+    margin-bottom: 12px;
+  }
+
+  #btnNext {
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    transform: translate(-50%, -50%);
+    background: #39ff14;
+    color: #000;
+    font-size: 15px;
+    font-weight: 900;
+    padding: 14px 28px;
+    box-shadow: 0 0 20px #39ff14;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: left 0.15s ease-out, top 0.15s ease-out;
+    white-space: nowrap;
+  }
+
+  .final-screen {
+    display: none;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .final-screen h2 {
+    color: #39ff14;
+    font-size: 26px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .status-text {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    min-height: 20px;
+  }
+
+  .error-text {
+    color: #ff3366;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glitch"></div>
+
+<div class="wrapper shake-active" id="mainWrapper">
+  <div class="card">
+    <h1>⚠ Bad UI CAPTCHA System</h1>
+    <div class="subtitle">Letters overlap vertically — type the glowing yellow sequence</div>
+
+    <!-- STAGE 1: CAPTCHA VERIFICATION -->
+    <div id="captchaStage">
+      <div class="captcha-display">
+        <svg class="strike-svg" id="svgLines" viewBox="0 0 500 150"></svg>
+        <div class="captcha-chars-container" id="charsContainer"></div>
+      </div>
+
+      <div class="input-section">
+        <div class="target-hint" id="targetHint">Hint: Only type the YELLOW characters (ignore cyan)</div>
+        <input type="text" id="userInput" placeholder="TYPE CAPTCHA..." autocomplete="off" spellcheck="false" maxlength="5">
+
+        <div class="btn-area">
+          <button class="btn-verify" id="btnVerify">SUBMIT & VERIFY</button>
+          <button class="btn-refresh" id="btnRefresh">↻ RELOAD</button>
+        </div>
+      </div>
+
+      <div class="status-text" id="statusMsg"></div>
+    </div>
+
+    <!-- STAGE 2: RUNAWAY VERIFIED NEXT BUTTON (Dodges 8 times) -->
+    <div class="next-section" id="nextStage">
+      <div class="verified-badge">✔ CAPTCHA VERIFIED SUCCESSFULLY!</div>
+      <div class="dodge-counter" id="dodgeInfo">Click "PROCEED TO NEXT STEP" to continue (Attempts: 0/8)</div>
+      
+      <button id="btnNext">PROCEED TO NEXT STEP ➔</button>
+    </div>
+
+    <!-- STAGE 3: FINAL SUCCESS SCREEN -->
+    <div class="final-screen" id="finalStage">
+      <h2>🎉 CONGRATULATIONS! 🎉</h2>
+      <p style="color: #00ffff;">Aapne CAPTCHA aur bhagne wale button dono ko clear kar diya!</p>
+      <p style="color: #ffe600; font-size: 14px;">Total Runaway Escapes: 8 | Human Agility: 100%</p>
+      <button onclick="location.reload()" style="background:#ff007f; color:#fff; margin-top:15px;">PLAY AGAIN</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Confusing characters (0/O, 1/I) hata diye hain taaki submit reject na ho
+  const CHAR_LIST = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let targetWord = "";
+  let decoyWord = "";
+  let dodgeCount = 0;
+  const REQUIRED_DODGES = 8;
+
+  const mainWrapper = document.getElementById('mainWrapper');
+  const charsContainer = document.getElementById('charsContainer');
+  const userInput = document.getElementById('userInput');
+  const btnVerify = document.getElementById('btnVerify');
+  const btnRefresh = document.getElementById('btnRefresh');
+  const statusMsg = document.getElementById('statusMsg');
+  const captchaStage = document.getElementById('captchaStage');
+  const nextStage = document.getElementById('nextStage');
+  const btnNext = document.getElementById('btnNext');
+  const dodgeInfo = document.getElementById('dodgeInfo');
+  const finalStage = document.getElementById('finalStage');
+  const svgLines = document.getElementById('svgLines');
+
+  function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function randomChar() {
+    return CHAR_LIST[rand(0, CHAR_LIST.length - 1)];
+  }
+
+  function drawLines() {
+    let svg = "";
+    for(let i=0; i<4; i++) {
+      let x1 = rand(0, 500), y1 = rand(10, 140);
+      let x2 = rand(0, 500), y2 = rand(10, 140);
+      let color = i % 2 === 0 ? "#ff007f" : "#00ffff";
+      svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2" opacity="0.6"/>`;
+    }
+    svgLines.innerHTML = svg;
+  }
+
+  // Generate fresh CAPTCHA
+  function generateCaptcha() {
+    targetWord = "";
+    decoyWord = "";
+    for(let i=0; i<5; i++) {
+      targetWord += randomChar();
+      decoyWord += randomChar();
+    }
+    renderLetters();
+    drawLines();
+  }
+
+  // Render elements in DOM
+  function renderLetters() {
+    charsContainer.innerHTML = "";
+    for (let i = 0; i < targetWord.length; i++) {
+      const realLetter = targetWord[i];
+      const decoyLetter = decoyWord[i];
+
+      const pair = document.createElement('div');
+      pair.className = 'captcha-char-pair';
+
+      const isUp = i % 2 === 0;
+      const realY = isUp ? -14 : 14;
+      const decoyY = isUp ? 18 : -18;
+      const rotReal = rand(-8, 8);
+      const rotDecoy = rand(-14, 14);
+
+      const spanReal = document.createElement('span');
+      spanReal.className = 'char-main';
+      spanReal.innerText = realLetter;
+      spanReal.style.transform = `translateY(${realY}px) rotate(${rotReal}deg)`;
+
+      const spanDecoy = document.createElement('span');
+      spanDecoy.className = 'char-decoy';
+      spanDecoy.innerText = decoyLetter;
+      spanDecoy.style.transform = `translateY(${decoyY}px) rotate(${rotDecoy}deg)`;
+
+      pair.appendChild(spanDecoy);
+      pair.appendChild(spanReal);
+      charsContainer.appendChild(pair);
+    }
+  }
+
+  // User typing effect: Target word mutate NAHI hoga (working banaye rakhne ke liye), 
+  // sirf visual jitter aayega taaki user confuse ho par verify succeed ho sake.
+  userInput.addEventListener('input', () => {
+    // Decoy letters shuffle hote hain taaki disturbance feel ho
+    let newDecoy = "";
+    for(let i=0; i<5; i++) newDecoy += randomChar();
+    decoyWord = newDecoy;
+    renderLetters();
+
+    // Input box jitter
+    userInput.style.transform = `translate(${rand(-4, 4)}px, ${rand(-3, 3)}px)`;
+    setTimeout(() => { userInput.style.transform = 'translate(0, 0)'; }, 60);
+  });
+
+  // Verify Button: Matching targetWord
+  btnVerify.addEventListener('click', () => {
+    const val = userInput.value.trim().toUpperCase();
+    if (val === targetWord) {
+      // Step 1 Success -> Step 2 par le jaao
+      mainWrapper.classList.remove('shake-active');
+      captchaStage.style.display = 'none';
+      nextStage.style.display = 'block';
+    } else {
+      statusMsg.innerHTML = `<span class="error-text">❌ WRONG CAPTCHA! Correct was "${targetWord}". Try again!</span>`;
+      userInput.value = "";
+      generateCaptcha();
+    }
+  });
+
+  btnRefresh.addEventListener('click', () => {
+    userInput.value = "";
+    statusMsg.innerText = "";
+    generateCaptcha();
+  });
+
+  // Step 2 Button Evade
+  function dodgeButton() {
+    if (dodgeCount < REQUIRED_DODGES) {
+      dodgeCount++;
+      dodgeInfo.innerText = `🚨 Alert: Button escaping! Evaded: ${dodgeCount}/${REQUIRED_DODGES}`;
+
+      const containerRect = nextStage.getBoundingClientRect();
+      const btnRect = btnNext.getBoundingClientRect();
+
+      const maxX = containerRect.width - btnRect.width - 20;
+      const maxY = containerRect.height - btnRect.height - 40;
+
+      const randomX = rand(20, Math.max(30, maxX));
+      const randomY = rand(50, Math.max(60, maxY));
+
+      btnNext.style.left = `${randomX}px`;
+      btnNext.style.top = `${randomY}px`;
+      btnNext.style.transform = `rotate(${rand(-15, 15)}deg) scale(${rand(9, 12)/10})`;
+
+      btnNext.style.background = dodgeCount % 2 === 0 ? "#ff007f" : "#ffaa00";
+      btnNext.style.color = "#fff";
+
+      if (dodgeCount === REQUIRED_DODGES) {
+        dodgeInfo.innerText = `⚡ BUTTON EXHAUSTED! Click now to proceed!`;
+        dodgeInfo.style.color = "#39ff14";
+        btnNext.style.background = "#39ff14";
+        btnNext.style.color = "#000";
+        btnNext.style.transform = "scale(1.1)";
+        btnNext.innerText = "CLICK ME NOW!";
+      }
+    }
+  }
+
+  btnNext.addEventListener('mouseenter', () => {
+    if (dodgeCount < REQUIRED_DODGES) {
+      dodgeButton();
+    }
+  });
+
+  btnNext.addEventListener('click', (e) => {
+    if (dodgeCount < REQUIRED_DODGES) {
+      e.preventDefault();
+      dodgeButton();
+    } else {
+      nextStage.style.display = 'none';
+      finalStage.style.display = 'block';
+    }
+  });
+
+  window.addEventListener('load', () => {
+    generateCaptcha();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>🔐 Human Verification Portal</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  width:100%;height:100%;
+  font-family:'Comic Sans MS','Comic Sans',cursive,sans-serif;
+  cursor:none;overflow:hidden;background:#000;
+}
+
+/* ── DISCO BG ── */
+#bg{
+  position:fixed;inset:0;z-index:0;
+  background:#ff00cc;
+  transition:background .08s;
+}
+
+/* ── FAKE CURSOR ── */
+#cur{
+  position:fixed;width:24px;height:24px;pointer-events:none;
+  z-index:9999;transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+}
+#cur::before{
+  content:'✥';font-size:22px;color:#fff;
+  filter:drop-shadow(0 0 3px #000);
+}
+
+/* ── ROTATING WRAPPER ── */
+#rot{
+  position:fixed;top:50%;left:50%;
+  width:100vw;height:100vh;
+  transform:translate(-50%,-50%) rotate(0deg);
+  transform-origin:center;
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+  z-index:1;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── BOUNCING CARD ── */
+#dvd{
+  position:absolute;
+  width:clamp(320px,90vw,520px);
+  padding:28px 24px 24px;
+  border:5px solid #ff0;
+  border-radius:4px;
+  background:#150022;
+  color:#fff;
+}
+
+/* ── KEY LOCK OVERLAY ── */
+#keyOverlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);
+  z-index:8000;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;text-align:center;
+  color:#fff;padding:20px;
+}
+#keyOverlay h2{font-size:24px;color:#ff0;}
+#keyOverlay p{font-size:13px;color:#0ff;max-width:380px;}
+#keyDots{display:flex;gap:12px;margin-top:8px;}
+.kdot{
+  width:42px;height:42px;border-radius:50%;
+  border:3px solid #555;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:bold;color:#888;
+  transition:all .15s;
+}
+.kdot.lit{border-color:#0f0;color:#0f0;background:#0f02;}
+
+/* ── STAGES ── */
+.stage{display:none;}
+.stage.active{display:block;}
+
+h1{
+  font-size:18px;text-align:center;color:#ff0;
+  margin-bottom:4px;letter-spacing:1px;
+}
+.sub{font-size:11px;color:#0ff;text-align:center;margin-bottom:14px;}
+.hint{font-size:10px;color:#f0f;text-align:center;margin-bottom:10px;}
+
+/* code display */
+#codeDisplay{
+  text-align:center;padding:12px;
+  background:repeating-linear-gradient(45deg,#000,#000 8px,#0a000a 8px,#0a000a 16px);
+  border:2px dashed #0ff;letter-spacing:6px;margin-bottom:12px;
+}
+#codeDisplay span{
+  display:inline-block;font-size:28px;font-weight:bold;
+}
+.timerBar{height:8px;background:#111;border:1px solid #0ff;overflow:hidden;margin-bottom:10px;}
+.timerFill{height:100%;background:#f0f;width:100%;}
+
+input[type=text]{
+  width:100%;padding:10px;font-size:16px;
+  background:#000;color:#0f0;
+  border:2px solid #ff0;font-family:inherit;
+  margin-bottom:8px;
+}
+.btn{
+  display:block;margin:8px auto 0;
+  padding:10px 28px;
+  background:#ff0;border:3px solid #000;
+  font-weight:bold;font-family:inherit;
+  cursor:none;font-size:14px;color:#000;
+  user-select:none;
+}
+.btn:active{transform:scale(.97);}
+.err{color:#f44;font-size:12px;text-align:center;min-height:16px;margin-top:4px;}
+
+/* shout */
+#micBar{height:28px;background:#111;border:2px solid #0f0;overflow:hidden;margin:10px 0;position:relative;}
+#micFill{height:100%;width:0%;background:#0f0;transition:width .1s;}
+#micLabel{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#fff;
+}
+#shoutTimer{font-size:36px;text-align:center;color:#ff0;min-height:48px;}
+.micStatus{font-size:12px;text-align:center;color:#0ff;margin-bottom:6px;}
+
+/* dropdown */
+#dropWrap{position:relative;margin:12px 0;}
+select{
+  width:100%;padding:10px 8px;
+  font-size:14px;font-family:inherit;
+  background:#000;color:#0f0;
+  border:2px solid #ff0;
+  max-height:140px;
+}
+#targetLabel{
+  text-align:center;font-size:20px;font-weight:bold;
+  color:#ff0;margin-bottom:10px;
+  text-shadow:0 0 8px #ff0;
+}
+
+/* success */
+#winScreen{
+  position:fixed;inset:0;background:#000;z-index:9000;
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;gap:12px;color:#fff;padding:24px;
+}
+#winScreen h1{font-size:32px;color:#0f0;}
+#winScreen p{font-size:14px;color:#0ff;}
+.stat{font-size:12px;color:#ff0;}
+.confetti{
+  position:fixed;top:-20px;font-size:20px;
+  pointer-events:none;
+  animation:confFall linear forwards;z-index:9500;
+}
+@keyframes confFall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+/* toast */
+#toast{
+  position:fixed;bottom:80px;right:16px;
+  background:#111;color:#0f0;border:2px solid #ff0;
+  padding:8px 14px;font-size:11px;z-index:7000;
+  max-width:260px;opacity:0;transition:opacity .25s;pointer-events:none;
+}
+
+
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="cur"></div>
+<div id="toast"></div>
+
+<!-- KEY LOCK OVERLAY -->
+<div id="keyOverlay">
+  <h2>🔒 HUMAN AUTHENTICATION REQUIRED</h2>
+  <p>Hold exactly <strong>4 different keys</strong> simultaneously to begin.<br>
+  Release even one and you restart from here.</p>
+  <div id="keyDots">
+    <div class="kdot" id="kd0">—</div>
+    <div class="kdot" id="kd1">—</div>
+    <div class="kdot" id="kd2">—</div>
+    <div class="kdot" id="kd3">—</div>
+  </div>
+  <p id="keyHint" style="color:#f0f;font-size:11px;">Hold 4 keys at once to unlock</p>
+</div>
+
+<!-- ROTATING WRAPPER -->
+<div id="rot">
+  <div id="dvd">
+    <!-- STAGE 1: Verification code -->
+    <div class="stage active" id="s1">
+      <h1>Stage 1 / 3 — Verify Code</h1>
+      <div class="sub">Screen rotates every 10s · Mouse is mirrored · Hold your 4 keys</div>
+      <div class="hint">⚠️ Type ONLY using keys you're NOT holding</div>
+      <div id="codeDisplay"></div>
+      <div class="timerBar"><div class="timerFill" id="tf1"></div></div>
+      <input type="text" id="codeIn" autocomplete="off" placeholder="Enter code above…" maxlength="6"/>
+      <div class="err" id="e1"></div>
+      <button class="btn" id="s1Btn">Submit</button>
+    </div>
+
+    <!-- STAGE 2: Shout -->
+    <div class="stage" id="s2">
+      <h1>Stage 2 / 3 — Prove You Have a Voice</h1>
+      <div class="sub">Shout continuously for 5 seconds.<br>Background noise is ignored.</div>
+      <div class="micStatus" id="micStatus">Requesting microphone…</div>
+      <div id="micBar"><div id="micFill"></div><div id="micLabel">—</div></div>
+      <div id="shoutTimer"></div>
+      <div class="err" id="e2"></div>
+    </div>
+
+    <!-- STAGE 3: Dropdown -->
+    <div class="stage" id="s3">
+      <h1>Stage 3 / 3 — Select Your Number</h1>
+      <div class="sub">Scroll the list and find the exact number shown below.</div>
+      <div id="targetLabel" id="tLabel">????</div>
+      <div id="dropWrap">
+        <select id="bigDrop" size="6"></select>
+      </div>
+      <div class="err" id="e3"></div>
+      <button class="btn" id="s3Btn">Confirm Selection</button>
+    </div>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div id="winScreen" style="display:none;">
+  <h1>✅ HUMAN CONFIRMED</h1>
+  <p>Congratulations. You have defeated the most diabolical captcha known to mankind.</p>
+  <div class="stat" id="wTime"></div>
+  <div class="stat" id="wRot"></div>
+  <div class="stat" id="wAttempts"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+const startTime = Date.now();
+let rotations = 0, codeAttempts = 0, shoutAttempts = 0;
+
+/* Cheat-state flags declared up front (not down near the cheat-code
+   section) so that code which runs early — e.g. the bounce loop's
+   very first synchronous step() call — can safely read them instead
+   of hitting a temporal-dead-zone ReferenceError. */
+let cheatMouseFixed    = false;
+let cheatClickFixed    = false;
+let cheatRotFrozen     = false;
+let cheatDiscoPaused   = false;
+let cheatBounceStopped = false;
+let cheatStopped       = false;
+
+function toast(msg){
+  const t=$('toast');
+  t.textContent=msg;t.style.opacity=1;
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.style.opacity=0,2800);
+}
+
+/* ════════════════════════════════════════
+   DISCO BG
+════════════════════════════════════════ */
+setInterval(()=>{
+  const h1=Math.random()*360|0, h2=Math.random()*360|0;
+  $('bg').style.background=`hsl(${h1},90%,48%)`;
+  const dvd=$('dvd');
+  dvd.style.background=`hsl(${h2},80%,10%)`;
+  dvd.style.borderColor=`hsl(${(h2+150)%360},100%,60%)`;
+},460);
+
+/* ════════════════════════════════════════
+   SCREEN ROTATION — always clockwise (angle only grows)
+════════════════════════════════════════ */
+let screenAngle = 0; // grows: 0,90,180,270,360,450 ...
+function applyRot(){
+  $('rot').style.transform=`translate(-50%,-50%) rotate(${screenAngle}deg)`;
+}
+setInterval(()=>{
+  screenAngle+=90;
+  rotations++;
+  applyRot();
+},10000);
+
+/* ════════════════════════════════════════
+   BOUNCING DVD CARD
+════════════════════════════════════════ */
+(function dvdBounce(){
+  const el=$('dvd');
+  let bx=0,by=0,vx=1.4,vy=1.1;
+  let W=window.innerWidth,H=window.innerHeight;
+  let cw,ch;
+  function resize(){W=window.innerWidth;H=window.innerHeight;}
+  window.addEventListener('resize',resize);
+
+  function step(){
+    if(cheatBounceStopped){
+      el.style.transform='translate(0,0)';
+      requestAnimationFrame(step);
+      return;
+    }
+    cw=el.offsetWidth;ch=el.offsetHeight;
+    bx+=vx;by+=vy;
+    const hw=cw/2,hh=ch/2;
+    if(bx>W/2-hw){bx=W/2-hw;vx=-vx;}
+    if(bx<-(W/2-hw)){bx=-(W/2-hw);vx=-vx;}
+    if(by>H/2-hh){by=H/2-hh;vy=-vy;}
+    if(by<-(H/2-hh)){by=-(H/2-hh);vy=-vy;}
+    el.style.transform=`translate(${bx}px,${by}px)`;
+    requestAnimationFrame(step);
+  }
+  step();
+})();
+
+/* ════════════════════════════════════════
+   INVERTED + ROTATION-LINKED MOUSE
+   Logic: ctrl+alt+→ rotates screen 90°CW; that makes the touchpad
+   feel like ctrl+alt+← (axes rotated 90°CCW). So we counteract the
+   display rotation AND invert (180°). Net transform on the delta:
+   rotate by -(screenAngle) then invert = rotate by (180° - screenAngle).
+════════════════════════════════════════ */
+const cur=$('cur');
+let cx=window.innerWidth/2, cy=window.innerHeight/2;
+let px=null,py=null;
+function placeCur(){cur.style.left=cx+'px';cur.style.top=cy+'px';}
+placeCur();
+
+document.addEventListener('mousemove',e=>{
+  if(cheatMouseFixed){ px=e.clientX; py=e.clientY; return; } // let the bubble-phase handler own cx/cy
+  if(px===null){px=e.clientX;py=e.clientY;return;}
+  const dx=e.clientX-px, dy=e.clientY-py;
+  px=e.clientX;py=e.clientY;
+  // rotate delta by (180 - screenAngle) degrees
+  const θ=(180-screenAngle)*Math.PI/180;
+  const rdx=dx*Math.cos(θ)-dy*Math.sin(θ);
+  const rdy=dx*Math.sin(θ)+dy*Math.cos(θ);
+  cx=Math.min(Math.max(cx+rdx,0),window.innerWidth);
+  cy=Math.min(Math.max(cy+rdy,0),window.innerHeight);
+  placeCur();
+},true);
+
+// Dodge checker proximity for stage1 (uses fake cursor pos)
+function fakePt(){return {x:cx,y:cy};}
+
+/* ════════════════════════════════════════
+   SWAPPED CLICKS (left→blocked, right→fires left at fake cursor pos)
+════════════════════════════════════════ */
+document.addEventListener('click',e=>{
+  if(!e.isTrusted)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  toast('❌ Left click disabled — use right-click');
+},true);
+
+document.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const el=document.elementFromPoint(cx,cy);
+  if(!el)return;
+  const t=el.closest('button,input,select,option,label')||el;
+  if(t.tagName==='OPTION'){
+    t.parentElement.value=t.value;
+    t.parentElement.dispatchEvent(new Event('change'));
+  } else {
+    if(t.focus)t.focus();
+    if(t.click)t.click();
+  }
+},true);
+
+/* ════════════════════════════════════════
+   HELD KEYS SYSTEM
+   — need 4 different keys held at all times after unlock
+   — the 4 held key codes are recorded and blocked from input fields
+════════════════════════════════════════ */
+const held=new Set();
+let unlockedKeys=null; // Set of 4 key codes required after unlock
+let unlocked=false;
+let beepCtx=null, beepOsc=null;
+
+function updateDots(){
+  const arr=[...held].slice(0,4);
+  for(let i=0;i<4;i++){
+    const d=$('kd'+i);
+    if(arr[i]){d.classList.add('lit');d.textContent=arr[i].replace('Key','').replace('Digit','');}
+    else{d.classList.remove('lit');d.textContent='—';}
+  }
+  $('keyHint').textContent=held.size>=4?'Release any key = RESTART':'Hold '+(4-held.size)+' more key(s)';
+}
+
+function startBeep(){
+  if(beepCtx)return;
+  try{
+    beepCtx=new(window.AudioContext||window.webkitAudioContext)();
+    beepOsc=beepCtx.createOscillator();
+    const gain=beepCtx.createGain();
+    beepOsc.type='square';
+    beepOsc.frequency.value=880;
+    gain.gain.value=0.04;
+    beepOsc.connect(gain).connect(beepCtx.destination);
+    beepOsc.start();
+  }catch(e){}
+}
+
+function resetToKeyLock(){
+  if(cheatStopped) return; // "stop" cheat disables the restart-on-release/blur behavior
+  unlocked=false;
+  unlockedKeys=null;
+  $('keyOverlay').style.display='flex';
+  held.clear();
+  updateDots();
+  // stop beep only at the very end
+}
+
+document.addEventListener('keydown',e=>{
+  held.add(e.code);
+  updateDots();
+
+  if(!unlocked && held.size>=4){
+    // unlock
+    unlocked=true;
+    unlockedKeys=new Set([...held].slice(0,4));
+    $('keyOverlay').style.display='none';
+    startBeep();
+    toast('🔓 Unlocked! Beep is forever. Sorry.');
+  }
+
+  // block held keys from going into text inputs
+  if(unlocked && unlockedKeys && unlockedKeys.has(e.code)){
+    const a=document.activeElement;
+    if(a&&a.tagName==='INPUT')e.preventDefault();
+  }
+},true);
+
+document.addEventListener('keyup',e=>{
+  if(unlocked){
+    if(unlockedKeys && unlockedKeys.has(e.code)){
+      // released a required key → reset
+      toast('💀 Key released — RESTARTING');
+      resetToKeyLock();
+      return;
+    }
+  }
+  held.delete(e.code);
+  updateDots();
+},true);
+
+window.addEventListener('blur',()=>{
+  if(unlocked){ resetToKeyLock(); toast('Window lost focus — RESTARTING'); }
+});
+
+/* ════════════════════════════════════════
+   STAGE SWITCHER
+════════════════════════════════════════ */
+function goStage(id){
+  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+/* ════════════════════════════════════════
+   STAGE 1 — VERIFICATION CODE
+════════════════════════════════════════ */
+const CODE_CHARS='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+let s1Code='', s1Timer=null, s1TimeLeft=30;
+
+function genCode(){
+  // generate code avoiding letters that match any held key label
+  const blockedLetters=unlockedKeys
+    ? [...unlockedKeys].map(k=>k.replace('Key','').replace('Digit','').toUpperCase())
+    : [];
+  let code='';
+  const safe=CODE_CHARS.split('').filter(c=>!blockedLetters.includes(c));
+  for(let i=0;i<6;i++) code+=safe[Math.floor(Math.random()*safe.length)];
+  return code;
+}
+
+function renderCode(code){
+  const el=$('codeDisplay');el.innerHTML='';
+  const fonts=['Impact','Georgia','monospace','Arial Black','Verdana'];
+  [...code].forEach(ch=>{
+    const s=document.createElement('span');
+    s.textContent=ch;
+    const rot=(Math.random()*30-15).toFixed(1);
+    const ty=(Math.random()*8-4).toFixed(1);
+    const hue=Math.random()*360|0;
+    s.style.cssText=`
+      transform:rotate(${rot}deg) translateY(${ty}px);
+      font-family:${fonts[Math.random()*fonts.length|0]};
+      color:hsl(${hue},90%,65%);
+    `;
+    el.appendChild(s);
+  });
+}
+
+function tickS1(){
+  s1TimeLeft--;
+  $('tf1').style.width=(s1TimeLeft/30*100)+'%';
+  if(s1TimeLeft<=0){
+    s1Code=genCode();
+    renderCode(s1Code);
+    s1TimeLeft=30;
+    $('codeIn').value='';
+    toast('⏰ Time up! New code generated.');
+  }
+}
+
+function initS1(){
+  s1Code=genCode();
+  renderCode(s1Code);
+  s1TimeLeft=30;
+  $('tf1').style.width='100%';
+  $('codeIn').value='';
+  $('e1').textContent='';
+  clearInterval(s1Timer);
+  s1Timer=setInterval(tickS1,1000);
+}
+
+$('s1Btn').addEventListener('click',()=>{
+  codeAttempts++;
+  const val=$('codeIn').value.trim().toUpperCase();
+  if(val===s1Code){
+    clearInterval(s1Timer);
+    $('e1').textContent='';
+    goStage('s2');
+    initS2();
+  } else {
+    $('e1').textContent='Wrong code. New one generated. Try again.';
+    s1Code=genCode();
+    renderCode(s1Code);
+    s1TimeLeft=30;
+    $('tf1').style.width='100%';
+    $('codeIn').value='';
+  }
+});
+
+// init when first unlocked (watch for overlay hide)
+const unlockObserver=new MutationObserver(()=>{
+  if($('keyOverlay').style.display==='none' && !s1Timer){
+    initS1();
+  }
+});
+unlockObserver.observe($('keyOverlay'),{attributes:true,attributeFilter:['style']});
+
+/* ════════════════════════════════════════
+   STAGE 2 — SHOUT DETECTION
+   Uses amplitude above a noise floor (measured at start) as the trigger.
+   Filters out steady background (laptop speakers) by measuring baseline
+   and requiring the user to exceed it by a significant threshold.
+════════════════════════════════════════ */
+let micStream=null, audioCtx=null, analyser=null;
+let noiseFloor=0, shoutSeconds=0, shoutInterval=null, isAboveThreshold=false;
+let calibrating=false;
+
+async function initS2(){
+  shoutAttempts++;
+  $('e2').textContent='';
+  $('shoutTimer').textContent='';
+  $('micStatus').textContent='Requesting microphone access…';
+  $('micFill').style.width='0%';
+
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({
+      audio:{
+        echoCancellation:false,    // keep raw signal
+        noiseSuppression:false,    // don't suppress our "noise"
+        autoGainControl:false,     // fixed gain
+      }
+    });
+    micStream=stream;
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const src=audioCtx.createMediaStreamSource(stream);
+    analyser=audioCtx.createAnalyser();
+    analyser.fftSize=256;
+    src.connect(analyser);
+
+    // Calibrate noise floor over 1.5 seconds
+    $('micStatus').textContent='🎙️ Calibrating background noise… stay quiet for 1.5s';
+    calibrating=true;
+    let samples=[];
+    const calId=setInterval(()=>{
+      const buf=new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(buf);
+      let rms=0;
+      buf.forEach(v=>rms+=v*v);
+      samples.push(Math.sqrt(rms/buf.length));
+    },100);
+
+    setTimeout(()=>{
+      clearInterval(calId);
+      calibrating=false;
+      noiseFloor=samples.reduce((a,b)=>a+b,0)/samples.length;
+      const threshold=Math.max(noiseFloor*3.5, 0.04); // need 3.5× above floor or >0.04 RMS
+      $('micStatus').textContent=`✅ Calibrated. Now SHOUT for 5 continuous seconds! 🗣️`;
+      shoutSeconds=0;
+      $('shoutTimer').textContent='5';
+
+      shoutInterval=setInterval(()=>{
+        const buf=new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(buf);
+        let rms=0;
+        buf.forEach(v=>rms+=v*v);
+        const level=Math.sqrt(rms/buf.length);
+        const pct=Math.min(level/threshold*100,100);
+        $('micFill').style.width=pct+'%';
+        $('micLabel').textContent=level>threshold?'🗣️ LOUDER!':'🤫 Too quiet…';
+
+        if(level>threshold){
+          isAboveThreshold=true;
+          shoutSeconds+=0.1;
+          const remaining=Math.max(0,5-shoutSeconds);
+          $('shoutTimer').textContent=remaining.toFixed(1);
+          if(shoutSeconds>=5){
+            clearInterval(shoutInterval);
+            stream.getTracks().forEach(t=>t.stop());
+            audioCtx.close();
+            $('micStatus').textContent='✅ Shouting confirmed!';
+            $('shoutTimer').textContent='✅';
+            $('micFill').style.width='100%';
+            // STOP rotation after this stage
+            screenAngle = Math.round(screenAngle/90)*90; // snap to nearest
+            // no more rotation intervals fire from here
+            setTimeout(()=>{
+              $('rot').style.transition='transform .8s ease';
+              screenAngle=0; applyRot();
+              setTimeout(()=>{ goStage('s3'); initS3(); },1000);
+            },600);
+          }
+        } else {
+          // reset streak if they stop shouting
+          if(isAboveThreshold){
+            shoutSeconds=0;
+            isAboveThreshold=false;
+            $('shoutTimer').textContent='5';
+            toast('⚠️ Stopped shouting! Start over.');
+          }
+        }
+      },100);
+    },1500);
+
+  } catch(err){
+    $('e2').textContent='Microphone access denied. Please allow mic and retry.';
+    $('micStatus').textContent='❌ No mic access.';
+    const retryBtn=document.createElement('button');
+    retryBtn.className='btn';retryBtn.textContent='Retry';
+    retryBtn.addEventListener('click',()=>{retryBtn.remove();initS2();});
+    $('s2').appendChild(retryBtn);
+  }
+}
+
+/* ════════════════════════════════════════
+   STAGE 3 — DROPDOWN 1000-9999
+════════════════════════════════════════ */
+let dropTarget=1000;
+
+function initS3(){
+  // pick random target
+  dropTarget=1000+Math.floor(Math.random()*9000);
+  $('targetLabel').textContent=`Find and select: ${dropTarget}`;
+  const sel=$('bigDrop');
+  sel.innerHTML='';
+  // shuffle order to make it extra painful
+  const nums=[];
+  for(let i=1000;i<=9999;i++)nums.push(i);
+  // Fisher-Yates
+  for(let i=nums.length-1;i>0;i--){
+    const j=Math.random()*i|0;
+    [nums[i],nums[j]]=[nums[j],nums[i]];
+  }
+  nums.forEach(n=>{
+    const o=document.createElement('option');
+    o.value=n;o.textContent=n;
+    sel.appendChild(o);
+  });
+  $('e3').textContent='';
+}
+
+$('s3Btn').addEventListener('click',()=>{
+  const sel=$('bigDrop');
+  const val=parseInt(sel.value);
+  if(val===dropTarget){
+    finish();
+  } else if(!sel.value){
+    $('e3').textContent='Please select a number first.';
+  } else {
+    $('e3').textContent=`${val} is wrong. Keep scrolling…`;
+    toast(`Nope! That's ${val}. Target is still ${dropTarget}.`);
+  }
+});
+
+/* ════════════════════════════════════════
+   STOP ROTATION AFTER STAGE 2 FINISHES
+════════════════════════════════════════ */
+// Override the rotation interval to check a flag
+let rotationStopped=false;
+const _origInterval=setInterval; // already set above, we use a flag instead
+// We patch into the rotation: once rotationStopped=true, we reset to 0 once
+// (handled inside initS2 above)
+
+/* ════════════════════════════════════════
+   FINISH
+════════════════════════════════════════ */
+function finish(){
+  // stop beep now — only moment it stops
+  if(beepCtx){ try{beepCtx.close();}catch(e){} beepCtx=null; }
+  const ws=$('winScreen');
+  ws.style.display='flex';
+  const elapsed=((Date.now()-startTime)/1000).toFixed(0);
+  $('wTime').textContent=`Time survived: ${elapsed}s`;
+  $('wRot').textContent=`Screen rotations endured: ${rotations}`;
+  $('wAttempts').textContent=`Code attempts: ${codeAttempts} · Shout attempts: ${shoutAttempts}`;
+  confetti();
+}
+
+function confetti(){
+  const em=['🎉','✅','🤖','🎊','😵','🔐','🗣️'];
+  for(let i=0;i<50;i++) setTimeout(()=>{
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.textContent=em[Math.random()*em.length|0];
+    c.style.left=Math.random()*100+'vw';
+    c.style.animationDuration=(1.5+Math.random()*2.5)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4500);
+  },i*70);
+}
+
+/* ════════════════════════════════════════
+   CHEAT CODES  (invisible — type anywhere)
+   stop  → bypass keylock + mute beep + fix mouse + fix click + freeze rotation + stop disco + stop bounce
+   win1  → stage 1: auto-fill verification code
+   win2  → stage 2: skip shout
+   win3  → stage 3: auto-select target number
+════════════════════════════════════════ */
+
+// (cheat flags are declared near the top of the script — see UTILITIES section)
+
+// ── cheat: stop (all comfort cheats) ──
+function cheat_stop(){
+  // 0. mark the bypass active so blur/keyup handlers stop resetting the game
+  cheatStopped=true;
+  // 1. bypass key lock
+  unlocked=true;
+  unlockedKeys=new Set(['__x1__','__x2__','__x3__','__x4__']); // codes nothing real matches
+  $('keyOverlay').style.display='none';
+  if(!s1Timer) initS1();
+  // 2. kill beep
+  if(beepCtx){ try{beepCtx.close();}catch(e){} beepCtx=null; }
+  // 3. normal mouse
+  cheatMouseFixed=true;
+  // 4. normal left-click
+  cheatClickFixed=true;
+  // 5. freeze rotation
+  cheatRotFrozen=true;
+  screenAngle=0; applyRot();
+  // 6. stop disco
+  cheatDiscoPaused=true;
+  $('bg').style.background='#1a1a2e';
+  $('dvd').style.background='#150022';
+  $('dvd').style.borderColor='#ff0';
+  // 7. stop bounce
+  cheatBounceStopped=true;
+  $('dvd').style.transform='translate(0,0)';
+  toast('🛑 STOP — all irritants disabled');
+}
+
+// ── cheat: win1 — auto-fill stage 1 code ──
+function cheat_win1(){
+  if(!$('s1').classList.contains('active')){ toast('⚠️ win1: not on Stage 1'); return; }
+  $('codeIn').value=s1Code;
+  toast('📋 WIN1 — code filled: '+s1Code);
+}
+
+// ── cheat: win2 — skip shout stage ──
+function cheat_win2(){
+  if(!$('s2').classList.contains('active')){ toast('⚠️ win2: not on Stage 2'); return; }
+  clearInterval(shoutInterval);
+  if(micStream) micStream.getTracks().forEach(t=>t.stop());
+  if(audioCtx) try{audioCtx.close();}catch(e){}
+  $('micStatus').textContent='✅ Shouting confirmed!';
+  $('shoutTimer').textContent='✅';
+  $('micFill').style.width='100%';
+  screenAngle=0; applyRot();
+  toast('🗣️ WIN2 — shout skipped');
+  setTimeout(()=>{ goStage('s3'); initS3(); },600);
+}
+
+// ── cheat: win3 — auto-select target in dropdown ──
+function cheat_win3(){
+  if(!$('s3').classList.contains('active')){ toast('⚠️ win3: not on Stage 3'); return; }
+  const sel=$('bigDrop');
+  const opt=[...sel.options].find(o=>parseInt(o.value)===dropTarget);
+  if(opt){ sel.value=opt.value; opt.selected=true; }
+  toast('🔢 WIN3 — selected: '+dropTarget);
+}
+
+// ── keyboard buffer listener ──
+// Listens globally; ignores keypresses that land in the text input (typing code)
+// so normal stage-1 typing doesn't accidentally trigger cheats.
+let cheatBuf='';
+let cheatTimer=null;
+const CHEATS={ stop:cheat_stop, win1:cheat_win1, win2:cheat_win2, win3:cheat_win3 };
+const CHEAT_MAX=4; // longest code length
+
+document.addEventListener('keydown', e=>{
+  // Don't intercept when focus is on the code input field
+  if(document.activeElement===$('codeIn')) return;
+  // Only care about printable single characters
+  if(e.key.length!==1) return;
+  cheatBuf=(cheatBuf+e.key.toLowerCase()).slice(-CHEAT_MAX);
+  clearTimeout(cheatTimer);
+  cheatTimer=setTimeout(()=>{ cheatBuf=''; }, 2000); // reset buffer after 2s idle
+  if(CHEATS[cheatBuf]){
+    const fn=CHEATS[cheatBuf];
+    cheatBuf='';
+    fn();
+  }
+}, false);
+
+// ── PATCH: mouse inversion respects cheatMouseFixed ──
+document.addEventListener('mousemove', e=>{
+  if(!cheatMouseFixed) return;
+  cx=Math.min(Math.max(e.clientX,0),window.innerWidth);
+  cy=Math.min(Math.max(e.clientY,0),window.innerHeight);
+  placeCur();
+}, false); // bubble — runs after capture-phase inverted handler, overwrites position
+
+// ── PATCH: left-click respects cheatClickFixed ──
+window.addEventListener('click', e=>{
+  if(!cheatClickFixed || !e.isTrusted) return;
+  e.stopImmediatePropagation(); // cancel the blocking capture handler
+  const el=document.elementFromPoint(cx,cy);
+  if(!el) return;
+  const t=el.closest('button,input,select,option')||el;
+  if(t.tagName==='OPTION'){ t.parentElement.value=t.value; }
+  else { if(t.focus) t.focus(); if(t.click) t.click(); }
+}, true); // capture — must beat the blocking capture handler via stopImmediatePropagation
+
+// ── PATCH: disco respects cheatDiscoPaused ──
+setInterval(()=>{
+  if(!cheatDiscoPaused) return;
+  $('bg').style.background='#1a1a2e';
+  $('dvd').style.background='#150022';
+  $('dvd').style.borderColor='#ff0';
+}, 50);
+
+// (bounce now checks cheatBounceStopped directly inside its own rAF loop —
+// see dvdBounce()'s step() function — so no separate patch interval is needed
+// here; a second timer racing against requestAnimationFrame could never have
+// won reliably anyway.)
+
+// ── PATCH: rotation respects cheatRotFrozen ──
+const _applyRotReal=applyRot;
+applyRot=function(){
+  if(cheatRotFrozen) return;
+  _applyRotReal();
+};
+
+})();
+</script>
+</body>
+</html>

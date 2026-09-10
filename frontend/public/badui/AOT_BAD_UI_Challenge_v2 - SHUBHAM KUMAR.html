@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WALL ZERO // HUMAN AUTHENTICATION</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#171914;--paper:#e9dfc4;--paper2:#f7efd8;--red:#a4261d;--green:#344d39;--gold:#c49b4d}
+body{margin:0;background:#6f6c5c;color:var(--ink);font-family:Georgia,serif;min-height:100vh}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.10;background:repeating-linear-gradient(0deg,transparent 0 3px,#111 4px)}
+header{height:64px;background:#1c1e19;color:#eee5cf;border-bottom:5px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 22px;box-shadow:0 5px 18px #0008}
+.logo{font-weight:bold;letter-spacing:3px}.terminal{font:11px monospace;color:#d2c89f}
+main{max-width:1200px;margin:auto;padding:22px}
+.alertbar{background:#b62a20;color:#fff;padding:10px;text-align:center;font-weight:bold;letter-spacing:1px;border:3px solid #40120f;box-shadow:5px 6px 0 #0004;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{filter:brightness(1.25)}}
+.layout{display:grid;grid-template-columns:250px minmax(360px,520px) 250px;gap:20px;justify-content:center;margin-top:20px}
+.card{background:var(--paper);border:3px solid #26271f;box-shadow:8px 9px 0 #0005;padding:16px;position:relative}
+.card h3{margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #77705c;padding-bottom:7px}
+.note{background:#d9cb9e;border:2px solid #36352c;padding:11px;transform:rotate(-2deg);box-shadow:4px 5px 0 #0003;font-size:13px}
+.tower{height:130px;background:repeating-linear-gradient(90deg,#aaa18d 0 39px,#716c5c 40px 44px);border:5px solid #363329;position:relative;margin-bottom:15px}
+.tower span{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-weight:bold;letter-spacing:5px}
+.seal{width:78px;height:78px;border:4px double #28291f;border-radius:50%;display:grid;place-items:center;margin:0 auto 7px;font-size:36px;transform:rotate(-10deg);background:#ded3b4}
+.login{background:var(--paper2);border:6px solid #25271f;padding:22px;box-shadow:12px 14px 0 #0006;position:relative;overflow:hidden}
+.login:after{content:"CLASSIFIED • CLASSIFIED • CLASSIFIED";position:absolute;top:105px;right:-70px;color:#a4261d;border:3px solid #a4261d;padding:4px 12px;transform:rotate(28deg);opacity:.5;font-weight:bold}
+h1{text-align:center;font-size:27px;margin:3px 0}.sub{text-align:center;font:10px monospace;margin-bottom:17px}
+label{font-weight:bold;display:block;margin:11px 0 5px}
+input,select{width:100%;padding:11px;border:2px solid #292a24;background:#fffdf3;font:15px Georgia;outline:none}
+input:focus,select:focus{border-color:var(--red)}
+.password{position:relative}.eye{position:absolute;right:4px;top:4px;padding:7px 10px;height:38px}
+.hint{font:10px monospace;color:#76302b;min-height:14px}
+.regiments{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.regiments label{font-size:11px;font-weight:normal;border:1px solid #777;padding:7px;background:#e5dbc1;margin:0}
+.challenge{margin-top:12px;border:2px dashed #625c49;padding:11px;background:#e4dac0}
+.challenge-title{font-weight:bold;font-size:12px}
+.captcha{background:#d8d8d2;border:2px solid #666;padding:8px;margin-top:8px;font-family:Arial}
+.noise{height:24px;background:repeating-linear-gradient(12deg,transparent 0 8px,#444 9px 11px),repeating-linear-gradient(-20deg,transparent 0 13px,#888 14px 16px)}
+.crow{display:flex;gap:7px;align-items:center;margin-top:6px}.crow input{width:20px}
+.small{font-size:11px}.terms{display:flex;gap:7px;margin-top:12px;font-size:11px}.terms input{width:auto}
+button{border:2px solid #20211c;background:#292b25;color:white;padding:10px 12px;font:bold 13px Georgia;cursor:pointer}
+button:hover{filter:brightness(1.2)}
+#login{width:100%;margin-top:15px;background:var(--green);font-size:17px;transition:.15s}
+#login.dodge{transform:translate(25px,-7px) rotate(2deg)}
+.secondary{width:100%;margin-top:7px;background:#7e291f}
+.progress{display:none;height:10px;border:1px solid #444;background:#b7ad95;margin-top:10px}.progress i{display:block;width:0;height:100%;background:#a4261d}
+#message{text-align:center;font:11px monospace;min-height:30px;margin-top:10px}
+ul{padding-left:19px;font-size:13px;line-height:1.5}
+.stat{display:flex;justify-content:space-between;border-bottom:1px dotted #777;padding:5px 0;font:11px monospace}
+.stamp{display:inline-block;border:3px solid var(--red);color:var(--red);padding:5px 8px;transform:rotate(-7deg);font-weight:bold}
+footer{text-align:center;font:10px monospace;color:#eee5cf;margin:22px}
+#toast{position:fixed;right:18px;bottom:18px;background:#a4261d;color:white;border:4px solid #35100d;padding:14px;max-width:330px;box-shadow:7px 8px 0 #0008;display:none;z-index:30}
+#toast button{float:right;padding:2px 6px}
+#breach{position:fixed;inset:0;background:#130b0bcc;z-index:40;display:none;align-items:center;justify-content:center;color:white;text-align:center}
+.breachbox{max-width:650px;background:#201812;border:5px solid #c49b4d;padding:28px;box-shadow:0 0 60px #000}
+.breachbox .giant{font-size:70px}.breachbox h2{font-size:35px;color:#e2ba61;margin:5px}
+#success{display:none;text-align:center;padding:35px 5px}.successIcon{font-size:65px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{display:none}.login{max-width:600px;margin:auto}}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">⚔ WALL ZERO // HUMAN AUTHORITY</div>
+<div class="terminal" id="clock">TERMINAL --:--:-- | LINK STABLE</div>
+</header>
+
+<main>
+<div class="alertbar" id="topAlert">⚠ TITAN BREACH: LEVEL 7 // ALL PERSONNEL MUST AUTHENTICATE IMMEDIATELY ⚠</div>
+
+<div class="layout">
+<aside class="card side">
+<div class="tower"><span>WALL MARIA</span></div>
+<span class="stamp">EYES ONLY</span>
+<h3>Commander Memo</h3>
+<div class="note">If the login looks easy, it is probably a trap. If it looks difficult, excellent.</div>
+<ul>
+<li>Trust no button.</li>
+<li>Never reveal your real password.</li>
+<li>Never ask why the CAPTCHA is angry.</li>
+<li>Potatoes require clearance.</li>
+</ul>
+<div class="stat"><b>Threat</b><span id="threat">UNKNOWN</span></div>
+<div class="stat"><b>Walls</b><span>UNCERTAIN</span></div>
+<div class="stat"><b>Morale</b><span id="morale">DECLINING</span></div>
+<button style="width:100%;margin-top:10px" onclick="panic()">PANIC BUTTON</button>
+</aside>
+
+<section class="login" id="loginCard">
+<div id="form">
+<div class="seal">⚔</div>
+<h1>SECURE WALL ACCESS</h1>
+<div class="sub">SURVEY CORPS PERSONNEL LOGIN // BUILD 1845.3</div>
+
+<label>Scout Identification Number</label>
+<input id="user" placeholder="SCOUT-____" autocomplete="off">
+<div class="hint" id="uhint">Hint: We don't know your ID either.</div>
+
+<label>Titan Clearance Password</label>
+<div class="password"><input id="pass" type="password" placeholder="8 characters. No vowels. Good luck."><button class="eye" onclick="toggle()" type="button">👁</button></div>
+<div class="hint">Exactly 8 chars • upper • lower • number • symbol • NO vowels</div>
+
+<label>Select your regiment (choose wisely)</label>
+<div class="regiments">
+<label><input type="radio" name="reg" value="survey"> Survey Corps</label>
+<label><input type="radio" name="reg" value="garrison"> Garrison</label>
+<label><input type="radio" name="reg" value="mp"> Military Police</label>
+</div>
+
+<label>Which wall are you defending?</label>
+<select id="wall">
+<option value="">-- DO NOT RUSH --</option>
+<option>Wall Maria</option><option>Wall Rose</option><option>Wall Sina</option>
+<option>Some wall I probably shouldn't mention</option>
+</select>
+
+<div class="challenge">
+<div class="challenge-title">HUMANITY VERIFICATION // ROUND 1 OF 3</div>
+<div class="captcha">
+<div><b>Prove you are NOT a Titan.</b></div>
+<div class="noise"></div>
+<div class="crow"><input type="checkbox" id="human"><span>I am definitely not 15 meters tall.</span><button type="button" onclick="shuffleCaptcha()">↻</button></div>
+</div>
+<div class="small" style="margin-top:8px">Round 2: How many letters are in <b id="word">TITAN</b>?</div>
+<input id="answer" inputmode="numeric" placeholder="Do not overthink it.">
+<div class="small" style="margin-top:7px">Round 3: Pick the correct emergency protocol.</div>
+<select id="protocol">
+<option value="">-- select one --</option>
+<option value="run">RUN</option><option value="scream">SCREAM</option>
+<option value="potato">POTATO</option><option value="both">RUN + SCREAM</option>
+</select>
+</div>
+
+<div class="terms"><input type="checkbox" id="terms"><span>I accept responsibility for any Titans, walls, horses, cables, potatoes, or existential crises caused by this login.</span></div>
+
+<button id="login" onclick="attempt()">⚔ ENTER THE WALLS ⚔</button>
+<button class="secondary" onclick="forgot()">FORGOT PASSWORD? (DON'T)</button>
+<button class="secondary" style="background:#686354" onclick="later()">MAYBE LATER — LET THE TITANS IN</button>
+
+<div class="progress" id="progress"><i id="bar"></i></div>
+<div id="message">SYSTEM: Waiting for a brave volunteer...</div>
+</div>
+
+<div id="success">
+<div class="successIcon">⚔️</div>
+<h1>ACCESS GRANTED</h1>
+<p id="welcome"></p>
+<p><b>Humanity has survived your login.</b></p>
+<hr>
+<h2>WAIT.</h2>
+<p>Command has detected an administrative problem.</p>
+<p style="color:#a4261d;font-weight:bold">YOU HAVE ACCESS TO THE WALL...</p>
+<p>...but you are not authorized to enter the wall.</p>
+<button onclick="location.reload()">RETURN TO LOGIN AND SUFFER AGAIN</button>
+</div>
+</section>
+
+<aside class="card side">
+<span class="stamp">LIVE</span>
+<h3>Wall Monitor</h3>
+<div class="stat"><b>Colossal Titan</b><span id="c">?</span></div>
+<div class="stat"><b>Armored Titan</b><span id="a">?</span></div>
+<div class="stat"><b>Beast Activity</b><span id="b">?</span></div>
+<div class="stat"><b>Potato Security</b><span>CRITICAL</span></div>
+<hr>
+<h3>Emergency</h3>
+<p style="font-size:12px">If this page becomes too frustrating, remember: that is the feature.</p>
+<button style="width:100%" onclick="breach()">SIMULATE TITAN BREACH</button>
+<p id="forgotMsg" style="font-size:12px"></p>
+</aside>
+</div>
+<footer>HIVE MIND 2026 • BAD UI CHALLENGE • HUMANITY'S MOST UNNECESSARY LOGIN SYSTEM</footer>
+</main>
+
+<div id="toast"><button onclick="hideToast()">X</button><b>⚠ COMMAND ALERT</b><p id="toastText"></p></div>
+
+<div id="breach">
+<div class="breachbox">
+<div class="giant">🧟</div>
+<h2>TITAN BREACH</h2>
+<p id="breachText">Authentication has been interrupted because something enormous is standing outside the wall.</p>
+<button onclick="closeBreach()">RETURN TO LOGIN</button>
+</div>
+</div>
+
+<script>
+let word="TITAN",attempts=0,dodge=false;
+const words=["TITAN","WALL","SCOUT","MARIA","ROSE","SINA","HORSE","ODM","ERWIN"];
+const msgs=[
+"Authentication failed. The Commander blames you.",
+"Your credentials are suspiciously human.",
+"Security passed. Unfortunately, security has changed its mind.",
+"The wall has rejected your vibes.",
+"Access denied. Try looking more trustworthy."
+];
+function clock(){document.getElementById("clock").textContent="TERMINAL "+new Date().toLocaleTimeString()+" | LINK "+(Math.random()>.08?"STABLE":"UNSTABLE")}setInterval(clock,1000);clock();
+function toast(x){document.getElementById("toastText").textContent=x;document.getElementById("toast").style.display="block"}function hideToast(){document.getElementById("toast").style.display="none"}
+function toggle(){let p=document.getElementById("pass");p.type=p.type==="password"?"text":"password";toast(p.type==="text"?"Password exposed to all nearby Titans.":"Password hidden. Probably.")}
+function shuffleCaptcha(){word=words[Math.floor(Math.random()*words.length)];document.getElementById("word").textContent=word;document.getElementById("answer").value="";toast("CAPTCHA changed because you looked too confident.")}
+function breach(){
+ const t=["A Titan is staring directly at your password field.","The gate has been breached. Authentication continues because management said so.","A giant hand has interrupted your session.","Commander protocol: panic first, verify later."];
+ document.getElementById("breachText").textContent=t[Math.floor(Math.random()*t.length)];
+ document.getElementById("breach").style.display="flex";
+}
+function closeBreach(){document.getElementById("breach").style.display="none"}
+function panic(){toast("PANIC REGISTERED. Unfortunately, there is no undo button.");document.getElementById("morale").textContent="EXTREMELY LOW"}
+function forgot(){
+ const x=["Password recovery failed because you forgot the password.","Your password has been eaten by a Titan.","Recovery pigeon unavailable. It joined the Garrison.","Excellent. You have successfully forgotten your password."];
+ document.getElementById("forgotMsg").textContent=x[Math.floor(Math.random()*x.length)];
+}
+function later(){document.getElementById("topAlert").textContent="⚠ MAYBE LATER SELECTED: TITAN HAS BEEN INVITED INSIDE ⚠";toast("There is no later. Only login.");setTimeout(breach,900)}
+function attempt(){
+ attempts++;
+ const u=document.getElementById("user").value.trim(),p=document.getElementById("pass").value;
+ const r=document.querySelector('input[name="reg"]:checked'),w=document.getElementById("wall").value;
+ const h=document.getElementById("human").checked,ans=document.getElementById("answer").value.trim();
+ const pr=document.getElementById("protocol").value,terms=document.getElementById("terms").checked,m=document.getElementById("message");
+ const btn=document.getElementById("login");
+ if(attempts===1){toast("Nice try. The login button was feeling neglected.");btn.textContent="⚔ TRY TO ENTER THE WALLS ⚔"}
+ if(attempts%4===0){breach();return}
+ if(!u){m.textContent="ERROR: Scout ID missing. Search your pockets.";return}
+ if(p.length!==8||!/[A-Z]/.test(p)||!/[a-z]/.test(p)||!/[0-9]/.test(p)||!/[^A-Za-z0-9]/.test(p)||/[aeiou]/i.test(p)){m.textContent="PASSWORD REJECTED: exactly 8 chars, upper/lower/number/symbol, NO vowels.";return}
+ if(!r){m.textContent="ERROR: You cannot be neutral during a Titan attack.";return}
+ if(!w){m.textContent="ERROR: Select a wall. Preferably one that exists.";return}
+ if(!h){m.textContent="ERROR: Titan detected. Check the box.";return}
+ if(Number(ans)!==word.length){m.textContent="CAPTCHA FAILED: Your Titan disguise is convincing.";shuffleCaptcha();return}
+ if(!pr){m.textContent="EMERGENCY PROTOCOL REQUIRED. RUN, SCREAM, POTATO, or both.";return}
+ if(!terms){m.textContent="You must accept responsibility for the apocalypse.";return}
+ btn.disabled=true;btn.textContent="VERIFYING HUMANITY...";
+ document.getElementById("progress").style.display="block";
+ let n=0;const bar=document.getElementById("bar");
+ const timer=setInterval(()=>{
+  n+=Math.floor(Math.random()*9)+6;bar.style.width=Math.min(n,100)+"%";
+  if(n>=100){clearInterval(timer);setTimeout(success,700)}
+ },220);
+}
+function success(){
+ document.getElementById("form").style.display="none";document.getElementById("success").style.display="block";
+ document.getElementById("welcome").textContent="Scout "+document.getElementById("user").value+" — your credentials have survived the world's worst login page.";
+}
+setInterval(()=>{
+ document.getElementById("c").textContent=Math.random()>.55?"BREACH":"QUIET";
+ document.getElementById("a").textContent=Math.random()>.65?"MOVING":"UNKNOWN";
+ document.getElementById("b").textContent=Math.random()>.8?"THROWN ROCKS":"LOW";
+ document.getElementById("threat").textContent=Math.random()>.7?"EXTREME":"WATCH";
+},2500);
+
+document.getElementById("login").addEventListener("mouseenter",()=>{
+ if(attempts>=1&&!dodge){dodge=true;document.getElementById("login").classList.add("dodge");document.getElementById("message").textContent="BUTTON ERROR: The button has relocated for tactical reasons.";setTimeout(()=>{document.getElementById("login").classList.remove("dodge")},900)}
+});
+</script>
+</body>
+</html>

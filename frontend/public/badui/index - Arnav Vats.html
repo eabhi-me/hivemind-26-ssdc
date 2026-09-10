@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Login Portal - Enterprise Edition</title>
+  <style>
+    /* ==========================================================================
+       BAD UX STYLING SYSTEM
+       Deliberately chaotic color palette, irregular typography, bad spacing,
+       unintuitive visual hierarchy, and distracting CSS keyframe animations.
+       ========================================================================== */
+
+    :root {
+      --bg-primary: #121820;
+      --bg-card: #1f2937;
+      --accent-clash: #ff0055;
+      --accent-warning: #ffcc00;
+      --accent-confusing: #00ffcc;
+      --text-muted: #6b7280;
+      --text-normal: #e5e7eb;
+      --font-bad-header: 'Impact', 'Comic Sans MS', sans-serif;
+      --font-bad-body: 'Courier New', Courier, monospace;
+      --font-bad-misc: 'Times New Roman', Times, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      background-image: 
+        radial-gradient(#2d3748 1px, transparent 1px),
+        linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #31102f 100%);
+      background-size: 20px 20px, 100% 100%;
+      color: var(--text-normal);
+      font-family: var(--font-bad-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      overflow-x: hidden;
+      /* BAD UX PATTERN: Custom cursor that is slightly off-center or confusing */
+      cursor: crosshair;
+    }
+
+    /* BAD UX PATTERN: Distracting animated banner background */
+    @keyframes pulseBackground {
+      0% { border-color: #ff0055; }
+      50% { border-color: #00ffcc; }
+      100% { border-color: #ff0055; }
+    }
+
+    /* BAD UX PATTERN: Marquee sub-header that causes visual distraction */
+    .marquee-text {
+      width: 100%;
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      font-size: 11px;
+      padding: 3px 0;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      border-bottom: 2px dashed #000;
+      margin-bottom: 10px;
+    }
+
+    .marquee-inner {
+      display: inline-block;
+      animation: marquee 12s linear infinite;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Top Navigation Header */
+    header {
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    /* BAD UX PATTERN: Header layout with weird font mixing and poor alignment */
+    h1 {
+      font-family: var(--font-bad-header);
+      font-size: 2.4rem;
+      letter-spacing: 3px;
+      color: #ffffff;
+      text-shadow: 3px 3px 0px var(--accent-clash);
+      transform: rotate(-1deg);
+      display: inline-block;
+    }
+
+    .subtitle {
+      font-family: var(--font-bad-misc);
+      font-style: italic;
+      font-size: 13px;
+      color: var(--accent-warning);
+      margin-top: -5px;
+      margin-left: 40px; /* Intentionally off-center */
+    }
+
+    /* Top Far-Away Notification Banner (BAD UX PATTERN: Errors appear far from inputs) */
+    #farAwayNotificationArea {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      width: 280px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast-msg {
+      background: #990000;
+      color: #ffffff;
+      border: 2px solid #ff5555;
+      padding: 10px 14px;
+      font-size: 12px;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      animation: slideIn 0.3s ease-out;
+      font-family: sans-serif;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); }
+      to { transform: translateX(0); }
+    }
+
+    /* Main Container */
+    .portal-card {
+      background: var(--bg-card);
+      border: 4px ridge #4b5563;
+      border-radius: 18px 4px 22px 6px; /* BAD UX PATTERN: Inconsistent border radii */
+      padding: 30px 25px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.4);
+      position: relative;
+      animation: pulseBackground 8s infinite;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      border-bottom: 1px dotted #6b7280;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--accent-confusing);
+      text-transform: uppercase;
+    }
+
+    .badge-secure {
+      background: #059669;
+      color: white;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      font-family: sans-serif;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Form Elements Styling */
+    .form-group {
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    /* BAD UX PATTERN: Floating labels that disappear completely on focus/input */
+    .disappearing-label {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 6px;
+      display: block;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      user-select: none;
+    }
+
+    .disappearing-label.hidden-label {
+      opacity: 0 !important;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      background: #111827;
+      border: 2px inset #374151;
+      color: #38bdf8;
+      padding: 12px 14px;
+      font-family: var(--font-bad-body);
+      font-size: 14px;
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--accent-clash);
+      box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
+    }
+
+    /* BAD UX PATTERN: Badly placed Show/Hide password toggle covering input text */
+    .password-toggle-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #374151;
+      color: #f3f4f6;
+      border: 1px solid #9ca3af;
+      font-size: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 3px;
+      z-index: 5;
+      /* BAD UX: Covers the last 5 characters of password */
+      width: 110px;
+      text-align: center;
+    }
+
+    .password-toggle-btn:hover {
+      background: #4b5563;
+    }
+
+    /* BAD UX PATTERN: Dodging / Slippery "Remember Me" Checkbox */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 11px;
+      color: #9ca3af;
+      user-select: none;
+      position: relative;
+      height: 30px;
+    }
+
+    .evasive-checkbox-wrapper {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+    }
+
+    /* BAD UX PATTERN: Extremely tiny actual click target box (4px x 4px) inside a big visual box */
+    .fake-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--accent-warning);
+      background: #000;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: left 0.15s ease, top 0.15s ease;
+    }
+
+    /* Microscopic actual input */
+    .tiny-actual-checkbox {
+      width: 4px;
+      height: 4px;
+      opacity: 0.8;
+      cursor: pointer;
+    }
+
+    /* BAD UX PATTERN: Deliberately misleading label */
+    .checkbox-label {
+      font-size: 11px;
+      cursor: pointer;
+      color: #d1d5db;
+    }
+
+    /* BAD UX PATTERN: Interactive JS CAPTCHA Section */
+    .captcha-box {
+      background: #111827;
+      border: 2px dashed #4b5563;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 22px;
+    }
+
+    .captcha-title {
+      font-size: 11px;
+      color: var(--accent-warning);
+      margin-bottom: 8px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .captcha-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .captcha-tile {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      user-select: none;
+      transition: transform 0.1s;
+    }
+
+    .captcha-tile:hover {
+      background: #374151;
+      transform: scale(0.95); /* BAD UX: Shrinks on hover instead of growing */
+    }
+
+    .captcha-tile.selected {
+      background: var(--accent-clash);
+      border-color: #ff5555;
+    }
+
+    .captcha-status {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* Button Area Mechanics */
+    .action-area {
+      position: relative;
+      min-height: 90px;
+      border: 1px dashed #374151;
+      padding: 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 10px;
+    }
+
+    /* BAD UX PATTERN: Huge visually prominent button that is actually a CANCEL / RESET button */
+    .btn-fake-primary {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      cursor: pointer;
+      font-family: var(--font-bad-header);
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+
+    .btn-fake-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.6);
+    }
+
+    /* BAD UX PATTERN: The actual Login button is tiny, non-prominent, and DODGES the cursor */
+    .btn-real-login-evasive {
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      background: #374151;
+      color: #9ca3af;
+      border: 1px solid #4b5563;
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: var(--font-bad-body);
+      z-index: 10;
+      transition: left 0.15s ease, top 0.15s ease, background-color 0.3s;
+      white-space: nowrap;
+    }
+
+    .btn-real-login-evasive:hover {
+      background: #4b5563;
+      color: #ffffff;
+    }
+
+    /* Unintuitive Links Placement (BAD UX PATTERN: Forgot password inside footer / footnote) */
+    .unintuitive-link-container {
+      margin-top: 15px;
+      text-align: right;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    .hidden-forgot-link {
+      color: #4b5563;
+      text-decoration: none;
+      font-size: 8px;
+      letter-spacing: -0.5px;
+      opacity: 0.6;
+    }
+
+    .hidden-forgot-link:hover {
+      color: var(--accent-warning);
+      text-decoration: underline;
+    }
+
+    /* Confirmation Modal System */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #1e293b;
+      border: 3px solid var(--accent-clash);
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    }
+
+    .modal-title {
+      font-size: 16px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      font-family: var(--font-bad-header);
+    }
+
+    .modal-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    /* BAD UX PATTERN: Swap visual hierarchy in modal (Confirm button looks like dangerous cancel) */
+    .btn-modal-confirm {
+      background: #334155;
+      color: #64748b;
+      border: 1px solid #475569;
+      padding: 6px 12px;
+      font-size: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-modal-cancel {
+      background: var(--accent-clash);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Loading Overlay & Fake Progress Indicator */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 14px;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .spinner {
+      width: 45px;
+      height: 45px;
+      border: 5px solid #334155;
+      border-top: 5px solid var(--accent-confusing);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .progress-bar-container {
+      width: 80%;
+      height: 12px;
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-clash), var(--accent-warning));
+      transition: width 0.3s ease;
+    }
+
+    .loading-status-text {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* Developer / Debug Panel Toggle & Overlay */
+    .debug-toggle-btn {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid #475569;
+      color: #94a3b8;
+      padding: 5px 10px;
+      font-size: 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 99999;
+      backdrop-filter: blur(4px);
+    }
+
+    .debug-toggle-btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    .debug-panel {
+      position: fixed;
+      bottom: 50px;
+      left: 12px;
+      width: 340px;
+      max-height: 420px;
+      background: #0f172a;
+      border: 2px solid var(--accent-confusing);
+      border-radius: 8px;
+      padding: 15px;
+      z-index: 99999;
+      overflow-y: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.9);
+      display: none;
+    }
+
+    .debug-panel.visible {
+      display: block;
+    }
+
+    .debug-panel h3 {
+      font-size: 13px;
+      color: var(--accent-confusing);
+      margin-bottom: 10px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 5px;
+    }
+
+    .debug-pattern-item {
+      font-size: 11px;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      padding-left: 10px;
+      border-left: 2px solid var(--accent-clash);
+    }
+
+    .debug-pattern-item strong {
+      color: var(--accent-warning);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 15px;
+      /* BAD UX: Slightly overlapping with container bottom */
+      transform: translateY(-5px);
+    }
+
+    /* Responsive Frustration Tweaks for Mobile */
+    @media (max-width: 480px) {
+      .portal-card {
+        padding: 20px 15px;
+        max-width: 100%;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      /* BAD UX: Even smaller dodging target on mobile */
+      .btn-real-login-evasive {
+        font-size: 8px;
+        padding: 2px 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Marquee (Distracting visual element) -->
+  <div class="marquee-text">
+    <div class="marquee-inner">
+      ⚠️ NOTICE: System security level set to MAXIMUM. Unsolicited mouse clicks will be logged and analyzed. Please ensure password adheres to RFC-99214 standards.
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <h1>Secure Login Portal</h1>
+    <div class="subtitle">v4.0.9 - Enterprise Authentication Gateway</div>
+  </header>
+
+  <!-- Far-Away Notification Toast Container (BAD UX: Messages appear far away from input) -->
+  <div id="farAwayNotificationArea"></div>
+
+  <!-- Main Login Card Container -->
+  <div class="portal-card" id="mainPortalCard">
+    
+    <!-- Loading Overlay with Fake Progress Bar -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+      <div class="loading-status-text" id="loadingStatusText">Initializing quantum cipher exchange...</div>
+    </div>
+
+    <div class="card-header">
+      <span class="card-title">User Sign-In</span>
+      <span class="badge-secure">🔒 256-BIT ENCRYPTED</span>
+    </div>
+
+    <form id="badLoginForm" onsubmit="return false;">
+      
+      <!-- Username Field with Disappearing Label -->
+      <div class="form-group">
+        <label for="usernameInput" class="disappearing-label" id="usernameLabel">
+          Account Username / Employee ID (Case Sensitive, No trailing spaces)
+        </label>
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="usernameInput" 
+            placeholder="User Identifier" 
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+      </div>
+
+      <!-- Password Field with Badly Placed Toggle -->
+      <div class="form-group">
+        <label for="passwordInput" class="disappearing-label" id="passwordLabel">
+          Security Cipher Key
+        </label>
+        <div class="input-wrapper">
+          <input 
+            type="password" 
+            id="passwordInput" 
+            placeholder="••••••••••••" 
+            autocomplete="off"
+          >
+          <!-- BAD UX PATTERN: Show password toggle covers actual password text -->
+          <button type="button" class="password-toggle-btn" id="passwordToggleBtn">
+            👁️ Reveal Password
+          </button>
+        </div>
+      </div>
+
+      <!-- Evasive "Remember Me" Checkbox -->
+      <div class="checkbox-container">
+        <div class="evasive-checkbox-wrapper" id="checkboxWrapper">
+          <div class="fake-checkbox" id="fakeCheckbox">
+            <!-- Actual tiny checkbox (4px by 4px) inside -->
+            <input type="checkbox" id="actualCheckbox" class="tiny-actual-checkbox">
+          </div>
+        </div>
+        <label for="actualCheckbox" class="checkbox-label" id="checkboxLabelText">
+          Do NOT remember this device (Check box to opt-out of not remembering)
+        </label>
+      </div>
+
+      <!-- Interactive JS CAPTCHA Section -->
+      <div class="captcha-box">
+        <div class="captcha-title" id="captchaInstruction">
+          CAPTCHA: Select all PRIME numbers in ascending order
+        </div>
+        <div class="captcha-grid" id="captchaGrid">
+          <!-- Tiles generated via JS -->
+        </div>
+        <div class="captcha-status" id="captchaStatusText">Status: 0/3 verified</div>
+      </div>
+
+      <!-- Unintuitive Action Buttons Area -->
+      <div class="action-area" id="actionArea">
+        
+        <!-- BAD UX PATTERN: Huge green button that clears the form! -->
+        <button type="button" class="btn-fake-primary" id="btnCancelForm">
+          CANCEL & RESET
+        </button>
+
+        <!-- BAD UX PATTERN: The REAL login button is tiny, mislabeled, and dodges the cursor! -->
+        <button type="button" class="btn-real-login-evasive" id="btnLoginDodger">
+          Submit?
+        </button>
+      </div>
+
+      <!-- Unintuitably Placed Links -->
+      <div class="unintuitive-link-container">
+        Lost access credentials? <a href="#" class="hidden-forgot-link" id="forgotPasswordLink">Request Password Reset Procedure (Form 104-B)</a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Confirmation Modal 1 & 2 -->
+  <div class="modal-overlay" id="confirmationModal">
+    <div class="modal-box">
+      <div class="modal-title" id="modalTitle">Authentication Confirmation Required</div>
+      <div class="modal-desc" id="modalDesc">
+        Are you absolutely sure you wish to submit these login credentials to the authorization gateway?
+      </div>
+      <div class="modal-actions">
+        <!-- BAD UX PATTERN: Inverted button colors (Cancel is prominent, Proceed is dull) -->
+        <button class="btn-modal-cancel" id="btnModalCancel">ABORT SYSTEM ENTRY</button>
+        <button class="btn-modal-confirm" id="btnModalConfirm">Proceed Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Extremely Secure Systems Inc. All rights reserved.</p>
+    <p style="font-size: 8px; opacity: 0.4; margin-top: 2px;">
+      Strict Compliance Standard 800-53. Unauthorized access will be logged with IP tracing.
+    </p>
+  </footer>
+
+  <!-- Developer / Debug Panel -->
+  <button class="debug-toggle-btn" id="btnToggleDebug">🛠️ Debug Bad UX Features</button>
+  <div class="debug-panel" id="debugPanel">
+    <h3>Active Bad UX Anti-Patterns</h3>
+    <div class="debug-pattern-item">
+      <strong>1. Dodging Login Button:</strong> Real login button moves randomly when mouse approaches, and button text dynamically changes ("Login", "Submit", "Maybe?", "Continue").
+    </div>
+    <div class="debug-pattern-item">
+      <strong>2. Visual Hierarchy Trap:</strong> The big green primary button is actually "CANCEL & RESET", while the actual Login button is tiny and grey.
+    </div>
+    <div class="debug-pattern-item">
+      <strong>3. Disappearing Labels:</strong> Form field labels vanish completely once fields gain focus or user starts typing.
+    </div>
+    <div class="debug-pattern-item">
+      <strong>4. Obstructive Password Toggle:</strong> The "Show Password" button sits directly over the input text, obscuring characters.
+    </div>
+    <div class="debug-pattern-item">
+      <strong>5. Microscopic Evasive Checkbox:</strong> The "Remember Me" checkbox dodge-shifts on hover and has a 4px click area with confusing double-negative labeling.
+    </div>
+    <div class="debug-pattern-item">
+      <strong>6. Far-Away Vague Errors:</strong> Error messages trigger in the top-right corner far away from inputs with vague messages ("Something went wrong", "Unexpected input").
+    </div>
+    <div class="debug-pattern-item">
+      <strong>7. Random Inactivity Field Wiping:</strong> Unfocusing input fields has a random chance to auto-clear typed text.
+    </div>
+    <div class="debug-pattern-item">
+      <strong>8. Cryptic Interactive CAPTCHA:</strong> Requires choosing prime numbers in ascending order, resetting on minor mistakes.
+    </div>
+    <div class="debug-pattern-item">
+      <strong>9. Double Confirmation Loop:</strong> Triggers nested/layered modal confirmations with reversed button styling.
+    </div>
+    <div class="debug-pattern-item">
+      <strong>10. Artificial Delay & Fake Session Expiry:</strong> Long fake progress bar loading (4s) which fails on the first attempt with "Session Expired" before eventual success.
+    </div>
+  </div>
+
+
+  <!-- ==========================================================================
+       JAVASCRIPT ARCHITECTURE & FRUSTRATION MECHANICS
+       ========================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      /* ----------------------------------------------------------------------
+         STATE MANAGEMENT
+         ---------------------------------------------------------------------- */
+      const state = {
+        dodgesCount: 0,
+        maxDodgesBeforeStay: 4,
+        captchaSolved: false,
+        captchaSelectedTiles: [],
+        loginAttempts: 0,
+        confirmStep: 0,
+        usernameAutoClearedOnce: false,
+        buttonTexts: ['Login', 'Continue', 'Submit', 'Maybe?', 'Try Again', 'Proceed?']
+      };
+
+      /* ----------------------------------------------------------------------
+         DOM ELEMENT REFERENCES
+         ---------------------------------------------------------------------- */
+      const usernameInput = document.getElementById('usernameInput');
+      const usernameLabel = document.getElementById('usernameLabel');
+      const passwordInput = document.getElementById('passwordInput');
+      const passwordLabel = document.getElementById('passwordLabel');
+      const passwordToggleBtn = document.getElementById('passwordToggleBtn');
+      
+      const checkboxWrapper = document.getElementById('checkboxWrapper');
+      const fakeCheckbox = document.getElementById('fakeCheckbox');
+      const actualCheckbox = document.getElementById('actualCheckbox');
+      
+      const btnLoginDodger = document.getElementById('btnLoginDodger');
+      const btnCancelForm = document.getElementById('btnCancelForm');
+      const actionArea = document.getElementById('actionArea');
+      
+      const farAwayNotificationArea = document.getElementById('farAwayNotificationArea');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const progressBarFill = document.getElementById('progressBarFill');
+      const loadingStatusText = document.getElementById('loadingStatusText');
+      
+      const confirmationModal = document.getElementById('confirmationModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalDesc = document.getElementById('modalDesc');
+      const btnModalConfirm = document.getElementById('btnModalConfirm');
+      const btnModalCancel = document.getElementById('btnModalCancel');
+      
+      const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+      const btnToggleDebug = document.getElementById('btnToggleDebug');
+      const debugPanel = document.getElementById('debugPanel');
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #1: Far-Away Toast Error Notification Function
+         Display vague error messages in the top right corner far from the input.
+         ---------------------------------------------------------------------- */
+      function showFarAwayNotification(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerText = message;
+        farAwayNotificationArea.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => toast.remove(), 500);
+        }, 4000);
+      }
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #2: Disappearing Labels on Focus/Input
+         Labels vanish when user starts interacting, causing confusion.
+         ---------------------------------------------------------------------- */
+      function setupDisappearingLabels() {
+        [
+          { input: usernameInput, label: usernameLabel },
+          { input: passwordInput, label: passwordLabel }
+        ].forEach(({ input, label }) => {
+          input.addEventListener('focus', () => label.classList.add('hidden-label'));
+          input.addEventListener('input', () => label.classList.add('hidden-label'));
+          input.addEventListener('blur', () => {
+            if (!input.value) {
+              label.classList.remove('hidden-label');
+            }
+          });
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #3: Random Inactivity Field Wiping
+         When username loses focus, 30% chance it auto-clears typed text!
+         ---------------------------------------------------------------------- */
+      usernameInput.addEventListener('blur', () => {
+        if (usernameInput.value.length > 2 && !state.usernameAutoClearedOnce) {
+          if (Math.random() < 0.4) {
+            usernameInput.value = '';
+            state.usernameAutoClearedOnce = true;
+            showFarAwayNotification("Unexpected input: Field state reset due to buffer instability.");
+          }
+        }
+      });
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #4: Obstructive Password Toggle Button
+         Toggle show/hide password, but text styling shifts and obscures input.
+         ---------------------------------------------------------------------- */
+      passwordToggleBtn.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          passwordToggleBtn.innerText = '🙈 Hide Password';
+          passwordToggleBtn.style.right = '45px'; // Shift position weirdly
+          showFarAwayNotification("Security Warning: Password characters exposed in cleartext.");
+        } else {
+          passwordInput.type = 'password';
+          passwordToggleBtn.innerText = '👁️ Reveal Password';
+          passwordToggleBtn.style.right = '8px';
+        }
+      });
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #5: Dodging / Slippery Checkbox Target
+         When mouse approaches checkbox, it shifts 15px away!
+         ---------------------------------------------------------------------- */
+      checkboxWrapper.addEventListener('mouseenter', () => {
+        const randomX = (Math.random() - 0.5) * 35;
+        const randomY = (Math.random() - 0.5) * 20;
+        fakeCheckbox.style.left = `${randomX}px`;
+        fakeCheckbox.style.top = `${randomY}px`;
+      });
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #6: Cryptic Interactive JS CAPTCHA
+         User must select prime numbers (2, 3, 5, 7, 11...) in ascending order.
+         ---------------------------------------------------------------------- */
+      const captchaGrid = document.getElementById('captchaGrid');
+      const captchaStatusText = document.getElementById('captchaStatusText');
+      const numbers = [4, 7, 12, 3, 9, 5]; // Primes are 3, 5, 7
+      const requiredPrimesAsc = [3, 5, 7];
+
+      function renderCaptcha() {
+        captchaGrid.innerHTML = '';
+        numbers.forEach((num) => {
+          const tile = document.createElement('div');
+          tile.className = 'captcha-tile';
+          tile.innerText = num;
+          tile.dataset.val = num;
+
+          tile.addEventListener('click', () => {
+            if (state.captchaSolved) return;
+
+            const val = parseInt(num);
+            if (tile.classList.contains('selected')) {
+              tile.classList.remove('selected');
+              state.captchaSelectedTiles = state.captchaSelectedTiles.filter(n => n !== val);
+            } else {
+              tile.classList.add('selected');
+              state.captchaSelectedTiles.push(val);
+            }
+
+            // Check correctness
+            if (state.captchaSelectedTiles.length === requiredPrimesAsc.length) {
+              const matches = state.captchaSelectedTiles.every((val, index) => val === requiredPrimesAsc[index]);
+              if (matches) {
+                state.captchaSolved = true;
+                captchaStatusText.innerText = "Status: Verified ✅";
+                captchaStatusText.style.color = "#10b981";
+                showFarAwayNotification("CAPTCHA successfully solved.");
+              } else {
+                showFarAwayNotification("CAPTCHA Failed: Numbers must be primes in ascending order.");
+                resetCaptcha();
+              }
+            } else {
+              captchaStatusText.innerText = `Status: ${state.captchaSelectedTiles.length}/3 selected`;
+            }
+          });
+
+          captchaGrid.appendChild(tile);
+        });
+      }
+
+      function resetCaptcha() {
+        state.captchaSelectedTiles = [];
+        state.captchaSolved = false;
+        captchaStatusText.innerText = "Status: 0/3 verified";
+        captchaStatusText.style.color = "var(--text-muted)";
+        const tiles = document.querySelectorAll('.captcha-tile');
+        tiles.forEach(t => t.classList.remove('selected'));
+      }
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #7: Dynamic & Dodging Login Button
+         1. Text changes randomly every 1.8s.
+         2. Button shifts position when cursor gets close.
+         ---------------------------------------------------------------------- */
+      // Dynamic button text updater
+      setInterval(() => {
+        if (!state.captchaSolved) {
+          const randomIndex = Math.floor(Math.random() * state.buttonTexts.length);
+          btnLoginDodger.innerText = state.buttonTexts[randomIndex];
+        }
+      }, 1800);
+
+      // Button dodging logic
+      actionArea.addEventListener('mousemove', (e) => {
+        if (state.dodgesCount >= state.maxDodgingLimit) return;
+
+        const btnRect = btnLoginDodger.getBoundingClientRect();
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        // Proximity calculation
+        const btnCenterX = btnRect.left + btnRect.width / 2;
+        const btnCenterY = btnRect.top + btnRect.height / 2;
+        const distance = Math.hypot(mouseX - btnCenterX, mouseY - btnCenterY);
+
+        if (distance < 50) {
+          state.dodgesCount++;
+          const areaRect = actionArea.getBoundingClientRect();
+          
+          // Calculate new random relative coordinates
+          const maxLeft = areaRect.width - btnRect.width - 15;
+          const maxTop = areaRect.height - btnRect.height - 15;
+
+          const newLeft = Math.max(10, Math.floor(Math.random() * maxLeft));
+          const newTop = Math.max(10, Math.floor(Math.random() * maxTop));
+
+          btnLoginDodger.style.left = `${newLeft}px`;
+          btnLoginDodger.style.top = `${newTop}px`;
+
+          if (state.dodgesCount === 3) {
+            showFarAwayNotification("Notice: Login target recalibrating...");
+          }
+        }
+      });
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #8: Trap Primary Button (Cancel & Reset)
+         The big green tempting button clears all inputs!
+         ---------------------------------------------------------------------- */
+      btnCancelForm.addEventListener('click', () => {
+        usernameInput.value = '';
+        passwordInput.value = '';
+        usernameLabel.classList.remove('hidden-label');
+        passwordLabel.classList.remove('hidden-label');
+        resetCaptcha();
+        showFarAwayNotification("Form cleared: Reset button triggered.");
+      });
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #9: Multi-Stage Confirmation Gauntlet & Validation
+         ---------------------------------------------------------------------- */
+      btnLoginDodger.addEventListener('click', () => {
+        // Validation check 1: Username formatting
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!username) {
+          showFarAwayNotification("Something went wrong.");
+          return;
+        }
+
+        // Intentionally pedantic requirement: Username must start with uppercase
+        if (username[0] !== username[0].toUpperCase() || username[0] === username[0].toLowerCase()) {
+          showFarAwayNotification("Invalid formatting: Capitalization standard violation.");
+          return;
+        }
+
+        if (!password) {
+          showFarAwayNotification("Invalid.");
+          return;
+        }
+
+        if (!state.captchaSolved) {
+          showFarAwayNotification("Security clearance missing: Complete CAPTCHA first.");
+          return;
+        }
+
+        // Launch Confirmation Modal Stage 1
+        triggerConfirmationStage(1);
+      });
+
+      function triggerConfirmationStage(stage) {
+        state.confirmStep = stage;
+        confirmationModal.classList.add('active');
+
+        if (stage === 1) {
+          modalTitle.innerText = "Are you absolutely sure?";
+          modalDesc.innerText = "Continuing will transmit your authorization parameters across open network nodes. Confirm intention?";
+          btnModalConfirm.innerText = "Proceed Anyway";
+          btnModalCancel.innerText = "ABORT SYSTEM ENTRY";
+        } else if (stage === 2) {
+          modalTitle.innerText = "Re-Confirm Confirmation (Step 2/2)";
+          modalDesc.innerText = "Please verify once more: Are you certain your cipher key does not contain secret spaces?";
+          btnModalConfirm.innerText = "Yes, Execute Login";
+          btnModalCancel.innerText = "Go Back";
+        }
+      }
+
+      btnModalCancel.addEventListener('click', () => {
+        confirmationModal.classList.remove('active');
+        showFarAwayNotification("Login sequence aborted by user.");
+      });
+
+      btnModalConfirm.addEventListener('click', () => {
+        if (state.confirmStep === 1) {
+          triggerConfirmationStage(2);
+        } else if (state.confirmStep === 2) {
+          confirmationModal.classList.remove('active');
+          startFakeLoadingSequence();
+        }
+      });
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #10: Long Delay, Fake Progress Bar & Session Expiry
+         ---------------------------------------------------------------------- */
+      function startFakeLoadingSequence() {
+        loadingOverlay.classList.add('active');
+        progressBarFill.style.width = '0%';
+        loadingStatusText.innerText = "Encrypting authentication payload...";
+
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 15;
+          progressBarFill.style.width = `${progress}%`;
+
+          if (progress === 45) {
+            loadingStatusText.innerText = "Contacting authentication server (Attempt 1)...";
+          } else if (progress === 75) {
+            loadingStatusText.innerText = "Validating token consistency...";
+          } else if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              loadingOverlay.classList.remove('active');
+              handlePostLoadingResult();
+            }, 600);
+          }
+        }, 600); // Takes ~4 seconds total
+      }
+
+      function handlePostLoadingResult() {
+        state.loginAttempts++;
+
+        if (state.loginAttempts === 1) {
+          // BAD UX: First attempt ALWAYS fails with "Session expired"
+          showFarAwayNotification("Session expired. Please try again.");
+          btnLoginDodger.innerText = "Retry Login";
+          resetCaptcha(); // Make user do CAPTCHA again!
+        } else {
+          // Success after gauntlet!
+          alert("🎉 SUCCESS! You have successfully passed the world's most frustrating login portal!");
+          document.getElementById('mainPortalCard').innerHTML = `
+            <div style="text-align: center; padding: 30px 10px;">
+              <h2 style="color: #10b981; font-size: 24px; margin-bottom: 10px;">Access Granted!</h2>
+              <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">Welcome back, Administrator. You survived the Bad UX Gauntlet.</p>
+              <button onclick="location.reload()" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                🔄 Restart UX Simulation
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         BAD UX PATTERN #11: Hidden / Unintuitive Forgot Password Link
+         ---------------------------------------------------------------------- */
+      forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert("To reset your password, please send a notarized physical letter to Corporate Security Headquarters in Antarctica.");
+      });
+
+      /* ----------------------------------------------------------------------
+         Developer / Debug Panel Controller
+         ---------------------------------------------------------------------- */
+      btnToggleDebug.addEventListener('click', () => {
+        debugPanel.classList.toggle('visible');
+      });
+
+      /* Initialize Components */
+      setupDisappearingLabels();
+      renderCaptcha();
+
+    });
+  </script>
+</body>
+</html>

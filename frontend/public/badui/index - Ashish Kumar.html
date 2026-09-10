@@ -1,0 +1,2685 @@
+﻿<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Babu Rao Memorial Portal 👹 | Login From Hell v2.0</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👹</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="portal-body">
+
+  <!-- =====================================================================
+       TOP MARQUEE: DESI CAMPUS NEWS & JOKES
+       ===================================================================== -->
+  <header class="top-news-ticker">
+    <div class="ticker-tag">📢 CAMPUS KHABAR</div>
+    <marquee behavior="scroll" direction="left" scrollamount="8" class="news-marquee">
+      🔥 <b>OFFICIAL:</b> Canteen mein Maggie banned hai, ab sirf Zeher milega! 💥 "25 DIN MEIN DEGREE DOUBLE" scheme cancelled by Dean Babu Rao. ⚠️ CONTROL MAJNU CONTROL! Password galat daala toh roll number cancel! 💩 Jethalal se jalebi fafda mangwao pehle! 🚨 "SEH LENGE THODA" - Official College Motto! 📢 150 RUPIYA BHI NAHI DEGA! 🤣 Kal Viva hai, sab Yamraj ki kripa se aana! 🔥
+    </marquee>
+  </header>
+
+  <!-- =====================================================================
+       TOP STATUS BAR: SESSION COUNTDOWN & CONTROLS
+       ===================================================================== -->
+  <div class="top-nav-bar">
+    <div class="session-pill" id="session-box">
+      <span class="pulse-dot"></span>
+      <span>Session Gayab Hoga: <b id="session-timer">00:10</b> <small>(Paisa Barbaad!)</small></span>
+      <button class="seh-lenge-btn" id="panic-btn" title="Click karo dard baatne ke liye">Seh Lenge Thoda 🥲</button>
+    </div>
+
+    <div class="top-actions">
+      <button class="hint-pill-btn" id="cheat-hint-btn">💡 Passcode Cheat Code</button>
+      <button class="sound-toggle-btn" id="sound-toggle">🔊 Audio: ON</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       FLOATING BAD UI & MEME SCORE BADGE (COMPETITION FEATURE)
+       ===================================================================== -->
+  <aside class="meme-score-badge" id="score-badge">
+    <div class="badge-title-row">
+      <span class="badge-trophy">🏆 BAD UI SCORE</span>
+      <span class="badge-score"><span id="score-val">98</span>/100</span>
+    </div>
+    <div class="badge-progress-bg">
+      <div class="badge-progress-fill" id="score-bar" style="width: 98%;"></div>
+    </div>
+    <div class="badge-remark" id="score-comment">"Ye Badiya Tha Guru!"</div>
+    <div class="badge-substats">
+      <span>Jokes Cracked: <b id="joke-counter">0</b></span> • 
+      <span>Dodges: <b id="dodge-counter">0</b></span>
+    </div>
+    <button class="inspect-violations-btn" id="inspect-btn">
+      📜 Inspect UX Crimes & Laws
+    </button>
+  </aside>
+
+  <!-- =====================================================================
+       MAIN WRAPPER: LOGIN PORTAL & JOKE BOX
+       ===================================================================== -->
+  <main class="main-container">
+
+    <!-- FLOATING TOAST NOTIFICATION -->
+    <div class="meme-toast" id="meme-toast" style="display: none;">
+      <span class="toast-icon" id="toast-icon">🏃‍♂️</span>
+      <span class="toast-msg" id="toast-msg">Bhaag Milkha Bhaag!</span>
+    </div>
+
+    <!-- THE LOGIN CARD -->
+    <section class="portal-card" id="main-card">
+      <div class="wobble-stamp">100% VASOOLI<br><small>Approved by Babu Rao</small></div>
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="college-emblem">
+          <span class="emblem-emoji">👹</span>
+          <span class="emblem-text">SHRI BABU RAO MEMORIAL INSTITUTE OF VASOOLI (SBMIV)</span>
+          <span class="emblem-affil">Affiliated to Yamraj Council for Technical Education (YCTE) • Est. 150 B.C.</span>
+        </div>
+        <h1 class="portal-heading">STUDENT LOGIN PORTAL 2.0</h1>
+        <p class="portal-subheading">"Ricks Nahi Lene Ka, Chup Chap Login Karne Ka" — Official Student Gateway</p>
+      </div>
+
+      <!-- Error / Troll Notification Banner -->
+      <div class="troll-banner" id="troll-banner" style="display: none;">
+        <span class="troll-icon">🛑</span>
+        <div class="troll-content">
+          <b id="troll-title">ERROR 420: Tumse Na Ho Payega!</b>
+          <p id="troll-desc">Babu Rao said the server is on a chai break. Ek aur baar try karo hero!</p>
+        </div>
+        <button class="close-troll-btn" id="close-troll-btn">✕</button>
+      </div>
+
+      <!-- THE FORM -->
+      <form id="babu-login-form" novalidate autocomplete="off">
+
+        <!-- 1. ROLL NUMBER / USERNAME -->
+        <div class="field-group">
+          <div class="label-row">
+            <label for="username" class="field-label">
+              🎓 Roll Number / Student ID <span class="req-star">*</span>
+            </label>
+            <button type="button" class="mini-tool-btn" id="random-bahana-btn" title="Ek mast bahana generate karo">
+              🎲 Random Bahana Generator
+            </button>
+          </div>
+
+          <div class="input-container">
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              class="field-input" 
+              placeholder="e.g. 21BECE069 (Ya Sharma ji ke bete ka roll number)"
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- Dynamic Babu Rao Reaction to Username -->
+          <div class="input-reaction-box" id="user-reaction-box">
+            <span class="reaction-emoji" id="user-reaction-emoji">👴</span>
+            <span class="reaction-text" id="user-reaction-text">Babu Rao: "Roll number dalo, tab tak main chai peeta hoon!"</span>
+          </div>
+        </div>
+
+        <!-- 2. PASSWORD FIELD -->
+        <div class="field-group">
+          <div class="label-row">
+            <label for="password" class="field-label">
+              🔑 Gupt Password <span class="req-star">*</span>
+            </label>
+            <button type="button" class="eye-reveal-btn" id="eye-toggle-btn">
+              👁️ Dekh Raha Hai Vinod?
+            </button>
+          </div>
+
+          <div class="input-container">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="field-input" 
+              placeholder="Passcode daalo (Babu Rao ke 7 Niyam)"
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- PASSWORD COMMANDMENTS (CLEAR, READABLE & FUNNY) -->
+          <div class="pass-checklist-card" id="pass-checklist">
+            <div class="checklist-header">
+              📜 <b>Babu Rao's 7 Commandments for Password:</b>
+            </div>
+            <ul class="checklist-items">
+              <li id="chk-len" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 8 characters <i>(Thoda toh sharam karo)</i></li>
+              <li id="chk-upper" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 CAPITAL letter <i>(Jaise Papa ka gussa)</i></li>
+              <li id="chk-lower" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 lowercase letter <i>(Jaise tumhari self-esteem)</i></li>
+              <li id="chk-num" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 number <i>(0-9, backlogs mat daalna)</i></li>
+              <li id="chk-sym" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 symbol <i>(!@#$% life ke confusion jaisa)</i></li>
+              <li id="chk-no-a" class="chk-item chk-pass"><span class="chk-icon">✅</span> <b>STRICTLY NO letter "A" or "a"</b> <i>('A' for Aukaat BANNED!)</i></li>
+              <li id="chk-emoji" class="chk-item chk-fail"><span class="chk-icon">❌</span> <b>At least 1 Emoji</b> <i>(e.g. 🔥, 🤡, 👹, 💀, 💩)</i></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 3. REMEMBER ME -->
+        <div class="checkbox-row">
+          <label class="custom-checkbox-container" for="remember-me">
+            <input type="checkbox" id="remember-me">
+            <span class="checkmark"></span>
+            <span class="checkbox-label-text">
+              Babu Rao ko raat 3 baje call karke puchna: <i>"Aye Devva! Star Fisheries kahan hai?"</i>
+            </span>
+          </label>
+        </div>
+
+        <!-- 4. FORGOT PASSWORD & SIGNUP MISLEADING LINKS -->
+        <div class="portal-links-bar">
+          <a href="#" class="forgot-link" id="forgot-link">Password Bhool Gaye? (Ghajini Mode Activate) 🧠</a>
+          <span class="signup-decoy">
+            Naya Bakra? <a href="#" class="signup-link" id="signup-decoy-link">Sign Up (Nahi Dunga)</a>
+          </span>
+        </div>
+
+        <!-- 5. LOGIN ACTION BUTTON AREA -->
+        <div class="submit-arena" id="submit-arena">
+          <button type="submit" class="babu-submit-btn" id="login-submit-btn">
+            Login Karo (Ricks Nahi Lene Ka)
+          </button>
+        </div>
+
+      </form>
+
+      <!-- 6. CHAI BREAK JOKE BOX (BUILT-IN JOKE GENERATOR) -->
+      <div class="joke-widget-box">
+        <div class="joke-widget-header">
+          <span>☕ <b>Chai & Sutta Break Jokes</b> (Desi College Specials)</span>
+          <button type="button" class="next-joke-btn" id="next-joke-btn">Naya Joke Sunao 😂</button>
+        </div>
+        <p class="joke-text" id="joke-display">
+          "Engineering student ne blood test karwaya... Doctor bola: 'Khoon mein 70% caffeine, 20% stress aur 10% backlog paya gaya hai!'"
+        </p>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       MOVING HELP CONCIERGE: "HELP CHAHIYE?"
+       ===================================================================== -->
+  <button class="evasive-help-pill" id="evasive-help-btn" title="Click karo agar pakad sakte ho">
+    Help Chahiye? 🆘
+  </button>
+
+  <!-- =====================================================================
+       POPUP #1: LAXMI CHIT FUND 25 DIN MEIN DEGREE DOUBLE
+       ===================================================================== -->
+  <div class="modal-overlay" id="scheme-popup" style="display: none;">
+    <div class="modal-card wobble-modal">
+      <div class="modal-tag">🎉 LAXMI CHIT FUND SPECIAL BROADCAST 🎉</div>
+      <h2 class="modal-h2">MUBARAK HO! 25 Din Mein Degree Double!</h2>
+      <p class="modal-p">
+        Aapko officially select kiya gaya hai <b>ABSOLUTELY NOTHING</b> ke liye!<br>
+        Babu Rao aur Kachra Seth ki taraf se aapko milta hai <b>Zero (0) Rupaye</b> aur ek "Gajab Beizzati" certificate!
+      </p>
+      <div class="modal-buttons" id="popup-btn-row">
+        <button class="modal-btn-close" id="close-scheme-btn">Chup Chap Band Kar</button>
+        <button class="modal-btn-later" id="later-scheme-btn">150 Rupiya Dega (Maybe Later)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #2: FORGOT PASSWORD (GHAJINI DILEMMA)
+       ===================================================================== -->
+  <div class="modal-overlay" id="forgot-modal" style="display: none;">
+    <div class="modal-card forgot-modal-card">
+      <div class="modal-tag">❓ GHAJINI CONFIRMATION DIALOG ❓</div>
+      <h2 class="modal-h2">Are you REALLY sure you forgot your password?</h2>
+      <p class="modal-p">
+        Sach mein bhool gaye ho ya fir kal subah 8:00 AM ke Viva aur Assignment submission se bachne ka bahana bana rahe ho?
+      </p>
+      <div class="forgot-choice-stack">
+        <button class="forgot-opt-btn btn-yes" id="forgot-yes-btn">Yes (Haan, main Ghajini hoon)</button>
+        <button class="forgot-opt-btn btn-no" id="forgot-no-btn">No (Nahi, abhi yaad aa gaya)</button>
+        <button class="forgot-opt-btn btn-oracle" id="forgot-oracle-btn">
+          ✨ KYA GUNDA BANEGA RE TU (Ask Babu Rao Oracle) ✨
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #3: FAKE LOADING PROGRESS OVERLAY
+       ===================================================================== -->
+  <div class="modal-overlay" id="loading-modal" style="display: none;">
+    <div class="modal-card loading-card">
+      <div class="meme-spinner">👹</div>
+      <h3 class="loading-title">PROCESSING YOUR SUFFERING...</h3>
+      <p class="loading-step-text" id="loading-step-text">Babu Rao se chashma maang rahe hain...</p>
+      <div class="loading-track">
+        <div class="loading-fill" id="loading-fill-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #4: CHEAT CODE HELPER FOR JUDGES
+       ===================================================================== -->
+  <div class="modal-overlay" id="cheat-modal" style="display: none;">
+    <div class="modal-card cheat-card">
+      <div class="modal-tag">🔑 JUDGES CHEAT SHEET & WORKING PASSCODE</div>
+      <h2 class="modal-h2">How to Conquer the Login (Babu Rao Edition)</h2>
+      <div class="cheat-content">
+        <p><b>1. Roll Number:</b> Enter anything (e.g. <code>KachraSeth</code>, <code>MunnaBhai</code>, or <code>BabuRao</code>).</p>
+        <p><b>2. Working Passcodes (Guaranteed to Pass):</b></p>
+        <div class="passcode-pills">
+          <code class="copy-passcode" id="code-sample-1">P$ssw0rd1🔥</code>
+          <code class="copy-passcode" id="code-sample-2">BabuRao1🔥</code>
+          <code class="copy-passcode" id="code-sample-3">HeraPheri99💀</code>
+        </div>
+        <p><i>Notice: None of these contain the letter 'A' or 'a', and each has $\ge 8$ chars, numbers, symbols, uppercase, lowercase, and an emoji!</i></p>
+        <p><b>3. Submit:</b> The button will attempt to dodge your mouse once. Click it twice (first attempt triggers the hilarious "Tumse Na Ho Payega" troll!).</p>
+      </div>
+      <button class="modal-btn-close" id="close-cheat-btn">Got It, Let's Play!</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #5: COMPETITION INSPECTOR (UX VIOLATIONS DOSSIER)
+       ===================================================================== -->
+  <div class="modal-overlay" id="inspector-modal" style="display: none;">
+    <div class="modal-card inspector-card">
+      <div class="inspector-header-row">
+        <h2>🏆 BAD UI COMPETITION CRIMES DOSSIER</h2>
+        <button class="close-x-btn" id="close-inspector-x">✖</button>
+      </div>
+      <p class="inspector-sub">Inventory of UX Heuristics & Laws Deliberately Broken for Comedic Brilliance:</p>
+      <div class="crimes-list">
+        <div class="crime-box">
+          <span class="crime-tag red">Nielsen #1</span>
+          <b>Visibility of System Status:</b>
+          <p>Session timer countdown hits 00:00 and continuously loops back to 00:10 ("Paisa Barbaad!"), creating perpetual false urgency.</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag orange">Fitts's Law</span>
+          <b>Evasive & Shifting Targets:</b>
+          <p>Login button and Help pill shift away on cursor approach, intentionally testing motor control and comedic patience.</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag yellow">Nielsen #5</span>
+          <b>Error Prevention Inverted:</b>
+          <p>Strictly banning common vowel 'A' and revealing strict emoji requirements only as user types, provoking comedic errors.</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag purple">Nielsen #9</span>
+          <b>Error Recovery Satire:</b>
+          <p>The first valid login is arbitrarily rejected with "Error 420: Tumse Na Ho Payega! System is on chai break."</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag green">Dark Patterns</span>
+          <b>Confirmshaming & Decoys:</b>
+          <p>Forgot password modal with tiny "Yes (I am Ghajini)" vs giant "Ask the Oracle"; non-functioning disabled signup links.</p>
+        </div>
+      </div>
+      <button class="modal-btn-close" id="close-inspector-btn">Close Dossier (Khatam Tata Bye Bye)</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       VICTORY SCREEN: SHABASH! YOU SURVIVED THE LOGIN!
+       ===================================================================== -->
+  <div class="victory-screen" id="victory-screen" style="display: none;">
+    <div class="certificate-container">
+      <div class="victory-emojis">🎊 🕺 🏆 👹 🔥 🤡 🎉 📜</div>
+      <h1 class="victory-headline">🎊 SHABASH! YOU SURVIVED THE LOGIN! 🎊</h1>
+      <p class="victory-punchline">
+        Babu Rao: <i>"Aye Devva! Khopdi tod saale ka! Aakhirkar tumne bina backlog ke login kar hi liya!"</i>
+      </p>
+
+      <!-- OFFICIAL MEME DEGREE CERTIFICATE -->
+      <div class="degree-certificate">
+        <div class="cert-border">
+          <div class="cert-header">SHRI BABU RAO MEMORIAL INSTITUTE OF VASOOLI</div>
+          <div class="cert-subtitle">OFFICIAL CERTIFICATE OF DIGITAL SURVIVAL & PATIENCE</div>
+          <p class="cert-body">
+            This is to certify that <b><span id="cert-user-name">Kachra Seth</span></b> has successfully defeated 
+            all 7 Passcode Commandments, evaded running buttons, endured 10-second infinite countdowns, 
+            and survived the most hilariously irritating login portal in human history.
+          </p>
+          <div class="cert-meta-grid">
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-score">98</span>
+              <span class="meta-lbl">Final Bad UI Score</span>
+            </div>
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-dodges">0</span>
+              <span class="meta-lbl">Button Dodges Evaded</span>
+            </div>
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-jokes">0</span>
+              <span class="meta-lbl">Jokes Enjoyed</span>
+            </div>
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-time">0s</span>
+              <span class="meta-lbl">Time Spent (Paisa Barbaad)</span>
+            </div>
+          </div>
+          <div class="cert-seal-row">
+            <div class="seal-mark">SEAL OF VASOOLI 👹</div>
+            <div class="sig-block">
+              <div class="sig-line"><i>Babu Rao Ganpatrao Apte</i></div>
+              <div class="sig-title">Dean of Chaos & Chai Break</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="suffer-again-btn" id="suffer-again-btn">
+        👹 Ek Aur Baar Dukh Jhelo (Abhi Maza Aayega Na Bhidu!)
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="sound.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Babu Rao Memorial Portal 👹 | Login From Hell v2.0</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👹</text></svg>">
+  <style>
+﻿/* ==============================================================================
+   BABU RAO MEME PORTAL - Master Stylesheet (style.css)
+   Clean, Readable, Fun Bollywood Comic Aesthetic
+   ============================================================================== */
+
+:root {
+  --bg-main: #0b0f19;
+  --bg-card: #151d2f;
+  --bg-card-alt: #1e293b;
+  --primary-gold: #f59e0b;
+  --accent-gold-bright: #fbbf24;
+  --danger-crimson: #ef4444;
+  --success-emerald: #10b981;
+  --text-light: #f8fafc;
+  --text-dim: #94a3b8;
+  --border-color: #334155;
+  --border-gold: #d97706;
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-comic: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+  --font-impact: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body.portal-body {
+  background-color: var(--bg-main);
+  background-image: 
+    radial-gradient(#1e293b 1px, transparent 1px),
+    radial-gradient(#1e293b 1px, var(--bg-main) 1px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  color: var(--text-light);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 60px;
+}
+
+/* ------------------------------------------------------------------------------
+   1. TOP NEWS MARQUEE
+   ------------------------------------------------------------------------------ */
+.top-news-ticker {
+  display: flex;
+  align-items: center;
+  background: #78350f;
+  background: linear-gradient(90deg, #991b1b, #b45309, #78350f);
+  border-bottom: 2px solid var(--primary-gold);
+  color: #fff;
+  font-size: 0.95rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.ticker-tag {
+  background: var(--primary-gold);
+  color: #000;
+  font-family: var(--font-impact);
+  letter-spacing: 1px;
+  padding: 6px 16px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  box-shadow: 3px 0 8px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+
+.news-marquee {
+  padding: 6px 0;
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------------------
+   2. TOP NAV STATUS BAR
+   ------------------------------------------------------------------------------ */
+.top-nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 24px;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.session-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1e1e2d;
+  border: 1px solid var(--danger-crimson);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+}
+
+.session-pill.pulse-alarm {
+  animation: alarm-shake 0.3s infinite alternate;
+}
+
+@keyframes alarm-shake {
+  0% { border-color: var(--danger-crimson); background: #3f1212; }
+  100% { border-color: var(--primary-gold); background: #1e1e2d; }
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger-crimson);
+  box-shadow: 0 0 8px var(--danger-crimson);
+  animation: blink-dot 1s infinite;
+}
+
+@keyframes blink-dot {
+  50% { opacity: 0.3; }
+}
+
+.seh-lenge-btn {
+  background: var(--danger-crimson);
+  color: #fff;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.seh-lenge-btn:hover {
+  transform: scale(1.08);
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.hint-pill-btn, .sound-toggle-btn {
+  background: var(--bg-card-alt);
+  color: var(--accent-gold-bright);
+  border: 1px solid var(--border-gold);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.hint-pill-btn:hover, .sound-toggle-btn:hover {
+  background: var(--primary-gold);
+  color: #000;
+}
+
+/* ------------------------------------------------------------------------------
+   3. FLOATING BAD UI & MEME SCORE BADGE
+   ------------------------------------------------------------------------------ */
+.meme-score-badge {
+  position: fixed;
+  top: 75px;
+  right: 20px;
+  width: 220px;
+  background: var(--bg-card);
+  border: 2px solid var(--primary-gold);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  transition: transform 0.2s ease;
+}
+.meme-score-badge:hover {
+  transform: translateY(-2px);
+}
+
+.badge-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.badge-trophy {
+  font-family: var(--font-impact);
+  font-size: 0.95rem;
+  color: var(--primary-gold);
+}
+.badge-score {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--success-emerald);
+}
+
+.badge-progress-bg {
+  height: 8px;
+  background: #334155;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.badge-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--danger-crimson), var(--primary-gold));
+  transition: width 0.3s ease;
+}
+
+.badge-remark {
+  font-size: 0.8rem;
+  color: var(--accent-gold-bright);
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.badge-substats {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.inspect-violations-btn {
+  width: 100%;
+  background: #334155;
+  color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.inspect-violations-btn:hover {
+  background: #475569;
+}
+
+/* ------------------------------------------------------------------------------
+   4. MAIN CONTAINER & LOGIN CARD
+   ------------------------------------------------------------------------------ */
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 16px;
+}
+
+.portal-card {
+  width: 100%;
+  max-width: 580px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-gold);
+  border-radius: 16px;
+  padding: 32px 28px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.15);
+  position: relative;
+}
+
+/* WOBBLING RETRO MEME STAMP */
+.wobble-stamp {
+  position: absolute;
+  top: -14px;
+  right: -12px;
+  background: var(--danger-crimson);
+  color: #fff;
+  border: 2px dashed #fef08a;
+  padding: 4px 12px;
+  font-family: var(--font-impact);
+  font-size: 0.85rem;
+  border-radius: 6px;
+  transform: rotate(10deg);
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  pointer-events: none;
+  animation: stamp-wiggle 3s infinite ease-in-out alternate;
+}
+.wobble-stamp small {
+  font-size: 0.68rem;
+  display: block;
+  color: #fef08a;
+}
+@keyframes stamp-wiggle {
+  0% { transform: rotate(8deg); }
+  100% { transform: rotate(13deg) scale(1.04); }
+}
+
+/* CARD HEADER */
+.card-header {
+  text-align: center;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 20px;
+  margin-bottom: 22px;
+}
+
+.college-emblem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+.emblem-emoji {
+  font-size: 2.8rem;
+}
+.emblem-text {
+  font-family: var(--font-impact);
+  letter-spacing: 1px;
+  font-size: 1.05rem;
+  color: var(--primary-gold);
+}
+.emblem-affil {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.portal-heading {
+  font-family: var(--font-impact);
+  font-size: 2rem;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  margin-bottom: 4px;
+}
+
+.portal-subheading {
+  font-size: 0.85rem;
+  color: var(--accent-gold-bright);
+  font-style: italic;
+}
+
+/* TROLL BANNER */
+.troll-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--danger-crimson);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+.troll-icon {
+  font-size: 1.8rem;
+}
+.troll-content b {
+  color: #fca5a5;
+  display: block;
+  font-size: 0.95rem;
+}
+.troll-content p {
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+.close-troll-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #fca5a5;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* FORM FIELDS */
+.field-group {
+  margin-bottom: 22px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.field-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+.req-star {
+  color: var(--danger-crimson);
+}
+
+.mini-tool-btn, .eye-reveal-btn {
+  background: #1e293b;
+  color: var(--accent-gold-bright);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mini-tool-btn:hover, .eye-reveal-btn:hover {
+  background: var(--primary-gold);
+  color: #000;
+}
+
+.input-container {
+  position: relative;
+}
+
+.field-input {
+  width: 100%;
+  background: #0f172a;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+/* Dynamic Reaction Box */
+.input-reaction-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #0f172a;
+  border-left: 3px solid var(--primary-gold);
+  padding: 6px 10px;
+  border-radius: 0 6px 6px 0;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+.reaction-emoji {
+  font-size: 1.1rem;
+}
+.reaction-text {
+  color: #cbd5e1;
+  font-style: italic;
+}
+
+/* PASSWORD CHECKLIST */
+.pass-checklist-card {
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 10px;
+}
+.checklist-header {
+  font-size: 0.82rem;
+  color: var(--accent-gold-bright);
+  margin-bottom: 8px;
+}
+.checklist-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.chk-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+.chk-item.chk-pass {
+  color: var(--success-emerald);
+}
+.chk-item.chk-fail {
+  color: #f87171;
+}
+.chk-item i {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* CHECKBOX ROW */
+.checkbox-row {
+  margin-bottom: 18px;
+}
+.custom-checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.custom-checkbox-container input {
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--primary-gold);
+}
+.checkbox-label-text {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+/* LINKS BAR */
+.portal-links-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  font-size: 0.82rem;
+}
+.forgot-link {
+  color: #38bdf8;
+  text-decoration: none;
+}
+.forgot-link:hover {
+  text-decoration: underline;
+}
+.signup-decoy {
+  color: var(--text-dim);
+}
+.signup-link {
+  color: var(--primary-gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+/* SUBMIT ARENA & BUTTON */
+.submit-arena {
+  position: relative;
+  min-height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.babu-submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #ffffff;
+  border: 2px solid var(--accent-gold-bright);
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-family: var(--font-impact);
+  font-size: 1.25rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.babu-submit-btn:hover {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+}
+
+/* CHAI BREAK JOKE WIDGET */
+.joke-widget-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+}
+.joke-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--primary-gold);
+}
+.next-joke-btn {
+  background: #1e293b;
+  color: #fff;
+  border: 1px solid var(--border-color);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.next-joke-btn:hover {
+  background: var(--primary-gold);
+  color: #000;
+}
+.joke-text {
+  font-size: 0.88rem;
+  color: #e2e8f0;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------------------------------
+   5. EVASIVE HELP BUTTON
+   ------------------------------------------------------------------------------ */
+.evasive-help-pill {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--danger-crimson);
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 24px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  z-index: 90;
+  transition: top 0.25s ease, left 0.25s ease;
+}
+
+/* ------------------------------------------------------------------------------
+   6. FLOATING TOAST
+   ------------------------------------------------------------------------------ */
+.meme-toast {
+  position: fixed;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e1e2d;
+  color: var(--primary-gold);
+  border: 2px solid var(--primary-gold);
+  border-radius: 30px;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  animation: toast-drop 0.25s ease;
+}
+@keyframes toast-drop {
+  from { transform: translate(-50%, -20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* ------------------------------------------------------------------------------
+   7. MODALS
+   ------------------------------------------------------------------------------ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-gold);
+  border-radius: 14px;
+  max-width: 520px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+  position: relative;
+}
+
+.modal-tag {
+  display: inline-block;
+  background: var(--primary-gold);
+  color: #000;
+  font-family: var(--font-impact);
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.modal-h2 {
+  font-family: var(--font-impact);
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.modal-p {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-btn-close, .modal-btn-later {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+}
+.modal-btn-close {
+  background: #334155;
+  color: #fff;
+}
+.modal-btn-later {
+  background: var(--primary-gold);
+  color: #000;
+}
+
+/* FORGOT PASSWORD CHOICES */
+.forgot-choice-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.forgot-opt-btn {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+.btn-yes { background: #1e293b; color: #94a3b8; }
+.btn-no { background: #1e293b; color: #38bdf8; }
+.btn-oracle {
+  background: linear-gradient(90deg, #b45309, #d97706);
+  color: #fff;
+  font-family: var(--font-impact);
+  font-size: 1.05rem;
+  text-align: center;
+  border-color: var(--primary-gold);
+  animation: pulse-glow 1.5s infinite alternate;
+}
+@keyframes pulse-glow {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+  100% { transform: scale(1.02); box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); }
+}
+
+/* LOADING MODAL */
+.loading-card {
+  text-align: center;
+  max-width: 400px;
+}
+.meme-spinner {
+  font-size: 3.5rem;
+  animation: spin-meme 2s infinite linear;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+@keyframes spin-meme {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.loading-title {
+  font-family: var(--font-impact);
+  font-size: 1.3rem;
+  color: var(--primary-gold);
+  margin-bottom: 6px;
+}
+.loading-step-text {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.loading-track {
+  width: 100%;
+  height: 10px;
+  background: #334155;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.loading-fill {
+  width: 15%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--danger-crimson), var(--primary-gold));
+  transition: width 0.3s ease;
+}
+
+/* CHEAT SHEET MODAL */
+.passcode-pills {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.copy-passcode {
+  background: #0f172a;
+  border: 1px solid var(--primary-gold);
+  color: var(--accent-gold-bright);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+/* INSPECTOR MODAL */
+.inspector-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.close-x-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.crimes-list {
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.crime-box {
+  background: #0f172a;
+  border-left: 4px solid var(--primary-gold);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.82rem;
+}
+.crime-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-right: 6px;
+  color: #fff;
+}
+.crime-tag.red { background: var(--danger-crimson); }
+.crime-tag.orange { background: #f97316; }
+.crime-tag.yellow { background: var(--primary-gold); color: #000; }
+.crime-tag.purple { background: #8b5cf6; }
+.crime-tag.green { background: var(--success-emerald); }
+
+/* ------------------------------------------------------------------------------
+   8. VICTORY SCREEN & DEGREE CERTIFICATE
+   ------------------------------------------------------------------------------ */
+.victory-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(11, 15, 25, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.certificate-container {
+  max-width: 680px;
+  width: 100%;
+  text-align: center;
+}
+
+.victory-emojis {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.victory-headline {
+  font-family: var(--font-impact);
+  font-size: 2.2rem;
+  color: var(--primary-gold);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.victory-punchline {
+  font-size: 1rem;
+  color: #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.degree-certificate {
+  background: #fefce8;
+  color: #1e293b;
+  border: 10px double #b45309;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  margin-bottom: 24px;
+  text-align: center;
+  position: relative;
+}
+
+.cert-header {
+  font-family: var(--font-impact);
+  font-size: 1.4rem;
+  color: #78350f;
+  letter-spacing: 1px;
+}
+
+.cert-subtitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #92400e;
+  border-bottom: 2px solid #b45309;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.cert-body {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #334155;
+  margin-bottom: 18px;
+}
+
+.cert-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  background: #fef3c7;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+
+.cert-meta-item {
+  display: flex;
+  flex-direction: column;
+}
+.meta-val {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #b45309;
+}
+.meta-lbl {
+  font-size: 0.68rem;
+  color: #78350f;
+  font-weight: 600;
+}
+
+.cert-seal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 10px;
+}
+.seal-mark {
+  font-family: var(--font-impact);
+  color: #dc2626;
+  border: 2px solid #dc2626;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  transform: rotate(-6deg);
+}
+.sig-line {
+  font-family: "Brush Script MT", cursive;
+  font-size: 1.4rem;
+  color: #1e293b;
+}
+.sig-title {
+  font-size: 0.7rem;
+  color: #64748b;
+  border-top: 1px solid #94a3b8;
+  padding-top: 2px;
+}
+
+.suffer-again-btn {
+  background: var(--danger-crimson);
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-family: var(--font-impact);
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+  transition: transform 0.2s;
+}
+.suffer-again-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ------------------------------------------------------------------------------
+   9. RESPONSIVE BREAKPOINTS
+   ------------------------------------------------------------------------------ */
+@media (max-width: 680px) {
+  .top-nav-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .meme-score-badge {
+    position: static;
+    width: 100%;
+    margin: 10px 0;
+  }
+  .portal-card {
+    padding: 24px 16px;
+  }
+  .cert-meta-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .evasive-help-pill {
+    bottom: 16px;
+    right: 16px;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+</style>
+</head>
+<body class="portal-body">
+
+  <!-- =====================================================================
+       TOP MARQUEE: DESI CAMPUS NEWS & JOKES
+       ===================================================================== -->
+  <header class="top-news-ticker">
+    <div class="ticker-tag">📢 CAMPUS KHABAR</div>
+    <marquee behavior="scroll" direction="left" scrollamount="8" class="news-marquee">
+      🔥 <b>OFFICIAL:</b> Canteen mein Maggie banned hai, ab sirf Zeher milega! 💥 "25 DIN MEIN DEGREE DOUBLE" scheme cancelled by Dean Babu Rao. ⚠️ CONTROL MAJNU CONTROL! Password galat daala toh roll number cancel! 💩 Jethalal se jalebi fafda mangwao pehle! 🚨 "SEH LENGE THODA" - Official College Motto! 📢 150 RUPIYA BHI NAHI DEGA! 🤣 Kal Viva hai, sab Yamraj ki kripa se aana! 🔥
+    </marquee>
+  </header>
+
+  <!-- =====================================================================
+       TOP STATUS BAR: SESSION COUNTDOWN & CONTROLS
+       ===================================================================== -->
+  <div class="top-nav-bar">
+    <div class="session-pill" id="session-box">
+      <span class="pulse-dot"></span>
+      <span>Session Gayab Hoga: <b id="session-timer">00:10</b> <small>(Paisa Barbaad!)</small></span>
+      <button class="seh-lenge-btn" id="panic-btn" title="Click karo dard baatne ke liye">Seh Lenge Thoda 🥲</button>
+    </div>
+
+    <div class="top-actions">
+      <button class="hint-pill-btn" id="cheat-hint-btn">💡 Passcode Cheat Code</button>
+      <button class="sound-toggle-btn" id="sound-toggle">🔊 Audio: ON</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       FLOATING BAD UI & MEME SCORE BADGE (COMPETITION FEATURE)
+       ===================================================================== -->
+  <aside class="meme-score-badge" id="score-badge">
+    <div class="badge-title-row">
+      <span class="badge-trophy">🏆 BAD UI SCORE</span>
+      <span class="badge-score"><span id="score-val">98</span>/100</span>
+    </div>
+    <div class="badge-progress-bg">
+      <div class="badge-progress-fill" id="score-bar" style="width: 98%;"></div>
+    </div>
+    <div class="badge-remark" id="score-comment">"Ye Badiya Tha Guru!"</div>
+    <div class="badge-substats">
+      <span>Jokes Cracked: <b id="joke-counter">0</b></span> • 
+      <span>Dodges: <b id="dodge-counter">0</b></span>
+    </div>
+    <button class="inspect-violations-btn" id="inspect-btn">
+      📜 Inspect UX Crimes & Laws
+    </button>
+  </aside>
+
+  <!-- =====================================================================
+       MAIN WRAPPER: LOGIN PORTAL & JOKE BOX
+       ===================================================================== -->
+  <main class="main-container">
+
+    <!-- FLOATING TOAST NOTIFICATION -->
+    <div class="meme-toast" id="meme-toast" style="display: none;">
+      <span class="toast-icon" id="toast-icon">🏃‍♂️</span>
+      <span class="toast-msg" id="toast-msg">Bhaag Milkha Bhaag!</span>
+    </div>
+
+    <!-- THE LOGIN CARD -->
+    <section class="portal-card" id="main-card">
+      <div class="wobble-stamp">100% VASOOLI<br><small>Approved by Babu Rao</small></div>
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="college-emblem">
+          <span class="emblem-emoji">👹</span>
+          <span class="emblem-text">SHRI BABU RAO MEMORIAL INSTITUTE OF VASOOLI (SBMIV)</span>
+          <span class="emblem-affil">Affiliated to Yamraj Council for Technical Education (YCTE) • Est. 150 B.C.</span>
+        </div>
+        <h1 class="portal-heading">STUDENT LOGIN PORTAL 2.0</h1>
+        <p class="portal-subheading">"Ricks Nahi Lene Ka, Chup Chap Login Karne Ka" — Official Student Gateway</p>
+      </div>
+
+      <!-- Error / Troll Notification Banner -->
+      <div class="troll-banner" id="troll-banner" style="display: none;">
+        <span class="troll-icon">🛑</span>
+        <div class="troll-content">
+          <b id="troll-title">ERROR 420: Tumse Na Ho Payega!</b>
+          <p id="troll-desc">Babu Rao said the server is on a chai break. Ek aur baar try karo hero!</p>
+        </div>
+        <button class="close-troll-btn" id="close-troll-btn">✕</button>
+      </div>
+
+      <!-- THE FORM -->
+      <form id="babu-login-form" novalidate autocomplete="off">
+
+        <!-- 1. ROLL NUMBER / USERNAME -->
+        <div class="field-group">
+          <div class="label-row">
+            <label for="username" class="field-label">
+              🎓 Roll Number / Student ID <span class="req-star">*</span>
+            </label>
+            <button type="button" class="mini-tool-btn" id="random-bahana-btn" title="Ek mast bahana generate karo">
+              🎲 Random Bahana Generator
+            </button>
+          </div>
+
+          <div class="input-container">
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              class="field-input" 
+              placeholder="e.g. 21BECE069 (Ya Sharma ji ke bete ka roll number)"
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- Dynamic Babu Rao Reaction to Username -->
+          <div class="input-reaction-box" id="user-reaction-box">
+            <span class="reaction-emoji" id="user-reaction-emoji">👴</span>
+            <span class="reaction-text" id="user-reaction-text">Babu Rao: "Roll number dalo, tab tak main chai peeta hoon!"</span>
+          </div>
+        </div>
+
+        <!-- 2. PASSWORD FIELD -->
+        <div class="field-group">
+          <div class="label-row">
+            <label for="password" class="field-label">
+              🔑 Gupt Password <span class="req-star">*</span>
+            </label>
+            <button type="button" class="eye-reveal-btn" id="eye-toggle-btn">
+              👁️ Dekh Raha Hai Vinod?
+            </button>
+          </div>
+
+          <div class="input-container">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="field-input" 
+              placeholder="Passcode daalo (Babu Rao ke 7 Niyam)"
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- PASSWORD COMMANDMENTS (CLEAR, READABLE & FUNNY) -->
+          <div class="pass-checklist-card" id="pass-checklist">
+            <div class="checklist-header">
+              📜 <b>Babu Rao's 7 Commandments for Password:</b>
+            </div>
+            <ul class="checklist-items">
+              <li id="chk-len" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 8 characters <i>(Thoda toh sharam karo)</i></li>
+              <li id="chk-upper" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 CAPITAL letter <i>(Jaise Papa ka gussa)</i></li>
+              <li id="chk-lower" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 lowercase letter <i>(Jaise tumhari self-esteem)</i></li>
+              <li id="chk-num" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 number <i>(0-9, backlogs mat daalna)</i></li>
+              <li id="chk-sym" class="chk-item chk-fail"><span class="chk-icon">❌</span> At least 1 symbol <i>(!@#$% life ke confusion jaisa)</i></li>
+              <li id="chk-no-a" class="chk-item chk-pass"><span class="chk-icon">✅</span> <b>STRICTLY NO letter "A" or "a"</b> <i>('A' for Aukaat BANNED!)</i></li>
+              <li id="chk-emoji" class="chk-item chk-fail"><span class="chk-icon">❌</span> <b>At least 1 Emoji</b> <i>(e.g. 🔥, 🤡, 👹, 💀, 💩)</i></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 3. REMEMBER ME -->
+        <div class="checkbox-row">
+          <label class="custom-checkbox-container" for="remember-me">
+            <input type="checkbox" id="remember-me">
+            <span class="checkmark"></span>
+            <span class="checkbox-label-text">
+              Babu Rao ko raat 3 baje call karke puchna: <i>"Aye Devva! Star Fisheries kahan hai?"</i>
+            </span>
+          </label>
+        </div>
+
+        <!-- 4. FORGOT PASSWORD & SIGNUP MISLEADING LINKS -->
+        <div class="portal-links-bar">
+          <a href="#" class="forgot-link" id="forgot-link">Password Bhool Gaye? (Ghajini Mode Activate) 🧠</a>
+          <span class="signup-decoy">
+            Naya Bakra? <a href="#" class="signup-link" id="signup-decoy-link">Sign Up (Nahi Dunga)</a>
+          </span>
+        </div>
+
+        <!-- 5. LOGIN ACTION BUTTON AREA -->
+        <div class="submit-arena" id="submit-arena">
+          <button type="submit" class="babu-submit-btn" id="login-submit-btn">
+            Login Karo (Ricks Nahi Lene Ka)
+          </button>
+        </div>
+
+      </form>
+
+      <!-- 6. CHAI BREAK JOKE BOX (BUILT-IN JOKE GENERATOR) -->
+      <div class="joke-widget-box">
+        <div class="joke-widget-header">
+          <span>☕ <b>Chai & Sutta Break Jokes</b> (Desi College Specials)</span>
+          <button type="button" class="next-joke-btn" id="next-joke-btn">Naya Joke Sunao 😂</button>
+        </div>
+        <p class="joke-text" id="joke-display">
+          "Engineering student ne blood test karwaya... Doctor bola: 'Khoon mein 70% caffeine, 20% stress aur 10% backlog paya gaya hai!'"
+        </p>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       MOVING HELP CONCIERGE: "HELP CHAHIYE?"
+       ===================================================================== -->
+  <button class="evasive-help-pill" id="evasive-help-btn" title="Click karo agar pakad sakte ho">
+    Help Chahiye? 🆘
+  </button>
+
+  <!-- =====================================================================
+       POPUP #1: LAXMI CHIT FUND 25 DIN MEIN DEGREE DOUBLE
+       ===================================================================== -->
+  <div class="modal-overlay" id="scheme-popup" style="display: none;">
+    <div class="modal-card wobble-modal">
+      <div class="modal-tag">🎉 LAXMI CHIT FUND SPECIAL BROADCAST 🎉</div>
+      <h2 class="modal-h2">MUBARAK HO! 25 Din Mein Degree Double!</h2>
+      <p class="modal-p">
+        Aapko officially select kiya gaya hai <b>ABSOLUTELY NOTHING</b> ke liye!<br>
+        Babu Rao aur Kachra Seth ki taraf se aapko milta hai <b>Zero (0) Rupaye</b> aur ek "Gajab Beizzati" certificate!
+      </p>
+      <div class="modal-buttons" id="popup-btn-row">
+        <button class="modal-btn-close" id="close-scheme-btn">Chup Chap Band Kar</button>
+        <button class="modal-btn-later" id="later-scheme-btn">150 Rupiya Dega (Maybe Later)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #2: FORGOT PASSWORD (GHAJINI DILEMMA)
+       ===================================================================== -->
+  <div class="modal-overlay" id="forgot-modal" style="display: none;">
+    <div class="modal-card forgot-modal-card">
+      <div class="modal-tag">❓ GHAJINI CONFIRMATION DIALOG ❓</div>
+      <h2 class="modal-h2">Are you REALLY sure you forgot your password?</h2>
+      <p class="modal-p">
+        Sach mein bhool gaye ho ya fir kal subah 8:00 AM ke Viva aur Assignment submission se bachne ka bahana bana rahe ho?
+      </p>
+      <div class="forgot-choice-stack">
+        <button class="forgot-opt-btn btn-yes" id="forgot-yes-btn">Yes (Haan, main Ghajini hoon)</button>
+        <button class="forgot-opt-btn btn-no" id="forgot-no-btn">No (Nahi, abhi yaad aa gaya)</button>
+        <button class="forgot-opt-btn btn-oracle" id="forgot-oracle-btn">
+          ✨ KYA GUNDA BANEGA RE TU (Ask Babu Rao Oracle) ✨
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #3: FAKE LOADING PROGRESS OVERLAY
+       ===================================================================== -->
+  <div class="modal-overlay" id="loading-modal" style="display: none;">
+    <div class="modal-card loading-card">
+      <div class="meme-spinner">👹</div>
+      <h3 class="loading-title">PROCESSING YOUR SUFFERING...</h3>
+      <p class="loading-step-text" id="loading-step-text">Babu Rao se chashma maang rahe hain...</p>
+      <div class="loading-track">
+        <div class="loading-fill" id="loading-fill-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #4: CHEAT CODE HELPER FOR JUDGES
+       ===================================================================== -->
+  <div class="modal-overlay" id="cheat-modal" style="display: none;">
+    <div class="modal-card cheat-card">
+      <div class="modal-tag">🔑 JUDGES CHEAT SHEET & WORKING PASSCODE</div>
+      <h2 class="modal-h2">How to Conquer the Login (Babu Rao Edition)</h2>
+      <div class="cheat-content">
+        <p><b>1. Roll Number:</b> Enter anything (e.g. <code>KachraSeth</code>, <code>MunnaBhai</code>, or <code>BabuRao</code>).</p>
+        <p><b>2. Working Passcodes (Guaranteed to Pass):</b></p>
+        <div class="passcode-pills">
+          <code class="copy-passcode" id="code-sample-1">P$ssw0rd1🔥</code>
+          <code class="copy-passcode" id="code-sample-2">BabuRao1🔥</code>
+          <code class="copy-passcode" id="code-sample-3">HeraPheri99💀</code>
+        </div>
+        <p><i>Notice: None of these contain the letter 'A' or 'a', and each has $\ge 8$ chars, numbers, symbols, uppercase, lowercase, and an emoji!</i></p>
+        <p><b>3. Submit:</b> The button will attempt to dodge your mouse once. Click it twice (first attempt triggers the hilarious "Tumse Na Ho Payega" troll!).</p>
+      </div>
+      <button class="modal-btn-close" id="close-cheat-btn">Got It, Let's Play!</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POPUP #5: COMPETITION INSPECTOR (UX VIOLATIONS DOSSIER)
+       ===================================================================== -->
+  <div class="modal-overlay" id="inspector-modal" style="display: none;">
+    <div class="modal-card inspector-card">
+      <div class="inspector-header-row">
+        <h2>🏆 BAD UI COMPETITION CRIMES DOSSIER</h2>
+        <button class="close-x-btn" id="close-inspector-x">✖</button>
+      </div>
+      <p class="inspector-sub">Inventory of UX Heuristics & Laws Deliberately Broken for Comedic Brilliance:</p>
+      <div class="crimes-list">
+        <div class="crime-box">
+          <span class="crime-tag red">Nielsen #1</span>
+          <b>Visibility of System Status:</b>
+          <p>Session timer countdown hits 00:00 and continuously loops back to 00:10 ("Paisa Barbaad!"), creating perpetual false urgency.</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag orange">Fitts's Law</span>
+          <b>Evasive & Shifting Targets:</b>
+          <p>Login button and Help pill shift away on cursor approach, intentionally testing motor control and comedic patience.</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag yellow">Nielsen #5</span>
+          <b>Error Prevention Inverted:</b>
+          <p>Strictly banning common vowel 'A' and revealing strict emoji requirements only as user types, provoking comedic errors.</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag purple">Nielsen #9</span>
+          <b>Error Recovery Satire:</b>
+          <p>The first valid login is arbitrarily rejected with "Error 420: Tumse Na Ho Payega! System is on chai break."</p>
+        </div>
+        <div class="crime-box">
+          <span class="crime-tag green">Dark Patterns</span>
+          <b>Confirmshaming & Decoys:</b>
+          <p>Forgot password modal with tiny "Yes (I am Ghajini)" vs giant "Ask the Oracle"; non-functioning disabled signup links.</p>
+        </div>
+      </div>
+      <button class="modal-btn-close" id="close-inspector-btn">Close Dossier (Khatam Tata Bye Bye)</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       VICTORY SCREEN: SHABASH! YOU SURVIVED THE LOGIN!
+       ===================================================================== -->
+  <div class="victory-screen" id="victory-screen" style="display: none;">
+    <div class="certificate-container">
+      <div class="victory-emojis">🎊 🕺 🏆 👹 🔥 🤡 🎉 📜</div>
+      <h1 class="victory-headline">🎊 SHABASH! YOU SURVIVED THE LOGIN! 🎊</h1>
+      <p class="victory-punchline">
+        Babu Rao: <i>"Aye Devva! Khopdi tod saale ka! Aakhirkar tumne bina backlog ke login kar hi liya!"</i>
+      </p>
+
+      <!-- OFFICIAL MEME DEGREE CERTIFICATE -->
+      <div class="degree-certificate">
+        <div class="cert-border">
+          <div class="cert-header">SHRI BABU RAO MEMORIAL INSTITUTE OF VASOOLI</div>
+          <div class="cert-subtitle">OFFICIAL CERTIFICATE OF DIGITAL SURVIVAL & PATIENCE</div>
+          <p class="cert-body">
+            This is to certify that <b><span id="cert-user-name">Kachra Seth</span></b> has successfully defeated 
+            all 7 Passcode Commandments, evaded running buttons, endured 10-second infinite countdowns, 
+            and survived the most hilariously irritating login portal in human history.
+          </p>
+          <div class="cert-meta-grid">
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-score">98</span>
+              <span class="meta-lbl">Final Bad UI Score</span>
+            </div>
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-dodges">0</span>
+              <span class="meta-lbl">Button Dodges Evaded</span>
+            </div>
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-jokes">0</span>
+              <span class="meta-lbl">Jokes Enjoyed</span>
+            </div>
+            <div class="cert-meta-item">
+              <span class="meta-val" id="cert-time">0s</span>
+              <span class="meta-lbl">Time Spent (Paisa Barbaad)</span>
+            </div>
+          </div>
+          <div class="cert-seal-row">
+            <div class="seal-mark">SEAL OF VASOOLI 👹</div>
+            <div class="sig-block">
+              <div class="sig-line"><i>Babu Rao Ganpatrao Apte</i></div>
+              <div class="sig-title">Dean of Chaos & Chai Break</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="suffer-again-btn" id="suffer-again-btn">
+        👹 Ek Aur Baar Dukh Jhelo (Abhi Maza Aayega Na Bhidu!)
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+﻿/**
+ * ==============================================================================
+ * BABU RAO MEME PORTAL - Sound Synthesizer (sound.js)
+ * Zero external audio files. Synthesized entirely with Web Audio API.
+ * ==============================================================================
+ */
+class MemeAudio {
+  constructor() {
+    this.ctx = null;
+    this.isMuted = false;
+
+    const unlock = () => {
+      if (!this.ctx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) this.ctx = new AudioContext();
+      } else if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+    window.addEventListener('click', unlock);
+    window.addEventListener('keydown', unlock);
+  }
+
+  ensureContext() {
+    if (!this.ctx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) this.ctx = new AudioContext();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    return this.ctx;
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    return this.isMuted;
+  }
+
+  // Dramatic Bollywood Soap Opera "DHUM TANA NA NA" Suspense Stabs
+  playDhumTana() {
+    if (this.isMuted || !this.ensureContext()) return;
+    try {
+      const ctx = this.ctx;
+      const now = ctx.currentTime;
+      const stabs = [0, 0.2, 0.4];
+      stabs.forEach((offset, idx) => {
+        const t = now + offset;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        const baseFreq = 100 + idx * 45;
+        osc.frequency.setValueAtTime(baseFreq * 2.2, t);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq, t + 0.15);
+
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.19);
+      });
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+
+  // Comedic Sad Trombone ("Wah-wah-wah-waaaah" - Paisa Barbaad!)
+  playSadTrombone() {
+    if (this.isMuted || !this.ensureContext()) return;
+    try {
+      const ctx = this.ctx;
+      const now = ctx.currentTime;
+      const notes = [
+        { f: 233.08, d: 0.25 }, // Bb3
+        { f: 220.00, d: 0.25 }, // A3
+        { f: 207.65, d: 0.25 }, // Ab3
+        { f: 196.00, d: 0.6, slide: 160 } // G3 sliding down
+      ];
+
+      let t = now;
+      notes.forEach((note) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(note.f, t);
+        if (note.slide) {
+          osc.frequency.linearRampToValueAtTime(note.slide, t + note.d);
+        }
+
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + note.d);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + note.d + 0.05);
+        t += note.d * 0.95;
+      });
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+
+  // Babu Rao Clown Horn ("Honk Honk!")
+  playHonk() {
+    if (this.isMuted || !this.ensureContext()) return;
+    try {
+      const ctx = this.ctx;
+      const now = ctx.currentTime;
+      [320, 440].forEach((freq) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.15, now + 0.1);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.9, now + 0.22);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.23);
+      });
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+
+  // Comedic Boing for button dodge
+  playBoing() {
+    if (this.isMuted || !this.ensureContext()) return;
+    try {
+      const ctx = this.ctx;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.3);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.31);
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+
+  // Victory Fanfare (Shabash!)
+  playVictory() {
+    if (this.isMuted || !this.ensureContext()) return;
+    try {
+      const ctx = this.ctx;
+      const now = ctx.currentTime;
+      const notes = [
+        { f: 261.63, d: 0.14 },
+        { f: 329.63, d: 0.14 },
+        { f: 392.00, d: 0.14 },
+        { f: 523.25, d: 0.35 },
+        { f: 440.00, d: 0.14 },
+        { f: 523.25, d: 0.55 }
+      ];
+      let t = now;
+      notes.forEach((note) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(note.f, t);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + note.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + note.d + 0.05);
+        t += note.d * 0.95;
+      });
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+
+  // Click tick
+  playTick() {
+    if (this.isMuted || !this.ensureContext()) return;
+    try {
+      const ctx = this.ctx;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(950, now);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.035);
+    } catch (e) {
+      console.warn(e);
+    }
+  }
+}
+
+window.memeAudio = new MemeAudio();
+
+
+﻿/**
+ * ==============================================================================
+ * BABU RAO MEME PORTAL - Application Logic (app.js)
+ * Pure Vanilla JavaScript. Packed with Jokes & Bollywood Memes.
+ * ==============================================================================
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ----------------------------------------------------------------------------
+  // APPLICATION STATE
+  // ----------------------------------------------------------------------------
+  const state = {
+    badUiScore: 98,
+    dodgeCount: 0,
+    maxDodges: 2, // Only dodge twice so UI is fun and NOT irritating!
+    jokesRead: 1,
+    isFirstSubmitBlocked: true,
+    hasTypedPassword: false,
+    soundEnabled: true,
+    sessionSeconds: 10,
+    startTime: Date.now()
+  };
+
+  // ----------------------------------------------------------------------------
+  // HINDI MEME & ENGINEERING JOKES LIBRARY (15+ Classic Desi Jokes)
+  // ----------------------------------------------------------------------------
+  const hindiJokes = [
+    "Engineering student ne blood test karwaya... Doctor bola: 'Khoon mein 70% caffeine, 20% stress aur 10% backlog paya gaya hai!'",
+    "Professor: 'Kal viva hai, sab padhke aana!' Student: 'Sir padh toh lenge, par samajh aane ki guarantee Yamraj bhi nahi de sakta!'",
+    "Interviewer: '5 saal mein khud ko kahan dekhte ho?' Student: 'Zinda... bas zinda rehna chahta hoon sir!'",
+    "Babu Rao: 'Utha le re baba utha le... mere ko nahi, is semester ke question paper banane waale ko utha le!'",
+    "Panchayat Sachiv ji: 'Dekh rahe ho Binod, kaise bina kisi framework ke full HTML/CSS/JS pe portal chalaya ja raha hai!'",
+    "Majnu Bhai: 'Ye login button itna bhaag raha hai jaise meri ghode wali painting auction se bhaag gayi ho!'",
+    "Jethalal: 'Chai piyo, biscuit khao... password bhool gaye ho toh Daya bhabhi se Garba karwao!'",
+    "Papa: 'Beta result kaisa aaya?' Beta: 'Papa, Sharma ji ke bete ke 98% aaye hain!' Papa: 'Aur tere?' Beta: 'Main toh result dekhne hi nahi gaya, nazar na lag jaye!'",
+    "Babu Rao to Kachra Seth: 'Dedh sau rupiya dega toh login karwaunga, varna seedha Star Fisheries bhej dunga!'",
+    "Student to HOD: 'Sir assignment submit karne ki last date kab hai?' HOD: 'Pichle hafte thi!' Student: 'Chalo badhiya, tension khatam!'",
+    "Doctor: 'Aapko aaram ki sakht zaroorat hai!' Engineering student: 'Doctor sahab, degree ke baad aaram hi aaram hai... ya fir berozgari!'",
+    "Munna Bhai to Circuit: 'Ye password yaad rakhne ka koi chemical locha hai kya?' Circuit: 'Bhai, seedha Dean ko bolte hain na roll number hi password bana de!'",
+    "Exam Hall Notice: 'Cheating is prohibited.' Student: 'Agar aati hoti toh aapki notice thodi na padh rahe hote!'",
+    "Vasooli Bhai: 'Apun ko 100% attendance mangta hai!' Student: 'Bhai, Yamraj ko bolo na ek extra janam de de engineering ke liye!'",
+    "Babu Rao: 'Khopdi tod saale ka! Ek button pe click karne ke liye 4 saal ka B.Tech degree maang raha hai!'"
+  ];
+
+  let currentJokeIndex = 0;
+  const jokeDisplayEl = document.getElementById("joke-display");
+  const nextJokeBtn = document.getElementById("next-joke-btn");
+  const jokeCounterEl = document.getElementById("joke-counter");
+
+  function showNextJoke() {
+    currentJokeIndex = (currentJokeIndex + 1) % hindiJokes.length;
+    if (jokeDisplayEl) {
+      jokeDisplayEl.textContent = `"${hindiJokes[currentJokeIndex]}"`;
+    }
+    state.jokesRead++;
+    if (jokeCounterEl) jokeCounterEl.textContent = state.jokesRead;
+    addScore(2, "Enjoyed a campus chai break joke");
+    if (window.memeAudio) window.memeAudio.playTick();
+    showToast("😂 Naya joke unlocked!");
+  }
+
+  if (nextJokeBtn) nextJokeBtn.addEventListener("click", showNextJoke);
+
+  // ----------------------------------------------------------------------------
+  // RANDOM BAHANA GENERATOR
+  // ----------------------------------------------------------------------------
+  const bahanas = [
+    "Kutta assignment kha gaya sir!",
+    "Hostel ka Wi-Fi kabootar le gaya!",
+    "Babu Rao ne bola 'Kal aana!'",
+    "Attendance 74.9% thi isliye sadme mein hoon!",
+    "Sharma ji ke bete ne assignment chura liya!",
+    "Chai peene gaya tha, shaam ho gayi!"
+  ];
+  const randomBahanaBtn = document.getElementById("random-bahana-btn");
+  if (randomBahanaBtn) {
+    randomBahanaBtn.addEventListener("click", () => {
+      const b = bahanas[Math.floor(Math.random() * bahanas.length)];
+      showToast(`🎲 Bahana: "${b}"`);
+      addScore(3, "Generated official college excuse");
+      if (window.memeAudio) window.memeAudio.playBoing();
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // TOAST NOTIFICATIONS
+  // ----------------------------------------------------------------------------
+  const memeToast = document.getElementById("meme-toast");
+  const toastMsg = document.getElementById("toast-msg");
+  let toastTimer = null;
+
+  function showToast(msg, icon = "📢") {
+    if (!memeToast || !toastMsg) return;
+    toastMsg.textContent = msg;
+    const iconEl = document.getElementById("toast-icon");
+    if (iconEl) iconEl.textContent = icon;
+    memeToast.style.display = "flex";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      memeToast.style.display = "none";
+    }, 2800);
+  }
+
+  // ----------------------------------------------------------------------------
+  // SCORE BADGE UPDATES
+  // ----------------------------------------------------------------------------
+  const scoreValEl = document.getElementById("score-val");
+  const scoreBarEl = document.getElementById("score-bar");
+  const scoreCommentEl = document.getElementById("score-comment");
+  const dodgeCounterEl = document.getElementById("dodge-counter");
+
+  const scoreRemarks = [
+    '"Ye Badiya Tha Guru!"',
+    '"Tumse Na Ho Payega"',
+    '"Paisa Barbaad!"',
+    '"Gajab Beizzati Hai Yaar"',
+    '"Control Majnu Control"',
+    '"Seh Lenge Thoda..."',
+    '"Khatam! Tata! Goodbye!"',
+    '"Babu Rao: Khopdi Tod!"'
+  ];
+
+  function addScore(points, reason = "") {
+    state.badUiScore += points;
+    if (scoreValEl) scoreValEl.textContent = state.badUiScore;
+    if (scoreBarEl) {
+      scoreBarEl.style.width = Math.min(state.badUiScore, 140) + "%";
+    }
+    if (scoreCommentEl) {
+      const idx = Math.min(Math.floor((state.badUiScore - 98) / 8), scoreRemarks.length - 1);
+      scoreCommentEl.textContent = scoreRemarks[Math.max(0, idx)];
+    }
+    console.log(`[SCORE +${points}] ${reason} -> ${state.badUiScore}`);
+  }
+
+  // ----------------------------------------------------------------------------
+  // AUDIO TOGGLE
+  // ----------------------------------------------------------------------------
+  const soundToggleBtn = document.getElementById("sound-toggle");
+  if (soundToggleBtn) {
+    soundToggleBtn.addEventListener("click", () => {
+      const isMuted = window.memeAudio.toggleMute();
+      state.soundEnabled = !isMuted;
+      soundToggleBtn.textContent = isMuted ? "🔇 Audio: MUTED" : "🔊 Audio: ON";
+      if (!isMuted) window.memeAudio.playHonk();
+      addScore(2, "Toggled audio settings");
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // SESSION COUNTDOWN (INFINITE 10-SEC LOOP)
+  // ----------------------------------------------------------------------------
+  const sessionTimerEl = document.getElementById("session-timer");
+  const sessionBoxEl = document.getElementById("session-box");
+  const panicBtn = document.getElementById("panic-btn");
+
+  setInterval(() => {
+    state.sessionSeconds--;
+    if (state.sessionSeconds < 0) {
+      state.sessionSeconds = 10;
+      if (sessionBoxEl) {
+        sessionBoxEl.classList.add("pulse-alarm");
+        setTimeout(() => sessionBoxEl.classList.remove("pulse-alarm"), 1200);
+      }
+      if (window.memeAudio) window.memeAudio.playSadTrombone();
+      addScore(4, "Session timer hit 00:00 and looped (Paisa Barbaad!)");
+      showToast("⚠️ 00:10 reset! Paisa barbaad bc!", "⏳");
+    }
+    if (sessionTimerEl) {
+      sessionTimerEl.textContent = `00:${state.sessionSeconds < 10 ? '0' : ''}${state.sessionSeconds}`;
+    }
+  }, 1000);
+
+  if (panicBtn) {
+    panicBtn.addEventListener("click", () => {
+      alert("🥲 SEH LENGE THODA:\nBabu Rao ne bola: 'Dard sabka ek hi hai, chalo chai piyo!'\nKoi action nahi liya gaya.");
+      addScore(5, "Clicked Seh Lenge Thoda button");
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // USERNAME INPUT INTERACTIONS & BABU RAO REACTIONS
+  // ----------------------------------------------------------------------------
+  const usernameInput = document.getElementById("username");
+  const userReactionText = document.getElementById("user-reaction-text");
+  const userReactionEmoji = document.getElementById("user-reaction-emoji");
+
+  if (usernameInput) {
+    usernameInput.addEventListener("input", () => {
+      const len = usernameInput.value.trim().length;
+      if (!userReactionText) return;
+
+      if (len === 0) {
+        userReactionEmoji.textContent = "👴";
+        userReactionText.textContent = 'Babu Rao: "Roll number dalo, tab tak main chai peeta hoon!"';
+      } else if (len < 5) {
+        userReactionEmoji.textContent = "🧐";
+        userReactionText.textContent = 'Babu Rao: "Aye devva! Itna chhota roll number? Ration card number hai kya?"';
+      } else if (len < 9) {
+        userReactionEmoji.textContent = "🤑";
+        userReactionText.textContent = 'Kachra Seth: "Dedh sau rupiya dega is roll number ke liye!"';
+      } else {
+        userReactionEmoji.textContent = "🎨";
+        userReactionText.textContent = 'Majnu Bhai: "Ye roll number meri ghode wali painting se bhi sundar hai!"';
+      }
+      updateSubmitButtonText();
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // PASSWORD FIELD & 7 INVIOLABLE COMMANDMENTS
+  // ----------------------------------------------------------------------------
+  const passwordInput = document.getElementById("password");
+  const eyeToggleBtn = document.getElementById("eye-toggle-btn");
+
+  const chkLen = document.getElementById("chk-len");
+  const chkUpper = document.getElementById("chk-upper");
+  const chkLower = document.getElementById("chk-lower");
+  const chkNum = document.getElementById("chk-num");
+  const chkSym = document.getElementById("chk-sym");
+  const chkNoA = document.getElementById("chk-no-a");
+  const chkEmoji = document.getElementById("chk-emoji");
+
+  let hadPenaltyForLetterA = false;
+
+  function evaluatePassword(val) {
+    const hasLen = val.length >= 8;
+    const hasUpper = /[A-Z]/.test(val);
+    const hasLower = /[a-z]/.test(val);
+    const hasNum = /[0-9]/.test(val);
+    const hasSym = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(val);
+    const hasNoA = !/[aA]/.test(val);
+    const hasEmoji = /\p{Extended_Pictographic}/u.test(val);
+
+    const updateCheck = (el, passed) => {
+      if (!el) return;
+      el.className = `chk-item ${passed ? "chk-pass" : "chk-fail"}`;
+      const icon = el.querySelector(".chk-icon");
+      if (icon) icon.textContent = passed ? "✅" : "❌";
+    };
+
+    updateCheck(chkLen, hasLen);
+    updateCheck(chkUpper, hasUpper);
+    updateCheck(chkLower, hasLower);
+    updateCheck(chkNum, hasNum);
+    updateCheck(chkSym, hasSym);
+    updateCheck(chkNoA, hasNoA);
+    updateCheck(chkEmoji, hasEmoji);
+
+    // Punish typing the forbidden letter 'a' with Bollywood suspense music
+    if (!hasNoA && !hadPenaltyForLetterA) {
+      hadPenaltyForLetterA = true;
+      if (window.memeAudio) window.memeAudio.playDhumTana();
+      addScore(10, "Typed forbidden letter 'A' ('A' for Aukaat)");
+      showToast("🚨 ARREY CHUP KAR BILKUL CHUP! 'A' is strictly banned!", "🛑");
+      alert("🚨 ARREY CHUP KAR BILKUL CHUP!\n\n'A' for Aukaat is STRICTLY BANNED in this college!\nBabu Rao says: Backspace dabao turant!");
+    } else if (hasNoA) {
+      hadPenaltyForLetterA = false;
+    }
+
+    return hasLen && hasUpper && hasLower && hasNum && hasSym && hasNoA && hasEmoji;
+  }
+
+  if (passwordInput) {
+    passwordInput.addEventListener("input", () => {
+      const val = passwordInput.value;
+      if (!state.hasTypedPassword && val.length > 0) {
+        state.hasTypedPassword = true;
+        addScore(5, "Started typing password trials");
+      }
+      evaluatePassword(val);
+      updateSubmitButtonText();
+    });
+  }
+
+  // Eye reveal toggle
+  if (eyeToggleBtn && passwordInput) {
+    eyeToggleBtn.addEventListener("click", () => {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      eyeToggleBtn.textContent = isPassword 
+        ? "🙈 Chhupa Lo (Rishtedaar Dekh Rahe)" 
+        : "👁️ Dekh Raha Hai Vinod?";
+      if (window.memeAudio) window.memeAudio.playTick();
+      addScore(4, "Toggled password visibility");
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // SUBMIT BUTTON (EVASIVE BUT FRIENDLY & EASY TO CLICK)
+  // ----------------------------------------------------------------------------
+  const loginSubmitBtn = document.getElementById("login-submit-btn");
+  const submitArena = document.getElementById("submit-arena");
+
+  const buttonTaunts = [
+    "Login Karo (Ricks Nahi Lene Ka)",
+    "Are You Sure? (Ruk Jaa Re Bande)",
+    "Don't Click Me (Giri Hui Harkat)",
+    "Abhi Hum Zinda Hai!",
+    "Tumse Na Ho Payega!",
+    "Khatam? Tata? Goodbye!",
+    "Chilla Mat Shuru Ho Gaya!"
+  ];
+  let tauntIdx = 0;
+
+  function updateSubmitButtonText() {
+    if (!loginSubmitBtn) return;
+    const hasData = (usernameInput && usernameInput.value.length > 0) ||
+                    (passwordInput && passwordInput.value.length > 0);
+    if (hasData) {
+      loginSubmitBtn.textContent = buttonTaunts[tauntIdx % buttonTaunts.length];
+    } else {
+      loginSubmitBtn.textContent = "Login Karo (Ricks Nahi Lene Ka)";
+    }
+  }
+
+  // Dodge logic - strictly limited to maxDodges so user is entertained, NOT frustrated!
+  if (submitArena && loginSubmitBtn) {
+    submitArena.addEventListener("mousemove", (e) => {
+      if (state.dodgeCount >= state.maxDodges) return; // Freeze in place so user easily clicks!
+
+      const rect = loginSubmitBtn.getBoundingClientRect();
+      const btnX = rect.left + rect.width / 2;
+      const btnY = rect.top + rect.height / 2;
+      const dist = Math.hypot(e.clientX - btnX, e.clientY - btnY);
+
+      if (dist < 60) {
+        state.dodgeCount++;
+        if (dodgeCounterEl) dodgeCounterEl.textContent = state.dodgeCount;
+
+        const moveX = (e.clientX < btnX ? 50 : -50) + (Math.random() * 20 - 10);
+        loginSubmitBtn.style.transform = `translateX(${moveX}px)`;
+
+        tauntIdx++;
+        updateSubmitButtonText();
+
+        if (window.memeAudio) window.memeAudio.playBoing();
+        addScore(8, "Submit button dodged cursor (Bhaag Milkha Bhaag)");
+        showToast("🏃‍♂️ Bhaag Milkha Bhaag! (Pakad ke dikha!)", "💨");
+
+        setTimeout(() => {
+          loginSubmitBtn.style.transform = "translateX(0px)";
+        }, 800);
+      }
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // FORM SUBMISSION & FAKE LOADING SEQUENCE
+  // ----------------------------------------------------------------------------
+  const babuForm = document.getElementById("babu-login-form");
+  const loadingModal = document.getElementById("loading-modal");
+  const loadingStepText = document.getElementById("loading-step-text");
+  const loadingFillBar = document.getElementById("loading-fill-bar");
+  const trollBanner = document.getElementById("troll-banner");
+  const closeTrollBtn = document.getElementById("close-troll-btn");
+
+  const loadingSteps = [
+    "Babu Rao se chashma maang rahe hain...",
+    "Munna Bhai se setting baitha rahe hain...",
+    "Sharma ji ke bete ki 1 Crore package se compare ho raha hai...",
+    "Jethalal ka Babita ji ko dekhte hue status check ho raha hai...",
+    "Sachiv ji se seal lagwa rahe hain..."
+  ];
+
+  if (closeTrollBtn && trollBanner) {
+    closeTrollBtn.addEventListener("click", () => {
+      trollBanner.style.display = "none";
+    });
+  }
+
+  if (babuForm) {
+    babuForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const userVal = usernameInput ? usernameInput.value.trim() : "";
+      const passVal = passwordInput ? passwordInput.value : "";
+
+      if (!userVal) {
+        showToast("🛑 Roll number dalo pehle! 'Hum pe toh hai hi 9!'", "❌");
+        alert("🛑 ROLL NUMBER MISSING:\nBabu Rao says: 'Arey bina roll number ke exam hall mein ghusega kya? Roll number dalo!'");
+        addScore(5, "Submitted empty roll number");
+        return;
+      }
+
+      const isValid = evaluatePassword(passVal);
+
+      // Launch humorous fake loading
+      if (loadingModal) loadingModal.style.display = "flex";
+      let step = 0;
+      if (loadingFillBar) loadingFillBar.style.width = "20%";
+      if (loadingStepText) loadingStepText.textContent = loadingSteps[0];
+
+      const stepTimer = setInterval(() => {
+        step++;
+        if (step < loadingSteps.length) {
+          if (loadingStepText) loadingStepText.textContent = loadingSteps[step];
+          if (loadingFillBar) loadingFillBar.style.width = `${(step + 1) * 20}%`;
+          if (window.memeAudio) window.memeAudio.playTick();
+        }
+      }, 500);
+
+      setTimeout(() => {
+        clearInterval(stepTimer);
+        if (loadingModal) loadingModal.style.display = "none";
+
+        if (!isValid) {
+          showTrollBanner("🛑 PASSCODE ERROR:", "Babu Rao ke 7 Niyam toot gaye! Checklist mein dekho kya missing hai!");
+          if (window.memeAudio) window.memeAudio.playHonk();
+          addScore(8, "Failed passcode requirements");
+          return;
+        }
+
+        // First attempt comedic troll: "Tumse na ho payega!"
+        if (state.isFirstSubmitBlocked) {
+          state.isFirstSubmitBlocked = false;
+          showTrollBanner("🛑 ERROR 420: Tumse Na Ho Payega!", "Server chai break pe gaya tha! Ek aur baar click karo hero!");
+          if (window.memeAudio) window.memeAudio.playSadTrombone();
+          addScore(10, "First attempt rejected with Tumse Na Ho Payega");
+          return;
+        }
+
+        // VICTORY!
+        triggerVictory(userVal);
+
+      }, 2600);
+    });
+  }
+
+  function showTrollBanner(title, desc) {
+    if (!trollBanner) return;
+    const t = document.getElementById("troll-title");
+    const d = document.getElementById("troll-desc");
+    if (t) t.textContent = title;
+    if (d) d.textContent = desc;
+    trollBanner.style.display = "flex";
+  }
+
+  // ----------------------------------------------------------------------------
+  // POPUP #1: LAXMI CHIT FUND (25 DIN MEIN DEGREE DOUBLE)
+  // ----------------------------------------------------------------------------
+  const schemePopup = document.getElementById("scheme-popup");
+  const closeSchemeBtn = document.getElementById("close-scheme-btn");
+  const laterSchemeBtn = document.getElementById("later-scheme-btn");
+  const popupBtnRow = document.getElementById("popup-btn-row");
+
+  setTimeout(() => {
+    if (schemePopup) {
+      schemePopup.style.display = "flex";
+      if (window.memeAudio) window.memeAudio.playHonk();
+      addScore(5, "Laxmi Chit Fund scheme popup appeared");
+    }
+  }, 4500);
+
+  // Playful button swap on hover
+  let hasSwapped = false;
+  if (closeSchemeBtn && popupBtnRow) {
+    closeSchemeBtn.addEventListener("mouseenter", () => {
+      if (!hasSwapped) {
+        hasSwapped = true;
+        popupBtnRow.style.flexDirection = "row-reverse";
+        if (window.memeAudio) window.memeAudio.playBoing();
+        addScore(4, "Popup close button swapped sides");
+      }
+    });
+    closeSchemeBtn.addEventListener("click", () => {
+      schemePopup.style.display = "none";
+      showToast("👍 Scheme closed! Babu Rao: 'Khopdi tod!'");
+    });
+  }
+
+  if (laterSchemeBtn) {
+    laterSchemeBtn.addEventListener("click", () => {
+      schemePopup.style.display = "none";
+      showToast("🤑 150 Rupiya Dega! Scheme postponed.");
+      addScore(4, "Clicked 150 Rupiya Dega button");
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // POPUP #2: FORGOT PASSWORD (GHAJINI DILEMMA)
+  // ----------------------------------------------------------------------------
+  const forgotLink = document.getElementById("forgot-link");
+  const forgotModal = document.getElementById("forgot-modal");
+  const forgotYesBtn = document.getElementById("forgot-yes-btn");
+  const forgotNoBtn = document.getElementById("forgot-no-btn");
+  const forgotOracleBtn = document.getElementById("forgot-oracle-btn");
+
+  if (forgotLink && forgotModal) {
+    forgotLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      forgotModal.style.display = "flex";
+      if (window.memeAudio) window.memeAudio.playTick();
+      addScore(5, "Opened Ghajini forgot password modal");
+    });
+  }
+
+  if (forgotYesBtn) {
+    forgotYesBtn.addEventListener("click", () => {
+      forgotModal.style.display = "none";
+      alert("📜 GHAJINI CONFIRMED:\nBabu Rao ne bola: 'Khopdi tod saale ka!' Password hint post office se 25 din mein aayega.");
+    });
+  }
+
+  if (forgotNoBtn) {
+    forgotNoBtn.addEventListener("click", () => {
+      forgotModal.style.display = "none";
+      alert("💡 SHABASH:\n'Arey devva! Yaad aa gaya?' Self-doubt cured. Ab chup chap login karo!");
+    });
+  }
+
+  if (forgotOracleBtn) {
+    forgotOracleBtn.addEventListener("click", () => {
+      forgotModal.style.display = "none";
+      const ans = prompt("🔮 BABU RAO ORACLE QUERY:\n'Baap ka, dada ka, bhai ka... sabka password lega re tera Faizal! Bolo 150 rupiya dega?'\n(Type: Haan / Na)");
+      alert(`🔮 ORACLE VERDICT:\nAapne kaha "${ans || 'kuch nahi'}".\nBabu Rao ne bola: "Khatam! Tata! Bye Bye!" Password nahi milega.`);
+      addScore(8, "Consulted Babu Rao password oracle");
+    });
+  }
+
+  // Decoy signup link
+  const signupDecoyLink = document.getElementById("signup-decoy-link");
+  if (signupDecoyLink) {
+    signupDecoyLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      alert("🚫 ADMISSION CLOSED:\nBabu Rao: 'Nahi dunga, nahi dunga! Naya admission 2099 tak band hai!'");
+      addScore(4, "Clicked disabled signup decoy");
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // MOVING HELP CONCIERGE BUTTON
+  // ----------------------------------------------------------------------------
+  const evasiveHelpBtn = document.getElementById("evasive-help-btn");
+  let helpDodgeCount = 0;
+
+  if (evasiveHelpBtn) {
+    evasiveHelpBtn.addEventListener("mouseenter", () => {
+      if (helpDodgeCount < 2) {
+        helpDodgeCount++;
+        const maxT = window.innerHeight - 80;
+        const maxL = window.innerWidth - 160;
+        evasiveHelpBtn.style.top = `${Math.floor(Math.random() * (maxT - 80)) + 60}px`;
+        evasiveHelpBtn.style.left = `${Math.floor(Math.random() * (maxL - 40)) + 30}px`;
+        evasiveHelpBtn.style.bottom = "auto";
+        evasiveHelpBtn.style.right = "auto";
+        if (window.memeAudio) window.memeAudio.playBoing();
+        addScore(6, "Chased evasive help button");
+        showToast("🏃‍♂️ Help button: 'Pakad ke dikha!'");
+      }
+    });
+
+    evasiveHelpBtn.addEventListener("click", () => {
+      alert("🆘 HELP STATUS:\n'Hum pe toh hai hi 9 😜'\nHelp is not coming! Sharma ji ke bete se tuition lo!");
+      if (window.memeAudio) window.memeAudio.playHonk();
+      addScore(10, "Caught and clicked the help button");
+    });
+  }
+
+  // ----------------------------------------------------------------------------
+  // CHEAT CODE HELPER MODAL FOR JUDGES
+  // ----------------------------------------------------------------------------
+  const cheatHintBtn = document.getElementById("cheat-hint-btn");
+  const cheatModal = document.getElementById("cheat-modal");
+  const closeCheatBtn = document.getElementById("close-cheat-btn");
+
+  if (cheatHintBtn && cheatModal) {
+    cheatHintBtn.addEventListener("click", () => {
+      cheatModal.style.display = "flex";
+      if (window.memeAudio) window.memeAudio.playTick();
+    });
+  }
+  if (closeCheatBtn && cheatModal) {
+    closeCheatBtn.addEventListener("click", () => {
+      cheatModal.style.display = "none";
+    });
+  }
+
+  // Click on sample passcode pills to autofill!
+  ["code-sample-1", "code-sample-2", "code-sample-3"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el && passwordInput) {
+      el.style.cursor = "pointer";
+      el.title = "Click to auto-fill!";
+      el.addEventListener("click", () => {
+        passwordInput.value = el.textContent.trim();
+        evaluatePassword(passwordInput.value);
+        updateSubmitButtonText();
+        if (cheatModal) cheatModal.style.display = "none";
+        showToast("🔑 Passcode autofilled! Ab submit karo!");
+        if (window.memeAudio) window.memeAudio.playTick();
+      });
+    }
+  });
+
+  // ----------------------------------------------------------------------------
+  // INSPECTOR MODAL (JUDGES DOSSIER)
+  // ----------------------------------------------------------------------------
+  const inspectBtn = document.getElementById("inspect-btn");
+  const inspectorModal = document.getElementById("inspector-modal");
+  const closeInspectorX = document.getElementById("close-inspector-x");
+  const closeInspectorBtn = document.getElementById("close-inspector-btn");
+
+  const toggleInspector = (open) => {
+    if (inspectorModal) inspectorModal.style.display = open ? "flex" : "none";
+    if (open && window.memeAudio) window.memeAudio.playTick();
+  };
+  if (inspectBtn) inspectBtn.addEventListener("click", () => toggleInspector(true));
+  if (closeInspectorX) closeInspectorX.addEventListener("click", () => toggleInspector(false));
+  if (closeInspectorBtn) closeInspectorBtn.addEventListener("click", () => toggleInspector(false));
+
+  // ----------------------------------------------------------------------------
+  // VICTORY SCREEN
+  // ----------------------------------------------------------------------------
+  const victoryScreen = document.getElementById("victory-screen");
+  const certUserName = document.getElementById("cert-user-name");
+  const certScore = document.getElementById("cert-score");
+  const certDodges = document.getElementById("cert-dodges");
+  const certJokes = document.getElementById("cert-jokes");
+  const certTime = document.getElementById("cert-time");
+  const sufferAgainBtn = document.getElementById("suffer-again-btn");
+
+  function triggerVictory(name) {
+    const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+
+    if (certUserName) certUserName.textContent = name || "Kachra Seth";
+    if (certScore) certScore.textContent = state.badUiScore;
+    if (certDodges) certDodges.textContent = state.dodgeCount;
+    if (certJokes) certJokes.textContent = state.jokesRead;
+    if (certTime) certTime.textContent = `${elapsed}s`;
+
+    if (victoryScreen) victoryScreen.style.display = "flex";
+    if (window.memeAudio) window.memeAudio.playVictory();
+  }
+
+  if (sufferAgainBtn) {
+    sufferAgainBtn.addEventListener("click", () => {
+      window.location.reload();
+    });
+  }
+
+});
+
+</script>
+</body>
+</html>

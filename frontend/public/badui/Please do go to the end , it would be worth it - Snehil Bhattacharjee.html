@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang= "en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verify you are human</title>
+
+<style>
+  @keyframes bg-flash {
+    0%{background-color:black}
+    50%{background-color:black}
+    51%{background-color:white}
+    100%{background-color:white}
+
+    
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  color: #173a59;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+
+  
+  animation: bg-flash 0.5s infinite;
+}
+
+  :root {
+    --bg: #d9edf9;
+    --card: #f7fbff;
+    --border: #8ba9c5;
+    --muted: #4c6277;
+    --primary: #2a74b9;
+    --primary-fg: #fff;
+    --danger: #b22c2c;
+    --ok: #28754a;
+    --panel-top: #ffffff;
+    --panel-bottom: #d9eaf7;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    color: #173a59;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background-color: #000;
+    animation: bg-flash 0.1s steps(1, end) infinite alternate;
+    
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    padding: 25px 26px 27px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: linear-gradient(var(--panel-top), var(--panel-bottom));
+    box-shadow:
+      0 1px 0 #fff inset,
+      0 12px 30px rgba(32, 72, 107, 0.38),
+      0 0 0 1px rgba(255, 255, 255, 0.45);
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 7px;
+    left: 7px;
+    height: 40px;
+    border-radius: 6px 6px 45% 45%;
+    background: linear-gradient(
+      rgba(255, 255, 255, 0.88),
+      rgba(255, 255, 255, 0)
+    );
+    pointer-events: none;
+  }
+
+  .card > * {
+    position: relative;
+  }
+
+  h1 {
+    margin: 0;
+    color: #174a76;
+    font-size: 21px;
+    line-height: 1.2;
+    text-shadow: 0 1px #fff;
+  }
+
+  .sub {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  label {
+    display: block;
+    margin-top: 20px;
+    color: #244f75;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    margin-top: 6px;
+    padding: 9px 12px;
+    border: 1px solid #7d9db8;
+    border-radius: 3px;
+    outline: none;
+    color: #173a59;
+    font-size: 14px;
+    background: linear-gradient(#fff, #f2f8fc);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.13) inset,
+      0 1px #fff;
+  }
+
+  input[type="text"]:focus {
+    border-color: #3b8ccc;
+    box-shadow:
+      0 0 0 1px rgba(77, 167, 224, 0.45),
+      0 1px 2px rgba(0, 0, 0, 0.12) inset;
+  }
+
+  input:disabled {
+    opacity: 0.6;
+  }
+
+  #captchaInput {
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  canvas {
+    border: 1px solid #7e9db7;
+    border-radius: 3px;
+    filter: blur(1.1px) contrast(1.1);
+    user-select: none;
+    box-shadow:
+      0 1px #fff,
+      0 1px 3px rgba(0, 0, 0, 0.18) inset;
+  }
+
+  button {
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .btn-sm {
+    padding: 5px 9px;
+    border: 1px solid #7e9db7;
+    border-radius: 3px;
+    color: #244f75;
+    font-size: 12px;
+    background: linear-gradient(#fff, #dcebf7 52%, #c3daec);
+    box-shadow:
+      0 1px #fff inset,
+      0 1px 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-sm:hover {
+    border-color: #4d91c7;
+    background: linear-gradient(#fff, #eaf6ff 48%, #c6e6fb);
+  }
+
+  .btn {
+    padding: 8px 18px;
+    border: 1px solid #1d5f93;
+    border-radius: 3px;
+    color: var(--primary-fg);
+    font-size: 14px;
+    font-weight: 600;
+    text-shadow: 0 -1px rgba(0, 0, 0, 0.28);
+    background: linear-gradient(
+      #6ec2f1 0,
+      #3e9ed6 48%,
+      #2478b5 52%,
+      #1e659e 100%
+    );
+    box-shadow:
+      0 1px rgba(255, 255, 255, 0.48) inset,
+      0 1px 1px rgba(0, 0, 0, 0.18);
+  }
+
+  .btn:hover {
+    background: linear-gradient(
+      #8bd6fb 0,
+      #4babdf 48%,
+      #2985c3 52%,
+      #206ea8 100%
+    );
+  }
+
+  .btn:active,
+  .btn-sm:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22) inset;
+  }
+
+  .hint {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .msg {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .msg.err {
+    color: var(--danger);
+  }
+
+  .msg.ok {
+    color: var(--ok);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .ic {
+    margin-top: 20px;
+    overflow: hidden;
+    border: 1px solid #7e9db7;
+    border-radius: 4px;
+    box-shadow: 0 1px #fff;
+  }
+
+  .ic-head {
+    padding: 12px 16px;
+    border-bottom: 1px solid #215e89;
+    color: #fff;
+    text-shadow: 0 -1px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(#6db8e6, #337fac 50%, #2a6f9b);
+  }
+
+  .ic-head small {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .ic-head strong {
+    font-size: 18px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    padding: 3px;
+    background: #9ebad1;
+  }
+
+  .tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    border: none;
+    color: inherit;
+    font-size: 34px;
+    background: linear-gradient(#f6fbff, #e0eef8);
+    filter: blur(0.6px) saturate(0.9);
+    transition: transform 0.15s;
+  }
+
+  .tile.sel {
+    transform: scale(0.88);
+    box-shadow: inset 0 0 0 4px #2d85c5;
+  }
+
+  .ic-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-top: 1px solid #b5ccdf;
+    background: linear-gradient(#fff, #e5f0f8);
+  }
+  .tile img{
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+  html{
+    transform-origin: bottom center ;
+    transition: transform 1s ease;
+  }
+
+
+
+  
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Verify you are human</h1>
+    <p class="sub" id="sub">Complete the CAPTCHA code below.</p>
+
+    <label for="name">Your name</label>
+    <input id="name" type="text" placeholder="John Doe" maxlength="100" />
+
+    <div id="textPhase">
+      <label>Main CAPTCHA</label>
+
+      <div class="row">
+        <canvas
+          id="cv"
+          width="220"
+          height="80"
+          role="img"
+          aria-label="CAPTCHA with 5 distorted letters">
+        </canvas>
+
+        <button class="btn-sm" id="refresh" type="button">Refresh</button>
+      </div>
+
+      <input
+        id="captchaInput"
+        type="text"
+        maxlength="1"
+        autocomplete="off"
+        placeholder="" />
+
+      <p class="hint">Entered: <span id="typed">—</span></p>
+    </div>
+
+    <div id="imagePhase" class="ic hidden">
+      <div class="ic-head">
+        <small>Select all images with</small>
+        <strong id="catName"></strong>
+      </div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="ic-foot">
+        
+        <button class="btn" id="verify" type="button">Verify</button>
+      </div>
+    </div>
+
+    <p class="msg" id="msg"></p>
+  </div>
+
+<script>
+(function (){
+  var CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789";
+  var TOTAL = 5, W = 220, H = 80;
+  var ROUNDS = [
+  {
+    question: "select the single people(like you hahahah)to proof that you are not robot.",
+    images: [
+      { src: "https://appmufc.wordpress.com/wp-content/uploads/2025/05/44052293_mtiny-e1491474184181.jpg?w=647", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtzG3AuYtES62m9nU0YmJlNjcTfsmr5MmNh4pks-mV9cqQhrgF-tqy5Vc&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHDjAOaPq3sCzyK2wBxLRQ5PhZmedWRm1bz8YrOPu9Reije6Gyx-CMBL8&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7dLVMxQ6jCXnEOHL3HcX29HKqvqRXvTYJvrzesfcLJL_kYaJcnI_bc4M&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMadDHQtWuiiw_BWoiwKyo8cQ5rf7ocX1z5w3GFpaE-Q&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDCwpFedzeUxORyksQ_SmWVgL5ljTcgqDX95u8UvXQ-UXlnpZBPNYRRrg&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8LW8X8mB-C6W-ekKEYGbB2xPAQ7WoopU92vWABBfsQmah6uOjCYy3stu9&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbplhyJESSkNu7D11FHIwS43JaSQxg2RFhubU8PTC5V051ojMheRyrHOJs&s=10", correct: true},
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7GqH8NUXdLq5LgYU6n5DJD_ewHzTTULBcSO27um886TCpjEvlGXjQWjxw&s=10", correct: false }
+    ]
+  },
+
+{
+    question: "select the couple(unlike you were)to proof that you are not robot.",
+    images: [
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4PrJ6rJWGjDd7midhiyZegLDA8qGVi5CWoNwNCMhUh_yHjVaB6PH_Dhg&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_MIdnWV1eoYBxGPXYqnI0U1GOGtxLmM3u1cxt0_rRzA&s", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC3WukstddgKUNFZfNo506LXV7hiUsYMLzXV3ZjEoiWIY6trl-wKJ2CcI&s=10", correct: true },
+      { src: "https://thumbs.dreamstime.com/b/mourning-3992482.jpg", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTko6Uwd6cSw1GWOOFxmdemRUW3N3H6-QaXh8wPwx1I5ThJ7huYUWyLviZp&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQukG4s97tfo_n2HzL-14jod2j9Ev-5R0G_hGU4J8_scUUAeHoJn4Tylh6W&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4eYE6levT0wkTiu5-pGTRMx6vTqVQHoWuwFOMyqeC2kcAxvF8BADCRThj&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROlE1nvtaX7UKhsnqA_7f3MYUHKPLW04jQxsTk5NyL5aROEmQYZyi_F_RE&s=10", correct: true },
+      { src: "https://media.gettyimages.com/id/636988328/photo/alone-on-the-bench.jpg?s=612x612&w=0&k=20&c=IvlnHlRPScrt14AG_F8ajKekyU9fs20k_djaBWi8j9Q=", correct: false }
+    ]
+  
+  },
+
+  {
+    question: "x^3-65x^2+1367x-9367=0, select the values of x(abh thori padhai cuz akele whi kr skte ho)to proof that you are not robot.",
+    images: [
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREEL8lSYf_xftaRlwI0AoFeFEen6gPGEL6n2UEXZO7Xw&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGRhNUH2paHZJcdwBIfvGNWqIzTpQa7NLYtBTXQFTUogwlLFwzik_Vqoo&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwNeDVHzkcuu6gtqSyQspqdoTxQw3zouxoUlvDhLG2gw&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS51sujmjKHBJeI8YyPO2IDVU8J7jejeVhVEAurqmUhHjURl447twlzqryE&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSL6DbuX1mQQ8cyRt6DUoFjTFcSU4ueExA46FVH8pXhhQ&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyCamyNmbG3tm3KOPQYUyTwHcrcJUjypraCJEq6NQDZg&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuSEyB7JgELZngCY3NPl_WjCjo4gDm14REp_XbL-SqFA&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw1Li3zne3XnyqkCOhYB6Yp7zUy6ix3Hbi7ZTSPLuxFrATPKyADkXVUJny&s=10", correct: false },
+      { src: "https://ih1.redbubble.net/image.3351274904.5199/st,extra_large,507x507-pad,600x600,f8f8f8.jpg", correct: true }
+    ]
+  },
+
+  {
+    question: "select the element with atomic weight 294u(u can use google cuz main janta hu aap nhi jante ho)to proof that you are robot.",
+    images: [
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2W4T-wo2EBOPM2Hpz-Efm4GlhIyB3BswEjIIUMR6fFg&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA6lYn8awWolOesdIGYEpJhMlHVcXiT7YMJlHjcDfJKg&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhhm3m2ZvSW_x1mpbfgOGOj5QPixxUYbXVm7Xn7yHDKg&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR6ynWQ1tu0t2XCd7W4p45oJp0fl5UgMcAsMTugjr3uw&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ43IE725qlqpQY7m9uMerSYTnSV_sshcnuEaqrsGjy5g&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4dm-HYONjswfZlhbyTI_ujMv_n9jeaXp7w_7uAl5qHA&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREd1lxRjqmJpQpWblp7VXmumaGOFzAdT3Xlx3OCUr2-A&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQz-iwMiYIg5jbpTAoAUk3rreXRj-zUFl_G6GQLsf3joA&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpTKtNEOuLkSgOd72gSJaEkdiiecWIBp19CIQ3ot43Mw&s", correct: true }
+    ]
+  },
+
+  {
+    question: "select the engine that works without oxygen(mechanical qtns cuz i'm a mech guy)to proof that you are not robot.",
+    images: [
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKhGCSIuGQAKwD5iVw7-A5y_mf4bSIhYX6j4R6w9zLcxl7anJ03tdsFK4&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPh2pESv18xS4iZAl0xt-duNQxNO6Dn7R_TcVOCHahYw&s", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnzsKjLI4xYXPxBcC_rxnqzAvn9PGHZCM_VkRlUSSjAMcYEeNUSwB01fM&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpVMSPDt5NZRRLKiCx08xksW6zwnxrG70IqgYsKq4JxAgOeMDZwwEIrVs&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLSlOtpHekWMG-Zov807o4UE9A0PXO7KmWyBr4KzRWvA&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRAZJX6FP9bdUgB9opta0sv1t5dADNkRnEKdUbdX5ByqoAPhY0SMll_iE&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiXTi7T9dQDdEOiNGrmg_AnL2dbgFew0Jl0aJ52ww0KuyElWDC5Ojc6rw&s=10", correct: true },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0q0bFQmq1yZwY65k6OtDxzL7aRRsm1nxRtSXPHCMy0g&s=10", correct: false },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8CiNvOj7S4JWQHaXZA89-p2iCEGNDnGuOXYbE7mv6iz0dBBSSIS6qZ-fC&s=10", correct: false }
+    ]
+  }
+];
+
+  
+var nameEl = document.getElementById("name");
+var textPhase = document.getElementById("textPhase");
+var imagePhase = document.getElementById("imagePhase");
+var input = document.getElementById("captchaInput");
+var cv = document.getElementById("cv");
+var msg = document.getElementById("msg");
+var sub = document.getElementById("sub");
+var grid = document.getElementById("grid");
+var catName = document.getElementById("catName");
+var code = "";
+var phase = "text";
+var roundIndex = 0;
+var round = null;
+var selected = [];
+var typedStr = "";
+var IMAGE_TOTAL=ROUNDS.length;
+var imageRoundIndex=0;
+
+  function rand(n) {
+    return Math.floor(Math.random() * n);
+  }
+
+  function shuffle(a) {
+    a = a.slice();
+
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = rand(i + 1);
+      var t = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+
+    return a;
+  }
+
+  function randomCode(len) {
+    var s = "";
+
+    for (var i = 0; i < len; i++) {
+      s += CHARS.charAt(rand(CHARS.length));
+    }
+
+    return s;
+  }
+
+  function setMsg(text, type) {
+    msg.textContent = text || "";
+    msg.className = "msg" + (text ? " " + type : "");
+  }
+
+  function drawCaptcha() {
+    var ctx = cv.getContext("2d");
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#eceaf3";
+    ctx.fillRect(0, 0, W, H);
+
+    for (var i = 0; i < 500; i++) {
+      ctx.fillStyle =
+        "rgba(" + rand(160) + "," + rand(160) + "," + rand(160) + ",0.25)";
+      ctx.fillRect(Math.random() * W, Math.random() * H, 2, 2);
+    }
+
+    ctx.save();
+    ctx.translate(W / 2, H / 2 + (Math.random() * 10 - 5));
+    ctx.rotate((Math.random() - 0.5) * 0.5);
+    ctx.transform(
+      1,
+      (Math.random() - 0.5) * 0.3,
+      (Math.random() - 0.5) * 0.3,
+      1,
+      0,
+      0
+    );
+
+    ctx.font = (38 + rand(12)) + "px Georgia, serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "hsl(" + rand(360) + ",45%,32%)";
+    ctx.fillText(code, 0, 0);
+    ctx.restore();
+
+    for (var k = 0; k < 4; k++) {
+      ctx.strokeStyle =
+        "rgba(" + rand(150) + "," + rand(150) + "," + rand(150) + ",0.6)";
+      ctx.lineWidth = 1 + Math.random() * 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, Math.random() * H);
+      ctx.bezierCurveTo(
+        W / 3,
+        Math.random() * H,
+        (W * 2) / 3,
+        Math.random() * H,
+        W,
+        Math.random() * H
+      );
+      ctx.stroke();
+    }
+  }
+
+  function refreshText() {
+    code = randomCode(TOTAL);
+    input.value = "";
+    typedStr = "";
+    roundIndex=0;
+    imageRoundIndex = 0;
+
+    nameEl.disabled = false;
+    document.getElementById("typed").textContent = "—";
+    sub.textContent = "Complete the CAPTCHA code below.";
+
+    drawCaptcha();
+  }
+
+  function showTextPhase() {
+    phase = "text";
+    imagePhase.classList.add("hidden");
+    textPhase.classList.remove("hidden");
+    input.value = "";
+    input.focus();
+  }
+
+  function buildRound() {
+  var current = ROUNDS[imageRoundIndex];
+
+  return {
+    category: { name: current.question },
+    tiles: current.images.map(function (img, i) {
+      return {
+        id: i,
+        src: img.src,
+        isTarget: img.correct
+      };
+    })
+  };
+}
+    
+  function renderRound() {
+    round = buildRound();
+    selected = [];
+
+    catName.textContent = round.category.name;
+    grid.innerHTML = "";
+
+    round.tiles.forEach(function (tile) {
+      var b = document.createElement("button");
+
+      b.type = "button";
+      b.className = "tile";
+      b.setAttribute("aria-label", "Image tile " + (tile.id + 1));
+
+      var span = document.createElement("img");
+      var img = document.createElement("img");
+      img.src = tile.src;
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+      b.appendChild(img);
+
+      
+      
+
+      b.onclick = function () {
+        var i = selected.indexOf(tile.id);
+
+        if (i >= 0) {
+          selected.splice(i, 1);
+          b.classList.remove("sel");
+        } else {
+          selected.push(tile.id);
+          b.classList.add("sel");
+        }
+      };
+
+      grid.appendChild(b);
+    });
+
+    sub.textContent =
+      "DO THE NEEDFUL TO GO THROUGH......"
+  }
+
+  document.getElementById("refresh").onclick = refreshText;
+
+  document.getElementById("verify").onclick = function () {
+
+  var correct =
+    selected.length > 0 &&
+    round.tiles.every(function (t) {
+      return (selected.indexOf(t.id) >= 0) === t.isTarget;
+    });
+
+  if (!correct) {
+    alert("read carefully");
+    refreshText();
+    showTextPhase();
+    return;
+  }
+
+  setMsg("");
+
+ 
+  roundIndex++;
+
+ 
+  if (roundIndex >= TOTAL) {
+    imagePhase.classList.add("hidden");
+    startFinalTorture();
+    return;
+  }
+
+  
+  imagePhase.classList.add("hidden");
+  textPhase.classList.remove("hidden");
+  input.focus();
+};
+input.addEventListener("input", function () {
+
+  var ch = input.value
+    .replace(/[^A-Za-z0-9]/g, "")
+    .slice(-1);
+
+  input.value = "";
+
+  if (!ch) return;
+
+  var n = nameEl.value.trim();
+  if (!n) return;
+
+  
+  if (ch !== code.charAt(roundIndex)) {
+    alert("read carefully");
+    refreshText();
+    showTextPhase();
+    input.focus();
+    return;
+  }
+
+
+  typedStr += ch;
+  document.getElementById("typed").textContent = typedStr;
+
+  nameEl.disabled = true;
+
+ 
+  imageRoundIndex = roundIndex;
+
+  textPhase.classList.add("hidden");
+  imagePhase.classList.remove("hidden");
+
+
+    renderRound();
+  });
+
+
+function startFinalTorture() {
+  sub.textContent = "Final verification stage...";
+  setMsg("Submit", "");
+
+  var btn = document.createElement("button");
+  var steps = [
+    "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
+    "11", "12", "13", "14", "15", "16", "17", "18", "19",
+    "19.1", "19.2", "19.3", "19.4", "19.5", "19.6", "19.7",
+    "19.8", "19.9", "19.91", "19.92", "19.93", "19.94",
+    "19.95", "19.96", "19.97", "19.98", "19.99","19.991","19.991","19.992","19.993","19.994","19.995","19.996","19.997","19.998","19.999","19.999","19.999","19.999","20"
+  ];
+
+  var clickIndex = 0;
+  var audio = new Audio(
+    "https://www.myinstants.com/media/sounds/movie_1.mp3"
+  );
+
+  btn.innerText = "Submit";
+  btn.className = "btn";
+  btn.style.position = "fixed";
+  btn.style.left = "50%";
+  btn.style.top = "70%";
+
+  document.body.appendChild(btn);
+
+  var soundTimer = setInterval(function () {
+    if (Math.random() > 0.6) {
+      audio.currentTime = 0;
+      audio.play().catch(function () {
+        /* Browser blocked automatic audio playback. */
+      });
+    }
+  }, 150);
+
+  btn.onclick = function () {
+    moveButton(btn);
+    if(clickIndex>=2 && (clickIndex-2)<
+  steps.length){
+    btn.innerText="Submit-"+ steps[clickIndex-2];
+  }
+
+    if (clickIndex === 0) {
+      setMsg("Submit it again to prove you're not a robot.", "");
+    } else if (clickIndex === 1) {
+      setMsg("Now press 20 times to really prove you're human.", "");
+    } else if (clickIndex === 6) {
+      setMsg("Only 15 clicks more......", "");
+    } else if (clickIndex === 11) {
+      setMsg("10 clicks more.......", "");
+    } else if (clickIndex === 16) {
+      setMsg("5 clicks more.......", "");
+    } else if (clickIndex === 20) {
+      setMsg("one click more....", "");  
+    } else if (clickIndex === 21) {
+      setMsg("I lied....", "");
+    } else if (clickIndex === 29) {
+      setMsg("one click more....", "");
+    } else if (clickIndex === 30) {
+      setMsg("I lied again....", "");
+    } else if (clickIndex === 38) {
+      setMsg("one click more.... I promise", "");
+    } else if (clickIndex === 39) {
+      setMsg("promises are meant to be broken......", "");
+    } else if (clickIndex === 45) {
+      setMsg("keep going ....", "");
+    } else if (clickIndex - 2 < steps.length) {
+      btn.innerText = "Submit - " + steps[clickIndex - 2];
+    } 
+    if (clickIndex-2>=steps.length){
+      btn.style.display = "none";
+      clearInterval(soundTimer);
+      audio.pause();
+
+      setMsg("I promise you... you will not regret it....", "");
+
+      setTimeout(function () {
+        setMsg("Loading...", "");
+      }, 1000);
+
+      setTimeout(showFinalQuestion, 3000);
+      return;
+    }
+
+    clickIndex++;
+  };
+
+  function showFinalQuestion() {
+    document.body.innerHTML = `
+      <div style="color:white;text-align:center;margin-top:15%">
+        <h1>Final Question</h1>
+        <p>Which position should you give me?</p>
+
+        <input
+          id="finalAns"
+          type="text"
+          style="padding:10px;font-size:18px"
+        >
+
+        <br><br>
+
+        <button
+          id="finalBtn"
+          type="button"
+          style="padding:10px 20px;font-size:16px"
+        >
+          Submit
+        </button>
+
+        <p id="finalMsg"></p>
+      </div>
+    `;
+
+    var finalBtn = document.getElementById("finalBtn");
+    var finalAns = document.getElementById("finalAns");
+    var finalMsg = document.getElementById("finalMsg");
+
+    finalBtn.onclick = function () {
+      var answer = finalAns.value.trim().toLowerCase();
+
+      if (answer === "1st" || answer === "first" || answer === "1"  ) {
+        finalMsg.textContent = "Congrats, you are indeed the best human. A small laugh from my side ... wait for few secs";
+
+        setTimeout(function () {
+          window.location.href =
+            "https://youtube.com/shorts/RSUUlwL395A?si=jTahm5w0ImwglpnT";
+        }, 5000);
+      } else {
+        finalMsg.textContent = "Wrong answer. Try again.";
+        finalAns.value = "";
+
+        document.body.style.transform = "translateX(10px)";
+
+        setTimeout(function () {
+          document.body.style.transform = "translateX(-10px)";
+        }, 100);
+
+        setTimeout(function () {
+          document.body.style.transform = "translateX(0)";
+        }, 200);
+      }
+    };
+  }
+}
+
+function moveButton(btn) {
+  var maxX = Math.max(0, window.innerWidth - btn.offsetWidth);
+  var maxY = Math.max(0, window.innerHeight - btn.offsetHeight);
+
+  btn.style.left = Math.random() * maxX + "px";
+  btn.style.top = Math.random() * maxY + "px";
+}
+
+refreshText();
+var rotated=false;
+setInterval(function(){
+  rotated=!rotated;
+  document.documentElement.style.transform= rotated 
+  ? "rotate(180deg)":"rotate(0deg)"
+
+},10000);
+document.addEventListener("keydown",function
+(e){
+  if (e.key==="Enter"){
+    e.preventDefault();
+    alert("I knew judges will try to use the enter button that's why, I am disabling the enter button please use your cursor only");
+  }
+});
+
+})();
+</script>
+</body>
+</html>

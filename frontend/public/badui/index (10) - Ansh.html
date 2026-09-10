@@ -1,0 +1,3290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusGuardian AI - Bad UI Cat Login (5s Challenge)</title>
+  <style>
+/* ==========================================================================
+   Interactive Cat Login - Modern Styling & Animations
+   ========================================================================== */
+
+:root {
+  --primary-color: #ff7675;
+  --primary-glow: rgba(255, 118, 117, 0.45);
+  --cat-orange: #ff9f43;
+  --cat-dark: #ee5253;
+  --cat-fur: #feca57;
+  --accent-color: #54a0ff;
+  --success-color: #1dd1a1;
+  --warning-color: #feca57;
+  --danger-color: #ff4757;
+  --bg-dark: #0f141d;
+  --bg-card: rgba(26, 33, 48, 0.85);
+  --border-card: rgba(255, 255, 255, 0.12);
+  --text-main: #f1f2f6;
+  --text-muted: #a4b0be;
+  --font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: radial-gradient(circle at 20% 20%, #1e272e 0%, #0c1017 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* Ambient Animated Wallpaper */
+.desktop-ambient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+  animation: floatBlobs 20s infinite alternate ease-in-out;
+}
+
+.blob-1 {
+  width: 450px;
+  height: 450px;
+  background: #ff7675;
+  top: 10%;
+  left: 15%;
+}
+
+.blob-2 {
+  width: 500px;
+  height: 500px;
+  background: #5f27cd;
+  bottom: 10%;
+  right: 15%;
+  animation-delay: -7s;
+}
+
+.blob-3 {
+  width: 350px;
+  height: 350px;
+  background: #ff9f43;
+  top: 60%;
+  left: 45%;
+  animation-delay: -14s;
+}
+
+@keyframes floatBlobs {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 60px) scale(1.1); }
+  100% { transform: translate(-30px, -40px) scale(0.95); }
+}
+
+/* Top Menu Bar */
+.desktop-menubar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  background: rgba(15, 20, 29, 0.7);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9rem;
+}
+
+.menubar-left, .menubar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--primary-color);
+  letter-spacing: 0.5px;
+}
+
+.brand-badge span {
+  font-size: 1.2rem;
+}
+
+.menu-item {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  transition: color 0.2s;
+  cursor: default;
+}
+
+.menu-item:hover {
+  color: var(--text-main);
+}
+
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-icon {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.btn-pet {
+  background: linear-gradient(135deg, rgba(255, 118, 117, 0.25), rgba(254, 202, 87, 0.25));
+  border-color: rgba(255, 118, 117, 0.5);
+  color: #ff9f43;
+  font-weight: 700;
+  animation: petHeartbeat 2.5s infinite ease-in-out;
+}
+
+.btn-pet:hover {
+  background: linear-gradient(135deg, rgba(255, 118, 117, 0.4), rgba(254, 202, 87, 0.4));
+  box-shadow: 0 0 16px var(--primary-glow);
+  transform: translateY(-2px) scale(1.04);
+}
+
+@keyframes petHeartbeat {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 118, 117, 0); }
+  50% { transform: scale(1.04); box-shadow: 0 0 14px rgba(255, 118, 117, 0.45); }
+}
+
+.speed-select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-main);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.speed-select option {
+  background: #1a2130;
+  color: #fff;
+}
+
+/* Main Workspace Stage */
+.desktop-stage {
+  position: relative;
+  z-index: 5;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 135px 20px 60px;
+  min-height: calc(100vh - 50px);
+  overflow-y: auto;
+}
+
+/* The Interactive Window Frame */
+.window-container {
+  position: relative;
+  width: 450px;
+  max-width: 95vw;
+  perspective: 1200px;
+  margin-top: 5px;
+}
+
+/* The Animated Cat Perch Container (PROMINENT & UNCLIPPED) */
+.cat-perch {
+  position: absolute;
+  top: -125px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 170px;
+  z-index: 25;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cat-perch:hover {
+  transform: translateX(-50%) scale(1.03);
+}
+
+/* Speech Bubble */
+.cat-bubble {
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #1e272e;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  opacity: 1;
+  transition: all 0.3s ease;
+  animation: bubbleFloat 3s infinite ease-in-out;
+}
+
+.cat-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: #ffffff transparent;
+  display: block;
+  width: 0;
+}
+
+@keyframes bubbleFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+/* Cat SVG Parts & Animations */
+.cat-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+}
+
+.cat-tail {
+  transform-origin: 50px 140px;
+  animation: tailWag 3.5s infinite ease-in-out;
+}
+
+@keyframes tailWag {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(12deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+.cat-ear-left {
+  transform-origin: 75px 65px;
+  animation: earTwitchLeft 6s infinite ease-in-out;
+}
+
+.cat-ear-right {
+  transform-origin: 145px 65px;
+  animation: earTwitchRight 7s infinite ease-in-out;
+}
+
+@keyframes earTwitchLeft {
+  0%, 90%, 100% { transform: rotate(0deg); }
+  93% { transform: rotate(-8deg); }
+  96% { transform: rotate(4deg); }
+}
+
+@keyframes earTwitchRight {
+  0%, 85%, 100% { transform: rotate(0deg); }
+  88% { transform: rotate(8deg); }
+  92% { transform: rotate(-4deg); }
+}
+
+/* Eye Blink Animation */
+.cat-eye-shape {
+  transform-origin: center;
+  transition: transform 0.15s ease;
+}
+
+.blinking .cat-eye-shape {
+  transform: scaleY(0.08);
+}
+
+/* Pupils Movement */
+.cat-pupil {
+  transition: transform 0.08s ease-out;
+}
+
+/* Heart Eyes (For Success State) */
+.cat-heart-eye {
+  display: none;
+  fill: #ff4757;
+  transform-origin: center;
+  animation: heartPulse 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1.15); }
+}
+
+.cat-happy .cat-eye-shape,
+.cat-happy .cat-pupil,
+.cat-happy .cat-pupil-shine {
+  display: none;
+}
+
+.cat-happy .cat-heart-eye {
+  display: block;
+}
+
+/* Paws covering eyes logic */
+.cat-paw {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* When password field is focused */
+.cat-perch.covering-eyes #paw-left {
+  transform: translate(12px, -70px) rotate(15deg);
+}
+
+.cat-perch.covering-eyes #paw-right {
+  transform: translate(-12px, -70px) rotate(-15deg);
+}
+
+/* When show password peek is activated */
+.cat-perch.peeking #paw-left {
+  transform: translate(12px, -70px) rotate(15deg);
+}
+
+.cat-perch.peeking #paw-right {
+  transform: translate(-6px, -35px) rotate(-6deg);
+}
+
+/* Impatient state (50% time left) */
+.cat-perch.impatient #paw-right {
+  animation: pawTapAnim 0.3s infinite alternate ease-in-out;
+}
+
+@keyframes pawTapAnim {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+/* Predatory butt-wiggle pounce prep (< 20% time left) */
+.cat-perch.wiggle {
+  animation: buttWiggle 0.22s infinite alternate ease-in-out;
+}
+
+@keyframes buttWiggle {
+  0% { transform: translateX(calc(-50% - 4px)) rotate(-2deg); }
+  100% { transform: translateX(calc(-50% + 4px)) rotate(2deg); }
+}
+
+/* Window Card */
+.window-card {
+  position: relative;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-card);
+  border-radius: 18px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  transform-origin: bottom center;
+}
+
+/* Window Title Bar */
+.window-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.window-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.dot:hover {
+  opacity: 0.8;
+}
+
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.window-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.window-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: rgba(84, 160, 255, 0.15);
+  color: var(--accent-color);
+  border: 1px solid rgba(84, 160, 255, 0.3);
+}
+
+/* Window Content */
+.window-content {
+  padding: 28px 32px 32px;
+}
+
+/* Urgency Timer Header */
+.timer-container {
+  margin-bottom: 22px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.timer-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timer-digits {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--success-color);
+  transition: color 0.3s;
+}
+
+.timer-digits.warning {
+  color: var(--warning-color);
+}
+
+.timer-digits.danger {
+  color: var(--danger-color);
+  animation: timerPulse 0.4s infinite alternate;
+}
+
+@keyframes timerPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); text-shadow: 0 0 10px var(--danger-color); }
+}
+
+.timer-bar-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #1dd1a1, #10ac84);
+  border-radius: 10px;
+  transition: width 0.1s linear, background 0.4s ease;
+}
+
+.timer-bar-fill.warning {
+  background: linear-gradient(90deg, #feca57, #ff9f43);
+}
+
+.timer-bar-fill.danger {
+  background: linear-gradient(90deg, #ff6b6b, #ee5253);
+  box-shadow: 0 0 12px rgba(238, 82, 83, 0.7);
+}
+
+/* Header Text */
+.form-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.form-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #fff, #c8d6e5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.form-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Form Styles */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  pointer-events: none;
+  transition: color 0.2s;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px 14px 12px 42px;
+  color: #fff;
+  font-size: 0.92rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-input:focus {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.form-input:focus + .input-icon {
+  color: var(--primary-color);
+}
+
+.btn-toggle-pw {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1.1rem;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.btn-toggle-pw:hover {
+  color: var(--text-main);
+  transform: scale(1.1);
+}
+
+/* Bad UI Password Checklist & Badges */
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bad-ui-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border: 1px solid rgba(255, 71, 87, 0.5);
+  letter-spacing: 0.5px;
+  animation: badgeBlink 1.2s infinite alternate;
+}
+
+@keyframes badgeBlink {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; text-shadow: 0 0 8px #ff4757; }
+}
+
+.password-rules-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: -4px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.rules-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #feca57;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.rules-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rule-item {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.rule-item.invalid {
+  color: #ff6b6b;
+}
+
+.rule-item.valid {
+  color: #1dd1a1;
+  font-weight: 600;
+}
+
+.rule-icon {
+  font-size: 0.8rem;
+  display: inline-block;
+  width: 16px;
+}
+
+/* Dog CAPTCHA */
+.dog-captcha-box {
+  background: rgba(254, 202, 87, 0.08);
+  border: 1px dashed rgba(254, 202, 87, 0.35);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.captcha-warning {
+  font-size: 0.72rem;
+  color: #feca57;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.captcha-input {
+  margin-top: 8px;
+  width: 100%;
+  font-size: 0.85rem;
+  padding: 8px 10px;
+}
+
+/* Fake Caps Lock Warning */
+.caps-lock-warning {
+  display: none;
+  font-size: 0.72rem;
+  color: #ff6b6b;
+  margin-top: 6px;
+  font-weight: 600;
+  animation: shakeX 0.4s ease;
+}
+.caps-lock-warning.visible {
+  display: block;
+}
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+/* Mandatory Terms & Conditions */
+.tos-box {
+  background: rgba(84, 160, 255, 0.08);
+  border: 1px dashed rgba(84, 160, 255, 0.35);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+.tos-box a {
+  color: #54a0ff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.tos-box .checkbox-label {
+  cursor: not-allowed;
+}
+.tos-box.agreed {
+  background: rgba(29, 209, 161, 0.08);
+  border-color: rgba(29, 209, 161, 0.35);
+}
+.tos-box.agreed .checkbox-label {
+  cursor: default;
+}
+
+.tos-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.tos-modal-overlay.visible {
+  display: flex;
+}
+.tos-modal {
+  background: #1b1e2b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.tos-modal h3 {
+  color: #fff;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+.tos-modal-content {
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 14px;
+}
+.tos-modal-content p {
+  margin-bottom: 12px;
+}
+.tos-modal-content strong {
+  color: #fff;
+}
+.tos-agree-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.tos-agree-btn.unlocked {
+  cursor: pointer;
+  background: linear-gradient(135deg, #1dd1a1, #10ac84);
+  color: #fff;
+}
+
+/* Nag-Chain Modal */
+.nag-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1001;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.nag-modal-overlay.visible {
+  display: flex;
+}
+.nag-modal {
+  background: #1b1e2b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  max-width: 380px;
+  width: 100%;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.nag-modal h3 {
+  color: #fff;
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.nag-modal-input {
+  margin-bottom: 14px;
+  width: 100%;
+  text-align: center;
+}
+.nag-modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+.nag-btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.nag-btn:active {
+  transform: scale(0.96);
+}
+.nag-btn-yes {
+  background: linear-gradient(135deg, #1dd1a1, #10ac84);
+  color: #fff;
+}
+.nag-btn-no {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+.nag-btn.dodging {
+  transition: transform 0.08s linear;
+}
+
+/* Fake Advertisement Interstitial */
+.ad-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(6, 8, 14, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.ad-overlay.hidden {
+  display: none;
+}
+.ad-card {
+  background: linear-gradient(160deg, #2a1f0f, #1b1e2b);
+  border: 3px solid #feca57;
+  border-radius: 14px;
+  max-width: 380px;
+  width: 100%;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(254, 202, 87, 0.25);
+}
+.ad-badge {
+  display: inline-block;
+  background: #feca57;
+  color: #1b1e2b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.ad-emoji {
+  font-size: 3rem;
+  margin-bottom: 6px;
+}
+.ad-body h3 {
+  color: #feca57;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+.ad-body p {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+.ad-skip-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.ad-skip-btn.unlocked {
+  cursor: pointer;
+  background: linear-gradient(135deg, #feca57, #ff9f43);
+  color: #1b1e2b;
+}
+
+/* Spammy notification toast stack */
+.notif-toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 260px;
+}
+.notif-toast {
+  background: #1b1e2b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  animation: toastIn 0.3s ease;
+}
+.notif-toast button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Random Floating Cat Photo Popup */
+.cat-photo-popup {
+  position: fixed;
+  z-index: 1600;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.7) rotate(-6deg);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.cat-photo-popup.visible {
+  opacity: 1;
+  transform: scale(1) rotate(-4deg);
+}
+.cat-photo-frame {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 10px 16px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+  width: 140px;
+  text-align: center;
+}
+.cat-photo-emoji {
+  font-size: 4.2rem;
+  line-height: 1;
+  background: linear-gradient(160deg, #ffe9c7, #ffd3a1);
+  border-radius: 4px;
+  padding: 14px 0;
+  margin-bottom: 8px;
+}
+.cat-photo-caption {
+  color: #333;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+/* Cat That Randomly Strolls Across The Screen */
+.strolling-cat {
+  position: fixed;
+  bottom: 12px;
+  left: -60px;
+  font-size: 2rem;
+  z-index: 1550;
+  pointer-events: none;
+  display: none;
+}
+.strolling-cat.walking {
+  display: block;
+  animation: strollAcross 6s linear forwards;
+}
+@keyframes strollAcross {
+  0% { left: -60px; }
+  100% { left: 105vw; }
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.forgot-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+/* Evasive Runaway Submit Button Container */
+.btn-submit-container {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  margin-top: 6px;
+}
+
+.btn-submit {
+  position: relative;
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #ff7675, #e84118);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px var(--primary-glow);
+  transition: transform 0.15s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  will-change: transform;
+}
+
+.btn-submit:hover {
+  box-shadow: 0 12px 30px rgba(255, 118, 117, 0.6);
+  background: linear-gradient(135deg, #ff8b8a, #f15229);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+/* Floating Cat Scratch Marks (-1.5s!) */
+.floating-scratch {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #ff4757;
+  z-index: 100;
+  text-shadow: 0 0 10px rgba(255, 71, 87, 0.8);
+  animation: scratchSlash 1.2s forwards ease-out;
+}
+
+@keyframes scratchSlash {
+  0% { transform: scale(0.6) rotate(-15deg); opacity: 1; }
+  30% { transform: scale(1.3) rotate(8deg); opacity: 1; }
+  100% { transform: translateY(-60px) scale(0.9) rotate(-10deg); opacity: 0; }
+}
+
+/* ==========================================================================
+   THE CLIMAX: Giant Paw & Window Slam Animation
+   ========================================================================== */
+
+/* The Giant Animated Paw that slams down */
+.giant-paw-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 360px;
+  height: 440px;
+  pointer-events: none;
+  z-index: 100;
+  transform: translate(120%, -140%) rotate(45deg);
+  opacity: 0;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+}
+
+.giant-paw-overlay.slapping {
+  animation: giantPawSlap 0.6s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+}
+
+@keyframes giantPawSlap {
+  0% {
+    transform: translate(80%, -140%) rotate(45deg) scale(0.9);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(-50%, -55%) rotate(-12deg) scale(1.18);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(-50%, -50%) rotate(-8deg) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -20%) rotate(0deg) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Comic Impact Burst / BAM */
+.comic-burst {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 60;
+  pointer-events: none;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: 3.5rem;
+  color: #feca57;
+  text-shadow: 4px 4px 0 #ee5253, -2px -2px 0 #ee5253, 0 0 20px #ff9f43;
+  letter-spacing: 2px;
+  opacity: 0;
+}
+
+.comic-burst.active {
+  animation: comicBurstPop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes comicBurstPop {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); opacity: 0; }
+  30% { transform: translate(-50%, -50%) scale(1.3) rotate(-5deg); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.8) rotate(10deg); opacity: 0; }
+}
+
+/* Window slamming closed animation */
+.window-card.slammed {
+  animation: windowSlamDown 0.6s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+}
+
+@keyframes windowSlamDown {
+  0% { transform: rotateX(0deg) scale(1); }
+  40% { transform: rotateX(-15deg) scale(1.02); }
+  100% { transform: rotateX(95deg) scale(0.7) translateY(60px); opacity: 0; }
+}
+
+/* Screen Shake Effect */
+.shake-screen {
+  animation: screenVibrate 0.45s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes screenVibrate {
+  10%, 90% { transform: translate3d(-3px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 2px, 0); }
+  30%, 50%, 70% { transform: translate3d(-7px, -3px, 0); }
+  40%, 60% { transform: translate3d(7px, 3px, 0); }
+}
+
+/* ==========================================================================
+   GAME OVER / "TRY AGAIN" SCREEN (The Closed State)
+   ========================================================================== */
+
+.closed-screen-card {
+  display: none;
+  position: relative;
+  background: rgba(20, 24, 34, 0.95);
+  backdrop-filter: blur(25px);
+  border: 2px solid rgba(238, 82, 83, 0.5);
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(238, 82, 83, 0.3);
+  transform: scale(0.85);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.closed-screen-card.visible {
+  display: block;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Danger Tape Bar */
+.danger-tape {
+  position: absolute;
+  top: 14px;
+  left: -20px;
+  right: -20px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #ee5253,
+    #ee5253 15px,
+    #222f3e 15px,
+    #222f3e 30px
+  );
+  height: 12px;
+  opacity: 0.8;
+}
+
+.closed-avatar-wrap {
+  position: relative;
+  width: 140px;
+  height: 120px;
+  margin: 15px auto 10px;
+}
+
+.closed-cat-img {
+  width: 100%;
+  height: 100%;
+}
+
+.closed-badge {
+  display: inline-block;
+  background: rgba(238, 82, 83, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(238, 82, 83, 0.5);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.closed-screen-card h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.closed-screen-card .roast-quote {
+  font-size: 0.95rem;
+  color: #feca57;
+  font-style: italic;
+  margin-bottom: 24px;
+  padding: 10px 18px;
+  background: rgba(254, 202, 87, 0.08);
+  border-radius: 12px;
+  border-left: 3px solid #feca57;
+}
+
+.btn-try-again {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #10ac84, #1dd1a1);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 10px 25px rgba(29, 209, 161, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: pulseButton 2s infinite ease-in-out;
+}
+
+.btn-try-again:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 35px rgba(29, 209, 161, 0.6);
+  background: linear-gradient(135deg, #1dd1a1, #10ac84);
+}
+
+@keyframes pulseButton {
+  0%, 100% { box-shadow: 0 10px 25px rgba(29, 209, 161, 0.4); }
+  50% { box-shadow: 0 10px 35px rgba(29, 209, 161, 0.75); }
+}
+
+/* ==========================================================================
+   SUCCESS DASHBOARD STATE (If logged in before cat closes)
+   ========================================================================== */
+
+.success-card {
+  display: none;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(29, 209, 161, 0.4);
+  border-radius: 20px;
+  padding: 36px 30px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 30px rgba(29, 209, 161, 0.25);
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.success-card.visible {
+  display: block;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.success-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-val {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--success-color);
+  margin-bottom: 4px;
+}
+
+.stat-name {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.btn-logout {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-main);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Floating Bonus Hearts / Particles */
+.floating-heart {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ff4757;
+  z-index: 100;
+  animation: floatUpFade 1.2s forwards ease-out;
+}
+
+@keyframes floatUpFade {
+  0% { transform: translateY(0) scale(0.6); opacity: 1; }
+  100% { transform: translateY(-70px) scale(1.3); opacity: 0; }
+}
+
+/* Confetti Container */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .window-container {
+    width: 100%;
+  }
+  .window-content {
+    padding: 24px 20px;
+  }
+  .desktop-menubar {
+    padding: 8px 12px;
+  }
+  .menu-item {
+    display: none;
+  }
+  .cat-perch {
+    width: 180px;
+    height: 120px;
+    top: -105px;
+  }
+}
+
+  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😾</text></svg>">
+</head>
+<body>
+
+  <!-- Ambient Animated Background Wallpaper -->
+  <div class="desktop-ambient">
+    <div class="ambient-blob blob-1"></div>
+    <div class="ambient-blob blob-2"></div>
+    <div class="ambient-blob blob-3"></div>
+  </div>
+
+  <!-- Confetti Canvas for Celebrations -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Desktop Top Menu Bar -->
+  <header class="desktop-menubar">
+    <div class="menubar-left">
+      <div class="brand-badge">
+        <span>😾</span> Bad UI Edition: Cat Guardian
+      </div>
+      <span class="menu-item">Rage Mode</span>
+      <span class="menu-item">Rules: 5s / 8 Words</span>
+    </div>
+    <div class="menubar-right">
+      <div class="controls-group">
+        <!-- Pet the Cat (Adds +3s Bonus Time!) -->
+        <button id="btn-pet-cat" class="btn-icon btn-pet" title="Pet the cat to gain +3 seconds!">
+          <span>💖</span> Pet Cat: +3s (<span id="pet-counter">0</span>)
+        </button>
+
+        <!-- Speed / Urgency Selector -->
+        <select id="timer-speed-select" class="speed-select" title="Difficulty Timer">
+          <option value="10" selected>⚡ Standard Cat (10s)</option>
+          <option value="15">😺 Relaxed Mode (15s)</option>
+          <option value="5">🔥 Chaos Mode (5s)</option>
+        </select>
+
+        <!-- Sound Toggle -->
+        <button id="btn-sound-toggle" class="btn-icon" title="Toggle Sound FX">
+          <span id="sound-icon">🔊</span> Sound: <span id="sound-status">ON</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Stage Area -->
+  <main class="desktop-stage" id="main-stage">
+    
+    <!-- Comic Slam Burst Effect (BAM!) -->
+    <div class="comic-burst" id="comic-burst">💥 BAM!!</div>
+
+    <!-- The Giant Paw that Slams down when timer expires -->
+    <div class="giant-paw-overlay" id="giant-paw">
+      <svg viewBox="0 0 200 280" width="100%" height="100%">
+        <!-- Giant Furry Arm -->
+        <path d="M 40 0 L 170 0 L 150 180 Q 140 225 95 225 Q 35 215 40 0 Z" fill="#ff9f43" stroke="#b33939" stroke-width="5"/>
+        <path d="M 60 50 L 85 75 L 68 95" stroke="#feca57" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M 120 80 L 145 105 L 128 125" stroke="#feca57" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <!-- Giant Paw Claws & Pad -->
+        <ellipse cx="95" cy="205" rx="60" ry="48" fill="#fff0db" stroke="#b33939" stroke-width="5"/>
+        <path d="M 72 212 Q 95 190 118 212 Q 130 238 95 244 Q 60 238 72 212 Z" fill="#ff7675"/>
+        <!-- 4 Claws / Toe Beans -->
+        <ellipse cx="55" cy="178" rx="15" ry="19" fill="#ff7675" transform="rotate(-15 55 178)"/>
+        <ellipse cx="83" cy="162" rx="15" ry="20" fill="#ff7675" transform="rotate(-5 83 162)"/>
+        <ellipse cx="111" cy="162" rx="15" ry="20" fill="#ff7675" transform="rotate(5 111 162)"/>
+        <ellipse cx="139" cy="178" rx="15" ry="19" fill="#ff7675" transform="rotate(15 139 178)"/>
+      </svg>
+    </div>
+
+    <!-- Interactive Window Container -->
+    <div class="window-container" id="window-container">
+
+      <!-- THE INTERACTIVE CAT (PROMINENT, FULLY VISIBLE & HIGH CONTRAST) -->
+      <div class="cat-perch" id="cat-perch">
+        <!-- Dynamic Speech Bubble -->
+        <div class="cat-bubble" id="cat-bubble">YOU HAVE 10 SECONDS! PET ME FOR +3s! 💖🐾</div>
+
+        <!-- SVG Cat Character -->
+        <svg class="cat-svg" viewBox="0 0 260 170" id="cat-svg">
+          <defs>
+            <linearGradient id="catBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ff9f43"/>
+              <stop offset="60%" stop-color="#ee5253"/>
+              <stop offset="100%" stop-color="#c0392b"/>
+            </linearGradient>
+            <linearGradient id="bellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#ffeaa7"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Swishing Tail (Back layer) -->
+          <g class="cat-tail" id="cat-tail">
+            <path d="M 55 150 Q 20 120 22 75 Q 26 45 42 52 Q 52 58 42 85 Q 32 115 70 155 Z" fill="#ff9f43" stroke="#b33939" stroke-width="3"/>
+            <!-- White Tail Tip -->
+            <path d="M 25 78 Q 26 45 42 52 Q 52 58 42 85 Z" fill="#ffffff"/>
+          </g>
+
+          <!-- Cat Body -->
+          <path id="cat-body" d="M 60 170 Q 60 104 130 104 Q 200 104 200 170 Z" fill="url(#catBodyGrad)" stroke="#b33939" stroke-width="3.5"/>
+          
+          <!-- White Chest/Belly Fluff -->
+          <path d="M 100 170 Q 105 125 130 125 Q 155 125 160 170 Z" fill="url(#bellyGrad)"/>
+
+          <!-- Left Ear -->
+          <g class="cat-ear-left" id="ear-left">
+            <path d="M 85 64 L 62 12 L 114 42 Z" fill="#ff9f43" stroke="#b33939" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M 86 56 L 72 24 L 106 42 Z" fill="#ffb8b8"/>
+          </g>
+
+          <!-- Right Ear -->
+          <g class="cat-ear-right" id="ear-right">
+            <path d="M 175 64 L 198 12 L 146 42 Z" fill="#ff9f43" stroke="#b33939" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M 174 56 L 188 24 L 154 42 Z" fill="#ffb8b8"/>
+          </g>
+
+          <!-- Cat Head Base (Large & Vivid!) -->
+          <ellipse id="cat-head" cx="130" cy="85" rx="55" ry="47" fill="url(#catBodyGrad)" stroke="#b33939" stroke-width="3.5"/>
+
+          <!-- Forehead Tabby Stripes -->
+          <path d="M 122 46 L 122 62 M 130 42 L 130 65 M 138 46 L 138 62" stroke="#b33939" stroke-width="3.5" stroke-linecap="round"/>
+
+          <!-- Cheeks / Cute Blush -->
+          <ellipse id="blush-left" cx="92" cy="98" rx="10" ry="6" fill="#ff7675" opacity="0.75"/>
+          <ellipse id="blush-right" cx="168" cy="98" rx="10" ry="6" fill="#ff7675" opacity="0.75"/>
+
+          <!-- White Muzzle Patch -->
+          <ellipse cx="130" cy="99" rx="26" ry="18" fill="#ffffff" stroke="#e17055" stroke-width="1.5"/>
+
+          <!-- Left Eye Socket -->
+          <g id="cat-eye-left" class="cat-eye-group">
+            <ellipse class="cat-eye-shape" cx="110" cy="80" rx="14" ry="16" fill="#ffffff" stroke="#2d3436" stroke-width="3"/>
+            <!-- Left Pupil -->
+            <g id="pupil-left" class="cat-pupil">
+              <circle cx="110" cy="80" r="8.2" fill="#2d3436"/>
+              <circle class="cat-pupil-shine" cx="107" cy="76" r="3" fill="#ffffff"/>
+              <circle class="cat-pupil-shine-small" cx="113" cy="83" r="1.5" fill="#ffffff"/>
+            </g>
+            <!-- Left Heart Eye (Success mode) -->
+            <path class="cat-heart-eye" d="M 110 87 C 103 80, 98 73, 103 68 C 107 64, 110 68, 110 70 C 110 68, 113 64, 117 68 C 122 73, 117 80, 110 87 Z"/>
+          </g>
+
+          <!-- Right Eye Socket -->
+          <g id="cat-eye-right" class="cat-eye-group">
+            <ellipse class="cat-eye-shape" cx="150" cy="80" rx="14" ry="16" fill="#ffffff" stroke="#2d3436" stroke-width="3"/>
+            <!-- Right Pupil -->
+            <g id="pupil-right" class="cat-pupil">
+              <circle cx="150" cy="80" r="8.2" fill="#2d3436"/>
+              <circle class="cat-pupil-shine" cx="147" cy="76" r="3" fill="#ffffff"/>
+              <circle class="cat-pupil-shine-small" cx="153" cy="83" r="1.5" fill="#ffffff"/>
+            </g>
+            <!-- Right Heart Eye (Success mode) -->
+            <path class="cat-heart-eye" d="M 150 87 C 143 80, 138 73, 143 68 C 147 64, 150 68, 150 70 C 150 68, 153 64, 157 68 C 162 73, 157 80, 150 87 Z"/>
+          </g>
+
+          <!-- Snout / Nose -->
+          <polygon points="124,93 136,93 130,100" fill="#ff7675" stroke="#b33939" stroke-width="1.5"/>
+
+          <!-- Mouth -->
+          <path id="cat-mouth" d="M 122 101 Q 130 108 130 101 Q 130 108 138 101" fill="none" stroke="#2d3436" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- Bold Whiskers -->
+          <path d="M 85 92 L 50 88 M 85 99 L 46 100 M 85 106 L 52 113" stroke="#2d3436" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M 175 92 L 210 88 M 175 99 L 214 100 M 175 106 L 208 113" stroke="#2d3436" stroke-width="2.2" stroke-linecap="round"/>
+
+          <!-- Left Paw on the Window Frame (Animated!) -->
+          <g class="cat-paw" id="paw-left">
+            <path d="M 80 165 Q 80 142 98 142 Q 116 142 116 165 Q 116 172 80 172 Z" fill="#fff0db" stroke="#b33939" stroke-width="3"/>
+            <line x1="92" y1="147" x2="92" y2="160" stroke="#ee5253" stroke-width="2" stroke-linecap="round"/>
+            <line x1="104" y1="147" x2="104" y2="160" stroke="#ee5253" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="98" cy="152" rx="8" ry="6" fill="#ff7675" opacity="0.95"/>
+          </g>
+
+          <!-- Right Paw on the Window Frame (Animated!) -->
+          <g class="cat-paw" id="paw-right">
+            <path d="M 144 165 Q 144 142 162 142 Q 180 142 180 165 Q 180 172 144 172 Z" fill="#fff0db" stroke="#b33939" stroke-width="3"/>
+            <line x1="156" y1="147" x2="156" y2="160" stroke="#ee5253" stroke-width="2" stroke-linecap="round"/>
+            <line x1="168" y1="147" x2="168" y2="160" stroke="#ee5253" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="162" cy="152" rx="8" ry="6" fill="#ff7675" opacity="0.95"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Fake Advertisement Interstitial (classic bad-UI move: block the form behind an ad) -->
+      <div class="ad-overlay" id="ad-overlay">
+        <div class="ad-card">
+          <div class="ad-badge">ADVERTISEMENT</div>
+          <div class="ad-body">
+            <div class="ad-emoji">🐈</div>
+            <h3>WHISKAS PREMIUM CAT FOOD</h3>
+            <p>9 out of 10 cats agree: this login page is 10/10 evil. Buy cat food now to make it stop. (It won't.)</p>
+          </div>
+          <button class="ad-skip-btn" id="ad-skip-btn" disabled>Skip Ad in <span id="ad-countdown">5</span>s</button>
+        </div>
+      </div>
+
+      <!-- MAIN LOGIN WINDOW CARD -->
+      <div class="window-card" id="window-card">
+        <!-- Window Title Bar -->
+        <div class="window-titlebar">
+          <div class="window-dots">
+            <div class="dot dot-red" id="dot-close" title="Emergency instant cat slam!"></div>
+            <div class="dot dot-yellow" title="Minimize (Blocked by cat)"></div>
+            <div class="dot dot-green" title="Expand (Blocked by cat)"></div>
+          </div>
+          <div class="window-title">🔥 10-Second Cat Portal (Pet for +3s!) 🐾</div>
+          <div class="window-badge" id="security-badge">CAT PATIENCE: 10s</div>
+        </div>
+
+        <!-- Window Inner Content -->
+        <div class="window-content">
+          
+          <!-- Urgency Countdown Timer (10.0s DEFAULT!) -->
+          <div class="timer-container">
+            <div class="timer-header">
+              <div class="timer-label">
+                <span>⏱️</span> Cat Patience Countdown
+              </div>
+              <div class="timer-digits warning" id="timer-display">10.0s</div>
+            </div>
+            <div class="timer-bar-track">
+              <div class="timer-bar-fill warning" id="timer-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Form Header -->
+          <div class="form-header">
+            <h2>Log In In 10 Seconds!</h2>
+            <p>Pet the cat anytime to gain +3 seconds, or face the claw!</p>
+          </div>
+
+          <!-- Login Form -->
+          <form class="login-form" id="login-form" autocomplete="off" onsubmit="return false;">
+            <!-- Username/Email Field -->
+            <div class="input-group">
+              <label for="input-username">Username or Email</label>
+              <div class="input-wrapper">
+                <span class="input-icon">👤</span>
+                <input type="text" id="input-username" class="form-input" placeholder="hooman@example.com" value="speedy@hooman.com" required>
+              </div>
+            </div>
+
+            <!-- Password Field (HARDCORE BAD UI REQUIREMENTS!) -->
+            <div class="input-group">
+              <div class="label-row">
+                <label for="input-password">Password (Strict Cat Rules)</label>
+                <span class="bad-ui-badge">COMPLEXITY: IMPOSSIBLE</span>
+              </div>
+              <div class="input-wrapper" id="pw-input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="input-password" class="form-input" placeholder="Type 8 letters with Upper, Number, Symbol..." required>
+                <button type="button" class="btn-toggle-pw" id="btn-toggle-pw" title="Show / Hide Password">
+                  👁️
+                </button>
+              </div>
+              <div class="caps-lock-warning" id="caps-lock-warning">⚠️ Caps Lock might be ON! (Or might not. Who's to say.)</div>
+            </div>
+
+            <!-- LIVE BAD UI PASSWORD CHECKLIST -->
+            <div class="password-rules-box" id="password-rules-box">
+              <div class="rules-header">
+                <span>⚠️ Cat Password Demands (Finish in 5s!):</span>
+                <span id="rules-score">0 / 4 met</span>
+              </div>
+              <ul class="rules-list">
+                <li id="rule-words" class="rule-item invalid">
+                  <span class="rule-icon">❌</span> Minimum 8 letters <strong id="words-counter">(0 / 8 letters)</strong>
+                </li>
+                <li id="rule-upper" class="rule-item invalid">
+                  <span class="rule-icon">❌</span> At least 1 Capital Letter (A-Z)
+                </li>
+                <li id="rule-number" class="rule-item invalid">
+                  <span class="rule-icon">❌</span> At least 1 Number (0-9)
+                </li>
+                <li id="rule-symbol" class="rule-item invalid">
+                  <span class="rule-icon">❌</span> At least 1 Special Symbol (!@#$%...)
+                </li>
+              </ul>
+            </div>
+
+            <!-- Annoying Meow Math Verification -->
+            <div class="dog-captcha-box" id="math-captcha-box">
+              <label class="checkbox-label" id="math-label">
+                <span id="captcha-question">🐾 Prove you're a hooman: 2 + 2 = ?</span>
+              </label>
+              <input type="text" id="captcha-answer" class="form-input captcha-input" placeholder="Type the answer..." autocomplete="off">
+              <div class="captcha-warning" id="captcha-warning">🙀 Cats can't do math. Can you?</div>
+            </div>
+
+            <!-- Mandatory Terms & Conditions (must scroll to bottom to agree!) -->
+            <div class="tos-box" id="tos-box">
+              <label class="checkbox-label" id="tos-checkbox-label">
+                <input type="checkbox" id="tos-checkbox">
+                <span>I agree to the <a href="#" id="tos-open-link">Terms &amp; Conditions</a> (mandatory, obviously)</span>
+              </label>
+            </div>
+
+            <!-- Form Options -->
+            <div class="form-options">
+              <a href="#" class="forgot-link" id="forgot-link">Give up?</a>
+            </div>
+
+            <!-- The Evasive Runaway Submit Button! -->
+            <div class="btn-submit-container">
+              <button type="submit" class="btn-submit" id="btn-submit">
+                <span id="btn-submit-text">Log In Now (Catch Me!)</span>
+                <span>⚡</span>
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+      <!-- Mandatory Terms & Conditions Modal (must scroll to bottom!) -->
+      <div class="tos-modal-overlay" id="tos-modal-overlay">
+        <div class="tos-modal">
+          <h3>🐾 Terms & Conditions of the Cat</h3>
+          <div class="tos-modal-content" id="tos-modal-content">
+            <p><strong>Section 1: The Cat's Authority</strong><br>
+            By using this login form, you acknowledge that the cat is the supreme authority over your login attempt, and any password rules, timers, or math problems presented are entirely at the cat's discretion and may change without notice, warning, or remorse.</p>
+            <p><strong>Section 2: The Runaway Button</strong><br>
+            You agree that the Log In button is legally allowed to run away from your cursor as many times as it wants, for as long as it wants, and that this is a feature, not a bug, no matter how many times you complain about it.</p>
+            <p><strong>Section 3: The Math Challenge</strong><br>
+            You agree that solving basic addition is a reasonable and proportionate security measure, and that cats have never been good at math, which is precisely why you have to do it for them.</p>
+            <p><strong>Section 4: The Nagging Clause</strong><br>
+            You agree to be asked "Are you sure?" a minimum of four times before actually logging in, and further agree that each of these questions is asked with love, and also mild suspicion.</p>
+            <p><strong>Section 5: Tuna Treats (Discontinued)</strong><br>
+            Any prior promises regarding tuna treats have been discontinued and are no longer honored, effective immediately, retroactively, and with no possibility of appeal.</p>
+            <p><strong>Section 6: Scrolling Requirement</strong><br>
+            You must scroll all the way down here to unlock the "I Agree" button. This is intentional. The cat finds this very funny.</p>
+            <p><strong>Section 7: Final Clause</strong><br>
+            Congratulations, hooman. You have read the entire Terms & Conditions, which is more than most cats can say about literally anything. You may now agree.</p>
+          </div>
+          <button class="tos-agree-btn" id="tos-agree-btn" disabled>Scroll down to unlock "I Agree" 🔒</button>
+        </div>
+      </div>
+
+      <!-- Annoying Nag-Chain Modal (used instead of native confirm/prompt dialogs, which browsers can block) -->
+      <div class="nag-modal-overlay" id="nag-modal-overlay">
+        <div class="nag-modal">
+          <h3 id="nag-modal-title">Do you want to login? 🐾</h3>
+          <input type="text" id="nag-modal-input" class="form-input nag-modal-input" placeholder="Type MEOW here..." autocomplete="off" style="display:none;">
+          <div class="nag-modal-buttons">
+            <button type="button" class="nag-btn nag-btn-yes" id="nag-modal-yes">Yes</button>
+            <button type="button" class="nag-btn nag-btn-no" id="nag-modal-no">No</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- THE "TRY AGAIN" SCREEN (Appears after the cat slams the page shut!) -->
+      <div class="closed-screen-card" id="closed-screen-card">
+        <div class="danger-tape"></div>
+        
+        <div class="closed-badge">SESSION TERMINATED BY FELINE AUTHORITY</div>
+
+        <!-- Smug Cat Mascot Avatar -->
+        <div class="closed-avatar-wrap">
+          <svg viewBox="0 0 160 140" class="closed-cat-img">
+            <path d="M 30 130 Q 30 70 80 70 Q 130 70 130 130 Z" fill="#ff9f43" stroke="#b33939" stroke-width="3.5"/>
+            <path d="M 60 130 Q 65 95 80 95 Q 95 95 100 130 Z" fill="#fff0db"/>
+            <!-- Ears -->
+            <polygon points="46,55 35,15 65,40" fill="#ff9f43" stroke="#b33939" stroke-width="3"/>
+            <polygon points="114,55 125,15 95,40" fill="#ff9f43" stroke="#b33939" stroke-width="3"/>
+            <!-- Head -->
+            <ellipse cx="80" cy="65" rx="38" ry="32" fill="#ff9f43" stroke="#b33939" stroke-width="3.5"/>
+            <!-- Smug Closed Eyes (^_^) -->
+            <path d="M 58 63 Q 66 54 74 63" fill="none" stroke="#2d3436" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 86 63 Q 94 54 102 63" fill="none" stroke="#2d3436" stroke-width="3" stroke-linecap="round"/>
+            <!-- Smug Smirk -->
+            <polygon points="76,73 84,73 80,78" fill="#ff7675"/>
+            <path d="M 74 80 Q 80 86 86 80" fill="none" stroke="#2d3436" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Cheeks -->
+            <circle cx="56" cy="72" r="6" fill="#ff7675" opacity="0.6"/>
+            <circle cx="104" cy="72" r="6" fill="#ff7675" opacity="0.6"/>
+            <!-- Whiskers -->
+            <path d="M 50 71 L 30 68 M 50 76 L 28 77" stroke="#2d3436" stroke-width="2"/>
+            <path d="M 110 71 L 130 68 M 110 76 L 132 77" stroke="#2d3436" stroke-width="2"/>
+            <!-- Arms crossed proudly -->
+            <ellipse cx="68" cy="115" rx="16" ry="12" fill="#fff0db" stroke="#b33939" stroke-width="2.5" transform="rotate(-10 68 115)"/>
+            <ellipse cx="92" cy="115" rx="16" ry="12" fill="#fff0db" stroke="#b33939" stroke-width="2.5" transform="rotate(10 92 115)"/>
+          </svg>
+        </div>
+
+        <h2>TOO SLOW, HOOMAN!</h2>
+        <div class="roast-quote" id="roast-quote">
+          "Did you really think you could write an 8-letter password with a capital letter, number, and symbol in 5 SECONDS? 😹"
+        </div>
+
+        <!-- Glowing Try Again Button -->
+        <button class="btn-try-again" id="btn-try-again">
+          <span>🔄</span> Try Again (Beat the 5-Second Cat Clock!)
+        </button>
+      </div>
+
+      <!-- SUCCESS LOGGED-IN SCREEN (If by miracle they beat the 5s challenge!) -->
+      <div class="success-card" id="success-card">
+        <div class="closed-badge" style="background: rgba(29, 209, 161, 0.2); color: #1dd1a1; border-color: rgba(29, 209, 161, 0.5);">ACCESS GRUDGINGLY GRANTED</div>
+        <h2 style="font-size: 1.6rem; color: #fff; margin-top: 10px;">FINE. YOU'RE IN. 😼🏆</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">You survived the math, the nagging, and the runaway button. The cat is mildly impressed.</p>
+        
+        <div class="success-stats-grid">
+          <div class="stat-item">
+            <div class="stat-val" id="stat-time-remaining">0.4s</div>
+            <div class="stat-name">Time Left</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">5 / 5</div>
+            <div class="stat-name">Nags Survived</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">🏆 Grand</div>
+            <div class="stat-name">Bad UI Trophy</div>
+          </div>
+        </div>
+
+        <button class="btn-logout" id="btn-logout">
+          <span>🐾 Challenge Cat Again</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Spammy Notification Toast Stack -->
+  <div class="notif-toast-container" id="notif-toast-container"></div>
+
+  <!-- Random Floating "Cat Photo" Popup -->
+  <div class="cat-photo-popup" id="cat-photo-popup">
+    <div class="cat-photo-frame">
+      <div class="cat-photo-emoji" id="cat-photo-emoji">😻</div>
+      <div class="cat-photo-caption" id="cat-photo-caption">Random Cat Sighting!</div>
+    </div>
+  </div>
+
+  <!-- Cat That Randomly Strolls Across The Screen -->
+  <div class="strolling-cat" id="strolling-cat">🐈</div>
+
+  <!-- Load Audio Synthesizer & Main Application Logic -->
+  
+  <script>
+/**
+ * Web Audio API Sound Synthesizer
+ * Zero external audio files needed - 100% reliable offline & lightweight.
+ */
+class SoundEffects {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+    this.initialized = false;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        this.ctx = new AudioContext();
+        this.initialized = true;
+      }
+    } else if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  toggleMute() {
+    this.muted = !this.muted;
+    return this.muted;
+  }
+
+  // Cute short meow sound
+  playMeow(pitchMultiplier = 1.0) {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    // Cat meow frequency inflection: starts high, slides higher, then resolves down
+    const baseFreq = 540 * pitchMultiplier;
+    osc.frequency.setValueAtTime(baseFreq, t);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, t + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.9, t + 0.35);
+
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.linearRampToValueAtTime(0.25, t + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.39);
+  }
+
+  // Playful purr sound (frequency modulation)
+  playPurr() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const carrier = this.ctx.createOscillator();
+    const mod = this.ctx.createOscillator();
+    const modGain = this.ctx.createGain();
+    const mainGain = this.ctx.createGain();
+
+    carrier.type = 'triangle';
+    carrier.frequency.setValueAtTime(80, t);
+
+    mod.type = 'sine';
+    mod.frequency.setValueAtTime(25, t); // rapid purr flutter
+
+    modGain.gain.setValueAtTime(40, t);
+    mod.connect(modGain);
+    modGain.connect(carrier.frequency);
+
+    mainGain.gain.setValueAtTime(0.001, t);
+    mainGain.gain.linearRampToValueAtTime(0.3, t + 0.1);
+    mainGain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+
+    carrier.connect(mainGain);
+    mainGain.connect(this.ctx.destination);
+
+    carrier.start(t);
+    mod.start(t);
+    carrier.stop(t + 0.61);
+    mod.stop(t + 0.61);
+  }
+
+  // Ticking countdown clock (sharp woody click)
+  playTick(urgency = 1) {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    const freq = 600 + urgency * 180;
+    osc.frequency.setValueAtTime(freq, t);
+    osc.frequency.exponentialRampToValueAtTime(120, t + 0.04);
+
+    gain.gain.setValueAtTime(0.18, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.05);
+  }
+
+  // Impatient paw tap sound
+  playPawTap() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, t);
+    osc.frequency.exponentialRampToValueAtTime(100, t + 0.06);
+
+    gain.gain.setValueAtTime(0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.08);
+  }
+
+  // Dramatic window slam / crash sound
+  playSlam() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+
+    // 1. Low frequency bass thud
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+    subOsc.type = 'triangle';
+    subOsc.frequency.setValueAtTime(160, t);
+    subOsc.frequency.exponentialRampToValueAtTime(35, t + 0.35);
+
+    subGain.gain.setValueAtTime(0.6, t);
+    subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
+    subOsc.connect(subGain);
+    subGain.connect(this.ctx.destination);
+    subOsc.start(t);
+    subOsc.stop(t + 0.46);
+
+    // 2. White noise punch / burst
+    const bufferSize = Math.floor(this.ctx.sampleRate * 0.25);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.06));
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1200, t);
+    filter.frequency.exponentialRampToValueAtTime(200, t + 0.25);
+
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.4, t);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(this.ctx.destination);
+
+    noise.start(t);
+  }
+
+  // Triumphant success fanfare
+  playSuccess() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    notes.forEach((freq, idx) => {
+      const t = this.ctx.currentTime + idx * 0.09;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.2, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.36);
+    });
+  }
+
+  // Bonus time chirp
+  playBonus() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(700, t);
+    osc.frequency.exponentialRampToValueAtTime(1200, t + 0.15);
+
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.linearRampToValueAtTime(0.22, t + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.21);
+  }
+
+  // Angry cat hiss / scratch sound
+  playHiss() {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const bufferSize = Math.floor(this.ctx.sampleRate * 0.35);
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.12));
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(2500, t);
+    filter.frequency.exponentialRampToValueAtTime(1000, t + 0.3);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.35, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.34);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    noise.start(t);
+  }
+}
+
+window.soundFX = new SoundEffects();
+
+
+/**
+ * FocusGuardian AI - Bad UI Cat Login Controller (5-Second Challenge)
+ * Engineered specifically for the Bad UI Competition:
+ * - 5.0 Second Hard Limit before cat physically slams the window shut
+ * - Impossible Password Requirements: Min 8 distinct words, 1 capital, 1 number, 1 symbol, 1 cat emoji
+ * - Evasive runaway submit button
+ * - Dangerous "Pet the Cat" trap (70% scratch penalty: -1.5s!)
+ * - Meow Math verification trap + login nag-confirm chain
+ * - Random "Cat stepped on keyboard" typo injections
+ * - Prominently visible, unclipped interactive cat
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Stage & Windows
+  const stage = document.getElementById('main-stage');
+  const windowContainer = document.getElementById('window-container');
+  const windowCard = document.getElementById('window-card');
+  const closedScreenCard = document.getElementById('closed-screen-card');
+  const successCard = document.getElementById('success-card');
+  
+  // Cat Elements
+  const catPerch = document.getElementById('cat-perch');
+  const catBubble = document.getElementById('cat-bubble');
+  const pupilLeft = document.getElementById('pupil-left');
+  const pupilRight = document.getElementById('pupil-right');
+  const giantPaw = document.getElementById('giant-paw');
+  const comicBurst = document.getElementById('comic-burst');
+  
+  // Form Elements
+  const loginForm = document.getElementById('login-form');
+  const inputUsername = document.getElementById('input-username');
+  const inputPassword = document.getElementById('input-password');
+  const pwInputWrapper = document.getElementById('pw-input-wrapper');
+  const btnTogglePw = document.getElementById('btn-toggle-pw');
+  const btnSubmit = document.getElementById('btn-submit');
+  const btnSubmitText = document.getElementById('btn-submit-text');
+  const forgotLink = document.getElementById('forgot-link');
+  const adOverlay = document.getElementById('ad-overlay');
+  const adSkipBtn = document.getElementById('ad-skip-btn');
+  const adCountdownEl = document.getElementById('ad-countdown');
+  const notifToastContainer = document.getElementById('notif-toast-container');
+  const catPhotoPopup = document.getElementById('cat-photo-popup');
+  const catPhotoEmoji = document.getElementById('cat-photo-emoji');
+  const catPhotoCaption = document.getElementById('cat-photo-caption');
+  const strollingCat = document.getElementById('strolling-cat');
+  const dotClose = document.getElementById('dot-close');
+  const captchaQuestion = document.getElementById('captcha-question');
+  const captchaAnswerInput = document.getElementById('captcha-answer');
+  const captchaWarning = document.getElementById('captcha-warning');
+  let captchaCorrectAnswer = 0;
+
+  function generateCaptcha() {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    captchaCorrectAnswer = a + b;
+    captchaQuestion.textContent = `🐾 Prove you're a hooman: ${a} + ${b} = ?`;
+    captchaAnswerInput.value = '';
+    captchaWarning.textContent = "🙀 Cats can't do math. Can you?";
+    captchaWarning.style.color = "#feca57";
+  }
+
+  // Caps Lock fake-warning elements
+  const capsLockWarning = document.getElementById('caps-lock-warning');
+
+  // Terms & Conditions elements
+  const tosBox = document.getElementById('tos-box');
+  const tosCheckbox = document.getElementById('tos-checkbox');
+  const tosOpenLink = document.getElementById('tos-open-link');
+  const tosModalOverlay = document.getElementById('tos-modal-overlay');
+  const tosModalContent = document.getElementById('tos-modal-content');
+  const tosAgreeBtn = document.getElementById('tos-agree-btn');
+  let tosAgreed = false;
+
+  // Nag-chain modal elements
+  const nagModalOverlay = document.getElementById('nag-modal-overlay');
+  const nagModalTitle = document.getElementById('nag-modal-title');
+  const nagModalInput = document.getElementById('nag-modal-input');
+  const nagModalYes = document.getElementById('nag-modal-yes');
+  const nagModalNo = document.getElementById('nag-modal-no');
+
+  // Password Rules Elements
+  const ruleWords = document.getElementById('rule-words');
+  const wordsCounter = document.getElementById('words-counter');
+  const ruleUpper = document.getElementById('rule-upper');
+  const ruleNumber = document.getElementById('rule-number');
+  const ruleSymbol = document.getElementById('rule-symbol');
+  const rulesScore = document.getElementById('rules-score');
+  
+  // Timer Elements
+  const timerDisplay = document.getElementById('timer-display');
+  const timerFill = document.getElementById('timer-fill');
+  const timerSpeedSelect = document.getElementById('timer-speed-select');
+  
+  // Controls & Action Buttons
+  const btnPetCat = document.getElementById('btn-pet-cat');
+  const petCounter = document.getElementById('pet-counter');
+  const btnSoundToggle = document.getElementById('btn-sound-toggle');
+  const soundIcon = document.getElementById('sound-icon');
+  const soundStatus = document.getElementById('sound-status');
+  const btnTryAgain = document.getElementById('btn-try-again');
+  const btnLogout = document.getElementById('btn-logout');
+  const roastQuote = document.getElementById('roast-quote');
+  const statTimeRemaining = document.getElementById('stat-time-remaining');
+  const confettiCanvas = document.getElementById('confetti-canvas');
+
+  // State
+  let totalDuration = parseFloat(timerSpeedSelect.value) || 10.0; // 10 SECONDS DEFAULT!
+  let timeLeft = totalDuration;
+  let timerInterval = null;
+  let isClosed = false;
+  let isLoggedIn = false;
+  let isPasswordHidden = true;
+  let petCount = 0;
+  let keystrokeCount = 0;
+  let allRulesValid = false;
+  let lastTickSecond = -1;
+  let hasStartedTyping = false;
+
+  // Funny Bad UI roast quotes for when the cat slams the page
+  const roastQuotes = [
+    '"Did you really think you could write an 8-letter password with a capital, number, and symbol in 10 SECONDS? 😹"',
+    '"Typing speed: 0.4 words/sec. The cat is severely unimpressed! 🐾"',
+    '"Access denied! You had 10 whole seconds plus pet bonuses and still failed the cat exam! ⏰"',
+    '"Your paw-sword was too slow! The cat took matters into its own paws. 💥"',
+    '"Too slow, hooman! Pet me next time if you need more seconds! 🐱"',
+    '"Rule #1 of Bad UI: The cat ALWAYS wins! Try again! ⚡"'
+  ];
+
+  // =========================================================================
+  // 1. Mouse & Eye Tracking System (Crisp, High Visibility)
+  // =========================================================================
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    updateEyeTracking();
+  });
+
+  function updateEyeTracking() {
+    if (catPerch.classList.contains('covering-eyes') || isClosed || isLoggedIn) return;
+
+    const catRect = catPerch.getBoundingClientRect();
+    const catCenterX = catRect.left + catRect.width / 2;
+    const catCenterY = catRect.top + 80; // Center of large cat eyes
+
+    const deltaX = mouseX - catCenterX;
+    const deltaY = mouseY - catCenterY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const maxRadius = 6.0;
+
+    let moveX = 0;
+    let moveY = 0;
+
+    if (distance > 0) {
+      const clampedDist = Math.min(distance / 55, maxRadius);
+      moveX = (deltaX / distance) * clampedDist;
+      moveY = (deltaY / distance) * clampedDist;
+    }
+
+    pupilLeft.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    pupilRight.style.transform = `translate(${moveX}px, ${moveY}px)`;
+  }
+
+  // Periodic Natural Blinking
+  setInterval(() => {
+    if (!isClosed && !isLoggedIn && !catPerch.classList.contains('covering-eyes')) {
+      catPerch.classList.add('blinking');
+      setTimeout(() => catPerch.classList.remove('blinking'), 150);
+    }
+  }, 3500);
+
+  // =========================================================================
+  // 2. Strict Bad UI Password Rules Live Verification
+  // =========================================================================
+
+  inputPassword.addEventListener('input', () => {
+    if (!hasStartedTyping) {
+      hasStartedTyping = true;
+      startCountdown();
+    }
+    validatePasswordRules();
+    handleKeyboardTypoInterference();
+  });
+
+  function validatePasswordRules() {
+    const val = inputPassword.value;
+    
+    // Rule 1: Minimum 8 letters
+    const letters = val.match(/[a-zA-Z]/g) || [];
+    const has8Words = letters.length >= 8;
+    wordsCounter.textContent = `(${letters.length} / 8 letters)`;
+    updateRuleState(ruleWords, has8Words);
+
+    // Rule 2: At least 1 Capital Letter (A-Z)
+    const hasUpper = /[A-Z]/.test(val);
+    updateRuleState(ruleUpper, hasUpper);
+
+    // Rule 3: At least 1 Number (0-9)
+    const hasNumber = /[0-9]/.test(val);
+    updateRuleState(ruleNumber, hasNumber);
+
+    // Rule 4: At least 1 Special Symbol (!@#$%...)
+    const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(val);
+    updateRuleState(ruleSymbol, hasSymbol);
+
+    // Calculate score
+    const rulesPassed = [has8Words, hasUpper, hasNumber, hasSymbol].filter(Boolean).length;
+    rulesScore.textContent = `${rulesPassed} / 4 met`;
+    rulesScore.style.color = rulesPassed === 4 ? '#1dd1a1' : '#feca57';
+
+    allRulesValid = (rulesPassed === 4);
+    return allRulesValid;
+  }
+
+  function updateRuleState(element, isValid) {
+    const icon = element.querySelector('.rule-icon');
+    if (isValid) {
+      element.className = 'rule-item valid';
+      if (icon) icon.textContent = '✔️';
+    } else {
+      element.className = 'rule-item invalid';
+      if (icon) icon.textContent = '❌';
+    }
+  }
+
+  // Bad UI Feature: "Cat steps on keyboard" random typo injection!
+  function handleKeyboardTypoInterference() {
+    keystrokeCount++;
+    if (keystrokeCount > 0 && keystrokeCount % 7 === 0 && !isClosed) {
+      // Cat randomly walks on keyboard!
+      const naughtyBehaviors = ['m', 'meow', '🐱', '🐾'];
+      const picked = naughtyBehaviors[Math.floor(Math.random() * naughtyBehaviors.length)];
+      
+      // Inject typo into password field
+      inputPassword.value += picked;
+      validatePasswordRules();
+
+      // Audio & Speech
+      window.soundFX.playMeow(1.3);
+      setBubble(`*tap* Cat stepped on your keys (+${picked})! 🐾`, 1800);
+    }
+  }
+
+  // =========================================================================
+  // 3. Password Focus Reactions & Peek-a-boo
+  // =========================================================================
+
+  inputUsername.addEventListener('focus', () => {
+    if (isClosed || isLoggedIn) return;
+    setBubble('Hurry up, only 10 seconds! Pet me for +3s! ⏰', 2000);
+    pupilLeft.style.transform = 'translate(0px, 5px)';
+    pupilRight.style.transform = 'translate(0px, 5px)';
+  });
+
+  inputPassword.addEventListener('focus', () => {
+    if (isClosed || isLoggedIn) return;
+    catPerch.classList.remove('peeking');
+    catPerch.classList.add('covering-eyes');
+    setBubble("I won't peek! (8 letters required! Pet me for +3s! 🙈)", 2500);
+    window.soundFX.playMeow(1.4);
+  });
+
+  inputPassword.addEventListener('blur', () => {
+    setTimeout(() => {
+      if (document.activeElement !== inputPassword && document.activeElement !== btnTogglePw) {
+        catPerch.classList.remove('covering-eyes', 'peeking');
+        updateEyeTracking();
+      }
+    }, 150);
+  });
+
+  // Toggle Password Visibility (Bad UI Troll!)
+  btnTogglePw.addEventListener('click', () => {
+    if (isClosed || isLoggedIn) return;
+    isPasswordHidden = !isPasswordHidden;
+
+    if (isPasswordHidden) {
+      inputPassword.type = 'password';
+      btnTogglePw.textContent = '👁️';
+      catPerch.classList.remove('peeking');
+      catPerch.classList.add('covering-eyes');
+      setBubble('Paws back up! Secret safe 🙈', 1800);
+    } else {
+      inputPassword.type = 'text';
+      btnTogglePw.textContent = '🙈';
+      catPerch.classList.remove('covering-eyes');
+      catPerch.classList.add('peeking');
+      setBubble('Ooo! I see all your typos! 😼', 2500);
+      window.soundFX.playMeow(1.1);
+    }
+  });
+
+  // =========================================================================
+  // 4. Bad UI Feature: Evasive Runaway "Log In" Button
+  // =========================================================================
+
+  btnSubmit.addEventListener('mouseenter', () => {
+    if (isClosed || isLoggedIn) return;
+
+    // The button dodges if rules aren't satisfied!
+    if (!allRulesValid) {
+      const maxRangeX = 140;
+      const maxRangeY = 40;
+      const randX = (Math.random() - 0.5) * (maxRangeX * 2);
+      const randY = (Math.random() - 0.5) * (maxRangeY * 2);
+
+      btnSubmit.style.transform = `translate(${randX}px, ${randY}px)`;
+      btnSubmitText.textContent = "Too Slow! 🐾";
+
+      const evasiveTaunts = [
+        "Can't catch me! 😹",
+        "Type all 8 letters first! 😾",
+        "Missed me! ⚡",
+        "Pet me for +3s! 💖"
+      ];
+      setBubble(evasiveTaunts[Math.floor(Math.random() * evasiveTaunts.length)], 1200);
+      window.soundFX.playPawTap();
+    } else {
+      // All rules met! Let the user triumphantly click!
+      btnSubmit.style.transform = 'translate(0, 0)';
+      btnSubmitText.textContent = "Log In Now! ⚡";
+    }
+  });
+
+  // Reset button position when mouse leaves the button area
+  btnSubmit.addEventListener('mouseleave', () => {
+    setTimeout(() => {
+      if (!isClosed && !isLoggedIn) {
+        btnSubmit.style.transform = 'translate(0, 0)';
+        btnSubmitText.textContent = "Log In Now (Catch Me!)";
+      }
+    }, 800);
+  });
+
+  // =========================================================================
+  // 5. Meow Math Verification Trap
+  // =========================================================================
+
+  captchaAnswerInput.addEventListener('input', () => {
+    const val = parseInt(captchaAnswerInput.value, 10);
+    if (!isNaN(val) && val === captchaCorrectAnswer) {
+      captchaWarning.textContent = "✔️ Math approved: Felinity verified.";
+      captchaWarning.style.color = "#1dd1a1";
+    } else {
+      captchaWarning.textContent = "🙀 Cats can't do math. Can you?";
+      captchaWarning.style.color = "#feca57";
+    }
+  });
+
+  // =========================================================================
+  // 5b. Fake Caps Lock Warning (completely made up, purely to annoy)
+  // =========================================================================
+
+  inputPassword.addEventListener('input', () => {
+    // ~20% chance per keystroke of a totally fabricated caps-lock scare
+    if (Math.random() < 0.2) {
+      capsLockWarning.classList.add('visible');
+      setTimeout(() => capsLockWarning.classList.remove('visible'), 1800);
+    }
+  });
+
+  // =========================================================================
+  // 5c. Mandatory Terms & Conditions (must scroll to the bottom to agree!)
+  // =========================================================================
+
+  function openTosModal() {
+    tosModalOverlay.classList.add('visible');
+    tosModalContent.scrollTop = 0;
+    tosAgreeBtn.disabled = true;
+    tosAgreeBtn.classList.remove('unlocked');
+    tosAgreeBtn.textContent = 'Scroll down to unlock "I Agree" 🔒';
+  }
+
+  tosOpenLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    openTosModal();
+  });
+
+  // Clicking the checkbox itself (before agreeing) just re-opens the modal
+  tosCheckbox.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!tosAgreed) openTosModal();
+  });
+
+  tosModalContent.addEventListener('scroll', () => {
+    const scrolledToBottom =
+      tosModalContent.scrollTop + tosModalContent.clientHeight >= tosModalContent.scrollHeight - 6;
+    if (scrolledToBottom) {
+      tosAgreeBtn.disabled = false;
+      tosAgreeBtn.classList.add('unlocked');
+      tosAgreeBtn.textContent = 'I Agree 🐾✅';
+    }
+  });
+
+  tosAgreeBtn.addEventListener('click', () => {
+    if (tosAgreeBtn.disabled) return;
+    tosAgreed = true;
+    tosCheckbox.checked = true;
+    tosCheckbox.disabled = false;
+    tosBox.classList.add('agreed');
+    tosModalOverlay.classList.remove('visible');
+    setBubble("Wow, you actually read that? Respect. 😼", 2200);
+  });
+
+  // Close modal if user clicks outside it (without agreeing)
+  tosModalOverlay.addEventListener('click', (e) => {
+    if (e.target === tosModalOverlay) {
+      tosModalOverlay.classList.remove('visible');
+    }
+  });
+
+  // =========================================================================
+  // 5d. Annoying Nag Chain (custom modal — native confirm/prompt get blocked
+  //     by some browsers, which is why login was failing silently before!)
+  // =========================================================================
+
+  const nagSteps = [
+    { title: "Do you want to login? 🐾", type: 'confirm' },
+    { title: "Are you sure? 🐱", type: 'confirm' },
+    { title: "Are you REALLY, REALLY sure you want to log in?? 🙀", type: 'confirm' },
+    { title: 'Okay, last chance. Absolutely certain? 🐾✅', type: 'confirm' },
+    { title: 'Last step! Type MEOW below to confirm you respect the cat 🐈', type: 'text', answer: 'meow' }
+  ];
+  const nagBounceMessages = [
+    "Changed your mind already? 😼",
+    "Indecisive hooman detected! 😹",
+    "Phew, that was close! 😾",
+    "Wow, so close to logging in! 😼"
+  ];
+  let nagStepIndex = 0;
+  let onNagChainComplete = null;
+
+  function startNagChain(onComplete) {
+    onNagChainComplete = onComplete;
+    nagStepIndex = 0;
+    showNagStep();
+  }
+
+  function showNagStep() {
+    const step = nagSteps[nagStepIndex];
+    nagModalTitle.textContent = step.title;
+    if (step.type === 'text') {
+      nagModalInput.style.display = 'block';
+      nagModalInput.value = '';
+      nagModalYes.textContent = 'Confirm';
+      nagModalNo.textContent = 'Cancel';
+    } else {
+      nagModalInput.style.display = 'none';
+      nagModalYes.textContent = 'Yes';
+      nagModalNo.textContent = 'No';
+    }
+    nagModalOverlay.classList.add('visible');
+    if (step.type === 'text') {
+      setTimeout(() => nagModalInput.focus(), 50);
+    }
+  }
+
+  nagModalYes.addEventListener('click', () => {
+    const step = nagSteps[nagStepIndex];
+    if (step.type === 'text' && nagModalInput.value.trim().toLowerCase() !== step.answer) {
+      nagModalOverlay.classList.remove('visible');
+      setBubble("That's not 'meow'. Access denied. Try again! 😾", 3000);
+      window.soundFX.playHiss();
+      return;
+    }
+
+    nagStepIndex++;
+    if (nagStepIndex >= nagSteps.length) {
+      nagModalOverlay.classList.remove('visible');
+      if (onNagChainComplete) onNagChainComplete();
+    } else {
+      showNagStep();
+    }
+  });
+
+  nagModalNo.addEventListener('click', () => {
+    nagModalOverlay.classList.remove('visible');
+    setBubble(nagBounceMessages[Math.min(nagStepIndex, nagBounceMessages.length - 1)], 2200);
+    window.soundFX.playMeow(1.1);
+  });
+
+  nagModalInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      nagModalYes.click();
+    }
+  });
+
+  // =========================================================================
+  // 6. Urgency Countdown Timer (5 SECONDS DEFAULT!)
+  // =========================================================================
+
+  function startCountdown() {
+    clearInterval(timerInterval);
+    timeLeft = totalDuration;
+    lastTickSecond = -1;
+    isClosed = false;
+    btnSubmit.style.transform = 'translate(0, 0)';
+
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+      timeLeft = Math.max(0, timeLeft - 0.05);
+      updateTimerDisplay();
+
+      // Sound: Rapid heartbeat / tick acceleration in last seconds
+      const currentSec = Math.ceil(timeLeft);
+      if (currentSec !== lastTickSecond && currentSec > 0 && currentSec <= 5) {
+        lastTickSecond = currentSec;
+        window.soundFX.playTick(6 - currentSec);
+      }
+
+      // Mood stages adapted for 10 seconds!
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        triggerCatClosesPage();
+      } else if (timeLeft <= 2.8) {
+        // Danger stage: Butt-wiggle & frantic ticking
+        catPerch.classList.remove('impatient');
+        catPerch.classList.add('wiggle');
+        timerDisplay.className = 'timer-digits danger';
+        timerFill.className = 'timer-bar-fill danger';
+        setBubble("UNDER 3 SECONDS!! I'M CLOSING IT!! 😼💥", 1000);
+      } else if (timeLeft <= 5.5) {
+        // Impatient stage: Rapid paw tapping
+        catPerch.classList.add('impatient');
+        catPerch.classList.remove('wiggle');
+        timerDisplay.className = 'timer-digits warning';
+        timerFill.className = 'timer-bar-fill warning';
+        if (Math.floor(timeLeft * 10) % 15 === 0) {
+          window.soundFX.playPawTap();
+        }
+        setBubble('Pet me for +3s or finish 8 letters! ⏰', 1500);
+      } else {
+        catPerch.classList.remove('impatient', 'wiggle');
+        timerDisplay.className = 'timer-digits';
+        timerFill.className = 'timer-bar-fill';
+      }
+    }, 50);
+  }
+
+  function updateTimerDisplay() {
+    timerDisplay.textContent = timeLeft.toFixed(1) + 's';
+    const percent = Math.max(0, Math.min(100, (timeLeft / totalDuration) * 100));
+    timerFill.style.width = percent + '%';
+  }
+
+  function setBubble(text, duration = 2000) {
+    catBubble.textContent = text;
+    catBubble.style.opacity = '1';
+  }
+
+  // Difficulty change
+  timerSpeedSelect.addEventListener('change', () => {
+    totalDuration = parseFloat(timerSpeedSelect.value) || 10.0;
+    if (!isClosed && !isLoggedIn) {
+      if (hasStartedTyping) {
+        startCountdown();
+      } else {
+        timeLeft = totalDuration;
+        updateTimerDisplay();
+      }
+      window.soundFX.playMeow(1.2);
+    }
+  });
+
+  // =========================================================================
+  // 7. THE CLIMAX: The Cat Closes The Page (The Slam Climax!)
+  // =========================================================================
+
+  function triggerCatClosesPage() {
+    isClosed = true;
+    clearInterval(timerInterval);
+
+    catPerch.classList.remove('covering-eyes', 'peeking', 'impatient', 'wiggle');
+    setBubble('TOO SLOW HOOMAN!! SLAM!! 💥', 3000);
+
+    // 1. Audio: Dramatic slam + growl
+    window.soundFX.playSlam();
+    setTimeout(() => window.soundFX.playHiss(), 250);
+
+    // 2. Comic burst
+    comicBurst.classList.add('active');
+    setTimeout(() => comicBurst.classList.remove('active'), 750);
+
+    // 3. Giant Paw Swipe Across Screen
+    giantPaw.classList.add('slapping');
+    setTimeout(() => giantPaw.classList.remove('slapping'), 600);
+
+    // 4. Screen Shake Effect
+    stage.classList.add('shake-screen');
+    setTimeout(() => stage.classList.remove('shake-screen'), 500);
+
+    // 5. Window Slams Shut
+    windowCard.style.animation = '';
+    windowCard.classList.add('slammed');
+
+    // 6. Transition to "TRY AGAIN" card
+    setTimeout(() => {
+      windowCard.style.display = 'none';
+      catPerch.style.opacity = '0';
+      catPerch.style.pointerEvents = 'none';
+      
+      const randomQuote = roastQuotes[Math.floor(Math.random() * roastQuotes.length)];
+      roastQuote.textContent = randomQuote;
+      
+      closedScreenCard.classList.add('visible');
+    }, 450);
+  }
+
+  // Red Close Dot on Titlebar triggers instant test closing
+  dotClose.addEventListener('click', () => {
+    if (!isClosed && !isLoggedIn) {
+      timeLeft = 0;
+      triggerCatClosesPage();
+    }
+  });
+
+  // =========================================================================
+  // 8. Try Again Recovery
+  // =========================================================================
+
+  btnTryAgain.addEventListener('click', () => {
+    window.soundFX.playMeow(1.3);
+    closedScreenCard.classList.remove('visible');
+
+    setTimeout(() => {
+      windowCard.style.display = 'block';
+      windowCard.classList.remove('slammed');
+      windowCard.style.animation = 'popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+      catPerch.style.opacity = '1';
+      catPerch.style.pointerEvents = 'auto';
+      
+      // Reset inputs & checklist
+      inputPassword.value = '';
+      inputPassword.type = 'password';
+      btnTogglePw.textContent = '👁️';
+      isPasswordHidden = true;
+      validatePasswordRules();
+      generateCaptcha();
+      btnSubmit.style.transform = 'translate(0, 0)';
+
+      // Reset Cat
+      catPerch.classList.remove('covering-eyes', 'peeking', 'impatient', 'wiggle', 'cat-happy');
+      setBubble("Round 2! Timer starts when you start typing! ⚡", 3000);
+
+      // Countdown will restart once the user starts typing again
+      clearInterval(timerInterval);
+      hasStartedTyping = false;
+      timeLeft = totalDuration;
+      isClosed = false;
+      updateTimerDisplay();
+      timerDisplay.className = 'timer-digits';
+      timerFill.className = 'timer-bar-fill';
+      catPerch.classList.remove('impatient', 'wiggle');
+      inputPassword.focus();
+    }, 150);
+  });
+
+  // =========================================================================
+  // 9. Pet The Cat Mechanic (Reliably Adds +3 Seconds!)
+  // =========================================================================
+
+  function petTheCat(event) {
+    if (isClosed || isLoggedIn) return;
+
+    petCount++;
+    petCounter.textContent = petCount;
+
+    // Reliably adds +3.0 seconds!
+    const bonus = 3.0;
+    // Allow stacking up to a max of 10s total
+    timeLeft = Math.min(10.0, timeLeft + bonus);
+    updateTimerDisplay();
+
+    // Cute purr & bonus chime audio
+    window.soundFX.playPurr();
+    window.soundFX.playBonus();
+
+    // Heart eyes / happy expression for 1.2 seconds!
+    catPerch.classList.add('cat-happy');
+    setTimeout(() => {
+      if (!isLoggedIn) catPerch.classList.remove('cat-happy');
+    }, 1200);
+
+    // Floating heart with +3s
+    createFloatingHeart(event, `+3.0s 💖`);
+    setBubble(`Purrrrr! +3 seconds added! (Total: ${timeLeft.toFixed(1)}s) 💖🐾`, 2200);
+  }
+
+  btnPetCat.addEventListener('click', (e) => petTheCat(e));
+  catPerch.addEventListener('click', (e) => petTheCat(e));
+
+  function createFloatingHeart(e, text = '+3.0s 💖') {
+    const heart = document.createElement('div');
+    heart.className = 'floating-heart';
+    heart.textContent = text;
+
+    let x = e && e.clientX ? e.clientX : window.innerWidth / 2;
+    let y = e && e.clientY ? e.clientY : window.innerHeight / 2 - 80;
+
+    heart.style.left = `${Math.max(20, x - 30)}px`;
+    heart.style.top = `${Math.max(40, y - 30)}px`;
+
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 1200);
+  }
+
+  // =========================================================================
+  // 10. Login Submission & Success State
+  // =========================================================================
+
+  loginForm.addEventListener('submit', handleLogin);
+  btnSubmit.addEventListener('click', handleLogin);
+
+  function handleLogin(e) {
+    e.preventDefault();
+    if (isClosed || isLoggedIn) return;
+
+    // Check mandatory Terms & Conditions agreement
+    if (!tosAgreed) {
+      setBubble("ACCESS DENIED: You must agree to the Terms first! 📜😾", 2500);
+      openTosModal();
+      window.soundFX.playHiss();
+      return;
+    }
+
+    // Check Meow Math verification
+    const answerVal = parseInt(captchaAnswerInput.value, 10);
+    if (isNaN(answerVal) || answerVal !== captchaCorrectAnswer) {
+      setBubble("ACCESS DENIED: Solve the math first! 😾", 2500);
+      captchaWarning.textContent = "🙀 Cats can't do math. Can you?";
+      captchaWarning.style.color = "#feca57";
+      window.soundFX.playHiss();
+      return;
+    }
+
+    // Check strict password rules
+    const isValid = validatePasswordRules();
+    if (!isValid) {
+      setBubble("PASSWORD REJECTED! You didn't meet all 5 cat rules! 😾", 2500);
+      window.soundFX.playHiss();
+      return;
+    }
+
+    // Everything checks out - freeze the timer so it can't run out mid-nag-chain
+    clearInterval(timerInterval);
+
+    // ANNOYING NAG CHAIN: ask way too many times, then finish logging in
+    startNagChain(completeLogin);
+  }
+
+  function completeLogin() {
+    // By a miracle, they beat the challenge AND survived the nag chain!
+    isLoggedIn = true;
+    clearInterval(timerInterval);
+
+    window.soundFX.playSuccess();
+    window.soundFX.playPurr();
+
+    catPerch.classList.remove('covering-eyes', 'peeking', 'impatient', 'wiggle');
+    catPerch.classList.add('cat-happy');
+    setBubble('UNBELIEVABLE!! YOU BEAT THE 5-SECOND BAD UI! 🏆🌟', 4000);
+
+    statTimeRemaining.textContent = timeLeft.toFixed(1) + 's';
+    launchConfetti();
+
+    setTimeout(() => {
+      windowCard.style.display = 'none';
+      successCard.classList.add('visible');
+    }, 400);
+  }
+
+  btnLogout.addEventListener('click', () => {
+    isLoggedIn = false;
+    successCard.classList.remove('visible');
+    catPerch.classList.remove('cat-happy');
+
+    setTimeout(() => {
+      windowCard.style.display = 'block';
+      inputPassword.value = '';
+      validatePasswordRules();
+      generateCaptcha();
+      clearInterval(timerInterval);
+      hasStartedTyping = false;
+      timeLeft = totalDuration;
+      isClosed = false;
+      updateTimerDisplay();
+      timerDisplay.className = 'timer-digits';
+      timerFill.className = 'timer-bar-fill';
+    }, 200);
+  });
+
+  forgotLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    setBubble("Giving up already? The cat expected as much! 😼", 2500);
+    window.soundFX.playMeow(1.2);
+  });
+
+  // Sound Toggle
+  btnSoundToggle.addEventListener('click', () => {
+    const isMuted = window.soundFX.toggleMute();
+    if (isMuted) {
+      soundIcon.textContent = '🔇';
+      soundStatus.textContent = 'OFF';
+    } else {
+      soundIcon.textContent = '🔊';
+      soundStatus.textContent = 'ON';
+      window.soundFX.playMeow(1.2);
+    }
+  });
+
+  // Confetti Cannon
+  function launchConfetti() {
+    const ctx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+
+    const colors = ['#ff7675', '#54a0ff', '#1dd1a1', '#feca57', '#5f27cd', '#ff9f43'];
+    const particles = [];
+
+    for (let i = 0; i < 90; i++) {
+      particles.push({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2 - 40,
+        vx: (Math.random() - 0.5) * 16,
+        vy: (Math.random() - 0.7) * 18,
+        size: Math.random() * 8 + 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 10,
+        opacity: 1
+      });
+    }
+
+    let frame = 0;
+    function render() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      let alive = false;
+
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.4;
+        p.rotation += p.rotSpeed;
+        p.opacity -= 0.012;
+
+        if (p.opacity > 0) {
+          alive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        }
+      });
+
+      frame++;
+      if (alive && frame < 120) {
+        requestAnimationFrame(render);
+      } else {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      }
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  window.addEventListener('resize', () => {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  });
+
+  // =========================================================================
+  // 11. More Annoying Features: Tab Title Flicker
+  // =========================================================================
+
+  const originalTitle = document.title;
+
+  inputPassword.addEventListener('input', () => {
+    document.title = '😾 DON\'T LEAVE ME...';
+    clearTimeout(window._titleFlickerTimeout);
+    window._titleFlickerTimeout = setTimeout(() => {
+      document.title = originalTitle;
+    }, 900);
+  });
+
+  // =========================================================================
+  // 12. Paw Print Cursor Trail (purely decorative chaos)
+  // =========================================================================
+
+  let lastPawTime = 0;
+  document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - lastPawTime < 220) return;
+    lastPawTime = now;
+
+    const paw = document.createElement('div');
+    paw.textContent = '🐾';
+    paw.style.position = 'fixed';
+    paw.style.left = (e.clientX - 10) + 'px';
+    paw.style.top = (e.clientY - 10) + 'px';
+    paw.style.fontSize = '16px';
+    paw.style.pointerEvents = 'none';
+    paw.style.zIndex = '9999';
+    paw.style.opacity = '0.8';
+    paw.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    paw.style.transform = `rotate(${Math.random() * 60 - 30}deg)`;
+    document.body.appendChild(paw);
+
+    requestAnimationFrame(() => {
+      paw.style.opacity = '0';
+      paw.style.transform += ' translateY(10px)';
+    });
+
+    setTimeout(() => paw.remove(), 850);
+  });
+
+  // =========================================================================
+  // 13. Fake "Advertisement" Interstitial (blocks the form on page load!)
+  // =========================================================================
+
+  let adCountdownVal = 5;
+  const adTimer = setInterval(() => {
+    adCountdownVal--;
+    if (adCountdownVal <= 0) {
+      clearInterval(adTimer);
+      adCountdownEl.textContent = '0';
+      adSkipBtn.disabled = false;
+      adSkipBtn.classList.add('unlocked');
+      adSkipBtn.textContent = 'Skip Ad ✖️';
+    } else {
+      adCountdownEl.textContent = adCountdownVal;
+    }
+  }, 1000);
+
+  adSkipBtn.addEventListener('click', () => {
+    if (adSkipBtn.disabled) return;
+    adOverlay.classList.add('hidden');
+  });
+
+  // =========================================================================
+  // 14. "Give Up?" Link Also Dodges The Cursor (why should the button be alone)
+  // =========================================================================
+
+  forgotLink.addEventListener('mouseenter', () => {
+    if (isClosed || isLoggedIn) return;
+    const randX = (Math.random() - 0.5) * 120;
+    const randY = (Math.random() - 0.5) * 30;
+    forgotLink.style.display = 'inline-block';
+    forgotLink.style.transform = `translate(${randX}px, ${randY}px)`;
+  });
+  forgotLink.addEventListener('mouseleave', () => {
+    setTimeout(() => {
+      forgotLink.style.transform = 'translate(0, 0)';
+    }, 400);
+  });
+
+  // =========================================================================
+  // 15. Nag Modal Yes/No Buttons Swap Positions On Hover (sneaky!)
+  // =========================================================================
+
+  function maybeSwapNagButtons(hoveredBtn) {
+    // Only swap sometimes, and only on the confirm-style steps
+    if (nagModalInput.style.display !== 'none') return; // don't swap on the MEOW text step
+    if (Math.random() < 0.5) {
+      const parent = hoveredBtn.parentElement;
+      if (parent.firstElementChild === nagModalYes) {
+        parent.insertBefore(nagModalNo, nagModalYes);
+      } else {
+        parent.insertBefore(nagModalYes, nagModalNo);
+      }
+    }
+  }
+
+  nagModalYes.addEventListener('mouseenter', () => maybeSwapNagButtons(nagModalYes));
+  nagModalNo.addEventListener('mouseenter', () => maybeSwapNagButtons(nagModalNo));
+
+  // =========================================================================
+  // 16. Spammy Notification Toasts (closing one doesn't stop the next)
+  // =========================================================================
+
+  const spamNotifMessages = [
+    "🔔 You have 3 new notifications",
+    "🐾 Someone pet a cat 4,201 miles away",
+    "📉 Your patience level: declining",
+    "🧦 A sock has gone missing nearby",
+    "🐈 The cat is watching you type",
+    "⚠️ This popup was unnecessary"
+  ];
+
+  function spawnNotifToast() {
+    if (isLoggedIn) return;
+    const toast = document.createElement('div');
+    toast.className = 'notif-toast';
+    const msg = spamNotifMessages[Math.floor(Math.random() * spamNotifMessages.length)];
+    toast.innerHTML = `<span>${msg}</span><button aria-label="Dismiss">✖️</button>`;
+    toast.querySelector('button').addEventListener('click', () => toast.remove());
+    notifToastContainer.appendChild(toast);
+    setTimeout(() => toast.remove(), 6000);
+
+    // Cap how many stack up at once
+    while (notifToastContainer.children.length > 3) {
+      notifToastContainer.removeChild(notifToastContainer.firstChild);
+    }
+  }
+
+  setInterval(() => {
+    if (Math.random() < 0.5) spawnNotifToast();
+  }, 9000);
+
+  // =========================================================================
+  // 17. Random Floating Cat Photo Popup (appears for a few seconds, then gone)
+  // =========================================================================
+
+  const catPhotoEmojis = ['😻', '🐱', '😼', '🙀', '😹', '😾'];
+  const catPhotoCaptions = [
+    'Random Cat Sighting!',
+    'This cat approves of nothing.',
+    'A wild cat photo appeared!',
+    'Not relevant. Just cute.',
+    'Cat.exe is running.',
+    'Someone had to see this.'
+  ];
+
+  function showCatPhotoPopup() {
+    if (isLoggedIn) return;
+    catPhotoEmoji.textContent = catPhotoEmojis[Math.floor(Math.random() * catPhotoEmojis.length)];
+    catPhotoCaption.textContent = catPhotoCaptions[Math.floor(Math.random() * catPhotoCaptions.length)];
+
+    // Random corner of the screen
+    const corners = [
+      { top: '80px', left: '20px', right: 'auto', bottom: 'auto' },
+      { top: '80px', right: '20px', left: 'auto', bottom: 'auto' },
+      { bottom: '90px', left: '20px', top: 'auto', right: 'auto' },
+      { bottom: '90px', right: '20px', top: 'auto', left: 'auto' }
+    ];
+    const c = corners[Math.floor(Math.random() * corners.length)];
+    Object.assign(catPhotoPopup.style, c);
+
+    catPhotoPopup.classList.add('visible');
+    setTimeout(() => catPhotoPopup.classList.remove('visible'), 3000);
+  }
+
+  setInterval(() => {
+    if (Math.random() < 0.6) showCatPhotoPopup();
+  }, 14000);
+
+  // Show one shortly after page load too
+  setTimeout(showCatPhotoPopup, 4000);
+
+  // =========================================================================
+  // 18. Cat That Randomly Strolls Across The Bottom Of The Screen
+  // =========================================================================
+
+  function strollCatAcross() {
+    if (isLoggedIn) return;
+    strollingCat.classList.remove('walking');
+    void strollingCat.offsetWidth; // restart animation
+    strollingCat.textContent = ['🐈', '🐈‍⬛', '🐱'][Math.floor(Math.random() * 3)];
+    strollingCat.classList.add('walking');
+  }
+
+  setInterval(() => {
+    if (Math.random() < 0.4) strollCatAcross();
+  }, 18000);
+
+  // =========================================================================
+  // 19. Random Ambient Meows (for absolutely no reason)
+  // =========================================================================
+
+  setInterval(() => {
+    if (!isLoggedIn && Math.random() < 0.3) {
+      window.soundFX.playMeow(0.9 + Math.random() * 0.5);
+    }
+  }, 11000);
+
+  // Initial validate & captcha (countdown starts on first password keystroke)
+  validatePasswordRules();
+  generateCaptcha();
+  updateTimerDisplay();
+});
+
+  </script>
+</body>
+</html>

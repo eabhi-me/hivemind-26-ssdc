@@ -1,0 +1,2929 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Internet That Refuses To Let You Log In (Windows XP Edition)</title>
+  <meta name="description" content="A Windows XP style login page that does not want you to log in.">
+  <meta property="og:title" content="The Internet That Refuses To Let You Log In">
+  <meta property="og:description" content="A Windows XP style login page that does not want you to log in.">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --xp-blue-dark: #0055ea;
+      --xp-blue-light: #3d95ff;
+      --xp-gray-bg: #ece9d8;
+      --xp-gray-light: #f5f4ea;
+      --xp-gray-border: #7f9db9;
+      --xp-taskbar-blue: #245edb;
+      --xp-start-green: #388e3c;
+      --win-btn-highlight: #ffffff;
+      --win-btn-shadow: #808080;
+      --win-btn-dark: #404040;
+      --win-btn-face: #ece9d8;
+      --crt-brightness: 1;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Tahoma", "MS Sans Serif", Geneva, Verdana, sans-serif;
+      font-size: 11px;
+      color: #000;
+      background-color: #008080; /* Classic Win98 / WinXP Teal Fallback */
+      cursor: default;
+    }
+
+    /* CRT Monitor & Scanline Overlay */
+    #crt-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      filter: brightness(var(--crt-brightness));
+      transition: filter 0.15s ease;
+      overflow: hidden;
+    }
+
+    .crt-overlay {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 99999;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                  radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.4) 100%);
+      background-size: 100% 3px, 100% 100%;
+      opacity: 0.65;
+    }
+
+    .crt-flicker {
+      animation: crtFlickerAnim 0.12s infinite;
+    }
+
+    @keyframes crtFlickerAnim {
+      0% { opacity: 0.65; }
+      50% { opacity: 0.72; }
+      100% { opacity: 0.63; }
+    }
+
+    /* Screen shake for errors / BSOD */
+    .shake-screen {
+      animation: screenShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes screenShake {
+      10%, 90% { transform: translate3d(-3px, 0, 0); }
+      20%, 80% { transform: translate3d(5px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+      40%, 60% { transform: translate3d(6px, 0, 0); }
+    }
+
+    #desktop {
+      flex: 1;
+      position: relative;
+      background: #008080 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23008080'/%3E%3Cpath d='M0 15h1v1H0zm2 0h1v1H2zm2 0h1v1H4zm2 0h1v1H6zm2 0h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm2 0h1v1h-1z' fill='%23007070'/%3E%3C/svg%3E");
+      overflow: hidden;
+      display: flex;
+      padding: 10px;
+    }
+
+    /* Browser Window */
+    .xp-window {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--xp-gray-bg);
+      border: 3px solid #0055ea;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.5), inset 1px 1px 0px #fff;
+      overflow: hidden;
+    }
+
+    #browser-window {
+      inset: 8px 8px 40px 8px;
+      z-index: 10;
+    }
+
+    /* Windows XP Luna Titlebar */
+    .xp-titlebar {
+      height: 30px;
+      background: linear-gradient(to right, #0058ee 0%, #3593ff 50%, #288eff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      color: #ffffff;
+      font-weight: bold;
+      text-shadow: 1px 1px 1px #0f3d99;
+      cursor: move;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    .xp-titlebar-text {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ie-icon-small {
+      width: 16px;
+      height: 16px;
+      background: #0078d7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-style: italic;
+      font-family: serif;
+      font-size: 12px;
+      border: 1px solid #ffffff;
+      box-shadow: 0 0 4px #00f0ff;
+    }
+
+    .xp-window-controls {
+      display: flex;
+      gap: 2px;
+    }
+
+    .xp-btn-ctrl {
+      width: 21px;
+      height: 21px;
+      border-radius: 3px;
+      border: 1px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 11px;
+      cursor: pointer;
+      color: white;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .btn-min, .btn-max {
+      background: linear-gradient(to bottom, #3980f4, #1247c4);
+    }
+    .btn-close {
+      background: linear-gradient(to bottom, #f26f55, #c02b11);
+    }
+    .xp-btn-ctrl:hover {
+      filter: brightness(1.2);
+    }
+    .xp-btn-ctrl:active {
+      filter: brightness(0.8);
+    }
+
+    /* IE6 Menu Bar */
+    .ie-menubar {
+      background: #ece9d8;
+      border-bottom: 1px solid #d4d0c8;
+      display: flex;
+      padding: 2px 4px;
+      gap: 12px;
+      font-size: 11px;
+    }
+
+    .ie-menu-item {
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+    .ie-menu-item:hover {
+      background-color: #316ac5;
+      color: #ffffff;
+    }
+
+    /* IE6 Toolbar */
+    .ie-toolbar {
+      background: #ece9d8;
+      border-bottom: 1px solid #d4d0c8;
+      display: flex;
+      align-items: center;
+      padding: 3px 6px;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .tool-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 5px;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .tool-btn:hover {
+      border: 1px solid #7f9db9;
+      background: #fdfefe;
+    }
+    .tool-btn:active {
+      border: 1px solid #0055ea;
+      background: #e2e8fa;
+    }
+
+    .tool-btn .icon {
+      font-size: 14px;
+    }
+
+    .tool-sep {
+      width: 1px;
+      height: 22px;
+      background: #999;
+      border-right: 1px solid #fff;
+      margin: 0 3px;
+    }
+
+    /* Animated CSS IE Globe Logo */
+    .ie-logo-spinner {
+      margin-left: auto;
+      width: 26px;
+      height: 26px;
+      background: radial-gradient(circle at 35% 35%, #00bcff, #0044aa);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5), 0 0 5px #0088ff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ie-logo-spinner::after {
+      content: "e";
+      color: #ffffff;
+      font-family: serif;
+      font-weight: bold;
+      font-style: italic;
+      font-size: 20px;
+      text-shadow: 0 0 3px #000;
+      animation: ieSpinPulse 3s infinite ease-in-out;
+    }
+
+    @keyframes ieSpinPulse {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.15); filter: hue-rotate(90deg); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    /* Address Bar */
+    .ie-addressbar {
+      background: #ece9d8;
+      border-bottom: 2px solid #7f9db9;
+      display: flex;
+      align-items: center;
+      padding: 3px 6px;
+      gap: 6px;
+    }
+
+    .address-label {
+      color: #666;
+      font-size: 11px;
+    }
+
+    .address-input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #7f9db9;
+      border-radius: 1px;
+      padding: 2px 6px;
+      gap: 4px;
+    }
+
+    .address-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      color: #000080;
+    }
+
+    .go-btn {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      background: linear-gradient(to bottom, #f0f0f0, #d4d0c8);
+      border: 1px solid #7f9db9;
+      font-size: 11px;
+      font-weight: bold;
+      color: #006600;
+      cursor: pointer;
+    }
+
+    .ie-content-pane {
+      flex: 1;
+      background: #ffffff;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(#d8d8d8 1px, transparent 1px),
+        linear-gradient(to bottom, #fbfaff, #f0f0e8);
+      background-size: 16px 16px, 100% 100%;
+    }
+
+    /* Cursed Marquee */
+    .cursed-marquee {
+      background: #000080;
+      color: #ffff00;
+      font-weight: bold;
+      font-family: "Courier New", monospace;
+      padding: 3px 0;
+      border-top: 2px solid #ff0000;
+      border-bottom: 2px solid #ff0000;
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .marquee-inner {
+      display: inline-block;
+      animation: marqueeScroll 22s linear infinite;
+    }
+
+    @keyframes marqueeScroll {
+      0% { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* CSS Flames & Under Construction Bar */
+    .under-construction-strip {
+      background: repeating-linear-gradient(
+        45deg,
+        #f5d300,
+        #f5d300 15px,
+        #000000 15px,
+        #000000 30px
+      );
+      height: 16px;
+      width: 100%;
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+      position: relative;
+    }
+
+    .flame-text {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 900;
+      font-family: Impact, "Arial Black", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ff3b00;
+      text-shadow: 0 -2px 4px #fff, 0 -4px 8px #ffeb3b, 0 -8px 12px #ff5722, 0 -12px 16px #bf360c;
+      animation: flamePulse 1.2s ease-in-out infinite alternate;
+      margin: 8px 0 4px 0;
+    }
+
+    @keyframes flamePulse {
+      0% { transform: scale(1); filter: drop-shadow(0 0 2px #ffcc00); }
+      100% { transform: scale(1.02); filter: drop-shadow(0 0 10px #ff3300); }
+    }
+
+    .portal-subtitle {
+      text-align: center;
+      color: #555;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+
+    .blink-tag {
+      animation: retroBlink 0.8s steps(1, start) infinite;
+      color: #cc0000;
+      font-weight: bold;
+    }
+
+    @keyframes retroBlink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* Main Container with Two Columns */
+    .page-main-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 8px 16px 20px 16px;
+      max-width: 960px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Left Column: Hilarious Badges & Ads */
+    .retro-sidebar {
+      flex: 1;
+      min-width: 190px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar-card {
+      background: var(--xp-gray-bg);
+      border: 2px outset #ffffff;
+      padding: 6px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .sidebar-card-title {
+      background: linear-gradient(to right, #708090, #9aa7b3);
+      color: white;
+      font-weight: bold;
+      padding: 3px 5px;
+      font-size: 11px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Visitor Counter */
+    .visitor-counter {
+      background: #000;
+      border: 3px inset #888;
+      color: #00ff00;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 4px;
+      padding: 4px 6px;
+      text-align: center;
+      text-shadow: 0 0 8px #00ff00;
+      margin: 4px 0;
+    }
+
+    /* Cursed 88x31 Badges (Pure CSS) */
+    .badge-rack {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .badge-btn {
+      width: 120px;
+      height: 31px;
+      border: 2px outset #ddd;
+      font-size: 9px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.1;
+      text-transform: uppercase;
+      box-shadow: 1px 1px 0 #000;
+      cursor: pointer;
+    }
+
+    .badge-ie6 { background: #003366; color: #fff; }
+    .badge-notepad { background: #ffffcc; color: #000; border: 2px outset #ccc; }
+    .badge-flash { background: #cc0000; color: #ffeb3b; }
+    .badge-limewire { background: #006600; color: #99ff99; }
+    .badge-btn:hover { border-style: inset; transform: scale(1.03); }
+
+    /* Moving Annoying Banner Ad */
+    .floating-ad {
+      background: linear-gradient(to bottom, #ffff00, #ff8800);
+      border: 3px dashed #ff0000;
+      padding: 8px;
+      text-align: center;
+      animation: adJiggle 2s infinite ease-in-out;
+      cursor: pointer;
+    }
+    @keyframes adJiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-2deg); }
+      75% { transform: rotate(2deg); }
+    }
+
+    /* Right Column: The Infamous Cursed Login Box */
+    .login-stage-container {
+      flex: 2;
+      min-width: 320px;
+      position: relative;
+    }
+
+    .login-dialog {
+      background: var(--xp-gray-bg);
+      border: 2px outset #ffffff;
+      box-shadow: 3px 3px 12px rgba(0,0,0,0.35);
+      border-radius: 4px;
+      padding: 0;
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .dialog-header {
+      background: linear-gradient(to right, #0a246a 0%, #a6caf0 100%);
+      color: #ffffff;
+      padding: 4px 8px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top-left-radius: 2px;
+      border-top-right-radius: 2px;
+    }
+
+    .dialog-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .passport-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 2px inset #d4d0c8;
+      padding: 8px;
+    }
+
+    .key-icon {
+      font-size: 28px;
+      color: #ffbb00;
+      text-shadow: 1px 1px 2px #333;
+    }
+
+    /* Form Fields & Traps */
+    .form-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .form-label {
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-label-hint {
+      font-weight: normal;
+      font-size: 9px;
+      color: #888;
+    }
+
+    .xp-input {
+      background: #ffffff;
+      border: 2px inset #7f9db9;
+      padding: 5px 8px;
+      font-family: "Tahoma", sans-serif;
+      font-size: 12px;
+      outline: none;
+      width: 100%;
+      box-shadow: inset 1px 1px 2px rgba(0,0,0,0.15);
+      transition: transform 0.15s ease, background-color 0.2s;
+    }
+
+    .xp-input:focus {
+      background-color: #fffde6;
+      border-color: #0055ea;
+    }
+
+    /* Fake Caps Lock Alert */
+    .caps-alert {
+      background: #ffffe1;
+      border: 1px solid #000;
+      padding: 4px 8px;
+      color: #333;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 2px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    /* Moving Terms Checkbox Row */
+    .terms-box {
+      background: #fbfbf8;
+      border: 1px solid #c0c0c0;
+      padding: 8px;
+      margin-top: 4px;
+      position: relative;
+      min-height: 54px;
+    }
+
+    .terms-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .lock-btn-small {
+      font-size: 9px;
+      padding: 1px 5px;
+      border: 1px outset #fff;
+      background: #e0e0e0;
+      cursor: pointer;
+      margin-left: 6px;
+    }
+
+    /* Sliders Puzzle Row */
+    .security-slider-group {
+      background: #f0ede0;
+      border: 1px inset #d4d0c8;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .xp-range {
+      flex: 1;
+      accent-color: #0055ea;
+      cursor: pointer;
+    }
+
+    .status-pill {
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .pill-fail { background: #ffcccc; color: #990000; border: 1px solid #cc0000; }
+    .pill-ok { background: #ccffcc; color: #006600; border: 1px solid #009900; }
+
+    /* The Dreaded Action Buttons Area */
+    .dialog-actions {
+      border-top: 1px solid #d4d0c8;
+      padding-top: 12px;
+      position: relative;
+      height: 75px;
+      overflow: visible;
+    }
+
+    .beveled-btn {
+      font-family: "Tahoma", sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      background: var(--win-btn-face);
+      border: 2px outset #ffffff;
+      color: #000;
+      padding: 5px 16px;
+      cursor: pointer;
+      outline: 1px solid #000;
+      outline-offset: -2px;
+      box-shadow: 1px 1px 0 #000;
+      white-space: nowrap;
+    }
+
+    .beveled-btn:active {
+      border-style: inset;
+      padding: 6px 15px 4px 17px;
+    }
+
+    /* The Elusive Runaway Login Button */
+    #runaway-login-btn {
+      position: absolute;
+      left: 20px;
+      top: 16px;
+      background: linear-gradient(to bottom, #ece9d8, #d8d4c4);
+      min-width: 105px;
+      text-align: center;
+      transition: top 0.15s cubic-bezier(0.1, 0.9, 0.2, 1), 
+                  left 0.15s cubic-bezier(0.1, 0.9, 0.2, 1),
+                  transform 0.1s,
+                  background-color 0.2s;
+      z-index: 50;
+    }
+
+    .btn-login-active {
+      border-color: #0055ea !important;
+      color: #002288 !important;
+    }
+
+    .btn-hazard {
+      background: #ffcccc !important;
+      color: #aa0000 !important;
+    }
+
+    #cancel-btn {
+      position: absolute;
+      right: 20px;
+      top: 16px;
+    }
+
+    #help-btn {
+      position: absolute;
+      right: 120px;
+      top: 16px;
+    }
+
+    .ie-statusbar {
+      height: 22px;
+      background: #ece9d8;
+      border-top: 2px groove #ffffff;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      font-size: 11px;
+      gap: 4px;
+      z-index: 20;
+    }
+
+    .status-panel {
+      border: 1px inset #d4d0c8;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .status-left { flex: 1; color: #000; }
+    .status-coords { width: 140px; color: #444; font-family: monospace; }
+    .status-shift { width: 130px; font-weight: bold; }
+    .status-zone { width: 150px; display: flex; align-items: center; gap: 4px; }
+
+    #taskbar {
+      height: 30px;
+      background: linear-gradient(to bottom, #1f42a5 0%, #245edb 10%, #1941a5 100%);
+      border-top: 2px solid #3c7bf3;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 5000;
+      padding: 0 2px;
+      box-shadow: 0 -1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Start Button */
+    .xp-start-btn {
+      height: 28px;
+      background: linear-gradient(to bottom, #388e3c 0%, #2e7d32 50%, #1b5e20 100%);
+      border: 1px solid #4caf50;
+      border-radius: 0 10px 10px 0;
+      display: flex;
+      align-items: center;
+      padding: 0 10px 0 6px;
+      gap: 6px;
+      cursor: pointer;
+      color: white;
+      font-style: italic;
+      font-weight: 900;
+      font-size: 14px;
+      text-shadow: 1px 1px 2px #003300;
+      box-shadow: inset 1px 1px 0 rgba(255,255,255,0.6), 2px 0 4px rgba(0,0,0,0.4);
+    }
+
+    .xp-start-btn:hover {
+      filter: brightness(1.15);
+    }
+    .xp-start-btn:active {
+      filter: brightness(0.85);
+    }
+
+    .windows-flag {
+      width: 16px;
+      height: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 1px;
+      transform: rotate(-10deg) skew(-8deg);
+    }
+    .flag-red { background: #f25022; }
+    .flag-green { background: #7fba00; }
+    .flag-blue { background: #00a4ef; }
+    .flag-yellow { background: #ffb900; }
+
+    /* Taskbar Tabs */
+    .taskbar-tasks {
+      flex: 1;
+      display: flex;
+      gap: 4px;
+      padding: 0 8px;
+      overflow: hidden;
+    }
+
+    .taskbar-tab {
+      background: linear-gradient(to bottom, #3980f4, #1b4cd6);
+      border: 1px solid #1a3f9e;
+      border-radius: 3px;
+      color: white;
+      padding: 3px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 170px;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .taskbar-tab.active {
+      background: linear-gradient(to bottom, #183bb0, #142f8c);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.6);
+    }
+
+    /* System Tray */
+    .system-tray {
+      background: linear-gradient(to bottom, #0c57c4, #0b459c);
+      border-left: 1px solid #113c88;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 8px;
+      color: white;
+      font-size: 11px;
+      box-shadow: inset 1px 0 2px rgba(0,0,0,0.4);
+    }
+
+    .tray-icon {
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+    }
+    .tray-icon:hover {
+      filter: drop-shadow(0 0 3px #fff);
+    }
+
+    /* Start Menu Popup */
+    #start-menu {
+      display: none;
+      position: absolute;
+      bottom: 30px;
+      left: 0;
+      width: 280px;
+      background: #ffffff;
+      border: 2px solid #0055ea;
+      border-top-right-radius: 6px;
+      box-shadow: 4px -4px 15px rgba(0,0,0,0.5);
+      z-index: 9999;
+    }
+
+    .start-menu-header {
+      background: linear-gradient(to right, #0058ee, #3593ff);
+      color: white;
+      padding: 10px;
+      font-weight: bold;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-shadow: 1px 1px 1px #000;
+    }
+
+    .avatar-box {
+      width: 32px;
+      height: 32px;
+      border: 2px solid #fff;
+      border-radius: 4px;
+      background: #ffcc00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .start-menu-items {
+      padding: 6px 0;
+      background: #ffffff;
+    }
+
+    .start-item {
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .start-item:hover {
+      background: #2b72e2;
+      color: white;
+    }
+
+    .start-menu-footer {
+      background: linear-gradient(to right, #3880eb, #1e5ac8);
+      padding: 6px 12px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .power-btn {
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .xp-dialog-box {
+      position: absolute;
+      background: var(--xp-gray-bg);
+      border: 2px solid #0055ea;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      box-shadow: 4px 4px 16px rgba(0,0,0,0.5), inset 1px 1px 0 #fff;
+      z-index: 1000;
+      min-width: 290px;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .xp-dialog-titlebar {
+      background: linear-gradient(to right, #0058ee, #3593ff);
+      color: white;
+      font-weight: bold;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      cursor: move;
+    }
+
+    .xp-dialog-content {
+      padding: 14px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .dialog-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    .xp-dialog-buttons {
+      background: #ece9d8;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid #d4d0c8;
+    }
+
+    #dialup-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 20000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dialup-window {
+      width: 420px;
+      background: var(--xp-gray-bg);
+      border: 3px solid #0055ea;
+      border-radius: 6px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    }
+
+    .modem-status-area {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modem-graphic {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px;
+      background: #fff;
+      border: 2px inset #d4d0c8;
+    }
+
+    .pc-icon {
+      font-size: 38px;
+    }
+    .dialup-wire {
+      flex: 1;
+      height: 4px;
+      background: #888;
+      position: relative;
+      overflow: hidden;
+    }
+    .dialup-pulse {
+      position: absolute;
+      width: 25px;
+      height: 100%;
+      background: #00ff00;
+      box-shadow: 0 0 8px #00ff00;
+      animation: modemPulse 0.6s linear infinite;
+    }
+    @keyframes modemPulse {
+      0% { left: -25px; }
+      100% { left: 100%; }
+    }
+
+    .xp-progress-track {
+      background: #fff;
+      border: 2px inset #7f9db9;
+      height: 22px;
+      padding: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .xp-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: repeating-linear-gradient(
+        90deg,
+        #30a030,
+        #30a030 10px,
+        #248824 10px,
+        #248824 12px
+      );
+      transition: width 0.3s ease;
+    }
+
+    /* 99% stall shake */
+    .stalled-bar {
+      animation: barStallTremor 0.1s infinite;
+      background: repeating-linear-gradient(
+        90deg,
+        #e09000,
+        #e09000 10px,
+        #b87400 10px,
+        #b87400 12px
+      ) !important;
+    }
+
+    @keyframes barStallTremor {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(2px); }
+      100% { transform: translateX(-2px); }
+    }
+
+    #bsod-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #0000aa;
+      color: #ffffff;
+      font-family: "Lucida Console", "Courier New", monospace;
+      font-size: 14px;
+      padding: 40px 60px;
+      z-index: 999999;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    #victory-desktop {
+      display: none;
+      position: fixed;
+      inset: 0 0 30px 0;
+      z-index: 15000;
+      /* CSS Bliss Wallpaper: Beautiful green rolling hills & blue sky */
+      background: 
+        radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.7) 0%, transparent 40%),
+        linear-gradient(to bottom, #2b70c9 0%, #68a4e8 45%, #92c47a 50%, #4c8a2b 75%, #306616 100%);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .desktop-icons-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 80px;
+    }
+
+    .desktop-icon-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      color: #ffffff;
+      text-shadow: 1px 1px 2px #000;
+      font-size: 11px;
+      cursor: pointer;
+      padding: 4px;
+      border: 1px solid transparent;
+      border-radius: 2px;
+    }
+    .desktop-icon-item:hover {
+      background: rgba(49, 106, 197, 0.4);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .desktop-icon-symbol {
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+
+    /* Victory Window */
+    .victory-modal-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 520px;
+      background: var(--xp-gray-bg);
+      border: 3px solid #0055ea;
+      border-radius: 6px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.8);
+      z-index: 100;
+    }
+
+    .victory-header-art {
+      background: linear-gradient(to right, #ffcc00, #ff6600);
+      color: #fff;
+      font-family: Impact, sans-serif;
+      font-size: 24px;
+      letter-spacing: 1px;
+      text-align: center;
+      padding: 12px;
+      text-shadow: 2px 2px 0 #990000;
+      border-bottom: 2px solid #fff;
+    }
+
+    .victory-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 12px;
+    }
+
+    .achievement-banner {
+      background: #ffffcc;
+      border: 2px dashed #ff9900;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 4px;
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 2px inset #d4d0c8;
+      font-family: "Courier New", monospace;
+    }
+    .stats-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .stats-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    #confetti-canvas {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 50;
+    }
+
+    #cheat-panel {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      width: 320px;
+      background: #000000;
+      color: #00ff00;
+      font-family: "Courier New", monospace;
+      border: 2px solid #00ff00;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+      z-index: 30000;
+      padding: 12px;
+    }
+    #cheat-panel h4 {
+      color: #fff;
+      border-bottom: 1px solid #00ff00;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+    }
+    .cheat-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+      align-items: center;
+    }
+    .cheat-btn {
+      background: #003300;
+      color: #00ff00;
+      border: 1px solid #00ff00;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .cheat-btn:hover {
+      background: #00ff00;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+<div id="crt-container">
+  <!-- CRT Scanlines and curvature effect -->
+  <div class="crt-overlay crt-flicker"></div>
+
+  <!-- Desktop Workspace Area -->
+  <div id="desktop">
+    
+    <!-- Main Internet Explorer 6 Window -->
+    <div class="xp-window" id="browser-window">
+      
+      <!-- XP Title Bar -->
+      <div class="xp-titlebar" id="browser-titlebar">
+        <div class="xp-titlebar-text">
+          <div class="ie-icon-small">e</div>
+          <span id="window-title-text">Microsoft Internet Explorer - [Sign In - Secure Passport Gateway 2003 (Build 2600.xpsp2)]</span>
+        </div>
+        <div class="xp-window-controls">
+          <div class="xp-btn-ctrl btn-min" title="Minimize" onclick="playBeep(); showQuickPopup('Notice', 'Minimizing is currently restricted by Network Policy #419.');">_</div>
+          <div class="xp-btn-ctrl btn-max" title="Maximize" onclick="playBeep(); toggleMaximize();">□</div>
+          <div class="xp-btn-ctrl btn-close" title="Close" onclick="triggerCloseAttempt();">✕</div>
+        </div>
+      </div>
+
+      <!-- IE6 Menu Bar -->
+      <div class="ie-menubar">
+        <div class="ie-menu-item" onclick="playBeep(); showQuickPopup('File Menu', 'Work Offline is permanently engaged due to dial-up line noise.');">File</div>
+        <div class="ie-menu-item" onclick="playBeep(); showQuickPopup('Edit Menu', 'Undo has been uninstalled to save 32KB of RAM.');">Edit</div>
+        <div class="ie-menu-item" onclick="playBeep(); toggleCrtFlicker();">View (Toggle CRT)</div>
+        <div class="ie-menu-item" onclick="playBeep(); showQuickPopup('Favorites', 'Favorite Added: &quot;Top 100 MIDI Songs of 2002&quot;.');">Favorites</div>
+        <div class="ie-menu-item" onclick="playBeep(); openCheatPanel();">Tools (Secret Webmaster)</div>
+        <div class="ie-menu-item" onclick="playBeep(); showAboutIE();">Help</div>
+      </div>
+
+      <!-- IE6 Navigation Toolbar -->
+      <div class="ie-toolbar">
+        <div class="tool-btn" onclick="playBeep(); handleBackButton();">
+          <span class="icon">⬅️</span>
+          <span>Back</span>
+        </div>
+        <div class="tool-btn" onclick="playBeep(); showQuickPopup('Forward Error', 'Cannot move forward. The future is uncertain.');">
+          <span class="icon">➡️</span>
+          <span>Forward</span>
+        </div>
+        <div class="tool-btn" onclick="playBeep(); showQuickPopup('Stopped', 'Stop clicked! Nothing actually stopped, but thank you for your input.');">
+          <span class="icon">🛑</span>
+          <span>Stop</span>
+        </div>
+        <div class="tool-btn" onclick="playBeep(); triggerRefreshGlitch();">
+          <span class="icon">🔄</span>
+          <span>Refresh</span>
+        </div>
+        <div class="tool-btn" onclick="playBeep(); window.scrollTo({top: 0, behavior: 'smooth'});">
+          <span class="icon">🏠</span>
+          <span>Home</span>
+        </div>
+        <div class="tool-sep"></div>
+        <div class="tool-btn" onclick="playBeep(); showQuickPopup('Search', 'Search engine &quot;Ask Jeeves&quot; is contemplating your query.');">
+          <span class="icon">🔍</span>
+          <span>Search</span>
+        </div>
+        <div class="tool-btn" onclick="playBeep(); showQuickPopup('Favorites', 'Your dial-up bookmarks are safe.');">
+          <span class="icon">⭐</span>
+          <span>Favorites</span>
+        </div>
+        
+        <!-- Spinning IE Logo (Clicking 10 times triggers Webmaster Cheat panel) -->
+        <div class="ie-logo-spinner" id="ie-spin-logo" title="Click me 10 times for secret 2003 Webmaster Menu" onclick="handleLogoClick();"></div>
+      </div>
+
+      <!-- Address Bar -->
+      <div class="ie-addressbar">
+        <span class="address-label">Address</span>
+        <div class="address-input-wrapper">
+          <span style="font-size:12px;">🌐</span>
+          <input type="text" class="address-input" id="address-bar-input" value="http://login.passport.net/xp/auth.asp?session=CHAOS_2003&amp;retry_count=4" readonly>
+        </div>
+        <div class="go-btn" onclick="playBeep(); triggerRefreshGlitch();">
+          <span>Go</span>
+          <span style="color:#008800;">➜</span>
+        </div>
+      </div>
+
+      <!-- GeoCities / Retro Content Area -->
+      <div class="ie-content-pane" id="ie-content-scroll">
+        
+        <!-- Marquee -->
+        <div class="cursed-marquee">
+          <div class="marquee-inner">
+            ★★★ WELCOME TO SECURE PASSPORT GATEWAY 2003 ★★★ BEST VIEWED AT 800x600 IN INTERNET EXPLORER 6.0 ★★★ DO NOT HIT BACK OR YOUR MODEM WILL DISCONNECT ★★★ DIAL-UP HANDSHAKE PROTOCOL ACTIVATED ★★★
+          </div>
+        </div>
+
+        <!-- Under Construction Strip -->
+        <div class="under-construction-strip"></div>
+
+        <div class="flame-text">🔥 SECURE PASSPORT AUTHORIZATION 🔥</div>
+        <div class="portal-subtitle">
+          <span class="blink-tag">⚠️ CAUTION:</span> 40-BIT ROT13 MILITARY ENCRYPTION DETECTED • PLEASE LOG IN TO PREVENT DELETION OF SYSTEM32
+        </div>
+
+        <!-- Main Layout with Badges & Login Box -->
+        <div class="page-main-layout">
+          
+          <!-- Left Column: Retro Sidebar -->
+          <div class="retro-sidebar">
+            
+            <div class="sidebar-card">
+              <div class="sidebar-card-title">
+                <span>Visitor Failure Counter</span>
+                <span>📶</span>
+              </div>
+              <p style="font-size:10px; color:#555;">Users who attempted to sign in:</p>
+              <div class="visitor-counter" id="visitor-count-display">00412891</div>
+              <p style="font-size:9px; color:#777; text-align:center;">Failed attempts log updated hourly.</p>
+            </div>
+
+            <!-- Annoying Floating Ad -->
+            <div class="floating-ad" onclick="playBeep(); showAdPopup();">
+              <div style="font-weight:900; font-size:11px; color:#cc0000;">🎁 CONGRATULATIONS! 🎁</div>
+              <div style="font-size:10px; font-weight:bold;">YOU WON A FREE SONY WALKMAN &amp; 128MB MP3 PLAYER!</div>
+              <div style="font-size:9px; color:#000; text-decoration:underline; margin-top:3px;">[CLICK HERE TO CLAIM PRIZE]</div>
+            </div>
+
+            <!-- Retro Web Badges -->
+            <div class="sidebar-card">
+              <div class="sidebar-card-title">
+                <span>Certified By</span>
+                <span>★</span>
+              </div>
+              <div class="badge-rack">
+                <div class="badge-btn badge-ie6" onclick="playBeep(); showQuickPopup('Browser Info', 'Optimized for 16-bit color displays and 56k V.90 modems.');">IE 6.0 BEST VIEWED</div>
+                <div class="badge-btn badge-notepad" onclick="playBeep(); showQuickPopup('Source Code', 'Created in Windows Notepad with zero syntax highlighting.');">MADE WITH NOTEPAD</div>
+                <div class="badge-btn badge-flash" onclick="playBeep(); showQuickPopup('Flash Player', 'Macromedia Flash 5.0 Plugin is 100% simulated.');">FLASH ENABLED</div>
+                <div class="badge-btn badge-limewire" onclick="playBeep(); showQuickPopup('LimeWire Notice', 'lime_wire_pro_installer_free.exe is currently downloading in background...');">LIMEWIRE VIRUS FREE</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: The Infamous Cursed Login Dialogue -->
+          <div class="login-stage-container">
+            
+            <div class="login-dialog" id="login-main-card">
+              
+              <div class="dialog-header">
+                <span>🔐 Passport Identification Console (Step 1 of ???)</span>
+                <span style="font-size:10px; cursor:pointer;" onclick="showQuickPopup('Info', 'Form integrity: 12% stable.');">❓</span>
+              </div>
+
+              <div class="dialog-body">
+                
+                <div class="passport-banner">
+                  <div class="key-icon">🔑</div>
+                  <div>
+                    <div style="font-weight:bold; font-size:12px; color:#003399;">Microsoft Passport Authentication</div>
+                    <div style="font-size:10px; color:#555;">Type your credentials. (Warning: Fields may drift during solar flares).</div>
+                  </div>
+                </div>
+
+                <!-- Username Field -->
+                <div class="form-field-group" id="user-group">
+                  <div class="form-label">
+                    <span id="user-label-text">User Name:</span>
+                    <span class="form-label-hint">Must be 2003-compatible</span>
+                  </div>
+                  <input 
+                    type="text" 
+                    id="username-input" 
+                    class="xp-input" 
+                    placeholder="e.g. Neo_Matrix2003" 
+                    tabindex="1"
+                    autocomplete="off"
+                    oninput="handleUsernameInput(this)"
+                    onfocus="handleInputFocus('user')"
+                  >
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-field-group" id="pass-group">
+                  <div class="form-label">
+                    <span id="pass-label-text">Password:</span>
+                    <span class="form-label-hint" id="pass-hint-text">Hidden for security</span>
+                  </div>
+                  <input 
+                    type="password" 
+                    id="password-input" 
+                    class="xp-input" 
+                    placeholder="••••••••••••" 
+                    tabindex="9"
+                    autocomplete="off"
+                    oninput="handlePasswordInput(this)"
+                    onfocus="handleInputFocus('pass')"
+                  >
+                </div>
+
+                <!-- Fake Caps Lock Warning (Appears randomly or flips) -->
+                <div class="caps-alert" id="caps-lock-warning" style="display:none;">
+                  <span style="color:#d97706; font-size:14px;">⚠️</span>
+                  <span id="caps-alert-text">Warning: Caps Lock appears to be in an ambiguous quantum state!</span>
+                </div>
+
+                <!-- Calibration Sliders Puzzle -->
+                <div class="security-slider-group">
+                  <div style="font-weight:bold; font-size:10px; color:#444; display:flex; justify-content:space-between;">
+                    <span>🛡️ HARDWARE SECURITY HARMONIZER</span>
+                    <span id="harmonize-status" class="status-pill pill-fail">UNALIGNED</span>
+                  </div>
+
+                  <!-- Slider 1: CRT Monitor Brightness / Gamma (Target: 73%) -->
+                  <div class="slider-row">
+                    <label style="font-size:10px; width:130px;" title="Controls the CRT brightness">
+                      CRT Gamma Calibration: <b id="bright-val-txt">100%</b>
+                    </label>
+                    <input 
+                      type="range" 
+                      id="slider-brightness" 
+                      class="xp-range" 
+                      min="30" 
+                      max="150" 
+                      value="100"
+                      tabindex="5"
+                      oninput="handleBrightnessSlider(this.value)"
+                    >
+                  </div>
+                  <div style="font-size:9px; color:#666; font-style:italic;">
+                    * Notice: Security token requires gamma calibrated to exactly <b>73%</b>.
+                  </div>
+
+                  <!-- Slider 2: Modem Baud Rate (Target: 56k) -->
+                  <div class="slider-row" style="margin-top:2px;">
+                    <label style="font-size:10px; width:130px;">
+                      Modem Speed: <b id="baud-val-txt">14.4k</b>
+                    </label>
+                    <input 
+                      type="range" 
+                      id="slider-baud" 
+                      class="xp-range" 
+                      min="1" 
+                      max="5" 
+                      value="1" 
+                      step="1"
+                      tabindex="7"
+                      oninput="handleBaudSlider(this.value)"
+                    >
+                  </div>
+                  <div style="font-size:9px; color:#666; font-style:italic;">
+                    * Dial-up ISP only authenticates at standard <b>56k V.90</b>.
+                  </div>
+                </div>
+
+                <!-- Moving Terms Checkbox -->
+                <div class="terms-box">
+                  <div class="terms-wrapper" id="terms-movable-wrapper" onmouseenter="handleTermsHover()">
+                    <input type="checkbox" id="terms-checkbox" tabindex="4" onclick="handleTermsClick(event)">
+                    <label for="terms-checkbox" style="font-size:10px; cursor:pointer;" id="terms-label-text">
+                      I accept the 84-page Dial-Up EULA &amp; agree not to pick up the landline telephone.
+                    </label>
+                  </div>
+                  <button class="lock-btn-small" title="Click to pin checkbox in place for 5 seconds" onclick="lockTermsCheckbox()">
+                    📌 Lock Checkbox
+                  </button>
+                </div>
+
+                <!-- The Action Buttons Area -->
+                <div class="dialog-actions" id="button-cage-area">
+                  
+                  <!-- The Infamous Runaway Submit Button -->
+                  <button 
+                    id="runaway-login-btn" 
+                    class="beveled-btn btn-login-active" 
+                    tabindex="3"
+                    onmouseenter="handleLoginBtnDodge(event)"
+                    onclick="handleLoginBtnClick(event)"
+                  >
+                    LOGIN
+                  </button>
+
+                  <!-- Cancel Button (clears fields or moves things) -->
+                  <button 
+                    id="cancel-btn" 
+                    class="beveled-btn" 
+                    tabindex="2"
+                    onclick="handleCancelBtnClick()"
+                  >
+                    Cancel
+                  </button>
+
+                  <!-- Help / Hint Button -->
+                  <button 
+                    id="help-btn" 
+                    class="beveled-btn" 
+                    tabindex="6"
+                    onclick="handleHelpBtnClick()"
+                  >
+                    Hint
+                  </button>
+
+                </div>
+
+                <div style="font-size:9px; color:#888; text-align:center; margin-top:-4px;">
+                  Pressing <b>Enter</b> is monitored by Microsoft Anti-Enter Sentinel.
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- IE6 Status Bar -->
+      <div class="ie-statusbar">
+        <div class="status-panel status-left" id="statusbar-main">
+          <span style="color:#008800; font-weight:bold;">●</span>
+          <span id="statusbar-msg" style="margin-left:4px;">Done, but with 14 errors on page.</span>
+        </div>
+        <div class="status-panel status-coords" id="statusbar-coords">
+          Cursor: X:0 Y:0
+        </div>
+        <div class="status-panel status-shift" id="statusbar-shift">
+          Shift: UNLOCKED
+        </div>
+        <div class="status-panel status-zone">
+          <span>🔒</span>
+          <span>Restricted Zone</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Windows XP Taskbar -->
+  <div id="taskbar">
+    
+    <!-- Green Start Button -->
+    <div class="xp-start-btn" id="xp-start-button" onclick="toggleStartMenu()">
+      <div class="windows-flag">
+        <div class="flag-red"></div>
+        <div class="flag-green"></div>
+        <div class="flag-blue"></div>
+        <div class="flag-yellow"></div>
+      </div>
+      <span>start</span>
+    </div>
+
+    <!-- Running Applications Tabs -->
+    <div class="taskbar-tasks">
+      <div class="taskbar-tab active" id="task-tab-ie" onclick="focusBrowserWindow()">
+        <div class="ie-icon-small" style="width:14px; height:14px; font-size:10px;">e</div>
+        <span>Internet Explorer</span>
+      </div>
+      <div class="taskbar-tab" id="task-tab-msn" onclick="playBeep(); showQuickPopup('MSN Messenger', 'Your contact &quot;CoolGuy_99&quot; has just nudged your screen!'); triggerScreenShake();">
+        <span style="font-size:12px;">🦋</span>
+        <span>MSN Messenger (Away)</span>
+      </div>
+      <div class="taskbar-tab" id="task-tab-dialup" onclick="playBeep(); showQuickPopup('Modem Diagnostics', 'Baud rate: 56,000 bps. High packet loss due to microwave oven.');">
+        <span style="font-size:12px;">📠</span>
+        <span>Dial-up (Online)</span>
+      </div>
+    </div>
+
+    <!-- System Tray -->
+    <div class="system-tray">
+      <!-- Audio Toggle Icon -->
+      <div class="tray-icon" id="tray-audio-toggle" title="Toggle Sound (Web Audio Synthesizer)" onclick="toggleAudioMute()">
+        <span id="audio-icon-sym">🔊</span>
+      </div>
+      <!-- Dial-up blinking lights -->
+      <div class="tray-icon" title="Dial-up Transmit / Receive Activity">
+        <span style="color:#00ff00; font-size:10px;" id="dialup-leds">🖥️</span>
+      </div>
+      <!-- Real Clock -->
+      <div id="tray-clock" style="font-weight:bold;" title="Double-click to view time">11:06 PM</div>
+    </div>
+
+  </div>
+
+  <!-- Windows XP Start Menu -->
+  <div id="start-menu">
+    <div class="start-menu-header">
+      <div class="avatar-box">🦆</div>
+      <div>
+        <div>Administrator</div>
+        <div style="font-size:9px; font-weight:normal; opacity:0.8;">Windows XP Professional SP2</div>
+      </div>
+    </div>
+    <div class="start-menu-items">
+      <div class="start-item" onclick="focusBrowserWindow(); toggleStartMenu();">
+        <span>🌐</span> <b>Internet Explorer</b>
+      </div>
+      <div class="start-item" onclick="playBeep(); showQuickPopup('Outlook Express', 'You have 4,892 unread spam emails offering herbal remedies.'); toggleStartMenu();">
+        <span>✉️</span> <b>Outlook Express</b>
+      </div>
+      <div class="start-item" onclick="openCheatPanel(); toggleStartMenu();">
+        <span>🛠️</span> <b>Webmaster Cheat Panel</b>
+      </div>
+      <div class="start-item" onclick="triggerBsod(); toggleStartMenu();">
+        <span>💥</span> <b>Trigger Blue Screen (Crash Test)</b>
+      </div>
+      <div class="start-item" onclick="playBeep(); showAboutIE(); toggleStartMenu();">
+        <span>ℹ️</span> <b>About Windows &amp; Contest</b>
+      </div>
+    </div>
+    <div class="start-menu-footer">
+      <div class="power-btn" onclick="triggerBsod(); toggleStartMenu();">
+        <span>🛑</span> <span>Turn Off Computer</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DIAL-UP CONNECTING 99% PROGRESS MODAL -->
+<div id="dialup-modal">
+  <div class="dialup-window">
+    <div class="xp-titlebar">
+      <div class="xp-titlebar-text">
+        <span>📠</span>
+        <span>Connecting to Microsoft Passport Gateway...</span>
+      </div>
+    </div>
+    <div class="modem-status-area">
+      <div class="modem-graphic">
+        <div class="pc-icon">💻</div>
+        <div class="dialup-wire">
+          <div class="dialup-pulse"></div>
+        </div>
+        <div class="pc-icon">🌐</div>
+      </div>
+
+      <div style="font-size:12px; font-weight:bold; color:#003399;" id="dialup-action-text">
+        Dialing 1-800-SLOW-NET...
+      </div>
+      <div style="font-size:10px; color:#666;" id="dialup-detail-text">
+        Negotiating baud rate and carrier frequency...
+      </div>
+
+      <div class="xp-progress-track">
+        <div class="xp-progress-bar" id="dialup-progress-fill"></div>
+      </div>
+
+      <!-- Human Verification Riddle on 99% Stall -->
+      <div id="stall-riddle-box" style="display:none; background:#fffde0; border:1px solid #c0b000; padding:8px; margin-top:4px;">
+        <div style="font-weight:bold; font-size:11px; color:#996600;">⚠️ VERIFICATION REQUIRED AT 99%:</div>
+        <p style="font-size:10px; margin:4px 0;">Solve this to finalize connection: <b>What year was Windows XP released?</b></p>
+        <div style="display:flex; gap:6px; margin-top:6px;">
+          <button class="beveled-btn" onclick="handleRiddleAnswer(1995)">1995 (Win95)</button>
+          <button class="beveled-btn" onclick="handleRiddleAnswer(2001)" style="font-weight:900; color:#006600;">2001 (Correct)</button>
+          <button class="beveled-btn" onclick="handleRiddleAnswer(2026)">2026 (Cyberpunk)</button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+        <button class="beveled-btn" onclick="cancelDialupSequence()">Abort Connection</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTHENTIC BLUE SCREEN OF DEATH (BSOD) -->
+<div id="bsod-screen">
+A problem has been detected and Windows has been shut down to prevent damage
+to your computer.
+
+THE_INTERNET_REFUSES_TO_LET_YOU_LOG_IN
+
+If this is the first time you've seen this Stop error screen,
+restart your computer. If this screen appears again, follow
+these steps:
+
+Check to make sure any new hardware or software is properly installed.
+If this is a new installation, ask your hardware or software manufacturer
+for any Windows updates you might need.
+
+If problems continue, disable or remove any newly installed hardware
+or software. Disable BIOS memory options such as caching or shadowing.
+If you need to use Safe Mode to remove or disable components, restart
+your computer, press F8 to select Advanced Startup Options, and then
+select Safe Mode.
+
+Technical information:
+
+*** STOP: 0x000000D1 (0x00000000, 0x000000F2, 0x00000000, 0xF834B76C)
+
+*** LOGIN.SYS - Address F834B76C base at F8340000, DateStamp 3d6dd67c
+
+Beginning dump of physical memory
+Physical memory dump complete.
+Recovering system state in 3 seconds...
+</div>
+
+<!-- THE GRAND FINALE: WINDOWS XP BLISS DESKTOP VICTORY -->
+<div id="victory-desktop">
+  
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="desktop-icons-grid">
+    <div class="desktop-icon-item" onclick="playBeep(); showQuickPopup('My Computer', 'Hard Drive C: 1.2 GB of 4.0 GB free.');">
+      <div class="desktop-icon-symbol">🖥️</div>
+      <span>My Computer</span>
+    </div>
+    <div class="desktop-icon-item" onclick="playBeep(); showQuickPopup('Recycle Bin', 'Contains 43 discarded login attempts.');">
+      <div class="desktop-icon-symbol">🗑️</div>
+      <span>Recycle Bin</span>
+    </div>
+    <div class="desktop-icon-item" onclick="playBeep(); showQuickPopup('MSN Messenger', 'All friends are currently playing Pinball.');">
+      <div class="desktop-icon-symbol">🦋</div>
+      <span>MSN Messenger</span>
+    </div>
+    <div class="desktop-icon-item" onclick="playBeep(); showQuickPopup('LimeWire', 'Finished downloading: song.mp3 (actually a text file).');">
+      <div class="desktop-icon-symbol">🍋</div>
+      <span>LimeWire</span>
+    </div>
+  </div>
+
+  <!-- Victory Window -->
+  <div class="victory-modal-card">
+    <div class="xp-titlebar">
+      <div class="xp-titlebar-text">
+        <span>🏆</span>
+        <span>Windows Security Alert: Authentication Succeeded!</span>
+      </div>
+    </div>
+    <div class="victory-header-art">
+      🎉 MISSION ACCOMPLISHED! 🎉
+    </div>
+    <div class="victory-body">
+      <div style="font-size:14px; font-weight:bold; color:#003399; text-align:center;">
+        Congratulations! You survived the worst login page ever made.
+      </div>
+      <p style="text-align:center; color:#444;">
+        Against all odds, elusive buttons, swapped credentials, quantum Caps Lock, and dial-up packet loss, you have logged into the 2003 Internet.
+      </p>
+
+      <div class="achievement-banner">
+        <span style="font-size:32px;">🎖️</span>
+        <div>
+          <div style="font-weight:bold; color:#995500;">ACHIEVEMENT UNLOCKED:</div>
+          <div style="font-size:11px; color:#333;">&quot;Patient Demigod of the 56k Era&quot; (Rare 0.001%)</div>
+        </div>
+      </div>
+
+      <table class="stats-table">
+        <tr>
+          <td>Time Spent in Purgatory:</td>
+          <td><b id="stat-time-val">0 seconds</b></td>
+        </tr>
+        <tr>
+          <td>Button Evasions Survived:</td>
+          <td><b id="stat-dodges-val">0 times</b></td>
+        </tr>
+        <tr>
+          <td>Popups Vanquished:</td>
+          <td><b id="stat-popups-val">0 closed</b></td>
+        </tr>
+        <tr>
+          <td>Sanity Level Remaining:</td>
+          <td><b style="color:#009900;">0.04% (Nominal)</b></td>
+        </tr>
+      </table>
+
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:6px;">
+        <button class="beveled-btn" onclick="resetGameToTryAgain()">
+          🔄 Play Again (Why?)
+        </button>
+        <button class="beveled-btn" onclick="downloadSingleHtmlFile()" style="color:#003399; font-weight:bold;">
+          💾 Download Standalone HTML
+        </button>
+        <button class="beveled-btn" onclick="copyCompetitionCertificate()">
+          📋 Copy Victory Certificate
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SECRET WEBMASTER CHEAT PANEL -->
+<div id="cheat-panel">
+  <h4>★ 2003 WEBMASTER CHEAT CONSOLE ★</h4>
+  <p style="font-size:10px; color:#aaa; margin-bottom:8px;">You found the secret dev menu! Use this to inspect or test all mechanics:</p>
+  
+  <div class="cheat-row">
+    <span>Evasive Button:</span>
+    <button class="cheat-btn" id="cheat-toggle-dodge" onclick="toggleCheatDodge()">ENABLED</button>
+  </div>
+  <div class="cheat-row">
+    <span>Force Brightness (73%):</span>
+    <button class="cheat-btn" onclick="document.getElementById('slider-brightness').value=73; handleBrightnessSlider(73);">SET 73%</button>
+  </div>
+  <div class="cheat-row">
+    <span>Force Modem (56k):</span>
+    <button class="cheat-btn" onclick="document.getElementById('slider-baud').value=4; handleBaudSlider(4);">SET 56K</button>
+  </div>
+  <div class="cheat-row">
+    <span>Trigger Random Popup:</span>
+    <button class="cheat-btn" onclick="spawnCursedPopup()">SPAWN</button>
+  </div>
+  <div class="cheat-row">
+    <span>Trigger Fake BSOD:</span>
+    <button class="cheat-btn" onclick="triggerBsod()">CRASH OS</button>
+  </div>
+  <div class="cheat-row">
+    <span style="color:#ffff00;">Instant Win (Skip to Desktop):</span>
+    <button class="cheat-btn" style="background:#ffff00; color:#000;" onclick="triggerInstantVictory()">WIN NOW</button>
+  </div>
+  <div style="text-align:right; margin-top:10px;">
+    <button class="cheat-btn" onclick="document.getElementById('cheat-panel').style.display='none'">Close Console</button>
+  </div>
+</div>
+
+<script>
+  let audioCtx = null;
+  let audioMuted = false;
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtxClass) {
+        audioCtx = new AudioCtxClass();
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function toggleAudioMute() {
+    audioMuted = !audioMuted;
+    document.getElementById('audio-icon-sym').innerText = audioMuted ? '🔇' : '🔊';
+    showStatusMsg(audioMuted ? 'System Audio: MUTED' : 'System Audio: UNMUTED');
+    if (!audioMuted) playBeep();
+  }
+
+  // Classic UI blip
+  function playBeep(freq = 880, duration = 0.04) {
+    if (audioMuted) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch(e) {}
+  }
+
+  // Windows XP Critical Stop / Error Chord
+  function playErrorSound() {
+    if (audioMuted) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const freqs = [350, 440, 554];
+      freqs.forEach(freq => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.36);
+      });
+    } catch(e) {}
+  }
+
+  // Procedural Dial-Up Modem Handshake Synthesizer
+  function playDialupStep(step) {
+    if (audioMuted) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      if (step === 'dial') {
+        // DTMF tone pair
+        [697, 1209].forEach(freq => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        });
+      } else if (step === 'screech') {
+        // Frequency sweep carrier tone
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(1200, now);
+        osc.frequency.linearRampToValueAtTime(2400, now + 0.5);
+        osc.frequency.linearRampToValueAtTime(1800, now + 1.0);
+        gain.gain.setValueAtTime(0.09, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 1.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 1.1);
+      } else if (step === 'noise') {
+        // Synthesized modulated burst
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(900, now + 0.4);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+    } catch(e) {}
+  }
+
+  // Windows XP Startup / Victory Chime
+  function playVictoryFanfare() {
+    if (audioMuted) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      // Majestic 4-tone retro arpeggio: Eb4, Bb4, G4, Eb5
+      const notes = [
+        { f: 311.13, start: 0,   dur: 0.8 },
+        { f: 466.16, start: 0.2, dur: 0.9 },
+        { f: 392.00, start: 0.4, dur: 1.1 },
+        { f: 622.25, start: 0.6, dur: 1.8 }
+      ];
+      notes.forEach(n => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(n.f, now + n.start);
+        gain.gain.setValueAtTime(0.18, now + n.start);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + n.start + n.dur);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + n.start);
+        osc.stop(now + n.start + n.dur);
+      });
+    } catch(e) {}
+  }
+
+  const gameState = {
+    startTime: Date.now(),
+    dodgesCount: 0,
+    popupsClosed: 0,
+    failuresCount: 412891,
+    brightness: 100,
+    baudRate: 1, // 1=14.4k, 2=28.8k, 3=33.6k, 4=56k (target), 5=Fiber
+    termsAccepted: false,
+    termsLocked: false,
+    shiftHeld: false,
+    cheatDodgeEnabled: true,
+    submitLabelIndex: 0,
+    submitLabels: [
+      'LOGIN',
+      'LOGIN',
+      'CANCEL',
+      'FORMAT C:',
+      'RETRY',
+      'INSTALL BONZI BUDDY',
+      'LOGIN',
+      'SELF-DESTRUCT',
+      'SEND TELEMETRY'
+    ],
+    logoClicks: 0,
+    konamiIndex: 0,
+    konamiCode: ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']
+  };
+
+  let swapTimeout = null;
+
+  function handleUsernameInput(input) {
+    // 2003 gamer tag auto-mischief
+    const val = input.value;
+    if (val.length === 6 && !val.includes('_')) {
+      input.value = 'xX_' + val + '03_Xx';
+      showStatusMsg('Auto-Format: Username standardized to 2003 MSN gaming guidelines.');
+      playBeep(600, 0.05);
+    }
+    // Random Caps Lock quantum warning
+    toggleRandomCapsLock();
+  }
+
+  function handlePasswordInput(input) {
+    const val = input.value;
+    
+    // Password visibility occasionally peeks for 400ms for "security audit"
+    if (val.length > 0 && Math.random() < 0.25) {
+      input.type = 'text';
+      document.getElementById('pass-hint-text').innerText = 'Auditing visibility...';
+      document.getElementById('pass-hint-text').style.color = '#cc0000';
+      setTimeout(() => {
+        input.type = 'password';
+        document.getElementById('pass-hint-text').innerText = 'Hidden for security';
+        document.getElementById('pass-hint-text').style.color = '#888';
+      }, 400);
+    }
+
+    // After typing 5 letters, swap Username and Password groups!
+    if (val.length === 5 && !swapTimeout) {
+      swapFieldsWithAnimation();
+    }
+
+    toggleRandomCapsLock();
+  }
+
+  function swapFieldsWithAnimation() {
+    const userGroup = document.getElementById('user-group');
+    const passGroup = document.getElementById('pass-group');
+    
+    showStatusMsg('Memory Relocation: Swapping stack pointers...');
+    playErrorSound();
+    
+    userGroup.style.transform = 'translateY(55px)';
+    passGroup.style.transform = 'translateY(-55px)';
+
+    swapTimeout = setTimeout(() => {
+      // Physically re-insert
+      const parent = userGroup.parentNode;
+      parent.insertBefore(passGroup, userGroup);
+      userGroup.style.transform = '';
+      passGroup.style.transform = '';
+      showStatusMsg('Field alignment restored (in reverse chronological order).');
+      swapTimeout = null;
+    }, 450);
+  }
+
+  function toggleRandomCapsLock() {
+    const alertBox = document.getElementById('caps-lock-warning');
+    const alertTxt = document.getElementById('caps-alert-text');
+    const states = [
+      'Warning: Caps Lock is OFF, but we suspect you wanted it ON.',
+      'Warning: Caps Lock detected in an ambiguous quantum superposition!',
+      'Warning: Shift key is contemplating life choices.',
+      'Security Alert: Typing speed exceeds dial-up throughput (limit: 4 WPM).'
+    ];
+    if (Math.random() < 0.3) {
+      alertTxt.innerText = states[Math.floor(Math.random() * states.length)];
+      alertBox.style.display = 'flex';
+      setTimeout(() => { alertBox.style.display = 'none'; }, 2200);
+    }
+  }
+
+  function handleInputFocus(type) {
+    showStatusMsg(`Focused ${type === 'user' ? 'Username' : 'Password'} buffer. Tab order randomized.`);
+  }
+
+  function handleBrightnessSlider(val) {
+    gameState.brightness = parseInt(val, 10);
+    document.getElementById('bright-val-txt').innerText = val + '%';
+    
+    // Adjust actual CRT brightness filter
+    const norm = val / 100;
+    document.documentElement.style.setProperty('--crt-brightness', norm);
+
+    checkHarmonization();
+  }
+
+  function handleBaudSlider(val) {
+    gameState.baudRate = parseInt(val, 10);
+    const baudMap = {
+      1: '14.4k (Slow)',
+      2: '28.8k (Noisy)',
+      3: '33.6k (Meh)',
+      4: '56k V.90 (TARGET)',
+      5: 'Fiber Optics (BANNED)'
+    };
+    document.getElementById('baud-val-txt').innerText = baudMap[val] || val;
+    playBeep(200 + val * 150, 0.03);
+
+    if (val == 5) {
+      showQuickPopup('Bandwidth Violation', 'Fiber Optics in 2003 is anachronistic and forbidden by dial-up police.');
+    }
+
+    checkHarmonization();
+  }
+
+  function checkHarmonization() {
+    const harmonized = (gameState.brightness === 73 && gameState.baudRate === 4);
+    const statusPill = document.getElementById('harmonize-status');
+    
+    if (harmonized) {
+      statusPill.className = 'status-pill pill-ok';
+      statusPill.innerText = 'HARMONIZED (READY)';
+      showStatusMsg('Security Clearance: Signals matched! Submit button speed normalized.');
+      playBeep(1200, 0.1);
+    } else {
+      statusPill.className = 'status-pill pill-fail';
+      statusPill.innerText = 'UNALIGNED';
+    }
+  }
+
+  let termsShift = 0;
+
+  function handleTermsHover() {
+    if (gameState.termsLocked || gameState.shiftHeld) return;
+    
+    const wrapper = document.getElementById('terms-movable-wrapper');
+    termsShift = (termsShift === 0) ? 65 : (termsShift === 65 ? -35 : 0);
+    wrapper.style.transform = `translateX(${termsShift}px)`;
+    playBeep(400, 0.02);
+  }
+
+  function handleTermsClick(e) {
+    const cb = document.getElementById('terms-checkbox');
+    if (cb.checked) {
+      playBeep(800, 0.05);
+      // Popup trickery
+      showDraggablePopup(
+        'EULA Verification',
+        'Did you thoroughly read subsection 42(b) regarding the donation of your dial-up modem to science?',
+        '❓',
+        [
+          { text: 'Yes, I read it', action: () => {
+            showQuickPopup('Liar Detected', 'Nobody reads page 42. Checkbox reset.');
+            cb.checked = false;
+            gameState.termsAccepted = false;
+          }},
+          { text: 'No, I admit it', action: () => {
+            showQuickPopup('Honesty Reward', 'Honesty accepted! Checkbox accepted.');
+            gameState.termsAccepted = true;
+          }}
+        ]
+      );
+    } else {
+      gameState.termsAccepted = false;
+    }
+  }
+
+  function lockTermsCheckbox() {
+    gameState.termsLocked = true;
+    const wrapper = document.getElementById('terms-movable-wrapper');
+    wrapper.style.transform = 'none';
+    showStatusMsg('Terms Checkbox pinned in place for 6 seconds.');
+    playBeep(1000, 0.08);
+
+    setTimeout(() => {
+      gameState.termsLocked = false;
+      showStatusMsg('Terms Checkbox pin expired.');
+    }, 6000);
+  }
+
+  const runawayBtn = document.getElementById('runaway-login-btn');
+  const buttonCage = document.getElementById('button-cage-area');
+
+  // Constantly cycle button label every 1.4s
+  setInterval(() => {
+    gameState.submitLabelIndex = (gameState.submitLabelIndex + 1) % gameState.submitLabels.length;
+    const label = gameState.submitLabels[gameState.submitLabelIndex];
+    runawayBtn.innerText = label;
+
+    if (label === 'LOGIN') {
+      runawayBtn.className = 'beveled-btn btn-login-active';
+    } else if (label === 'FORMAT C:' || label === 'SELF-DESTRUCT') {
+      runawayBtn.className = 'beveled-btn btn-hazard';
+    } else {
+      runawayBtn.className = 'beveled-btn';
+    }
+  }, 1400);
+
+  function handleLoginBtnDodge(e) {
+    if (!gameState.cheatDodgeEnabled) return;
+    if (gameState.shiftHeld) return; // Holding Shift freezes it!
+
+    // If fully harmonized (73% gamma + 56k), the button barely dodges so user can catch it!
+    const isHarmonized = (gameState.brightness === 73 && gameState.baudRate === 4);
+
+    gameState.dodgesCount++;
+    incrementVisitorFailures();
+
+    const cageRect = buttonCage.getBoundingClientRect();
+    const btnRect = runawayBtn.getBoundingClientRect();
+
+    const maxLeft = cageRect.width - btnRect.width - 20;
+    const maxTop = cageRect.height - btnRect.height - 8;
+
+    let newLeft = Math.floor(Math.random() * Math.max(10, maxLeft));
+    let newTop = Math.floor(Math.random() * Math.max(10, maxTop));
+
+    if (isHarmonized) {
+      // Much milder dodge
+      newLeft = Math.min(newLeft, 80);
+      newTop = 16;
+    }
+
+    runawayBtn.style.left = `${newLeft}px`;
+    runawayBtn.style.top = `${newTop}px`;
+
+    playBeep(700 + (gameState.dodgesCount % 5) * 60, 0.02);
+    showStatusMsg(`Login Button evaded! (${gameState.dodgesCount} dodges). TIP: Hold SHIFT or calibrate hardware!`);
+  }
+
+  function handleLoginBtnClick(e) {
+    const currentLabel = runawayBtn.innerText.trim();
+
+    if (currentLabel === 'FORMAT C:') {
+      playErrorSound();
+      showQuickPopup('Warning', 'Format command recognized! Initializing hard drive wipe...');
+      setTimeout(triggerBsod, 800);
+      return;
+    }
+
+    if (currentLabel === 'CANCEL') {
+      handleCancelBtnClick();
+      return;
+    }
+
+    if (currentLabel === 'INSTALL BONZI BUDDY') {
+      playBeep(440, 0.2);
+      showDraggablePopup(
+        'BonziBuddy Installer',
+        'Hello there! I am your 2003 purple gorilla companion! Would you like to search the web or hear a joke?',
+        '🦍',
+        [{ text: 'Help Me', action: () => showQuickPopup('Bonzi', 'Why did the computer sneeze? It had a virus! Haha!') }]
+      );
+      return;
+    }
+
+    if (currentLabel === 'SELF-DESTRUCT') {
+      triggerScreenShake();
+      playErrorSound();
+      showQuickPopup('Emergency Alert', 'Self-Destruct sequence aborted. Insufficient dial-up credit.');
+      return;
+    }
+
+    // If label is LOGIN (or user clicked it at right time):
+    validateAndProceed();
+  }
+
+  function validateAndProceed() {
+    const user = document.getElementById('username-input').value.trim();
+    const pass = document.getElementById('password-input').value.trim();
+    const cb = document.getElementById('terms-checkbox').checked;
+
+    if (!user) {
+      playErrorSound();
+      showDraggablePopup('Validation Error #102', 'Please provide a User Name before proceeding into cyberspace.', '⚠️');
+      document.getElementById('username-input').focus();
+      return;
+    }
+
+    if (!pass) {
+      playErrorSound();
+      showDraggablePopup('Validation Error #103', 'Password cannot be blank (unless telepathy is enabled in BIOS).', '⚠️');
+      document.getElementById('password-input').focus();
+      return;
+    }
+
+    if (!cb && !gameState.termsAccepted) {
+      playErrorSound();
+      showDraggablePopup('EULA Required', 'You must accept the Dial-Up Terms & Conditions before connecting.', '📜');
+      return;
+    }
+
+    // All preliminary checks passed! Launch dial-up sequence!
+    startDialupSequence();
+  }
+
+  function handleCancelBtnClick() {
+    playBeep(300, 0.08);
+    document.getElementById('username-input').value = '';
+    document.getElementById('password-input').value = '';
+    showStatusMsg('Cancel clicked. All credentials wiped for your convenience.');
+    showQuickPopup('Fields Reset', 'Your input has been peacefully cleared.');
+  }
+
+  function handleHelpBtnClick() {
+    playBeep();
+    showDraggablePopup(
+      '2003 Webmaster Hint',
+      'Struggling to log in?\n\n1. Set CRT Brightness to 73% and Modem to 56k.\n2. Hold SHIFT to freeze runaway buttons.\n3. Click LOGIN when the button actually says "LOGIN".\n4. Or click the spinning "e" logo 10 times for cheat mode!',
+      '💡'
+    );
+  }
+
+  let dialupInterval = null;
+
+  function startDialupSequence() {
+    const modal = document.getElementById('dialup-modal');
+    modal.style.display = 'flex';
+    
+    const fill = document.getElementById('dialup-progress-fill');
+    const actionTxt = document.getElementById('dialup-action-text');
+    const detailTxt = document.getElementById('dialup-detail-text');
+    const riddleBox = document.getElementById('stall-riddle-box');
+
+    fill.style.width = '0%';
+    fill.classList.remove('stalled-bar');
+    riddleBox.style.display = 'none';
+
+    playDialupStep('dial');
+    actionTxt.innerText = 'Dialing 1-800-SLOW-NET...';
+    detailTxt.innerText = 'Opening COM3 port at 56,000 baud...';
+
+    let progress = 0;
+    
+    dialupInterval = setInterval(() => {
+      progress += Math.floor(Math.random() * 8) + 4;
+      
+      if (progress > 30 && progress < 60) {
+        playDialupStep('screech');
+        actionTxt.innerText = 'Exchanging carrier waves...';
+        detailTxt.innerText = 'Negotiating V.90 handshake with Microsoft Passport servers...';
+      } else if (progress >= 60 && progress < 90) {
+        playDialupStep('noise');
+        actionTxt.innerText = 'Authenticating user credentials...';
+        detailTxt.innerText = 'Validating username against Windows 2003 Domain Controller...';
+      }
+
+      if (progress >= 99) {
+        // THE 99% STALL!
+        progress = 99;
+        clearInterval(dialupInterval);
+        fill.style.width = '99%';
+        fill.classList.add('stalled-bar');
+        
+        playErrorSound();
+        actionTxt.innerText = 'STALL DETECTED AT 99%!';
+        detailTxt.innerText = 'Line noise detected. Final security challenge triggered:';
+        riddleBox.style.display = 'block';
+        showStatusMsg('Progress halted at 99%. Answer riddle to break the stall!');
+      } else {
+        fill.style.width = `${progress}%`;
+      }
+    }, 350);
+  }
+
+  function handleRiddleAnswer(year) {
+    if (year === 2001) {
+      playBeep(1200, 0.15);
+      const fill = document.getElementById('dialup-progress-fill');
+      const actionTxt = document.getElementById('dialup-action-text');
+      const detailTxt = document.getElementById('dialup-detail-text');
+
+      fill.classList.remove('stalled-bar');
+      fill.style.width = '100%';
+      actionTxt.innerText = 'CONNECTION ESTABLISHED (100%)!';
+      detailTxt.innerText = 'Welcome to Windows XP Desktop... Loading Bliss wallpaper...';
+
+      setTimeout(() => {
+        document.getElementById('dialup-modal').style.display = 'none';
+        triggerInstantVictory();
+      }, 1000);
+    } else {
+      playErrorSound();
+      showQuickPopup('Incorrect Year', 'Windows XP was released in 2001! Progress dropped back to 35%!');
+      const fill = document.getElementById('dialup-progress-fill');
+      fill.classList.remove('stalled-bar');
+      document.getElementById('stall-riddle-box').style.display = 'none';
+      startDialupSequence(); // restarts dialup!
+    }
+  }
+
+  function cancelDialupSequence() {
+    if (dialupInterval) clearInterval(dialupInterval);
+    document.getElementById('dialup-modal').style.display = 'none';
+    playBeep(300, 0.08);
+    showStatusMsg('Dial-up connection aborted by user.');
+  }
+
+  function triggerInstantVictory() {
+    if (dialupInterval) clearInterval(dialupInterval);
+    document.getElementById('dialup-modal').style.display = 'none';
+    
+    // Hide main browser window or lower its z-index
+    document.getElementById('browser-window').style.display = 'none';
+    
+    // Show victory desktop
+    const victoryDesk = document.getElementById('victory-desktop');
+    victoryDesk.style.display = 'block';
+
+    // Populate stats
+    const elapsedSec = Math.round((Date.now() - gameState.startTime) / 1000);
+    document.getElementById('stat-time-val').innerText = `${elapsedSec} seconds`;
+    document.getElementById('stat-dodges-val').innerText = `${gameState.dodgesCount} dodges`;
+    document.getElementById('stat-popups-val').innerText = `${gameState.popupsClosed} dismissed`;
+
+    playVictoryFanfare();
+    startConfettiFireworks();
+  }
+
+  function resetGameToTryAgain() {
+    document.getElementById('victory-desktop').style.display = 'none';
+    document.getElementById('browser-window').style.display = 'flex';
+    gameState.startTime = Date.now();
+    gameState.dodgesCount = 0;
+    gameState.popupsClosed = 0;
+    document.getElementById('username-input').value = '';
+    document.getElementById('password-input').value = '';
+    document.getElementById('terms-checkbox').checked = false;
+    showStatusMsg('Session reloaded. The ordeal begins anew.');
+    playBeep();
+  }
+
+  function copyCompetitionCertificate() {
+    const elapsed = Math.round((Date.now() - gameState.startTime) / 1000);
+    const cert = `🏆 BAD UI COMPETITION 2003 SURVIVOR CERTIFICATE 🏆
+User: ${document.getElementById('username-input').value || 'Anonymous Surfer'}
+Theme: "The Internet That Refuses To Let You Log In"
+Status: VICTORY ACHIEVED!
+Time Wasted: ${elapsed}s | Button Dodges: ${gameState.dodgesCount} | Popups: ${gameState.popupsClosed}
+Rated 10/10 in Nostalgic Frustration and Authentic XP Aesthetics.`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cert).then(() => {
+        showQuickPopup('Copied!', 'Competition Certificate copied to your clipboard!');
+      }).catch(() => {
+        showQuickPopup('Certificate', cert);
+      });
+    } else {
+      showQuickPopup('Certificate', cert);
+    }
+  }
+
+  // Standalone Single-File HTML Download
+  function downloadSingleHtmlFile() {
+    const htmlContent = document.documentElement.outerHTML;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'the-internet-that-refuses-to-let-you-log-in.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showQuickPopup('Downloaded', 'Single HTML file saved! You can submit this file directly to the competition.');
+  }
+
+  function startConfettiFireworks() {
+    const canvas = document.getElementById('confetti-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const colors = ['#f44336', '#e91e63', '#9c27b0', '#2196f3', '#4caf50', '#ffeb3b', '#ff9800'];
+
+    for (let i = 0; i < 160; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        size: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        velX: (Math.random() - 0.5) * 4,
+        velY: Math.random() * 3 + 2,
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 10
+      });
+    }
+
+    function renderConfetti() {
+      if (document.getElementById('victory-desktop').style.display !== 'block') return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
+        p.x += p.velX;
+        p.y += p.velY;
+        p.rot += p.rotSpeed;
+
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+      });
+
+      requestAnimationFrame(renderConfetti);
+    }
+
+    renderConfetti();
+  }
+
+  let topZIndex = 2000;
+
+  function showDraggablePopup(title, message, icon = '⚠️', buttons = null) {
+    playErrorSound();
+    incrementVisitorFailures();
+
+    topZIndex += 2;
+    const dialog = document.createElement('div');
+    dialog.className = 'xp-dialog-box';
+    dialog.style.zIndex = topZIndex;
+
+    // Random initial position within screen bounds
+    const posX = Math.max(20, Math.min(window.innerWidth - 360, Math.floor(Math.random() * (window.innerWidth - 380))));
+    const posY = Math.max(40, Math.min(window.innerHeight - 240, Math.floor(Math.random() * (window.innerHeight - 260))));
+    dialog.style.left = `${posX}px`;
+    dialog.style.top = `${posY}px`;
+
+    const defaultButtons = buttons || [
+      { text: 'OK', action: () => {} }
+    ];
+
+    const btnHtml = defaultButtons.map((btn, i) => 
+      `<button class="beveled-btn" id="pop-btn-${i}">${btn.text}</button>`
+    ).join('');
+
+    dialog.innerHTML = `
+      <div class="xp-dialog-titlebar">
+        <span>${title}</span>
+        <div class="xp-btn-ctrl btn-close" style="width:16px; height:16px; font-size:9px;" id="pop-close-x">✕</div>
+      </div>
+      <div class="xp-dialog-content">
+        <div class="dialog-icon">${icon}</div>
+        <div style="flex:1; white-space:pre-wrap;">${message}</div>
+      </div>
+      <div class="xp-dialog-buttons">
+        ${btnHtml}
+      </div>
+    `;
+
+    document.getElementById('desktop').appendChild(dialog);
+
+    // Draggable logic
+    const titlebar = dialog.querySelector('.xp-dialog-titlebar');
+    makeElementDraggable(dialog, titlebar);
+
+    // Close handlers
+    const closePopup = () => {
+      playBeep(500, 0.03);
+      gameState.popupsClosed++;
+      dialog.remove();
+    };
+
+    dialog.querySelector('#pop-close-x').onclick = closePopup;
+
+    defaultButtons.forEach((btn, idx) => {
+      dialog.querySelector(`#pop-btn-${idx}`).onclick = () => {
+        if (btn.action) btn.action();
+        closePopup();
+      };
+    });
+
+    dialog.onmousedown = () => {
+      topZIndex += 1;
+      dialog.style.zIndex = topZIndex;
+    };
+  }
+
+  function showQuickPopup(title, msg) {
+    showDraggablePopup(title, msg, 'ℹ️');
+  }
+
+  function spawnCursedPopup() {
+    const popups = [
+      {
+        t: 'Internet Explorer Error',
+        m: 'Internet Explorer has detected too much confidence in your typing speed. Please slow down to 12 baud.',
+        i: '⚠️'
+      },
+      {
+        t: 'Mouse.exe Stopped Responding',
+        m: 'A cursor collision occurred at coordinate (X, Y). Windows suggests blowing into the optical mouse ball.',
+        i: '🖱️'
+      },
+      {
+        t: 'Low Virtual Memory',
+        m: 'Windows is paging your login patience to C:\\pagefile.sys. System performance may degrade slightly.',
+        i: '💾'
+      },
+      {
+        t: 'Suspicious Accuracy',
+        m: 'You clicked the input field directly on the first try. That is highly anomalous behavior. Are you an automated script?',
+        i: '🤖'
+      },
+      {
+        t: 'Security Alert: Cookie Overload',
+        m: 'We use 14,289 cookies to provide essential dial-up ambiance. Please accept our gratitude.',
+        i: '🍪'
+      }
+    ];
+
+    const item = popups[Math.floor(Math.random() * popups.length)];
+    showDraggablePopup(item.t, item.m, item.i);
+  }
+
+  function showAdPopup() {
+    showDraggablePopup(
+      'CONGRATULATIONS LUCKY WINNER!',
+      'You are the 999,999th visitor to this Windows Passport portal!\n\nTo claim your free Sony Walkman & Pentium 4 processor, please log in with extreme precision.',
+      '🎁'
+    );
+  }
+
+  function showAboutIE() {
+    showDraggablePopup(
+      'About Internet Explorer 6.0',
+      'Microsoft Internet Explorer 6.0\nVersion: 6.0.2800.1106.xpsp2\nCipher Strength: 40-bit\nProduct ID: 55274-640-1234567-23456\n\nThis program is not responsible for lost data, lost time, or lost patience.',
+      '🌐'
+    );
+  }
+
+  // Draggable Helper Function
+  function makeElementDraggable(elem, handle) {
+    let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
+
+    handle.onmousedown = (e) => {
+      e.preventDefault();
+      startX = e.clientX;
+      startY = e.clientY;
+      initialLeft = elem.offsetLeft;
+      initialTop = elem.offsetTop;
+
+      document.onmousemove = (moveEvent) => {
+        const dx = moveEvent.clientX - startX;
+        const dy = moveEvent.clientY - startY;
+        elem.style.left = `${initialLeft + dx}px`;
+        elem.style.top = `${initialTop + dy}px`;
+      };
+
+      document.onmouseup = () => {
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    };
+  }
+
+  function triggerBsod() {
+    playErrorSound();
+    triggerScreenShake();
+    const bsod = document.getElementById('bsod-screen');
+    bsod.style.display = 'block';
+
+    setTimeout(() => {
+      bsod.style.display = 'none';
+      showDraggablePopup(
+        'System Recovery Notice',
+        'Windows has recovered from a serious Stop Error (0x000000D1).\n\nA log of this error has been forwarded to nobody in particular.',
+        '🛑'
+      );
+    }, 2800);
+  }
+
+  function triggerCloseAttempt() {
+    playErrorSound();
+    showDraggablePopup(
+      'Closing Forbidden',
+      'Closing Internet Explorer now will forfeit your 250 free AOL dial-up hours and notify your network administrator.\n\nAre you sure?',
+      '⚠️',
+      [
+        { text: 'Stay Here', action: () => showStatusMsg('Wise choice.') },
+        { text: 'Cancel Close', action: () => showStatusMsg('Close aborted.') }
+      ]
+    );
+  }
+
+  function triggerRefreshGlitch() {
+    showStatusMsg('Refreshing page... Modem handshaking with GeoCities mirror...');
+    triggerScreenShake();
+    playBeep(350, 0.15);
+    incrementVisitorFailures();
+    
+    // Briefly flash blue or invert
+    const card = document.getElementById('login-main-card');
+    card.style.transform = 'scale(0.98) rotate(1deg)';
+    setTimeout(() => {
+      card.style.transform = 'none';
+      showStatusMsg('Page refreshed. Buttons have re-randomized their disposition.');
+    }, 300);
+  }
+
+  function handleBackButton() {
+    showQuickPopup('Navigation Blocked', 'There is no going back in 2003. History has been archived to a floppy disk.');
+  }
+
+  function triggerScreenShake() {
+    const crt = document.getElementById('crt-container');
+    crt.classList.add('shake-screen');
+    setTimeout(() => crt.classList.remove('shake-screen'), 450);
+  }
+
+  function incrementVisitorFailures() {
+    gameState.failuresCount += Math.floor(Math.random() * 3) + 1;
+    const str = String(gameState.failuresCount).padStart(8, '0');
+    document.getElementById('visitor-count-display').innerText = str;
+  }
+
+  function showStatusMsg(text) {
+    const el = document.getElementById('statusbar-msg');
+    if (el) el.innerText = text;
+  }
+
+  function toggleMaximize() {
+    const win = document.getElementById('browser-window');
+    if (win.style.inset === '0px 0px 30px 0px') {
+      win.style.inset = '8px 8px 40px 8px';
+    } else {
+      win.style.inset = '0px 0px 30px 0px';
+    }
+  }
+
+  function toggleCrtFlicker() {
+    const overlay = document.querySelector('.crt-overlay');
+    overlay.classList.toggle('crt-flicker');
+    showStatusMsg(`CRT Scanline Flicker: ${overlay.classList.contains('crt-flicker') ? 'ACTIVE' : 'OFF'}`);
+  }
+
+  function toggleStartMenu() {
+    const menu = document.getElementById('start-menu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    playBeep(600, 0.03);
+  }
+
+  function focusBrowserWindow() {
+    const win = document.getElementById('browser-window');
+    win.style.display = 'flex';
+    document.getElementById('start-menu').style.display = 'none';
+  }
+
+  // Logo 10-click handler
+  function handleLogoClick() {
+    gameState.logoClicks++;
+    playBeep(500 + gameState.logoClicks * 70, 0.04);
+    
+    if (gameState.logoClicks >= 10) {
+      gameState.logoClicks = 0;
+      openCheatPanel();
+    } else {
+      showStatusMsg(`Webmaster Secret: ${10 - gameState.logoClicks} more clicks to open Webmaster Console.`);
+    }
+  }
+
+  function openCheatPanel() {
+    document.getElementById('cheat-panel').style.display = 'block';
+    playBeep(1200, 0.1);
+    showStatusMsg('★ 2003 Webmaster Cheat Console Opened ★');
+  }
+
+  function toggleCheatDodge() {
+    gameState.cheatDodgeEnabled = !gameState.cheatDodgeEnabled;
+    const btn = document.getElementById('cheat-toggle-dodge');
+    btn.innerText = gameState.cheatDodgeEnabled ? 'ENABLED' : 'DISABLED';
+    btn.style.color = gameState.cheatDodgeEnabled ? '#00ff00' : '#ff3333';
+  }
+
+  // Keyboard monitoring (Shift freezing, Enter key interception, Konami Code)
+  window.addEventListener('keydown', (e) => {
+    // SHIFT KEY FREEZE MECHANIC
+    if (e.key === 'Shift') {
+      gameState.shiftHeld = true;
+      document.getElementById('statusbar-shift').innerText = 'Shift: FREEZING';
+      document.getElementById('statusbar-shift').style.color = '#00aa00';
+    }
+
+    // ENTER KEY TRAP
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      playErrorSound();
+      showQuickPopup('Anti-Enter Protocol', 'Pressing [Enter] was intercepted! Please use the elusive manual button.');
+      handleCancelBtnClick();
+    }
+
+    // KONAMI CODE
+    if (e.key === gameState.konamiCode[gameState.konamiIndex]) {
+      gameState.konamiIndex++;
+      if (gameState.konamiIndex === gameState.konamiCode.length) {
+        gameState.konamiIndex = 0;
+        showDraggablePopup(
+          '🎮 KONAMI CODE UNLOCKED!',
+          'GOD MODE ENGAGED!\n\nRunaway button evasion disabled, hardware calibrated, and dial-up speed maximized to 56k!',
+          '👾'
+        );
+        gameState.cheatDodgeEnabled = false;
+        document.getElementById('slider-brightness').value = 73;
+        handleBrightnessSlider(73);
+        document.getElementById('slider-baud').value = 4;
+        handleBaudSlider(4);
+        playVictoryFanfare();
+      }
+    } else {
+      gameState.konamiIndex = 0;
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'Shift') {
+      gameState.shiftHeld = false;
+      document.getElementById('statusbar-shift').innerText = 'Shift: UNLOCKED';
+      document.getElementById('statusbar-shift').style.color = '#000';
+    }
+  });
+
+  // Track live mouse coordinates on statusbar
+  window.addEventListener('mousemove', (e) => {
+    const coordsEl = document.getElementById('statusbar-coords');
+    if (coordsEl) {
+      coordsEl.innerText = `Cursor: X:${e.clientX} Y:${e.clientY}`;
+    }
+  });
+
+  // Taskbar Real-time Clock updater
+  function updateTrayClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    document.getElementById('tray-clock').innerText = `${hours}:${minutes} ${ampm}`;
+  }
+  setInterval(updateTrayClock, 1000);
+  updateTrayClock();
+
+  // Initial welcome message in status bar
+  setTimeout(() => {
+    showStatusMsg('Page loaded with 40-bit encryption. Good luck logging in.');
+  }, 1000);
+
+  // Close Start Menu on outer click
+  document.addEventListener('click', (e) => {
+    const startMenu = document.getElementById('start-menu');
+    const startBtn = document.getElementById('xp-start-button');
+    if (startMenu.style.display === 'block' && !startMenu.contains(e.target) && !startBtn.contains(e.target)) {
+      startMenu.style.display = 'none';
+    }
+  });
+
+  // Ensure AudioContext unlocks on very first user interaction
+  window.addEventListener('pointerdown', () => {
+    getAudioContext();
+  }, { once: true });
+</script>
+
+</body>
+</html>

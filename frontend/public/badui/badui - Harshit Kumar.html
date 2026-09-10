@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #ec4899;
+            --surface: rgba(255, 255, 255, 0.85);
+            --text: #1e293b;
+            --error: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            background-attachment: fixed;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Server Down Overlay */
+        .server-down-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: not-allowed; 
+        }
+
+        .server-down-overlay * {
+            cursor: not-allowed;
+            user-select: none;
+        }
+
+        .red-exclamation {
+            font-size: 150px;
+            font-weight: 900;
+            color: var(--error);
+            line-height: 1;
+            margin-bottom: 20px;
+            animation: pulse-error 1s infinite;
+        }
+
+        .server-down-text {
+            color: white;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .server-reconnecting-text {
+            color: #f59e0b;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @keyframes pulse-error {
+            0% { transform: scale(1); opacity: 1; text-shadow: 0 0 20px rgba(239,68,68,0.5); }
+            50% { transform: scale(1.1); opacity: 0.8; text-shadow: 0 0 40px rgba(239,68,68,0.8); }
+            100% { transform: scale(1); opacity: 1; text-shadow: 0 0 20px rgba(239,68,68,0.5); }
+        }
+
+        .login-card {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            transition: opacity 0.5s ease, filter 0.5s ease;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .logo-svg {
+            width: 60px;
+            height: 60px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            color: var(--text);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: #94a3b8;
+        }
+
+        .email-split {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .email-prefix {
+            flex: 1;
+        }
+
+        .at-symbol {
+            font-weight: bold;
+            color: #94a3b8;
+        }
+
+        .email-domain {
+            width: 140px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: var(--text);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .eye-icon:hover {
+            color: var(--primary);
+        }
+
+        .button-container {
+            height: 52px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: background-color 0.2s, filter 0.3s ease, transform 0.1s;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+        }
+
+        .submit-btn:disabled {
+            background: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            position: relative;
+            height: 24px;
+            color: #475569;
+        }
+
+        #human-check, #terms-check {
+            position: absolute;
+            left: 0;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        #human-check {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .checkbox-label {
+            margin-left: 28px;
+            font-weight: 500;
+        }
+
+        #terms-group { display: none; }
+
+        #terms-text { transition: color 0.3s; }
+        #terms-text.active-link {
+            color: var(--primary);
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .revert-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--text);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .revert-btn:hover { transform: scale(1.1); background-color: #000; }
+
+        .reconnecting-popup {
+            position: fixed;
+            top: 20px;
+            right: 80px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            color: #d97706;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            letter-spacing: 1px;
+            border: 1px solid rgba(217, 119, 6, 0.2);
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rules-container {
+            margin-top: -12px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: var(--error);
+            display: none;
+            background: rgba(254, 242, 242, 0.8);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            font-weight: 500;
+        }
+
+        .rule { display: flex; align-items: center; gap: 8px; }
+        .rule::before { content: "✕"; font-weight: bold; }
+
+        .blur-btn {
+            filter: blur(4px);
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            z-index: 2000;
+        }
+
+        .terms-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            z-index: 2001;
+            display: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .terms-modal h2 {
+            margin-bottom: 16px;
+            font-size: 20px;
+            color: var(--text);
+        }
+
+        .terms-content {
+            max-height: 350px;
+            overflow-y: auto;
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255,255,255,0.8);
+            scroll-behavior: smooth;
+        }
+
+        .terms-content p {
+            margin-bottom: 8px;
+        }
+
+        .terms-content::-webkit-scrollbar { width: 8px; }
+        .terms-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .terms-content::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+
+        /* Trap checkboxes are now fully visible so users have a fighting chance */
+        .evil-trap-checkbox {
+            cursor: pointer; 
+            width: 14px;
+            height: 14px;
+            margin: 0 4px;
+            vertical-align: middle;
+        }
+
+        .modal-bottom-check {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 2px dashed #cbd5e1;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(241, 245, 249, 0.8);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .modal-bottom-check input {
+            margin-top: 4px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        .modal-bottom-check label {
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="server-down-overlay" id="server-down-overlay">
+        <div class="red-exclamation">!</div>
+        <div class="server-down-text">SERVER DOWN</div>
+        <div class="server-reconnecting-text">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+            Reconnecting...
+        </div>
+    </div>
+
+    <button class="revert-btn" id="revert-btn" title="Restore Visibility">✕</button>
+
+    <div class="reconnecting-popup" id="reconnecting-popup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+        RECONNECTING
+    </div>
+
+    <!-- Terms and Conditions Modal & Overlay -->
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="terms-modal" id="terms-modal">
+        <h2>Terms and Conditions (Read Carefully)</h2>
+        <div class="terms-content" id="terms-content-container"></div>
+        <button class="submit-btn" style="position:relative; width: 100%; top: 0;" id="close-terms" disabled>I have explicitly read this</button>
+    </div>
+
+    <div class="toast" id="toast">Error Message</div>
+
+    <div class="login-card" id="login-card">
+        <div class="logo-container">
+            <svg viewBox="0 0 100 100" class="logo-svg">
+                <path d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z" fill="url(#grad)" />
+                <path d="M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z" fill="#ffffff" />
+                <circle cx="50" cy="50" r="12" fill="url(#grad)" />
+                <defs>
+                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <div class="header">
+            <h1>Welcome Back</h1>
+            <p>Access your Nexus workspace</p>
+        </div>
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-with-icon">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <div class="email-split">
+                    <input type="text" id="email-prefix" class="email-prefix" placeholder="username" autocomplete="off" style="padding-left: 40px;">
+                    <span class="at-symbol">@</span>
+                    <select id="email-domain" class="email-domain">
+                        <option value="" disabled selected>Domain</option>
+                        <option value="yandex.ru">yandex.ru</option>
+                        <option value="zmail.com">zmail.com</option>
+                        <option value="hotmail.co.uk">hotmail.co.uk</option>
+                        <option value="protonmail.com">protonmail.com</option>
+                        <option value="aol.com">aol.com</option>
+                        <option value="gmail.com">gmail.com</option>
+                        <option value="yahoo.com">yahoo.com</option>
+                        <option value="icloud.com">icloud.com</option>
+                        <option value="mail.com">mail.com</option>
+                        <option value="outlook.com">outlook.com</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Secure Password</label>
+            <div class="password-wrapper">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="z-index: 10;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <input type="password" id="password-visual" placeholder="••••••••" autocomplete="new-password" style="padding-left: 40px;">
+                <span class="eye-icon" id="eye-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </span>
+            </div>
+        </div>
+
+        <div class="rules-container" id="rules-container">
+            <div class="rule" id="current-rule"></div>
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="human-check">
+            <span class="checkbox-label">I confirm I am a human</span>
+        </div>
+
+        <div class="checkbox-group" id="terms-group">
+            <input type="checkbox" id="terms-check">
+            <span class="checkbox-label">I accept <span id="terms-text">terms & conditions</span></span>
+        </div>
+
+        <div class="button-container">
+            <button class="submit-btn" id="submit-btn">Authenticate</button>
+        </div>
+    </div>
+
+    <script>
+        const passVisual = document.getElementById('password-visual');
+        const emailPrefix = document.getElementById('email-prefix');
+        const emailDomain = document.getElementById('email-domain');
+        const submitBtn = document.getElementById('submit-btn');
+        const eyeIcon = document.getElementById('eye-icon');
+        const rulesContainer = document.getElementById('rules-container');
+        const currentRuleText = document.getElementById('current-rule');
+        const toast = document.getElementById('toast');
+        const loginCard = document.getElementById('login-card');
+        const humanCheck = document.getElementById('human-check');
+        const revertBtn = document.getElementById('revert-btn');
+        const termsGroup = document.getElementById('terms-group');
+        const termsCheck = document.getElementById('terms-check');
+        const reconnectingPopup = document.getElementById('reconnecting-popup');
+        const termsText = document.getElementById('terms-text');
+        const termsModal = document.getElementById('terms-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const closeTermsBtn = document.getElementById('close-terms');
+        const termsContainer = document.getElementById('terms-content-container');
+        const serverDownOverlay = document.getElementById('server-down-overlay');
+
+        let actualPassword = "";
+        let cardOpacity = 1;
+        let currentBlur = 0; 
+        let hasReadTerms = false; 
+        let isTermsLinkActive = false;
+        
+        let currentTrapPoint1 = -1;
+        let currentTrapPoint2 = -1;
+
+        const rules = [
+            { text: "Password must be exactly 8 characters long.", check: (val) => val.length === 8 },
+            { text: "Password must contain exactly 2 uppercase letters.", check: (val) => (val.match(/[A-Z]/g) || []).length === 2 },
+            { text: "Password must contain exactly 2 numbers.", check: (val) => (val.match(/[0-9]/g) || []).length === 2 },
+            { text: "Password must contain only letters and numbers (no special characters).", check: (val) => /^[a-zA-Z0-9]+$/.test(val) },
+            { text: "All characters in the password must be distinct (no repeating characters).", check: (val) => new Set(val).size === val.length }
+        ];
+
+        let currentRuleIndex = 0;
+
+        const fillerPhrases = [
+            "Be patient. You are absolutely going to need it.",
+            "Do yoga. Deep breathing helps with the impending rage.",
+            "Join SLIET. A Bachelor of Engineering in Computer Science is a fantastic path.",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "You must click the eye icon exactly once every lunar eclipse.",
+            "We are not responsible for broken keyboards, smashed monitors, or thrown mice.",
+            "By reading this, you are technically not reading anything else. Fascinating.",
+            "Please remember to hydrate. Tears do not count as hydration.",
+            "If you manage to log in, you will immediately be logged out.",
+            "Your password is safe with us, mostly because even we don't know what you typed.",
+            "Praesent commodo cursus magna, vel scelerisque nisl consectetur et.",
+            "Never trust an escaping checkbox. It has its own agenda and it does not like you.",
+            "Any attempt to copy-paste will be met with severe digital disappointment.",
+            "We reserve the right to change these terms without notifying you.",
+            "In fact, we just changed them while you were reading this sentence.",
+            "When you get frustrated, remember that learning Java takes time, practice, and debugging.",
+            "Nullspace and void are the only true returns in this form.",
+            "Do not look directly at the authentication button. It is easily startled."
+        ];
+
+        function triggerServerDown() {
+            serverDownOverlay.style.display = 'flex';
+            
+            setTimeout(() => {
+                serverDownOverlay.style.display = 'none';
+            }, 2000); 
+        }
+
+        setInterval(triggerServerDown, 10000);
+
+        function generateTermsContent() {
+            termsContainer.innerHTML = ''; 
+            
+            currentTrapPoint1 = Math.floor(Math.random() * 105) + 10;
+            currentTrapPoint2 = Math.floor(Math.random() * 105) + 10;
+            
+            while (currentTrapPoint1 === currentTrapPoint2) {
+                currentTrapPoint2 = Math.floor(Math.random() * 105) + 10;
+            }
+            
+            for (let i = 1; i <= 125; i++) {
+                const p = document.createElement('p');
+                
+                if (i === currentTrapPoint1) {
+                    p.innerHTML = `<strong>${i}.</strong> You must check this first box to prove you are actually reading: <input type="checkbox" id="dynamic-trap-check-1" class="evil-trap-checkbox"> Do not miss the second one.`;
+                } else if (i === currentTrapPoint2) {
+                    p.innerHTML = `<strong>${i}.</strong> You must check this second box to prevent resetting: <input type="checkbox" id="dynamic-trap-check-2" class="evil-trap-checkbox"> Praesent commodo cursus magna.`;
+                } else {
+                    const phrase = fillerPhrases[i % fillerPhrases.length];
+                    p.innerHTML = `<strong>${i}.</strong> ${phrase}`;
+                }
+                termsContainer.appendChild(p);
+            }
+
+            const bottomCheckDiv = document.createElement('div');
+            bottomCheckDiv.className = 'modal-bottom-check';
+            bottomCheckDiv.innerHTML = `
+                <input type="checkbox" id="modal-terms-check">
+                <label for="modal-terms-check">I confirm I have scrolled through all 125 points and read this nonsense.</label>
+            `;
+            termsContainer.appendChild(bottomCheckDiv);
+
+            document.getElementById('modal-terms-check').addEventListener('change', function() {
+                closeTermsBtn.disabled = !this.checked;
+            });
+        }
+
+        generateTermsContent();
+
+        function showToast(message, color = 'var(--error)') {
+            toast.style.background = color;
+            toast.innerText = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 10px)';
+            setTimeout(() => { 
+                toast.style.opacity = '0'; 
+                toast.style.transform = 'translate(-50%, 0)';
+            }, 2500);
+        }
+
+        function wipeForm() {
+            actualPassword = "";
+            passVisual.value = "";
+            emailPrefix.value = "";
+            emailDomain.selectedIndex = 0;
+            
+            humanCheck.checked = false;
+            humanCheck.style.transform = `translateX(0px)`;
+            
+            termsCheck.checked = false;
+            termsGroup.style.display = 'none';
+            hasReadTerms = false;
+            
+            closeTermsBtn.disabled = true;
+            
+            rulesContainer.style.display = 'none';
+            currentRuleIndex = 0;
+
+            generateTermsContent();
+        }
+
+        passVisual.addEventListener('keydown', function(e) {
+            e.preventDefault(); 
+            
+            if (e.key === 'Backspace') {
+                wipeForm();
+                showToast("Security protocol initiated: Backspace clears all fields.");
+                return;
+            }
+
+            if (e.key.length > 1) return;
+
+            actualPassword += e.key;
+            setTimeout(() => {
+                passVisual.value = '•'.repeat(actualPassword.length);
+            }, 600);
+        });
+
+        passVisual.addEventListener('paste', function(e) {
+            e.preventDefault();
+            showToast("Clipboard access denied. Please type manually.");
+        });
+
+        eyeIcon.addEventListener('click', function() {
+            cardOpacity -= 0.15;
+            currentBlur += 4; 
+
+            if (cardOpacity < 0.2) cardOpacity = 0.2;
+            if (currentBlur > 20) currentBlur = 20; 
+            
+            loginCard.style.opacity = cardOpacity;
+            loginCard.style.filter = `blur(${currentBlur}px)`;
+            
+            revertBtn.style.display = 'none';
+            
+            setTimeout(() => {
+                revertBtn.style.display = 'block'; 
+            }, 3000);
+        });
+
+        revertBtn.addEventListener('click', function() {
+            cardOpacity = 1;
+            currentBlur = 0;
+            loginCard.style.opacity = 1;
+            loginCard.style.filter = `blur(0px)`;
+            this.style.display = 'none';
+            showToast("Visibility restored.", "var(--success)");
+        });
+
+        humanCheck.addEventListener('mouseover', function() {
+            if (!this.checked) {
+                const jumpX = Math.floor(Math.random() * 160) + 40; 
+                this.style.transform = `translateX(${jumpX}px)`;
+            }
+        });
+
+        document.querySelector('.checkbox-group').addEventListener('mouseleave', function() {
+            humanCheck.style.transform = `translateX(0px)`;
+        });
+
+        humanCheck.addEventListener('change', function() {
+            if (this.checked) {
+                termsGroup.style.display = 'flex';
+                showToast("New requirement added.", "#f59e0b");
+            } else {
+                termsGroup.style.display = 'none';
+                termsCheck.checked = false;
+            }
+        });
+
+        termsText.addEventListener('click', function(e) {
+            if (isTermsLinkActive) {
+                termsModal.style.display = 'block';
+                modalOverlay.style.display = 'block';
+                document.querySelector('.terms-content').scrollTop = 0; 
+            }
+        });
+
+        closeTermsBtn.addEventListener('click', function() {
+            const trap1 = document.getElementById('dynamic-trap-check-1');
+            const trap2 = document.getElementById('dynamic-trap-check-2');
+            
+            if (!trap1 || !trap1.checked || !trap2 || !trap2.checked) {
+                alert(`You missed the trap checkboxes! They were hiding at points ${currentTrapPoint1} and ${currentTrapPoint2}. Form resetting!`);
+                
+                termsModal.style.display = 'none';
+                modalOverlay.style.display = 'none';
+                wipeForm();
+                return;
+            }
+            
+            termsModal.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            hasReadTerms = true;
+        });
+
+        termsCheck.addEventListener('change', function() {
+            if (this.checked) {
+                submitBtn.classList.add('blur-btn');
+                showToast("Terms accepted. Calibrating...", "#f59e0b");
+                setTimeout(() => {
+                    submitBtn.classList.remove('blur-btn');
+                }, 3000);
+            }
+        });
+
+        submitBtn.addEventListener('click', function() {
+            if (emailPrefix.value === '' || emailDomain.value === '') {
+                showToast("Incomplete email address. Resetting form.");
+                wipeForm();
+                return;
+            }
+
+            if (!humanCheck.checked) {
+                showToast("You must confirm you are human. Resetting form.");
+                wipeForm();
+                return;
+            }
+            
+            if (termsGroup.style.display === 'flex') {
+                if (!termsCheck.checked) {
+                    showToast("You must accept the terms and conditions. Resetting form.");
+                    wipeForm();
+                    return;
+                }
+                
+                if (!hasReadTerms) {
+                    alert("Read the terms and conditions first! Resetting form.");
+                    isTermsLinkActive = true;
+                    termsText.classList.add('active-link'); 
+                    wipeForm();
+                    return;
+                }
+            }
+            
+            if (actualPassword === '') {
+                showToast("Password cannot be empty. Resetting form.");
+                wipeForm();
+                return;
+            }
+
+            rulesContainer.style.display = 'block';
+            const activeRule = rules[currentRuleIndex];
+            
+            if (!activeRule.check(actualPassword)) {
+                currentRuleText.innerText = activeRule.text;
+                submitBtn.innerText = "Verifying...";
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    submitBtn.innerText = "Authenticate";
+                    submitBtn.disabled = false;
+                    showToast("Security check failed. Restarting protocol.");
+                    wipeForm(); 
+                }, 1200);
+            } else {
+                currentRuleIndex++;
+                
+                if (currentRuleIndex < rules.length) {
+                    currentRuleText.innerText = rules[currentRuleIndex].text;
+                    actualPassword = ""; 
+                    passVisual.value = ""; 
+                    showToast("Requirement met. Validating next security protocol...", "var(--success)");
+                } else {
+                    submitBtn.innerText = "Connecting...";
+                    submitBtn.disabled = true;
+                    
+                    reconnectingPopup.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        reconnectingPopup.style.display = 'none';
+                        
+                        alert("You delayed and timed out!! Please fill everything again, but faster this time.");
+                        
+                        submitBtn.innerText = "Authenticate";
+                        submitBtn.disabled = false;
+                        wipeForm(); 
+                    }, 5000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

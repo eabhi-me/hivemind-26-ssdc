@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>login (do not refresh)</title>
+<style>
+  * {
+    cursor: none !important;
+    user-select: none;
+  }
+
+  body {
+    background: repeating-conic-gradient(#ff0000 0deg 10deg, #00ff00 10deg 20deg, #0000ff 20deg 30deg, #ffff00 30deg 40deg);
+    font-family: "Comic Sans MS", cursive;
+    margin: 0;
+    overflow: hidden;
+    animation: hue 2s linear infinite;
+  }
+
+  @keyframes hue {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+
+  .page-flip {
+    transform: rotate(180deg);
+    transition: transform 4s;
+  }
+
+  marquee {
+    background: black;
+    color: lime;
+    font-size: 26px;
+    font-family: monospace;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 46px;
+    color: red;
+    text-shadow: 4px 4px 0 blue, -4px -4px 0 yellow;
+    animation: jiggle 0.1s infinite, grow 3s infinite alternate;
+  }
+
+  @keyframes jiggle {
+    0% { transform: rotate(-6deg) scale(1); }
+    50% { transform: rotate(6deg) scale(1.1); }
+    100% { transform: rotate(-6deg) scale(1); }
+  }
+  @keyframes grow {
+    from { font-size: 20px; }
+    to { font-size: 60px; }
+  }
+
+  .form-wrapper {
+    position: relative;
+    width: 300px;
+    height: 460px;
+    margin: 20px auto;
+    background: repeating-linear-gradient(90deg, #444 0 4px, #999 4px 8px);
+    border: 8px double lime;
+    padding: 10px;
+    overflow: hidden;
+  }
+
+  label {
+    color: transparent;
+    text-shadow: 0 0 0 black;
+    font-size: 8px;
+    display: block;
+    filter: blur(0.6px);
+  }
+
+  input {
+    font-size: 20px;
+    width: 40px;
+    height: 30px;
+    background: white;
+    color: white;
+    border: 3px dotted red;
+    direction: rtl;
+    text-transform: uppercase;
+  }
+
+  input:focus {
+    width: 15px;
+    transform: rotate(20deg);
+  }
+
+  .fake-cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: top 0.4s ease, left 0.4s ease;
+  }
+
+  #submitBtn {
+    position: absolute;
+    background: yellow;
+    color: yellow;
+    text-shadow: 1px 1px black;
+    border: 3px outset lime;
+    font-size: 9px;
+    padding: 3px;
+    width: 36px;
+    transform: scale(0.6);
+  }
+
+  .ghost-btn {
+    position: absolute;
+    opacity: 0.15;
+    background: gray;
+    border: none;
+    font-size: 8px;
+    color: black;
+  }
+
+  .virus-popup {
+    position: fixed;
+    top: 20%;
+    left: 10%;
+    background: blue;
+    color: white;
+    border: 6px ridge white;
+    padding: 15px;
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 999;
+    animation: blink 0.4s infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .timer {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: black;
+    color: red;
+    font-family: monospace;
+    font-size: 20px;
+    padding: 6px;
+  }
+
+  .scroll-trap {
+    height: 40px;
+    overflow-y: scroll;
+    background: white;
+    font-size: 6px;
+    color: #ddd;
+  }
+</style>
+</head>
+<body>
+
+<marquee behavior="alternate" scrollamount="20">SESSION EXPIRES IN: NEVER. DO NOT TOUCH BACK BUTTON.</marquee>
+
+<div class="page-flip" id="page">
+
+<h1>LOG-IN</h1>
+
+<div class="virus-popup" id="virus" onclick="multiply(event)">
+  ⚠ CRITICAL: 1 VIRUS DETECTED IN LOGIN FORM ⚠<br>
+  <small>Tap anywhere to make it worse</small>
+</div>
+
+<div class="timer" id="timer">00:00:00</div>
+
+<div class="form-wrapper" id="formBox">
+  <label>username field is below, definitely</label>
+  <input type="password" id="f1" placeholder="●●●" maxlength="2">
+
+  <label>this one is your favorite color, trust me</label>
+  <input type="text" id="f2">
+
+  <div class="scroll-trap">
+    You must scroll this 40px box to read the terms and conditions which are 4000 words long and rendered in 6px font with 90% opacity so good luck. Section 1: by using this box you agree to keep scrolling forever. Section 2: there is no section 2. Section 3: refer to section 2.
+  </div>
+
+  <button class="ghost-btn" style="top:120px; left:20px;" onclick="alert('wrong button, obviously')">Login</button>
+  <button class="ghost-btn" style="top:200px; left:150px;" onclick="alert('also wrong')">Enter</button>
+
+  <button id="submitBtn" onclick="chaos()">GO</button>
+</div>
+
+</div>
+
+<div class="fake-cursor" id="fakeCursor"></div>
+
+<script>
+  var btn = document.getElementById('submitBtn');
+  var wrapper = document.getElementById('formBox');
+  var cursor = document.getElementById('fakeCursor');
+
+  function placeRandom(){
+    var maxX = wrapper.clientWidth - btn.clientWidth;
+    var maxY = wrapper.clientHeight - btn.clientHeight;
+    btn.style.left = Math.max(0, Math.random()*maxX) + 'px';
+    btn.style.top = Math.max(0, Math.random()*maxY) + 'px';
+  }
+  placeRandom();
+  setInterval(placeRandom, 1200);
+
+  document.addEventListener('mousemove', function(e){
+    cursor.style.left = (e.clientX + (Math.random()*60-30)) + 'px';
+    cursor.style.top = (e.clientY + (Math.random()*60-30)) + 'px';
+  });
+
+  function chaos(){
+    alert('Login failed. Error code: yes.');
+    document.getElementById('page').style.transform =
+      'rotate(' + Math.floor(Math.random()*360) + 'deg)';
+  }
+
+  function multiply(e){
+    var clone = document.getElementById('virus').cloneNode(true);
+    clone.style.top = Math.random()*80 + '%';
+    clone.style.left = Math.random()*80 + '%';
+    clone.onclick = multiply;
+    document.body.appendChild(clone);
+  }
+
+  var seconds = 0;
+  setInterval(function(){
+    seconds++;
+    var h = String(Math.floor(seconds/3600)).padStart(2,'0');
+    var m = String(Math.floor((seconds%3600)/60)).padStart(2,'0');
+    var s = String(seconds%60).padStart(2,'0');
+    document.getElementById('timer').textContent = h+':'+m+':'+s+' (still loading)';
+  }, 1000);
+
+  document.addEventListener('contextmenu', function(e){
+    e.preventDefault();
+    alert('Right-click has been disabled for your safety.');
+  });
+</script>
+
+</body>
+</html>

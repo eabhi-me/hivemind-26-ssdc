@@ -35,16 +35,17 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const navLinks = [
-    { name: 'HIVEMIND 2026', path: '/#hero', isHash: true },
-    { name: 'EVENTS', path: '/events', isHash: false },
-    { name: 'TIMELINE', path: '/#timeline', isHash: true },
-    { name: 'ORGANIZERS', path: '/organizers', isHash: false },
-    { name: 'PRIZES', path: '/#prizes', isHash: true },
+    { name: 'HIVEMIND 2026', path: '/#hero', isHash: true, isHighlighted: false },
+    { name: 'EVENTS', path: '/events', isHash: false, isHighlighted: false },
+    { name: 'WINNERS', path: '/winners', isHash: false, isHighlighted: true },
+    { name: 'TIMELINE', path: '/#timeline', isHash: true, isHighlighted: false },
+    { name: 'ORGANIZERS', path: '/organizers', isHash: false, isHighlighted: false },
+    { name: 'PRIZES', path: '/#prizes', isHash: true, isHighlighted: false },
     ...(isLoggedIn
-      ? [{ name: dashboardLabel, path: dashboardPath, isHash: false }]
+      ? [{ name: dashboardLabel, path: dashboardPath, isHash: false, isHighlighted: false }]
       : [
-          { name: 'DASHBOARD', path: '/dashboard', isHash: false },
-          { name: 'LOGIN', path: '/login', isHash: false },
+          { name: 'DASHBOARD', path: '/dashboard', isHash: false, isHighlighted: false },
+          { name: 'LOGIN', path: '/login', isHash: false, isHighlighted: false },
         ]),
   ];
 
@@ -102,22 +103,26 @@ export const Navbar: React.FC = () => {
                   <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-cyber-cyan group-hover:w-full transition-all duration-300" />
                 </a>
               ) : (
-                <Link
-                  to={link.path}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`font-display italic text-sm tracking-wider transition-colors relative py-1 group ${
-                    location.pathname === link.path
-                      ? 'text-cyber-cyan font-bold'
-                      : 'text-cyber-muted hover:text-cyber-cyan'
-                  }`}
-                >
-                  {link.name}
-                  <span
-                    className={`absolute bottom-0 left-0 h-[2px] bg-cyber-cyan transition-all duration-300 ${
-                      location.pathname === link.path ? 'w-full' : 'w-0 group-hover:w-full'
+                  <Link
+                    to={link.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`font-display italic text-sm tracking-wider transition-all relative py-1 group ${
+                      link.isHighlighted
+                        ? 'text-cyber-yellow font-bold drop-shadow-[0_0_8px_rgba(255,215,0,0.6)] hover:drop-shadow-[0_0_12px_rgba(255,215,0,1)]'
+                        : location.pathname.startsWith(link.path) && link.path !== '/'
+                        ? 'text-cyber-cyan font-bold'
+                        : 'text-cyber-muted hover:text-cyber-cyan'
                     }`}
-                  />
-                </Link>
+                  >
+                    {link.name}
+                    <span
+                      className={`absolute bottom-0 left-0 h-[2px] transition-all duration-300 ${
+                        link.isHighlighted ? 'bg-cyber-yellow' : 'bg-cyber-cyan'
+                      } ${
+                        location.pathname.startsWith(link.path) && link.path !== '/' ? 'w-full' : 'w-0 group-hover:w-full'
+                      }`}
+                    />
+                  </Link>
               )}
             </React.Fragment>
           ))}
@@ -194,10 +199,14 @@ export const Navbar: React.FC = () => {
                   <Link
                     to={link.path}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="font-display italic text-lg tracking-wider text-cyber-white hover:text-cyber-cyan flex items-center justify-between py-2 border-b border-cyber-charcoal-light"
+                    className={`font-display italic text-lg tracking-wider flex items-center justify-between py-2 border-b border-cyber-charcoal-light ${
+                      link.isHighlighted 
+                        ? 'text-cyber-yellow font-bold drop-shadow-[0_0_8px_rgba(255,215,0,0.6)]' 
+                        : 'text-cyber-white hover:text-cyber-cyan'
+                    }`}
                   >
                     <span>{link.name}</span>
-                    <ChevronRight className="w-4 h-4 text-cyber-cyan" />
+                    <ChevronRight className={`w-4 h-4 ${link.isHighlighted ? 'text-cyber-yellow' : 'text-cyber-cyan'}`} />
                   </Link>
                 )}
               </React.Fragment>

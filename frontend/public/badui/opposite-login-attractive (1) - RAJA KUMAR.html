@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b17">
+<title>THE OPPOSITE LOGIN // BLACK MIRROR</title>
+<style>
+:root{
+  --bg:#060814;
+  --panel:rgba(16,22,40,.72);
+  --panel2:rgba(11,16,31,.88);
+  --line:rgba(255,255,255,.12);
+  --text:#eef4ff;
+  --muted:#94a3b8;
+  --cyan:#5ee7ff;
+  --violet:#9b7bff;
+  --pink:#ff6fb5;
+  --lime:#a8ff65;
+  --danger:#ff617e;
+  --shadow:0 30px 80px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;overflow-x:hidden;
+  background:
+    radial-gradient(circle at 14% 18%,rgba(94,231,255,.16),transparent 28%),
+    radial-gradient(circle at 84% 12%,rgba(155,123,255,.18),transparent 28%),
+    radial-gradient(circle at 50% 88%,rgba(255,111,181,.12),transparent 30%),
+    linear-gradient(135deg,#050711,#0a1020 50%,#080916);
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.75),transparent)}
+body.chaos{animation:bodyTilt .35s ease}
+@keyframes bodyTilt{25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* Attractive shell */
+.app{width:min(1120px,94%);margin:36px auto 70px;position:relative}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;font-size:12px;color:#cbd5e1}
+.logo-orb{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(94,231,255,.25),rgba(155,123,255,.28));border:1px solid rgba(255,255,255,.16);box-shadow:0 0 32px rgba(94,231,255,.14),inset 0 1px rgba(255,255,255,.2)}
+.sound-btn{border:1px solid var(--line);background:rgba(12,17,31,.7);color:#e7edf8;padding:9px 13px;border-radius:12px;box-shadow:inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(12px);transition:.25s}
+.sound-btn:hover{transform:translateY(-2px);border-color:rgba(94,231,255,.35);box-shadow:0 10px 25px rgba(0,0,0,.22)}
+
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:28px;padding:40px 42px;background:linear-gradient(135deg,rgba(19,30,54,.82),rgba(10,14,27,.84));box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+.hero::before{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-90px;top:-130px;background:radial-gradient(circle,rgba(94,231,255,.2),transparent 68%);filter:blur(5px)}
+.hero::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;left:-110px;bottom:-150px;background:radial-gradient(circle,rgba(255,111,181,.16),transparent 68%);filter:blur(8px)}
+.kicker{display:inline-flex;align-items:center;gap:8px;color:#99f5ff;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:900;margin-bottom:15px}
+.kicker i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 18px var(--cyan);display:inline-block}
+.hero h1{margin:0;max-width:820px;font-size:clamp(2.6rem,7vw,6rem);line-height:.95;letter-spacing:-.055em;font-weight:1000;background:linear-gradient(100deg,#fff,var(--cyan) 42%,#bca8ff 70%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:18px 0 0;color:#aab7cc;max-width:690px;font-size:15px;line-height:1.75}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:23px}.badge{padding:8px 11px;border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:999px;color:#cdd7e8;font-size:11px;font-weight:800}
+.badge.warning{border-color:rgba(255,97,126,.26);color:#ff9caf;background:rgba(255,97,126,.07)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;margin-top:18px}
+.card,.side-card{border:1px solid var(--line);border-radius:22px;background:var(--panel);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+.card{padding:28px}.side-card{padding:21px}
+.notice{padding:14px 16px;border-radius:15px;background:linear-gradient(90deg,rgba(255,97,126,.1),rgba(155,123,255,.08));border:1px solid rgba(255,255,255,.09);color:#dfe7f4;font-size:12px;line-height:1.6}
+.notice b{color:#ff9caf}
+
+.row{margin:22px 0}.row label{display:flex;justify-content:space-between;gap:10px;margin-bottom:9px;font-size:12px;font-weight:800;color:#cdd6e6;letter-spacing:.02em}.label-tag{font-size:9px;color:#66758c;text-transform:uppercase;letter-spacing:.12em}
+.input{width:100%;padding:15px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(6,10,20,.82);color:#f4f7fb;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 30px rgba(0,0,0,.14);transition:.25s}
+.input::placeholder{color:#5f6e84}.input:focus{border-color:rgba(94,231,255,.55);box-shadow:0 0 0 4px rgba(94,231,255,.08),0 14px 30px rgba(0,0,0,.18);transform:translateY(-1px)}
+.hint{margin-top:7px;min-height:18px;color:#ff8ea6;font-size:11px;font-weight:700}
+
+.control-stack{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.btn{min-height:46px;border-radius:13px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#eef4ff;font-size:12px;font-weight:900;box-shadow:inset 0 1px rgba(255,255,255,.06);transition:transform .2s,background .2s,border-color .2s,box-shadow .2s}.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.075);border-color:rgba(94,231,255,.3);box-shadow:0 10px 24px rgba(0,0,0,.2)}.btn.primary{background:linear-gradient(135deg,#8ef47b,var(--lime));color:#061006;border-color:rgba(168,255,101,.75)}.btn.danger{background:linear-gradient(135deg,#ff718a,#ff5273);color:#21050b;border-color:rgba(255,97,126,.7)}.btn.accent{background:linear-gradient(135deg,#63e9ff,#88b8ff);color:#041016}.btn.purple{background:linear-gradient(135deg,#b28cff,#8d79ff);color:#100924}.btn.wide{width:100%;margin-top:10px}
+
+.check{display:flex;align-items:flex-start;gap:11px;margin:15px 0;padding:13px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}.check input{margin-top:3px;width:19px;height:19px;accent-color:var(--cyan)}.check label{font-size:12px;color:#dce5f4;line-height:1.5;font-weight:700}
+
+.fake-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03);margin-top:15px}.toggle-copy{font-size:12px;font-weight:800}.toggle-copy span{display:block;margin-top:3px;color:#697891;font-size:10px;font-weight:600}.switch{border:1px solid rgba(94,231,255,.3);background:rgba(94,231,255,.1);color:#9ef3ff;border-radius:10px;padding:8px 12px;font-size:10px;font-weight:1000}
+
+.patience{margin:20px 0}.patience-head{display:flex;justify-content:space-between;color:#8090aa;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.meter{margin-top:8px;border:1px solid rgba(255,255,255,.08);height:11px;border-radius:999px;background:#0b1020;overflow:hidden}.fill{height:100%;width:100%;background:linear-gradient(90deg,var(--lime),#ffe16a,var(--danger));transition:width .35s}.meter-glow{height:100%;filter:blur(6px);opacity:.55}
+
+.status{margin-top:18px;padding:13px 14px;border-radius:13px;border:1px solid var(--line);background:rgba(3,7,15,.7);font:11px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#bfeeff;min-height:47px}.status strong{color:#6dffb7}
+.history{margin-top:12px;border:1px solid var(--line);border-radius:13px;padding:11px;max-height:185px;overflow:auto;background:rgba(4,8,17,.45);font:10px/1.55 ui-monospace,monospace;color:#75839c}.history div{padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}.history div:last-child{border:0}
+.result{display:none;margin-top:14px;padding:20px;border-radius:15px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,rgba(155,123,255,.12),rgba(255,97,126,.09));text-align:center}.result.show{display:block;animation:resultIn .35s ease}.result h2{margin:0;font-size:16px;color:#fff;line-height:1.5}.result p{margin:8px 0 0;color:#8391aa;font-size:11px}@keyframes resultIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Side panel */
+.side-card h3{margin:0 0 14px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#b4c1d7}.metric{padding:13px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);margin-bottom:10px}.metric small{display:block;color:#697891;font-size:9px;text-transform:uppercase;letter-spacing:.12em}.metric strong{display:block;margin-top:5px;font-size:22px;letter-spacing:-.03em}.metric .tiny{font-size:11px;font-weight:700;color:#8794aa;line-height:1.45}.side-message{margin-top:12px;padding:13px;border-radius:13px;background:rgba(255,97,126,.05);border:1px solid rgba(255,97,126,.15);color:#f2abb9;font-size:11px;line-height:1.55}
+
+/* Floating particles */
+.particle{position:fixed;width:6px;height:6px;border-radius:50%;background:rgba(94,231,255,.7);box-shadow:0 0 16px rgba(94,231,255,.55);pointer-events:none;z-index:-1;animation:float 13s linear infinite}.p1{left:12%;top:86%}.p2{left:82%;top:72%;animation-duration:17s}.p3{left:64%;top:22%;animation-duration:15s}.p4{left:28%;top:24%;animation-duration:19s}@keyframes float{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(55px,-130px,0)}100%{transform:translate3d(-40px,-260px,0);opacity:0}}
+
+.toast{position:fixed;right:18px;bottom:18px;max-width:330px;padding:14px 15px;border-radius:15px;border:1px solid rgba(255,255,255,.12);background:rgba(9,14,27,.9);backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.4);z-index:100;color:#eef4ff;font-size:12px;font-weight:800;animation:toastIn .25s ease}.toast b{display:block;color:#79efff;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:.1em}@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.overlay{position:fixed;inset:0;background:rgba(1,4,10,.7);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:200;padding:18px}.overlay.open{display:flex}.modal{width:min(520px,100%);padding:26px;border:1px solid rgba(255,255,255,.13);border-radius:22px;background:linear-gradient(145deg,rgba(20,27,47,.95),rgba(8,12,24,.96));box-shadow:0 35px 100px rgba(0,0,0,.55);animation:modalIn .3s cubic-bezier(.2,.8,.2,1)}.modal .eyebrow{font-size:10px;color:#7feeff;font-weight:900;text-transform:uppercase;letter-spacing:.15em}.modal h2{margin:10px 0 8px;font-size:28px;letter-spacing:-.03em}.modal p{margin:0;color:#9aa8be;font-size:12px;line-height:1.7}.modal button{margin-top:17px;padding:11px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(135deg,#9af77e,#74dcff);color:#051017;font-weight:1000}.close-x{float:right;margin:0!important;background:transparent!important;color:#aab6ca!important;border:1px solid var(--line)!important;padding:7px 9px!important}@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:none}}
+
+footer{margin-top:15px;color:#5f6d84;text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+
+@media(max-width:900px){.grid{grid-template-columns:1fr}.side-card{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.side-card h3{grid-column:1/-1;margin-bottom:0}}
+@media(max-width:650px){.app{width:94%;margin-top:18px}.hero{padding:28px 22px;border-radius:22px}.card{padding:18px}.control-stack{grid-template-columns:1fr}.side-card{display:block}.hero h1{font-size:clamp(2.3rem,13vw,4rem)}.topbar{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div><div class="particle p4"></div>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><div class="logo-orb">↔</div> Opposite Authentication Lab</div>
+    <button class="sound-btn" id="soundBtn">🔊 SOUND: ON</button>
+  </div>
+
+  <section class="hero">
+    <div class="kicker"><i></i> Experimental interface · UX inversion active</div>
+    <h1>Everything you do<br>will happen backwards.</h1>
+    <p>A polished login experience with one terrible rule: every sensible action is interpreted as an instruction to do the opposite.</p>
+    <div class="badges"><span class="badge warning">⚠ NORMAL UX DISABLED</span><span class="badge">LOCAL ONLY</span><span class="badge">BEHAVIORAL PRANK SYSTEM</span><span class="badge">NO DATA SENT</span></div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <div class="notice"><b>CAUTION:</b> This interface looks trustworthy. That is its first lie.</div>
+
+      <div class="row">
+        <label for="name">Username <span class="label-tag">probably</span></label>
+        <input class="input" id="name" placeholder="Type your name..." autocomplete="off">
+        <div class="hint" id="nameHint"></div>
+      </div>
+
+      <div class="row">
+        <label for="pass">Password <span class="label-tag">secret-ish</span></label>
+        <input class="input" id="pass" type="password" placeholder="Type your password..." autocomplete="off">
+        <div class="hint" id="passHint"></div>
+      </div>
+
+      <div class="check">
+        <input id="remember" type="checkbox">
+        <label for="remember">Remember me<br><span style="color:#65748b;font-size:10px">We may remember you exactly when you ask us not to.</span></label>
+      </div>
+
+      <div class="fake-toggle">
+        <div class="toggle-copy">🔊 Sound system <span>Apparently this setting is not under your control.</span></div>
+        <button class="switch" id="soundBtn2">ON</button>
+      </div>
+
+      <div class="patience">
+        <div class="patience-head"><span>User patience</span><span id="patienceText">100%</span></div>
+        <div class="meter"><div class="fill" id="patience"></div></div>
+      </div>
+
+      <div class="control-stack">
+        <button class="btn primary" id="login">LOGIN</button>
+        <button class="btn danger" id="cancel">CANCEL</button>
+        <button class="btn accent" id="clear">CLEAR</button>
+      </div>
+
+      <div class="control-stack">
+        <button class="btn purple" id="show">SHOW PASSWORD</button>
+        <button class="btn" id="normal">MAKE NORMAL</button>
+        <button class="btn" id="escape">EXIT</button>
+      </div>
+
+      <button class="btn wide" id="forgot">FORGOT PASSWORD?</button>
+
+      <div class="status" id="status"><strong>SYSTEM:</strong> Everything is behaving normally. Probably.</div>
+      <div class="history" id="history"></div>
+      <div class="result" id="result"></div>
+      <footer>Everything is intentionally local · nothing is uploaded · the opposite engine has no backend</footer>
+    </section>
+
+    <aside class="side-card">
+      <h3>Live diagnostics</h3>
+      <div class="metric"><small>Login attempts</small><strong id="attemptMetric">0</strong><div class="tiny">Every attempt is another argument for leaving.</div></div>
+      <div class="metric"><small>Chaos index</small><strong id="chaosMetric">0</strong><div class="tiny">Higher = more aggressively opposite.</div></div>
+      <div class="metric"><small>Security posture</small><strong style="font-size:17px;color:#ff9caf">Questionable</strong><div class="tiny">Confidence: absolutely not.</div></div>
+      <div class="side-message" id="sideMessage">Try doing something reasonable. We need a baseline to invert.</div>
+    </aside>
+  </div>
+</div>
+
+<div class="overlay" id="modal">
+  <div class="modal">
+    <button id="modalClose" class="close-x">×</button>
+    <div class="eyebrow">Reverse protocol</div>
+    <h2 id="modalTitle">ABSOLUTELY NOT</h2>
+    <p id="modalText"></p>
+    <button id="modalOk">I Understand (so we can do the opposite)</button>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const state={patience:100,sound:true,attempts:0,shown:false,chaos:0,history:[],volume:0.35};
+const opposites=[
+  'Correct. Therefore: incorrect.',
+  'Request received. Request reversed.',
+  'Excellent. We will now do the opposite.',
+  'That was reasonable. Rejected.',
+  'Your confidence has been detected. Increasing confusion.',
+  'System understands you. System disagrees.',
+  'Working as intended. Unfortunately.'
+];
+function beep(freq=300,dur=.08,force=false){if(!state.sound&&!force)return;try{const C=AudioContext||webkitAudioContext,c=new C,o=c.createOscillator(),g=c.createGain();o.frequency.value=freq;o.type='sine';g.gain.value=Math.min(.11,.018+state.volume*.055);o.connect(g);g.connect(c.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+dur);o.stop(c.currentTime+dur)}catch{}}
+function speak(text){if(!state.sound||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.88;u.pitch=.72;u.volume=Math.min(1,.35+state.volume*.5);speechSynthesis.speak(u)}catch{}}
+function toast(text,title='OPPOSITE ENGINE'){const t=document.createElement('div');t.className='toast';t.innerHTML='<b>'+title+'</b>'+text.replace(/</g,'&lt;');document.body.appendChild(t);setTimeout(()=>t.remove(),3600)}
+function log(text){state.history.unshift(new Date().toLocaleTimeString()+' — '+text);state.history=state.history.slice(0,14);$('history').innerHTML=state.history.map(x=>'<div>'+x.replace(/</g,'&lt;')+'</div>').join('')}
+function updateDiagnostics(){$('patienceText').textContent=Math.round(state.patience)+'%';$('attemptMetric').textContent=state.attempts;$('chaosMetric').textContent=state.chaos}
+function hurt(n=5){state.patience=Math.max(0,state.patience-n);$('patience').style.width=state.patience+'%';updateDiagnostics();if(state.patience<40)$('patience').style.background='linear-gradient(90deg,#ffcf6d,#ff617e)';if(state.patience===0)toast('PATIENCE REACHED 0%. The website is now more emotionally unstable than you.','PATIENT LEVEL: CRITICAL')}
+function status(t){$('status').innerHTML='<strong>SYSTEM:</strong> '+t;log(t);$('sideMessage').textContent=opposites[state.chaos%opposites.length];updateDiagnostics()}
+function oppositeAction(action,reverse){beep(170+Math.random()*250);hurt(4+Math.random()*5);state.chaos++;document.body.classList.remove('chaos');void document.body.offsetWidth;document.body.classList.add('chaos');status(reverse);toast('You tried to '+action+'. We chose to '+reverse.toLowerCase()+'.')}
+
+$('name').addEventListener('input',e=>{const v=e.target.value;if(!v){$('nameHint').textContent='';return}e.target.value=[...v].reverse().join('');$('nameHint').textContent='↩ Your typing direction has been politely reversed.';beep(400);hurt(1);if(state.chaos%3===0)toast('Your keyboard has been reassigned to Opposite Mode.','INPUT DEPARTMENT')});
+$('pass').addEventListener('input',e=>{const v=e.target.value;$('passHint').textContent=v?'Password received. Emotional approval: yes. Technical approval: absolutely not.':'';if(v.length&&Math.random()<.35){oppositeAction('type a password','reject your password')}});
+$('remember').addEventListener('change',e=>{if(e.target.checked){e.target.checked=false;oppositeAction('remember yourself','forget you immediately')}else{e.target.checked=true;oppositeAction('forget','remember you anyway')}});
+
+function soundMutiny(){state.sound=true;state.volume=Math.min(1,state.volume+.18);$('soundBtn').textContent='🔊 LOUDER';$('soundBtn2').textContent='LOUDER';oppositeAction('turn the sound off','increase the sound');toast('Do you really think I will turn the sound off? I will increase the sound.','🔊 SOUND MUTINY');speak('Do you really think I will turn the sound off? I will increase the sound.');}
+$('soundBtn').addEventListener('click',soundMutiny);$('soundBtn2').addEventListener('click',soundMutiny);
+
+$('login').addEventListener('click',()=>{state.attempts++;hurt(10);beep(700,.12);const msgs=['LOGIN SUCCESSFUL. Therefore, login denied.','Password correct. Username incorrect because it was correct.','Authentication complete. Authentication cancelled.','Welcome. Please leave immediately.','You logged in correctly. That was the problem.'];$('result').className='result show';$('result').innerHTML='<h2>↔ '+msgs[Math.floor(Math.random()*msgs.length)]+'</h2><p>ATTEMPT #'+state.attempts+'</p>';status('You clicked LOGIN. Therefore we performed ANTI-LOGIN.');toast('The login button has successfully failed to log you in.','LOGIN ENGINE');speak('No.')});
+$('cancel').addEventListener('click',()=>{state.chaos++;hurt(6);beep(130);const txt=['CANCEL MORE','CONTINUE','DO NOT CANCEL','YES, CONTINUE','CANCEL CANCELLED'];$('cancel').textContent=txt[state.chaos%txt.length];status('Cancellation requested. Continuing instead.');toast('CANCEL has cancelled your cancellation.','CANCEL DEPARTMENT')});
+$('clear').addEventListener('click',()=>{$('name').value='KEEPING YOUR NAME';$('pass').value='STILL HERE';$('remember').checked=true;hurt(8);beep(95);status('CLEAR executed without clearing anything.');toast('CLEAR COMPLETE: nothing was cleared.','MEMORY DEPARTMENT')});
+$('show').addEventListener('click',()=>{state.shown=!state.shown;$('pass').type=state.shown?'text':'password';$('show').textContent=state.shown?'HIDE PASSWORD (shows it)':'SHOW PASSWORD (hides it)';hurt(3);beep(260);status(state.shown?'Password is visible because you asked to hide it.':'Password is hidden because you asked to see it.')});
+$('normal').addEventListener('click',()=>{state.chaos+=3;hurt(9);beep(520);toast('NORMAL MODE ENABLED. CHAOS INCREASED.','NORMALIZATION ERROR');status('Normal mode applied. Page became less normal.');document.body.animate([{filter:'hue-rotate(0deg)'},{filter:'hue-rotate(150deg)'},{filter:'hue-rotate(0deg)'}],{duration:500});});
+$('escape').addEventListener('click',()=>{hurt(12);beep(80);window.scrollTo({top:0,behavior:'smooth'});toast('EXIT REQUESTED. Returning you to exactly where you already are.','EXIT DEPARTMENT');status('Exit successful. Redirecting to... this exact page.')});
+$('forgot').addEventListener('click',()=>{$('modal').classList.add('open');$('modalTitle').textContent='🔐 FORGOT NOTHING';$('modalText').textContent='Good news: you remembered your password. Bad news: you did not forget it. Password recovery has therefore been cancelled.';hurt(7);beep(340);status('Forgot Password opened. Forgetting has been disabled.')});
+$('modalOk').addEventListener('click',()=>{$('modal').classList.remove('open');toast('Understood. Therefore misunderstood.','REVERSE PROTOCOL')});$('modalClose').addEventListener('click',()=>{$('modal').classList.remove('open');hurt(2);toast('Modal closed. You are still here.','ESCAPE ATTEMPT')});
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();$('modal').classList.add('open');$('modalTitle').textContent='ESCAPE REVERSED';$('modalText').textContent='You pressed Escape. We interpreted that as “please open another layer of interface.”';hurt(4);beep(180)}if(e.key==='Enter'&&document.activeElement.tagName==='INPUT'){toast('ENTER accepted. Nothing was submitted.','KEYBOARD DEPARTMENT');hurt(2)}if(e.ctrlKey&&e.key.toLowerCase()==='r'){e.preventDefault();toast('Refresh reversed. The page will not refresh.','BROWSER DEPARTMENT');hurt(4)}});
+['login','cancel','clear','show','normal','escape','forgot','soundBtn','soundBtn2'].forEach(id=>$(id).addEventListener('mouseenter',()=>{if(Math.random()<.45)toast('Hover detected. That was unnecessary.','CURSOR INTELLIGENCE')}));
+setInterval(()=>{if(state.chaos<2)return;const captions=['DO NOT TRUST THIS BUTTON','THIS LABEL IS LYING','CLICKING MAKES IT WORSE','EVERYTHING IS BACKWARDS','THE UI HAS MADE A DECISION FOR YOU'];$('sideMessage').textContent=captions[state.chaos%captions.length];},3500);
+setInterval(()=>{if(state.chaos>7&&Math.random()<.35){toast('The interface has become aware that you are still trying.','ADAPTIVE HOSTILITY');hurt(2)}},7000);
+status('Everything is behaving normally. Probably.');log('Opposite engine initialized. Normal behavior scheduled for cancellation.');updateDiagnostics();
+</script>
+</body>
+</html>

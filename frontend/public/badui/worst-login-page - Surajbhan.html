@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEST LOGIN PAGE BY Surajbhan</title>
+    <style>
+        body {
+            background: repeating-radial-gradient(circle, #00ff00, #ff00ff 10%, #ffff00 20%);
+            font-family: "Comic Sans MS", "Times New Roman", serif;
+            color: #0000ff;
+            margin: 0;
+            padding: 0;
+            cursor: crosshair;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            margin: 43px;
+        }
+        .sidebar {
+            width: 22.5%;
+            background-color: #ff0000;
+            border: 7px dashed #00ffff;
+            padding: 11px;
+            color: #ffff00;
+            font-family: Impact, fantasy;
+            text-align: right;
+            box-shadow: 15px 15px 0px #000;
+        }
+        .login-box {
+            width: 800px;
+            background: linear-gradient(45deg, #0000ff, #ff8800);
+            border-top: 12px dotted pink;
+            border-bottom: 2px solid green;
+            border-left: 25px double yellow;
+            border-right: 1px solid black;
+            padding: 54px;
+            border-radius: 50px 0px 100px 12px;
+            box-shadow: inset 5px 5px 20px #fff, 20px 20px 50px #000;
+            margin-top: -15px;
+        }
+        h1 {
+            font-size: 72px;
+            text-transform: uppercase;
+            text-decoration: underline overline wavy red;
+            text-shadow: 3px 3px 0px #00ff00, 6px 6px 0px #ff00ff;
+            text-align: justify;
+        }
+        marquee {
+            font-size: 24px;
+            background-color: black;
+            color: lime;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 37.5px;
+            padding-left: 14px;
+        }
+        label {
+            font-family: "Courier New", monospace;
+            font-size: 10px;
+            font-weight: 900;
+            color: #ffffff;
+            background-color: #000;
+            letter-spacing: -1px;
+            display: block;
+            margin-bottom: -5px;
+            transform: rotate(-2deg);
+        }
+        input[type="text"], input[type="password"] {
+            width: 103%;
+            padding: 2px;
+            font-size: 28px;
+            background-color: #ffffcc;
+            border: 5px outset #ff00ff;
+            color: #ff0000;
+            height: 55px;
+            margin-left: 20px;
+        }
+        input::placeholder {
+            color: #0000ff;
+            font-style: italic;
+            font-size: 14px;
+        }
+        .help-text {
+            font-size: 8px;
+            color: #00ff00;
+            text-decoration: line-through;
+        }
+        .btn-login {
+            background: radial-gradient(#ffff00, #ff0000);
+            color: #0000ff;
+            font-size: 44px;
+            font-weight: bold;
+            padding: 30px;
+            border: 15px inset #00ff00;
+            border-radius: 100px 0 100px 0;
+            cursor: wait;
+            width: 115%;
+            margin-left: -30px;
+            transition: all 0.1s;
+        }
+        .btn-login:hover {
+            transform: translate(15px, -15px) rotate(3deg);
+            background: radial-gradient(#ff0000, #ffff00);
+        }
+        .links {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+            font-size: 24px;
+        }
+        a {
+            color: #00ffff;
+            background-color: #800080;
+            padding: 2px;
+            border: 1px solid #fff;
+        }
+        a:hover {
+            font-size: 30px;
+            color: #ff00ff;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .blink {
+            animation: blink 0.1s infinite;
+            color: red;
+            background: yellow;
+            font-weight: bold;
+        }
+        .strength-meter {
+            height: 10px;
+            width: 50%;
+            background: red;
+            margin-left: 20px;
+            border: 3px solid black;
+            transition: width 0.2s, background-color 0.2s;
+        }
+        .spinning-badge {
+            width: 100px;
+            height: 100px;
+            background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 0 black;
+            animation: spin 0.5s linear infinite;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            color: lime;
+            font-family: monospace;
+            z-index: 9999;
+            text-align: center;
+            padding-top: 200px;
+            font-size: 40px;
+        }
+        
+        @media (max-width: 800px) {
+            .main-container { flex-direction: column; margin: 10px; }
+            .login-box { width: 90%; margin-left: -5%; }
+            .sidebar { width: 100%; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<marquee direction="right" scrollamount="35">🔥 100% TRUSTED WEBSITE 🔥 VERY SECURE 🔥 DO NOT BE AFRAID 🔥</marquee>
+<marquee direction="left" scrollamount="15" style="background: white; color: red;">🎉🎉🎉 WELCOME TO THE INTERNET!!! 🎉🎉🎉</marquee>
+
+<div class="main-container">
+    <div class="sidebar">
+        <h2>SIDEBAR OF IMPORTANCE</h2>
+        <p>This website was proudly created in 2003.</p>
+        <p>You are visitor #847291.</p>
+        <hr>
+        <p class="blink">WARNING!!!</p>
+        <p>Security Level: EXTREMELY SECURE™</p>
+        <marquee direction="up" scrollamount="10" height="200">
+            SYSTEM STATUS: OK<br>
+            FIREWALL: ONLINE<br>
+            HACKERS: BLOCKED<br>
+            MAINFRAME: ENCRYPTED<br>
+            IP ADDRESS: LOGGED
+        </marquee>
+        <br><br>
+        <div id="clock">12:00:00 AM</div>
+    </div>
+
+    <div class="login-box">
+        <h1>Welcome To The Internet!!! 👋👋👋</h1>
+        
+        <form id="terribleForm" onsubmit="return attemptLogin(event)">
+            
+            <div class="form-group">
+                <label for="username">ENTER YOUR VERY IMPORTANT USER IDENTIFICATION THING HERE:</label>
+                <input type="text" id="username" placeholder="Type your email or username or whatever here please...">
+                <div class="help-text">Do not type the wrong thing!</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">SECRET PASSWORD (SHHH DO NOT TELL ANYONE):</label>
+                <input type="password" id="password" oninput="updateStrength()" placeholder="••••••••••••••••••••••••••••••••">
+                <button type="button" onclick="togglePassword()" style="background:pink; border: 5px solid lime; cursor:help; font-size: 20px; transform: rotate(5deg);">👁️ SHOW SECRETS</button>
+                <div style="font-size: 9px; color: white;">PASSWORD STRENGTH METER:</div>
+                <div class="strength-meter" id="strengthBar"></div>
+            </div>
+
+            <div class="form-group" style="background: cyan; padding: 10px; border: 2px dashed red; transform: skewX(-10deg);">
+                <label for="captcha" style="color: black; background: none; font-size:14px; margin-bottom:5px;">HUMAN VERIFICATION CAPTCHA (HARD):</label>
+                What is 10 + 5 minus 2? 
+                <input type="text" id="captcha" style="width: 100px; height: 30px; font-size: 15px; margin:0;" placeholder="Answer???">
+            </div>
+
+            <div class="form-group" style="text-align: right;">
+                <input type="checkbox" id="remember" style="width: 30px; height: 30px;">
+                <label for="remember" style="display:inline; font-size: 18px; color: yellow; background: purple;">REMEMBER ME FOREVER AND EVER</label>
+            </div>
+
+            <button type="submit" class="btn-login">🚨 CLICK HERE TO LOGIN!!! 🚨 🔑</button>
+
+            <div class="links">
+                <a href="#" onclick="alert('Too bad!')">Forgot Password??? 😭</a>
+                <a href="#" onclick="alert('We are not accepting new accounts at this time.')">Create Account 📝</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="spinning-badge">100%<br>SECURE</div>
+
+<div id="overlay">
+    <div id="loadingText">INITIALIZING MAINFRAME...<br>HACKING THE GIBSON...<br>0%</div>
+</div>
+
+<script>
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+
+    function togglePassword() {
+        const pwd = document.getElementById('password');
+        pwd.type = pwd.type === 'password' ? 'text' : 'password';
+    }
+
+    function updateStrength() {
+        const bar = document.getElementById('strengthBar');
+        const colors = ['red', 'orange', 'yellow', 'lime', 'blue', 'magenta'];
+        bar.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        bar.style.width = Math.floor(Math.random() * 100) + '%';
+    }
+
+    function attemptLogin(e) {
+        e.preventDefault();
+        
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        const captcha = document.getElementById('captcha').value;
+
+        if (!user || !pass) {
+            alert("ERROR: Please try being more logged in. (Fields are empty!)");
+            return false;
+        }
+        if (pass.length < 3) {
+            alert("ERROR: Your password is too password-like.");
+            return false;
+        }
+        if (captcha !== "13") {
+            alert("LOGIN SYSTEM IS CONFUSED. Wrong CAPTCHA! Are you a robot??? 🤖");
+            return false;
+        }
+
+        const overlay = document.getElementById('overlay');
+        const loadingText = document.getElementById('loadingText');
+        overlay.style.display = 'block';
+        
+        let percent = 0;
+        const interval = setInterval(() => {
+            percent += Math.floor(Math.random() * 20);
+            if (percent >= 100) percent = 100;
+            loadingText.innerHTML = `INITIALIZING MAINFRAME...<br>HACKING THE GIBSON...<br>${percent}%`;
+            
+            if (percent === 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    overlay.style.background = 'hotpink';
+                    overlay.style.color = 'yellow';
+                    loadingText.innerHTML = "🎉 YOU DID IT! LOGGED IN AS A HACKER! 🎉<br><br>Welcome, " + user + "!!!<br><br>Your secrets are safe with us.";
+                }, 500);
+            }
+        }, 300);
+
+        return false;
+    }
+</script>
+
+</body>
+</html>

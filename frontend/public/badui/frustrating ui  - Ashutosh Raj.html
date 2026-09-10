@@ -1,0 +1,2803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Page</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+      color: #172033;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(99, 102, 241, 0.22), transparent 28rem),
+        radial-gradient(circle at 88% 85%, rgba(14, 165, 233, 0.16), transparent 26rem),
+        #eef2ff;
+      font-family: Arial, sans-serif;
+    }
+
+    .signup-card {
+      width: min(100%, 430px);
+      padding: 34px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(31, 41, 80, 0.15);
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin-bottom: 26px;
+      color: #667085;
+      font-size: 16px;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      color: #172033;
+      background: white;
+      border: 1px solid #d9dfeb;
+      border-radius: 12px;
+      outline: none;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.16);
+    }
+
+    input[aria-invalid="true"] {
+      border-color: #c62828;
+    }
+
+    #fullName[readonly][aria-busy="true"],
+    #email[readonly][aria-busy="true"] {
+      color: #667085;
+      background: #f7f7ff;
+      cursor: wait;
+    }
+
+    .name-feedback {
+      position: relative;
+      min-height: 15px;
+    }
+
+    .name-feedback .error {
+      position: absolute;
+      inset: 0;
+    }
+
+    .processing-status {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      gap: 7px;
+      color: #4f46e5;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .processing-status.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 13px;
+      height: 13px;
+      border: 2px solid #c7d2fe;
+      border-top-color: #4f46e5;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .email-confirm {
+      min-height: 42px;
+      padding: 9px 14px;
+      color: white;
+      background: #4f46e5;
+      border: 1px solid #4f46e5;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.15s;
+    }
+
+    .email-confirm:hover:not(:disabled) {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+
+    .email-confirm:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .email-confirm.confirmed {
+      color: #087f5b;
+      background: #eafaf4;
+      border-color: #b7ead8;
+      opacity: 1;
+    }
+
+    .password-confirm {
+      min-height: 42px;
+      padding: 9px 14px;
+      color: white;
+      background: #4f46e5;
+      border: 1px solid #4f46e5;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.15s;
+    }
+
+    .password-confirm:hover:not(:disabled) {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+
+    .password-confirm:disabled {
+      cursor: not-allowed;
+    }
+
+    .password-confirm.confirmed {
+      color: #087f5b;
+      background: #eafaf4;
+      border-color: #b7ead8;
+    }
+
+    #passwordError.accepted,
+    #confirmError.accepted {
+      color: #087f5b;
+    }
+
+    #fullName {
+      cursor: pointer;
+    }
+
+    .floating-keyboard-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: none;
+      place-items: center;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+    }
+
+    .floating-keyboard-modal.show {
+      display: grid;
+    }
+
+    .floating-keyboard-card {
+      width: min(100%, 520px);
+      padding: 22px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 28px 80px rgba(15, 23, 42, 0.34);
+    }
+
+    .floating-keyboard-card h2 {
+      margin-bottom: 5px;
+      font-size: 22px;
+      text-align: center;
+    }
+
+    .floating-keyboard-help {
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .floating-name-preview {
+      min-height: 48px;
+      margin: 14px 0 10px;
+      padding: 12px;
+      overflow-wrap: anywhere;
+      color: #172033;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 11px;
+      font-size: 17px;
+      font-weight: bold;
+      line-height: 1.35;
+    }
+
+    .floating-name-preview.empty {
+      color: #98a2b3;
+      font-weight: normal;
+    }
+
+    .floating-letter-stage {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 40px));
+      justify-content: center;
+      gap: 9px;
+      padding: 14px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(99, 102, 241, 0.3), transparent 34%),
+        radial-gradient(circle at 78% 76%, rgba(14, 165, 233, 0.24), transparent 34%),
+        #172033;
+      border: 2px solid #4f46e5;
+      border-radius: 16px;
+    }
+
+    .floating-letter {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      color: #172033;
+      background: #ffffff;
+      border: 2px solid #a5b4fc;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      user-select: none;
+      touch-action: manipulation;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
+      transition:
+        transform 0.12s,
+        background 0.12s;
+    }
+
+    .floating-letter:active {
+      background: #fef08a;
+      transform: scale(0.86);
+    }
+
+    .floating-name-status {
+      min-height: 18px;
+      margin: 9px 0;
+      color: #667085;
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .floating-keyboard-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .floating-control {
+      min-height: 42px;
+      padding: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .floating-control.secondary {
+      color: #475467;
+      background: white;
+      border: 1px solid #d9dfeb;
+    }
+
+    .floating-control.done {
+      color: white;
+      background: #4f46e5;
+      border: 1px solid #4f46e5;
+    }
+
+    .floating-control:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .email-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.58);
+      backdrop-filter: blur(4px);
+    }
+
+    .email-modal.show {
+      display: grid;
+    }
+
+    .email-modal-card {
+      width: min(100%, 390px);
+      padding: 26px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+      text-align: center;
+    }
+
+    .email-modal-card h2 {
+      margin-bottom: 10px;
+      font-size: 21px;
+      line-height: 1.3;
+    }
+
+    .email-modal-card p {
+      color: #667085;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .email-to-confirm {
+      display: block;
+      margin-top: 12px;
+      padding: 11px;
+      overflow-wrap: anywhere;
+      color: #172033;
+      background: #f3f4ff;
+      border: 1px solid #d9dfeb;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .email-retype-input {
+      margin-top: 14px;
+      text-align: left;
+    }
+
+    .retype-feedback {
+      position: relative;
+      min-height: 23px;
+    }
+
+    .email-retype-error {
+      display: block;
+      min-height: 16px;
+      margin-top: 7px;
+      color: #c62828;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .email-modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .email-modal-button {
+      min-height: 44px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .email-modal-button.edit {
+      color: #475467;
+      background: white;
+      border: 1px solid #d9dfeb;
+    }
+
+    .email-modal-button.yes {
+      color: white;
+      background: #4f46e5;
+      border: 1px solid #4f46e5;
+    }
+
+    .phone-picker {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      background: #f8f9ff;
+      border: 1px solid #dfe3f0;
+      border-radius: 14px;
+      outline: none;
+    }
+
+    .phone-picker[aria-invalid="true"] {
+      border-color: #c62828;
+    }
+
+    .phone-digits {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .phone-digit {
+      min-width: 0;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: #98a2b3;
+      background: white;
+      border: 1px solid #d9dfeb;
+      border-radius: 8px;
+      font-size: 19px;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+      transition: 0.15s;
+    }
+
+    .phone-digit.active {
+      color: #4f46e5;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .phone-digit.locked {
+      color: #172033;
+      background: #eef2ff;
+      border-color: #c7d2fe;
+    }
+
+    .phone-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .phone-button {
+      min-height: 42px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.15s;
+    }
+
+    .phone-button.restart {
+      color: #475467;
+      background: white;
+      border: 1px solid #d9dfeb;
+    }
+
+    .phone-button.set {
+      color: white;
+      background: #4f46e5;
+      border: 1px solid #4f46e5;
+    }
+
+    .phone-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .phone-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+    }
+
+    .phone-status {
+      min-height: 16px;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .dob-picker {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      background: #f8f9ff;
+      border: 1px solid #dfe3f0;
+      border-radius: 14px;
+      outline: none;
+    }
+
+    .dob-picker[aria-invalid="true"] {
+      border-color: #c62828;
+    }
+
+    .dob-units {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .dob-unit {
+      display: grid;
+      gap: 6px;
+      text-align: center;
+    }
+
+    .dob-unit-label {
+      color: #667085;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .dob-value {
+      min-height: 48px;
+      display: grid;
+      place-items: center;
+      color: #1d4ed8;
+      background: #dbeafe;
+      border: 2px solid #60a5fa;
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dob-step-button {
+      min-height: 38px;
+      padding: 7px 5px;
+      color: white;
+      background: #2563eb;
+      border: 1px solid #2563eb;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .dob-step-button:active {
+      transform: translateY(1px);
+    }
+
+    .dob-step-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
+    }
+
+    .dob-step-button.confirmed {
+      color: #087f5b;
+      background: #eafaf4;
+      border-color: #86d7b9;
+      opacity: 1;
+    }
+
+    .dob-year-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+
+    .dob-year-reset {
+      color: #344054;
+      background: white;
+      border-color: #cbd5e1;
+    }
+
+    .dob-year-reset:hover {
+      background: #f1f5f9;
+    }
+
+    .dob-year-status {
+      grid-column: 1 / -1;
+      min-height: 26px;
+      display: grid;
+      place-items: center;
+      color: #667085;
+      font-size: 10px;
+      font-weight: bold;
+      line-height: 1.25;
+    }
+
+    .password-box {
+      position: relative;
+    }
+
+    .error {
+      min-height: 15px;
+      color: #c62828;
+      font-size: 12px;
+    }
+
+    .submit-btn {
+      height: 50px;
+      color: white;
+      background: #4f46e5;
+      border: none;
+      border-radius: 13px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+      transition: 0.2s;
+    }
+
+    .submit-btn:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+
+    .success-message {
+      display: none;
+      padding: 13px 16px;
+      color: #087f5b;
+      background: #eafaf4;
+      border: 1px solid #b7ead8;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    @media (min-width: 900px) {
+      body {
+        padding: 44px 28px;
+      }
+
+      .signup-card {
+        width: min(100%, 1020px);
+        padding: 42px 46px 46px;
+        border-radius: 28px;
+        box-shadow: 0 30px 80px rgba(31, 41, 80, 0.18);
+      }
+
+      h1 {
+        font-size: 34px;
+        text-align: center;
+      }
+
+      .subtitle {
+        margin-bottom: 32px;
+        font-size: 17px;
+        text-align: center;
+      }
+
+      #signupForm {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+          "name email"
+          "phone dob"
+          "password confirm"
+          "submit submit"
+          "success success";
+        column-gap: 28px;
+        row-gap: 20px;
+      }
+
+      #signupForm > .field {
+        min-width: 0;
+        align-content: start;
+      }
+
+      .name-field {
+        grid-area: name;
+      }
+
+      .phone-field {
+        grid-area: phone;
+      }
+
+      .email-field {
+        grid-area: email;
+      }
+
+      .dob-field {
+        grid-area: dob;
+      }
+
+      .password-field {
+        grid-area: password;
+      }
+
+      .confirm-password-field {
+        grid-area: confirm;
+      }
+
+      .phone-field .phone-picker,
+      .dob-field .dob-picker {
+        min-height: 220px;
+        align-content: start;
+      }
+
+      .submit-btn {
+        grid-area: submit;
+        width: min(100%, 430px);
+        justify-self: center;
+        margin-top: 6px;
+      }
+
+      .success-message {
+        grid-area: success;
+      }
+
+      .floating-keyboard-card {
+        width: min(100%, 720px);
+        padding: 28px;
+      }
+
+      .floating-letter-stage {
+        grid-template-columns: repeat(9, minmax(0, 48px));
+        gap: 12px;
+        padding: 20px;
+      }
+
+      .email-modal-card {
+        width: min(100%, 460px);
+        padding: 30px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .signup-card {
+        padding: 24px;
+        border-radius: 20px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .phone-picker {
+        padding: 11px;
+      }
+
+      .phone-digits {
+        gap: 3px;
+      }
+
+      .phone-digit {
+        height: 38px;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+    }
+    /* Intentionally chaotic Worst UI competition theme */
+    @keyframes badCardPulse {
+      0%, 100% {
+        border-color: #f50057;
+        box-shadow:
+          16px 18px 0 #00e5ff,
+          -14px -12px 0 #ffea00,
+          0 30px 70px rgba(84, 0, 130, 0.42);
+      }
+      50% {
+        border-color: #00c853;
+        box-shadow:
+          -16px 14px 0 #ff6d00,
+          14px -12px 0 #d500f9,
+          0 30px 70px rgba(0, 74, 173, 0.42);
+      }
+    }
+
+    @keyframes requiredBlink {
+      0%, 48% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      49%, 100% {
+        opacity: 0.22;
+        transform: scale(0.94);
+      }
+    }
+
+    @keyframes headingWobble {
+      0%, 100% {
+        transform: rotate(-1.4deg) skewX(-4deg);
+      }
+      50% {
+        transform: rotate(1.2deg) skewX(3deg);
+      }
+    }
+
+    body {
+      cursor: crosshair;
+      background-color: #00e5ff;
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          rgba(255, 0, 140, 0.48) 0 18px,
+          rgba(255, 234, 0, 0.55) 18px 36px,
+          rgba(0, 230, 118, 0.48) 36px 54px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          transparent 0 24px,
+          rgba(98, 0, 234, 0.28) 24px 48px
+        );
+      background-size: 76px 76px, 96px 96px;
+    }
+
+    .signup-card {
+      position: relative;
+      background:
+        linear-gradient(
+          132deg,
+          #fff500 0 21%,
+          #ff80c8 21% 46%,
+          #69f0ae 46% 72%,
+          #80d8ff 72% 100%
+        );
+      border: 7px dashed #f50057;
+      border-radius: 5px 54px 12px 38px;
+      animation: badCardPulse 4.5s linear infinite;
+    }
+
+    .signup-card::before {
+      content: "100% USER FRIENDLY";
+      position: absolute;
+      top: -19px;
+      left: 8%;
+      padding: 5px 12px;
+      color: #ffff00;
+      background: #5b00a8;
+      border: 3px solid #ff6d00;
+      font-family: "Courier New", monospace;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      transform: rotate(-4deg);
+    }
+
+    h1 {
+      width: fit-content;
+      margin-right: auto;
+      margin-left: auto;
+      padding: 7px 14px;
+      color: #39ff14;
+      background: #6200ea;
+      border: 5px double #ff6d00;
+      border-radius: 18px 0 22px 3px;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(29px, 3.1vw, 46px);
+      letter-spacing: 4px;
+      text-align: center;
+      text-shadow:
+        3px 3px 0 #ff1744,
+        -3px -3px 0 #00b0ff;
+      text-transform: uppercase;
+      animation: headingWobble 5s ease-in-out infinite;
+    }
+
+    .subtitle {
+      width: fit-content;
+      margin-right: auto;
+      margin-left: auto;
+      padding: 5px 10px;
+      color: #b00020;
+      background: #00ffff;
+      border: 3px dotted #3f00ff;
+      font-family: "Courier New", monospace;
+      font-weight: 900;
+      text-align: center;
+      text-decoration: underline wavy #ff00aa;
+      transform: rotate(0.8deg);
+    }
+
+    #signupForm > .field {
+      padding: 12px;
+      border-width: 4px;
+      border-style: ridge;
+      box-shadow:
+        7px 7px 0 rgba(0, 0, 0, 0.2),
+        inset 0 0 0 3px rgba(255, 255, 255, 0.38);
+    }
+
+    #signupForm > .field > label::after {
+      content: " REQUIRED!!!";
+      display: inline-block;
+      margin-left: 5px;
+      color: #ff003c;
+      font-family: "Courier New", monospace;
+      font-size: 10px;
+      font-weight: 900;
+      animation: requiredBlink 1.8s step-end infinite;
+    }
+
+    .name-field {
+      color: #3d0066;
+      background: #c6ff00;
+      border-color: #ff00d4;
+      border-radius: 0 31px 4px 19px;
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
+    }
+
+    .phone-field {
+      color: #0037ff;
+      background: #ff9800;
+      border-color: #004cff;
+      border-radius: 28px 2px 34px 6px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .email-field {
+      color: #7a0000;
+      background: #00e5ff;
+      border-color: #ff1744;
+      border-radius: 4px 38px 0 27px;
+      font-family: "Courier New", monospace;
+    }
+
+    .dob-field {
+      color: #004d1a;
+      background: #ff80ab;
+      border-color: #006400;
+      border-radius: 37px 3px 25px 0;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    .password-field {
+      color: #2d0078;
+      background: #fff176;
+      border-color: #8e24aa;
+      border-radius: 3px 26px 2px 41px;
+      font-family: Verdana, Geneva, sans-serif;
+    }
+
+    .confirm-password-field {
+      color: #5b2100;
+      background: #b388ff;
+      border-color: #ff6d00;
+      border-radius: 32px 0 9px 27px;
+      font-family: "Lucida Console", Monaco, monospace;
+    }
+
+    .name-field > label {
+      color: #f00000;
+      font-size: 20px;
+      text-align: right;
+      transform: rotate(-2deg);
+    }
+
+    .phone-field > label {
+      color: #002bff;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: lowercase;
+    }
+
+    .email-field > label {
+      color: #8b0000;
+      font-size: 18px;
+      text-align: center;
+      transform: skewX(-12deg);
+    }
+
+    .dob-field > label {
+      color: #005c20;
+      font-size: 21px;
+      text-decoration: overline;
+    }
+
+    .password-field > label {
+      color: #7100a8;
+      font-size: 13px;
+      text-align: right;
+      text-transform: uppercase;
+    }
+
+    .confirm-password-field > label {
+      color: #7c2500;
+      font-size: 17px;
+      letter-spacing: -1px;
+      transform: rotate(1.5deg);
+    }
+
+    .name-field input {
+      color: #8500a8;
+      background: #fff200;
+      border: 5px groove #003cff;
+      border-radius: 0;
+      font-family: "Comic Sans MS", cursive;
+      transform: rotate(0.6deg);
+    }
+
+    .email-field input {
+      color: #00ff55;
+      background: #171717;
+      border: 4px double #ff1744;
+      border-radius: 26px;
+      font-family: "Courier New", monospace;
+    }
+
+    .password-field input {
+      color: #ffffff;
+      background: #4a148c;
+      border: 5px inset #ffea00;
+      border-radius: 2px 28px 2px 28px;
+      font-family: Verdana, sans-serif;
+    }
+
+    .confirm-password-field input {
+      color: #9b0000;
+      background: #ffeb3b;
+      border: 5px double #00838f;
+      border-radius: 31px 0 31px 0;
+      font-family: "Lucida Console", monospace;
+    }
+
+    input::placeholder {
+      color: #ff5c00;
+      font-family: Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+      opacity: 1;
+    }
+
+    input:focus {
+      border-color: #ff00c8;
+      box-shadow:
+        0 0 0 5px #00ff73,
+        0 0 0 9px #ffea00;
+    }
+
+    .phone-picker {
+      background: #ffec80;
+      border: 5px dotted #e00000;
+      border-radius: 29px 0 22px 3px;
+    }
+
+    .phone-digit:nth-child(odd) {
+      color: #d50000;
+      background: #ffeb3b;
+      border-color: #6200ea;
+      transform: translateY(3px) rotate(-2deg);
+    }
+
+    .phone-digit:nth-child(even) {
+      color: #004dff;
+      background: #69f0ae;
+      border-color: #ff00aa;
+      transform: translateY(-3px) rotate(2deg);
+    }
+
+    .phone-digit.active {
+      color: white;
+      background: #ff00a8;
+      border-color: #00ff66;
+      box-shadow: 0 0 0 4px #fff500;
+      transform: rotate(7deg) scale(1.08);
+    }
+
+    .phone-button.restart {
+      color: #ffff00;
+      background: #e00000;
+      border: 5px outset #ff8a80;
+      border-radius: 0;
+      font-family: Impact, sans-serif;
+      font-size: 17px;
+      letter-spacing: 1px;
+    }
+
+    .phone-button.set {
+      color: #ffff00;
+      background: #5d4037;
+      border: 5px inset #00e5ff;
+      border-radius: 29px 2px;
+      font-family: "Courier New", monospace;
+    }
+
+    .dob-picker {
+      background: #b2ff59;
+      border: 6px double #ff1744;
+      border-radius: 0 34px 5px 21px;
+    }
+
+    .dob-value {
+      color: #5b00a8;
+      background: #00ff66;
+      border-color: #ff0000;
+      border-radius: 50% 7px 45% 3px;
+      font-family: "Courier New", monospace;
+      transform: rotate(-1deg);
+    }
+
+    .dob-step-button {
+      color: #3a006b;
+      background: #ffea00;
+      border: 4px outset #ff00a8;
+      border-radius: 17px 0;
+      font-family: "Comic Sans MS", cursive;
+    }
+
+    .dob-year-reset {
+      color: #ffff00;
+      background: #d50000;
+      border-color: #ff8a80;
+      font-size: 17px;
+      transform: scale(1.08) rotate(1deg);
+    }
+
+    .email-confirm,
+    .password-confirm {
+      width: 39%;
+      min-height: 31px;
+      justify-self: end;
+      padding: 5px 8px;
+      color: #5f6368;
+      background: #d8d8d8;
+      border: 4px outset #ffffff;
+      border-radius: 0;
+      cursor: help;
+      font-family: "Times New Roman", serif;
+      font-size: 10px;
+      font-weight: normal;
+      text-transform: lowercase;
+      box-shadow: none;
+    }
+
+    .email-confirm.confirmed,
+    .password-confirm.confirmed {
+      color: #4c003f;
+      background: #ff80d5;
+      border-color: #6a00ff;
+    }
+
+    .error:not(:empty),
+    .email-retype-error:not(:empty) {
+      padding: 3px 5px;
+      color: #ff5a00;
+      background: #c6ff00;
+      border: 2px dotted #6a00ff;
+      font-family: "Courier New", monospace;
+      font-weight: 900;
+      text-transform: uppercase;
+      transform: rotate(-0.4deg);
+    }
+
+    .submit-btn {
+      color: #8b8f97;
+      background: #d1d5db;
+      border: 3px solid #9ca3af;
+      border-radius: 2px;
+      cursor: not-allowed;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+      font-weight: normal;
+      letter-spacing: -0.8px;
+      box-shadow: none;
+      opacity: 0.88;
+      transform: skewX(-8deg);
+    }
+
+    .submit-btn:hover {
+      color: #777b84;
+      background: #c7cbd1;
+      transform: skewX(8deg) translateY(1px);
+    }
+
+    .floating-keyboard-card {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #ffea00 0 24px,
+          #ff80c8 24px 48px,
+          #69f0ae 48px 72px
+        );
+      border: 8px ridge #6200ea;
+      border-radius: 3px 46px 8px 31px;
+    }
+
+    .floating-keyboard-card h2 {
+      color: #ffff00;
+      background: #d50000;
+      border: 4px dotted #00e5ff;
+      font-family: Impact, sans-serif;
+      letter-spacing: 3px;
+      transform: rotate(-1deg);
+    }
+
+    .floating-letter:nth-child(3n + 1) {
+      color: #ff1744;
+      background: #ffea00;
+      border-color: #6200ea;
+      transform: rotate(-5deg);
+    }
+
+    .floating-letter:nth-child(3n + 2) {
+      color: #003cff;
+      background: #69f0ae;
+      border-color: #ff00a8;
+      transform: rotate(4deg);
+    }
+
+    .floating-letter:nth-child(3n) {
+      color: #ffffff;
+      background: #ff6d00;
+      border-color: #00e5ff;
+      transform: rotate(-1deg);
+    }
+
+    .email-modal-card {
+      background:
+        repeating-linear-gradient(
+          -35deg,
+          #ffeb3b 0 20px,
+          #00e5ff 20px 40px,
+          #ff80ab 40px 60px
+        );
+      border: 8px double #6200ea;
+      border-radius: 0 44px 6px 29px;
+      font-family: "Comic Sans MS", cursive;
+    }
+
+    .email-modal-card h2,
+    .email-modal-card p {
+      padding: 5px;
+      color: #5b0038;
+      background: rgba(255, 255, 255, 0.82);
+      border: 2px dashed #ff1744;
+    }
+
+    .email-modal-button.edit {
+      color: #ffff00;
+      background: #d50000;
+      border: 5px outset #ff8a80;
+      border-radius: 0;
+      font-family: Impact, sans-serif;
+      font-size: 17px;
+    }
+
+    .email-modal-button.yes {
+      color: #5f6368;
+      background: #d8d8d8;
+      border: 3px solid #9ca3af;
+      border-radius: 22px;
+      font-family: "Times New Roman", serif;
+      font-size: 10px;
+    }
+
+    @media (min-width: 900px) {
+      #signupForm {
+        grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+      }
+
+      .name-field,
+      .phone-field,
+      .password-field {
+        transform: translateX(-9px) rotate(-0.45deg);
+      }
+
+      .email-field,
+      .dob-field,
+      .confirm-password-field {
+        transform: translate(11px, 10px) rotate(0.55deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .signup-card,
+      h1,
+      #signupForm > .field > label::after {
+        animation: none;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <main class="signup-card">
+    <h1>Create your account</h1>
+    <p class="subtitle">Enter your details to get started.</p>
+
+    <form id="signupForm" novalidate>
+      <div class="field name-field">
+        <label for="fullName">Full name</label>
+        <input
+          type="text"
+          id="fullName"
+          placeholder="Tap to open the floating keyboard"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          inputmode="none"
+          spellcheck="false"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          aria-haspopup="dialog"
+          readonly
+        >
+        <small class="error" id="nameError"></small>
+      </div>
+
+      <div class="field phone-field">
+        <label id="phoneLabel">Phone number</label>
+        <div
+          class="phone-picker"
+          id="phonePicker"
+          role="group"
+          aria-labelledby="phoneLabel"
+          aria-invalid="false"
+          tabindex="-1"
+        >
+          <div class="phone-digits" id="phoneDigits" aria-label="Phone number digits">
+            <span class="phone-digit active" data-index="0">0</span>
+            <span class="phone-digit" data-index="1"></span>
+            <span class="phone-digit" data-index="2"></span>
+            <span class="phone-digit" data-index="3"></span>
+            <span class="phone-digit" data-index="4"></span>
+            <span class="phone-digit" data-index="5"></span>
+            <span class="phone-digit" data-index="6"></span>
+            <span class="phone-digit" data-index="7"></span>
+            <span class="phone-digit" data-index="8"></span>
+            <span class="phone-digit" data-index="9"></span>
+          </div>
+
+          <div class="phone-actions">
+            <button type="button" class="phone-button restart" id="restartPhone">
+              Restart
+            </button>
+            <button type="button" class="phone-button set" id="setPhoneDigit">
+              Set digit
+            </button>
+          </div>
+
+          <small class="phone-status" id="phoneStatus" role="status" aria-live="polite">
+            Press Set digit to lock the moving number.
+          </small>
+        </div>
+        <input type="hidden" id="phoneNumber" name="phoneNumber">
+        <small class="error" id="phoneError"></small>
+      </div>
+
+      <div class="field email-field">
+        <label for="email">Email address</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="you@example.com"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          aria-busy="false"
+          readonly
+        >
+        <div class="name-feedback">
+          <small
+            class="processing-status"
+            id="emailProcessing"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="spinner" aria-hidden="true"></span>
+            Processing...
+          </small>
+          <small class="error" id="emailError"></small>
+        </div>
+        <button type="button" class="email-confirm" id="confirmEmail" disabled>
+          Confirm email
+        </button>
+      </div>
+
+      <div class="field dob-field">
+        <label id="dobLabel">Date of birth</label>
+        <div
+          class="dob-picker"
+          id="dobPicker"
+          role="group"
+          aria-labelledby="dobLabel"
+          aria-invalid="false"
+          tabindex="-1"
+        >
+          <div class="dob-units">
+            <div class="dob-unit">
+              <span class="dob-unit-label">Day</span>
+              <span class="dob-value" id="dobDayValue">01</span>
+              <button type="button" class="dob-step-button" id="addDobDay">
+                +1 Day
+              </button>
+            </div>
+            <div class="dob-unit">
+              <span class="dob-unit-label">Month</span>
+              <span class="dob-value" id="dobMonthValue">01</span>
+              <button type="button" class="dob-step-button" id="addDobMonth">
+                +1 Month
+              </button>
+            </div>
+            <div class="dob-unit">
+              <span class="dob-unit-label">Year</span>
+              <span class="dob-value" id="dobYearValue">1900</span>
+              <div class="dob-year-actions">
+                <button type="button" class="dob-step-button" id="dobYearEarlier">
+                  Earlier
+                </button>
+                <button type="button" class="dob-step-button" id="dobYearLater">
+                  Later
+                </button>
+                <button
+                  type="button"
+                  class="dob-step-button dob-year-confirm"
+                  id="confirmDobYear"
+                >
+                  Correct
+                </button>
+                <button
+                  type="button"
+                  class="dob-step-button dob-year-reset"
+                  id="resetDobYear"
+                >
+                  Reset
+                </button>
+                <span
+                  class="dob-year-status"
+                  id="dobYearStatus"
+                  aria-live="polite"
+                >
+                  Is 1900 correct?
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="dateOfBirth" name="dateOfBirth">
+        <small class="error" id="dobError"></small>
+      </div>
+
+      <div class="field password-field">
+        <label for="password">Password</label>
+        <div class="password-box">
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter a password"
+            autocomplete="new-password"
+            aria-describedby="passwordError"
+          >
+        </div>
+        <button
+          type="button"
+          class="password-confirm"
+          id="confirmPasswordRules"
+          aria-describedby="passwordError"
+        >
+          Confirm
+        </button>
+        <small
+          class="error"
+          id="passwordError"
+          aria-live="polite"
+        ></small>
+      </div>
+
+      <div class="field confirm-password-field">
+        <label for="confirmPassword">Confirm password backwards</label>
+        <div class="password-box">
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Enter your password backwards"
+            autocomplete="new-password"
+          >
+        </div>
+        <button
+          type="button"
+          class="password-confirm"
+          id="confirmBackwardPassword"
+          aria-describedby="confirmError"
+        >
+          Confirm
+        </button>
+        <small
+          class="error"
+          id="confirmError"
+          aria-live="polite"
+        ></small>
+      </div>
+
+      <button type="submit" class="submit-btn">Create account</button>
+      <div class="success-message" id="successMessage" role="status"></div>
+    </form>
+
+  </main>
+
+  <div
+    class="floating-keyboard-modal"
+    id="floatingKeyboardModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="floatingKeyboardTitle"
+    aria-hidden="true"
+  >
+    <div class="floating-keyboard-card">
+      <h2 id="floatingKeyboardTitle">Catch the letters</h2>
+      <p class="floating-keyboard-help">
+        Tap a letter to type it. The keyboard shuffles after every tap.
+      </p>
+      <div
+        class="floating-name-preview empty"
+        id="floatingNamePreview"
+        aria-live="polite"
+      >
+        Your name will appear here
+      </div>
+      <div
+        class="floating-letter-stage"
+        id="floatingLetterStage"
+        aria-label="Floating letter keyboard"
+      ></div>
+      <div class="floating-name-status" id="floatingNameStatus">
+        0 / 6 letters
+      </div>
+      <div class="floating-keyboard-controls">
+        <button
+          type="button"
+          class="floating-control secondary"
+          id="cancelNameKeyboard"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="floating-control secondary"
+          id="addNameSpace"
+        >
+          Space
+        </button>
+        <button
+          type="button"
+          class="floating-control secondary"
+          id="clearNameKeyboard"
+          aria-label="Clear the whole name"
+        >
+          ⌫
+        </button>
+        <button
+          type="button"
+          class="floating-control done"
+          id="finishNameKeyboard"
+          disabled
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="email-modal"
+    id="emailConfirmModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="emailConfirmTitle"
+    aria-hidden="true"
+  >
+    <div class="email-modal-card">
+      <h2 id="emailConfirmTitle">Check if this email is correct</h2>
+
+      <div id="emailReviewStep">
+        <p>
+          Please check the email once more.
+          <span class="email-to-confirm" id="emailToConfirm"></span>
+        </p>
+        <div class="email-modal-actions">
+          <button type="button" class="email-modal-button edit" id="editEmail">
+            Edit
+          </button>
+          <button type="button" class="email-modal-button yes" id="acceptEmail">
+            Yes
+          </button>
+        </div>
+      </div>
+
+      <div id="emailRetypeStep" hidden>
+        <p>Type the same email again to continue.</p>
+        <input
+          class="email-retype-input"
+          type="email"
+          id="retypedEmail"
+          placeholder="Retype your email"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          readonly
+        >
+        <div class="retype-feedback">
+          <small
+            class="processing-status"
+            id="retypeEmailProcessing"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="spinner" aria-hidden="true"></span>
+            Processing...
+          </small>
+          <small class="email-retype-error" id="retypedEmailError"></small>
+        </div>
+        <div class="email-modal-actions">
+          <button
+            type="button"
+            class="email-modal-button edit"
+            id="editOriginalEmail"
+          >
+            Edit original
+          </button>
+          <button
+            type="button"
+            class="email-modal-button yes"
+            id="verifyRetypedEmail"
+            disabled
+          >
+            Verify email
+          </button>
+        </div>
+      </div>
+
+      <div id="emailBackwardStep" hidden>
+        <p>Enter every character in reverse order.</p>
+        <input
+          class="email-retype-input"
+          type="text"
+          inputmode="email"
+          id="backwardEmail"
+          placeholder="Enter email backwards"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          readonly
+        >
+        <div class="retype-feedback">
+          <small
+            class="processing-status"
+            id="backwardEmailProcessing"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="spinner" aria-hidden="true"></span>
+            Processing...
+          </small>
+          <small class="email-retype-error" id="backwardEmailError"></small>
+        </div>
+        <div class="email-modal-actions">
+          <button
+            type="button"
+            class="email-modal-button edit"
+            id="editOriginalFromBackward"
+          >
+            Edit original
+          </button>
+          <button
+            type="button"
+            class="email-modal-button yes"
+            id="verifyBackwardEmail"
+            disabled
+          >
+            Verify backwards
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("signupForm");
+    const fullName = document.getElementById("fullName");
+    const floatingKeyboardModal = document.getElementById("floatingKeyboardModal");
+    const floatingLetterStage = document.getElementById("floatingLetterStage");
+    const floatingNamePreview = document.getElementById("floatingNamePreview");
+    const floatingNameStatus = document.getElementById("floatingNameStatus");
+    const cancelNameKeyboard = document.getElementById("cancelNameKeyboard");
+    const addNameSpace = document.getElementById("addNameSpace");
+    const clearNameKeyboard = document.getElementById("clearNameKeyboard");
+    const finishNameKeyboard = document.getElementById("finishNameKeyboard");
+    const email = document.getElementById("email");
+    const confirmEmail = document.getElementById("confirmEmail");
+    const dobPicker = document.getElementById("dobPicker");
+    const dateOfBirth = document.getElementById("dateOfBirth");
+    const dobDayValue = document.getElementById("dobDayValue");
+    const dobMonthValue = document.getElementById("dobMonthValue");
+    const dobYearValue = document.getElementById("dobYearValue");
+    const addDobDay = document.getElementById("addDobDay");
+    const addDobMonth = document.getElementById("addDobMonth");
+    const dobYearEarlier = document.getElementById("dobYearEarlier");
+    const dobYearLater = document.getElementById("dobYearLater");
+    const confirmDobYear = document.getElementById("confirmDobYear");
+    const resetDobYear = document.getElementById("resetDobYear");
+    const dobYearStatus = document.getElementById("dobYearStatus");
+    const dobError = document.getElementById("dobError");
+    const emailConfirmModal = document.getElementById("emailConfirmModal");
+    const emailConfirmTitle = document.getElementById("emailConfirmTitle");
+    const emailReviewStep = document.getElementById("emailReviewStep");
+    const emailRetypeStep = document.getElementById("emailRetypeStep");
+    const emailToConfirm = document.getElementById("emailToConfirm");
+    const editEmail = document.getElementById("editEmail");
+    const acceptEmail = document.getElementById("acceptEmail");
+    const retypedEmail = document.getElementById("retypedEmail");
+    const retypedEmailError = document.getElementById("retypedEmailError");
+    const retypeEmailProcessing = document.getElementById("retypeEmailProcessing");
+    const editOriginalEmail = document.getElementById("editOriginalEmail");
+    const verifyRetypedEmail = document.getElementById("verifyRetypedEmail");
+    const emailBackwardStep = document.getElementById("emailBackwardStep");
+    const backwardEmail = document.getElementById("backwardEmail");
+    const backwardEmailProcessing = document.getElementById("backwardEmailProcessing");
+    const backwardEmailError = document.getElementById("backwardEmailError");
+    const editOriginalFromBackward = document.getElementById("editOriginalFromBackward");
+    const verifyBackwardEmail = document.getElementById("verifyBackwardEmail");
+    const password = document.getElementById("password");
+    const confirmPasswordRules =
+      document.getElementById("confirmPasswordRules");
+    const passwordError = document.getElementById("passwordError");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const confirmBackwardPassword =
+      document.getElementById("confirmBackwardPassword");
+    const confirmError = document.getElementById("confirmError");
+    const successMessage = document.getElementById("successMessage");
+    const emailProcessing = document.getElementById("emailProcessing");
+    const phonePicker = document.getElementById("phonePicker");
+    const phoneNumber = document.getElementById("phoneNumber");
+    const phoneStatus = document.getElementById("phoneStatus");
+    const phoneError = document.getElementById("phoneError");
+    const setPhoneDigit = document.getElementById("setPhoneDigit");
+    const restartPhone = document.getElementById("restartPhone");
+    const phoneDigitBoxes = Array.from(document.querySelectorAll(".phone-digit"));
+    let floatingNameDraft = "";
+    const minimumDobYear = 1900;
+    let dobDay = 1;
+    let dobMonth = 1;
+    let dobYear = minimumDobYear;
+    let dobYearLower = minimumDobYear;
+    let dobYearUpper = new Date().getFullYear();
+    let isDobYearConfirmed = false;
+    let isEmailProcessing = false;
+    let emailProcessingTimer;
+    let isEmailConfirmed = false;
+    let isPasswordConfirmed = false;
+    let isBackwardPasswordConfirmed = false;
+    let isEmailReviewOpen = false;
+    let acceptedEmail = "";
+    let acceptedRetypedEmail = "";
+    let isRetypeEmailProcessing = false;
+    let retypeEmailProcessingTimer;
+    let acceptedBackwardEmail = "";
+    let isBackwardEmailProcessing = false;
+    let backwardEmailProcessingTimer;
+    let selectedPhoneDigits = Array(10).fill(null);
+
+    fullName.value = "";
+    email.value = "";
+    retypedEmail.value = "";
+    backwardEmail.value = "";
+    let activePhoneDigit = 0;
+    let movingPhoneDigit = 0;
+    let phoneCounterTimer;
+
+    function showError(input, errorId, message) {
+      document.getElementById(errorId).textContent = message;
+      input.setAttribute("aria-invalid", message ? "true" : "false");
+    }
+
+    function validEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function countPasswordCharacters(value) {
+      if (typeof Intl.Segmenter === "function") {
+        const segmenter = new Intl.Segmenter(undefined, {
+          granularity: "grapheme"
+        });
+        return Array.from(segmenter.segment(value)).length;
+      }
+
+      return Array.from(value).length;
+    }
+
+    function reversePassword(value) {
+      if (typeof Intl.Segmenter === "function") {
+        const segmenter = new Intl.Segmenter(undefined, {
+          granularity: "grapheme"
+        });
+        return Array.from(
+          segmenter.segment(value),
+          (part) => part.segment
+        ).reverse().join("");
+      }
+
+      return Array.from(value).reverse().join("");
+    }
+
+    function nextPasswordRule(value) {
+      const rules = [
+        {
+          passes: /[A-Z]/.test(value),
+          message: "Add one capital letter."
+        },
+        {
+          passes: /[a-z]/.test(value),
+          message: "Add one small letter."
+        },
+        {
+          passes: /\d/.test(value),
+          message: "Add one digit."
+        },
+        {
+          passes: value.includes("@"),
+          message: "Add the @ symbol."
+        },
+        {
+          passes: value.includes("#"),
+          message: "Add the # symbol."
+        },
+        {
+          passes: value.includes("₹"),
+          message: "Add the ₹ symbol."
+        },
+        {
+          passes: value.includes("&"),
+          message: "Add the & symbol."
+        },
+        {
+          passes: countPasswordCharacters(value) === 26,
+          message: "Make the password exactly 26 characters long."
+        }
+      ];
+
+      return rules.find((rule) => !rule.passes)?.message || "";
+    }
+
+    function resetBackwardPasswordConfirmation(clearValue = false) {
+      isBackwardPasswordConfirmed = false;
+      confirmBackwardPassword.disabled = false;
+      confirmBackwardPassword.textContent = "Confirm";
+      confirmBackwardPassword.classList.remove("confirmed");
+      confirmError.classList.remove("accepted");
+
+      if (clearValue) {
+        confirmPassword.value = "";
+      }
+
+      showError(confirmPassword, "confirmError", "");
+    }
+
+    function resetPasswordConfirmation() {
+      isPasswordConfirmed = false;
+      confirmPasswordRules.disabled = false;
+      confirmPasswordRules.textContent = "Confirm";
+      confirmPasswordRules.classList.remove("confirmed");
+      passwordError.classList.remove("accepted");
+      resetBackwardPasswordConfirmation(true);
+      showError(password, "passwordError", "");
+    }
+
+    function countNameLetters(value) {
+      return (value.match(/\p{L}/gu) || []).length;
+    }
+
+    function daysInDobMonth() {
+      return new Date(dobYear, dobMonth, 0).getDate();
+    }
+
+    function updateDob() {
+      dobDay = Math.min(dobDay, daysInDobMonth());
+      dobDayValue.textContent = String(dobDay).padStart(2, "0");
+      dobMonthValue.textContent = String(dobMonth).padStart(2, "0");
+      dobYearValue.textContent = String(dobYear);
+      dateOfBirth.value =
+        String(dobYear) + "-" +
+        String(dobMonth).padStart(2, "0") + "-" +
+        String(dobDay).padStart(2, "0");
+      dobPicker.setAttribute("aria-invalid", "false");
+      dobError.textContent = "";
+      updateDobYearGuessControls();
+    }
+
+    function updateDobYearGuessControls() {
+      const onlyOneYearLeft = dobYearLower === dobYearUpper;
+
+      dobYearEarlier.disabled =
+        isDobYearConfirmed || dobYear <= dobYearLower;
+      dobYearLater.disabled =
+        isDobYearConfirmed || dobYear >= dobYearUpper;
+      confirmDobYear.disabled = isDobYearConfirmed;
+      confirmDobYear.textContent =
+        isDobYearConfirmed ? "Confirmed" : "Correct";
+      confirmDobYear.classList.toggle(
+        "confirmed",
+        isDobYearConfirmed
+      );
+
+      if (isDobYearConfirmed) {
+        dobYearStatus.textContent = "Year confirmed";
+      } else if (onlyOneYearLeft) {
+        dobYearStatus.textContent = "Only one year left. Is this it?";
+      } else {
+        dobYearStatus.textContent = "Is " + dobYear + " correct?";
+      }
+    }
+
+    function resetDobYearGuess() {
+      dobYearLower = minimumDobYear;
+      dobYearUpper = new Date().getFullYear();
+      dobYear = minimumDobYear;
+      isDobYearConfirmed = false;
+      updateDob();
+    }
+
+    function resetDob() {
+      dobDay = 1;
+      dobMonth = 1;
+      resetDobYearGuess();
+    }
+
+    function dobIsInFuture() {
+      const selected = new Date(dobYear, dobMonth - 1, dobDay);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return selected > today;
+    }
+
+    addDobDay.addEventListener("click", () => {
+      dobDay = dobDay >= daysInDobMonth() ? 1 : dobDay + 1;
+      updateDob();
+    });
+
+    addDobMonth.addEventListener("click", () => {
+      dobMonth = dobMonth >= 12 ? 1 : dobMonth + 1;
+      updateDob();
+    });
+
+    function guessDobYear(direction) {
+      if (isDobYearConfirmed) {
+        return;
+      }
+
+      if (direction === "earlier") {
+        dobYearUpper = dobYear - 1;
+      } else {
+        dobYearLower = dobYear + 1;
+      }
+
+      if (dobYearLower > dobYearUpper) {
+        dobError.textContent =
+          "The year escaped. Start the guessing game again.";
+        dobPicker.setAttribute("aria-invalid", "true");
+        return;
+      }
+
+      dobYear = Math.floor((dobYearLower + dobYearUpper) / 2);
+      updateDob();
+    }
+
+    dobYearEarlier.addEventListener("click", () => {
+      guessDobYear("earlier");
+    });
+
+    dobYearLater.addEventListener("click", () => {
+      guessDobYear("later");
+    });
+
+    confirmDobYear.addEventListener("click", () => {
+      isDobYearConfirmed = true;
+      dobPicker.setAttribute("aria-invalid", "false");
+      dobError.textContent = "";
+      updateDobYearGuessControls();
+    });
+
+    resetDobYear.addEventListener("click", () => {
+      resetDobYearGuess();
+    });
+
+    function startPhoneCounter() {
+      clearInterval(phoneCounterTimer);
+
+      if (activePhoneDigit >= phoneDigitBoxes.length) {
+        return;
+      }
+
+      phoneDigitBoxes.forEach((box, index) => {
+        box.classList.toggle("active", index === activePhoneDigit);
+      });
+
+      movingPhoneDigit = 0;
+      phoneDigitBoxes[activePhoneDigit].textContent = movingPhoneDigit;
+
+      phoneCounterTimer = setInterval(() => {
+        movingPhoneDigit = (movingPhoneDigit + 1) % 10;
+        phoneDigitBoxes[activePhoneDigit].textContent = movingPhoneDigit;
+      }, 250);
+    }
+
+    function resetPhoneNumber(showMessage = true) {
+      clearInterval(phoneCounterTimer);
+      selectedPhoneDigits = Array(10).fill(null);
+      activePhoneDigit = 0;
+      movingPhoneDigit = 0;
+      phoneNumber.value = "";
+      setPhoneDigit.disabled = false;
+      phonePicker.setAttribute("aria-invalid", "false");
+      phoneError.textContent = "";
+
+      phoneDigitBoxes.forEach((box) => {
+        box.textContent = "";
+        box.classList.remove("active", "locked");
+      });
+
+      if (showMessage) {
+        phoneStatus.textContent = "Restarted. Set the first moving digit.";
+      }
+
+      startPhoneCounter();
+    }
+
+    setPhoneDigit.addEventListener("click", () => {
+      if (activePhoneDigit >= phoneDigitBoxes.length) {
+        return;
+      }
+
+      clearInterval(phoneCounterTimer);
+      selectedPhoneDigits[activePhoneDigit] = String(movingPhoneDigit);
+      phoneDigitBoxes[activePhoneDigit].textContent = movingPhoneDigit;
+      phoneDigitBoxes[activePhoneDigit].classList.remove("active");
+      phoneDigitBoxes[activePhoneDigit].classList.add("locked");
+      activePhoneDigit += 1;
+      phonePicker.setAttribute("aria-invalid", "false");
+      phoneError.textContent = "";
+
+      if (activePhoneDigit === phoneDigitBoxes.length) {
+        phoneNumber.value = selectedPhoneDigits.join("");
+        setPhoneDigit.disabled = true;
+        phoneStatus.textContent = "All 10 digits are set.";
+        return;
+      }
+
+      phoneStatus.textContent =
+        "Digit " + activePhoneDigit + " saved. Set the next moving digit.";
+      startPhoneCounter();
+    });
+
+    restartPhone.addEventListener("click", () => {
+      resetPhoneNumber(true);
+    });
+
+    function isSingleManualCharacter(event, previousValue, currentValue) {
+      const inputType = event.inputType || "";
+      const insertedLength = Array.from(event.data || "").length;
+      const lengthChange =
+        Array.from(currentValue).length - Array.from(previousValue).length;
+
+      return (
+        (inputType === "insertText" || inputType === "insertCompositionText") &&
+        insertedLength === 1 &&
+        lengthChange === 1
+      );
+    }
+
+    function updateFloatingNamePreview() {
+      const letterCount = countNameLetters(floatingNameDraft);
+      const displayName = floatingNameDraft || "Your name will appear here";
+
+      floatingNamePreview.textContent = displayName;
+      floatingNamePreview.classList.toggle("empty", !floatingNameDraft);
+      floatingNameStatus.textContent =
+        letterCount + " / 6 letters" +
+        (letterCount >= 6 ? " — ready" : "");
+      finishNameKeyboard.disabled = letterCount < 6;
+      addNameSpace.disabled =
+        !floatingNameDraft || floatingNameDraft.endsWith(" ");
+      clearNameKeyboard.disabled = !floatingNameDraft;
+    }
+
+    function shuffleFloatingLetters() {
+      const buttons = Array.from(floatingLetterStage.children);
+
+      for (let index = buttons.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [buttons[index], buttons[randomIndex]] = [
+          buttons[randomIndex],
+          buttons[index]
+        ];
+      }
+
+      buttons.forEach((button) => {
+        floatingLetterStage.appendChild(button);
+      });
+    }
+
+    function buildFloatingKeyboard() {
+      if (floatingLetterStage.children.length) return;
+
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach((letter) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "floating-letter";
+        button.textContent = letter;
+        button.setAttribute("aria-label", "Add letter " + letter);
+        button.addEventListener("click", () => {
+          if (floatingNameDraft.length >= 32) return;
+
+          const shouldCapitalize =
+            !floatingNameDraft || floatingNameDraft.endsWith(" ");
+          floatingNameDraft += shouldCapitalize
+            ? letter
+            : letter.toLowerCase();
+          updateFloatingNamePreview();
+          shuffleFloatingLetters();
+        });
+        floatingLetterStage.appendChild(button);
+      });
+    }
+
+    function closeFloatingKeyboard() {
+      floatingKeyboardModal.classList.remove("show");
+      floatingKeyboardModal.setAttribute("aria-hidden", "true");
+      fullName.blur();
+    }
+
+    function openFloatingKeyboard() {
+      if (floatingKeyboardModal.classList.contains("show")) return;
+
+      buildFloatingKeyboard();
+      floatingNameDraft = fullName.value;
+      updateFloatingNamePreview();
+      floatingKeyboardModal.classList.add("show");
+      floatingKeyboardModal.setAttribute("aria-hidden", "false");
+      shuffleFloatingLetters();
+      cancelNameKeyboard.focus();
+    }
+
+    fullName.addEventListener("click", openFloatingKeyboard);
+    fullName.addEventListener("focus", openFloatingKeyboard);
+
+    ["copy", "cut", "paste", "drop"].forEach((eventName) => {
+      fullName.addEventListener(eventName, (event) => {
+        event.preventDefault();
+      });
+    });
+
+    addNameSpace.addEventListener("click", () => {
+      if (
+        floatingNameDraft &&
+        !floatingNameDraft.endsWith(" ") &&
+        floatingNameDraft.length < 32
+      ) {
+        floatingNameDraft += " ";
+        updateFloatingNamePreview();
+        shuffleFloatingLetters();
+      }
+    });
+
+    clearNameKeyboard.addEventListener("click", () => {
+      floatingNameDraft = "";
+      updateFloatingNamePreview();
+      shuffleFloatingLetters();
+    });
+
+    cancelNameKeyboard.addEventListener("click", () => {
+      floatingNameDraft = "";
+      closeFloatingKeyboard();
+    });
+
+    finishNameKeyboard.addEventListener("click", () => {
+      if (countNameLetters(floatingNameDraft) < 6) return;
+
+      fullName.value = floatingNameDraft.trim();
+      fullName.setAttribute("aria-invalid", "false");
+      document.getElementById("nameError").textContent = "";
+      closeFloatingKeyboard();
+    });
+
+    function clearFullName() {
+      floatingNameDraft = "";
+      fullName.value = "";
+      fullName.setAttribute("aria-invalid", "false");
+      document.getElementById("nameError").textContent = "";
+      updateFloatingNamePreview();
+      closeFloatingKeyboard();
+    }
+
+    function unlockEmail() {
+      if (!isEmailProcessing && !isEmailConfirmed && !isEmailReviewOpen) {
+        email.readOnly = false;
+      }
+    }
+
+    email.addEventListener("pointerdown", unlockEmail);
+    email.addEventListener("focus", unlockEmail);
+    email.addEventListener("blur", () => {
+      if (!isEmailProcessing) {
+        email.readOnly = true;
+      }
+    });
+
+    email.addEventListener("input", (event) => {
+      const enteredValue = email.value;
+
+      if (!isSingleManualCharacter(event, acceptedEmail, enteredValue)) {
+        email.value = acceptedEmail;
+        return;
+      }
+
+      acceptedEmail = enteredValue;
+      isEmailConfirmed = false;
+      isEmailReviewOpen = false;
+      confirmEmail.disabled = true;
+      confirmEmail.textContent = "Confirm email";
+      confirmEmail.classList.remove("confirmed");
+      emailConfirmModal.classList.remove("show");
+      emailConfirmModal.setAttribute("aria-hidden", "true");
+      resetEmailReviewSteps();
+
+      if (isEmailProcessing) return;
+
+      isEmailProcessing = true;
+      email.readOnly = true;
+      email.setAttribute("aria-busy", "true");
+      document.getElementById("emailError").textContent = "";
+      emailProcessing.classList.add("show");
+
+      clearTimeout(emailProcessingTimer);
+      emailProcessingTimer = setTimeout(() => {
+        isEmailProcessing = false;
+        email.readOnly = false;
+        email.setAttribute("aria-busy", "false");
+        emailProcessing.classList.remove("show");
+        confirmEmail.disabled = !validEmail(email.value.trim());
+        email.focus();
+      }, 1000);
+    });
+
+    ["copy", "cut", "paste", "drop"].forEach((eventName) => {
+      email.addEventListener(eventName, (event) => {
+        event.preventDefault();
+      });
+    });
+
+    function clearEmail() {
+      clearTimeout(emailProcessingTimer);
+      isEmailProcessing = false;
+      acceptedEmail = "";
+      isEmailConfirmed = false;
+      isEmailReviewOpen = false;
+      email.value = "";
+      email.readOnly = false;
+      confirmEmail.disabled = true;
+      confirmEmail.textContent = "Confirm email";
+      confirmEmail.classList.remove("confirmed");
+      emailConfirmModal.classList.remove("show");
+      emailConfirmModal.setAttribute("aria-hidden", "true");
+      email.setAttribute("aria-busy", "false");
+      email.setAttribute("aria-invalid", "false");
+      document.getElementById("emailError").textContent = "";
+      emailProcessing.classList.remove("show");
+      resetEmailReviewSteps();
+    }
+
+    email.addEventListener("keydown", (event) => {
+      if ((event.key === "Backspace" || event.key === "Delete") && email.value) {
+        event.preventDefault();
+        clearEmail();
+      }
+    });
+
+    email.addEventListener("beforeinput", (event) => {
+      const isBlockedInsert =
+        event.inputType === "insertFromPaste" ||
+        event.inputType === "insertFromDrop" ||
+        event.inputType === "insertReplacementText" ||
+        (event.inputType?.startsWith("insert") &&
+          Array.from(event.data || "").length > 1);
+
+      if (isBlockedInsert) {
+        event.preventDefault();
+        return;
+      }
+
+      if (event.inputType?.startsWith("delete") && email.value) {
+        event.preventDefault();
+        clearEmail();
+      }
+    });
+
+    function resetEmailReviewSteps() {
+      clearTimeout(retypeEmailProcessingTimer);
+      clearTimeout(backwardEmailProcessingTimer);
+      isRetypeEmailProcessing = false;
+      isBackwardEmailProcessing = false;
+      emailConfirmTitle.textContent = "Check if this email is correct";
+      emailReviewStep.hidden = false;
+      emailRetypeStep.hidden = true;
+      emailBackwardStep.hidden = true;
+
+      acceptedRetypedEmail = "";
+      retypedEmail.value = "";
+      retypedEmail.readOnly = true;
+      retypedEmail.setAttribute("aria-busy", "false");
+      retypedEmailError.textContent = "";
+      retypeEmailProcessing.classList.remove("show");
+      verifyRetypedEmail.disabled = true;
+
+      acceptedBackwardEmail = "";
+      backwardEmail.value = "";
+      backwardEmail.readOnly = true;
+      backwardEmail.setAttribute("aria-busy", "false");
+      backwardEmailError.textContent = "";
+      backwardEmailProcessing.classList.remove("show");
+      verifyBackwardEmail.disabled = true;
+    }
+
+    function returnToOriginalEmail() {
+      isEmailReviewOpen = false;
+      isEmailConfirmed = false;
+      emailConfirmModal.classList.remove("show");
+      emailConfirmModal.setAttribute("aria-hidden", "true");
+      resetEmailReviewSteps();
+      confirmEmail.disabled = !validEmail(email.value.trim());
+      confirmEmail.textContent = "Confirm email";
+      confirmEmail.classList.remove("confirmed");
+      email.readOnly = false;
+      email.focus();
+    }
+
+    function clearRetypedEmail() {
+      clearTimeout(retypeEmailProcessingTimer);
+      isRetypeEmailProcessing = false;
+      acceptedRetypedEmail = "";
+      retypedEmail.value = "";
+      retypedEmail.readOnly = false;
+      retypedEmail.setAttribute("aria-busy", "false");
+      retypedEmailError.textContent = "";
+      retypeEmailProcessing.classList.remove("show");
+      verifyRetypedEmail.disabled = true;
+    }
+
+    function clearBackwardEmail() {
+      clearTimeout(backwardEmailProcessingTimer);
+      isBackwardEmailProcessing = false;
+      acceptedBackwardEmail = "";
+      backwardEmail.value = "";
+      backwardEmail.readOnly = false;
+      backwardEmail.setAttribute("aria-busy", "false");
+      backwardEmailError.textContent = "";
+      backwardEmailProcessing.classList.remove("show");
+      verifyBackwardEmail.disabled = true;
+    }
+
+    confirmEmail.addEventListener("click", () => {
+      if (!validEmail(email.value.trim())) {
+        showError(email, "emailError", "Please enter a valid email address.");
+        return;
+      }
+
+      clearTimeout(emailProcessingTimer);
+      isEmailProcessing = false;
+      isEmailConfirmed = false;
+      isEmailReviewOpen = true;
+      email.readOnly = true;
+      email.setAttribute("aria-busy", "false");
+      email.setAttribute("aria-invalid", "false");
+      document.getElementById("emailError").textContent = "";
+      emailProcessing.classList.remove("show");
+      confirmEmail.disabled = true;
+      resetEmailReviewSteps();
+      emailToConfirm.textContent = email.value.trim();
+      emailConfirmModal.classList.add("show");
+      emailConfirmModal.setAttribute("aria-hidden", "false");
+      acceptEmail.focus();
+    });
+
+    acceptEmail.addEventListener("click", () => {
+      emailConfirmTitle.textContent =
+        "I don't trust you. Please retype your email.";
+      emailReviewStep.hidden = true;
+      emailRetypeStep.hidden = false;
+      emailBackwardStep.hidden = true;
+      clearRetypedEmail();
+      retypedEmail.readOnly = false;
+      retypedEmail.focus();
+    });
+
+    editEmail.addEventListener("click", returnToOriginalEmail);
+    editOriginalEmail.addEventListener("click", returnToOriginalEmail);
+    editOriginalFromBackward.addEventListener("click", returnToOriginalEmail);
+
+    retypedEmail.addEventListener("pointerdown", () => {
+      if (!isRetypeEmailProcessing) {
+        retypedEmail.readOnly = false;
+      }
+    });
+
+    retypedEmail.addEventListener("focus", () => {
+      if (!isRetypeEmailProcessing) {
+        retypedEmail.readOnly = false;
+      }
+    });
+
+    retypedEmail.addEventListener("blur", () => {
+      if (!isRetypeEmailProcessing) {
+        retypedEmail.readOnly = true;
+      }
+    });
+
+    retypedEmail.addEventListener("input", (event) => {
+      const enteredValue = retypedEmail.value;
+
+      if (!isSingleManualCharacter(event, acceptedRetypedEmail, enteredValue)) {
+        retypedEmail.value = acceptedRetypedEmail;
+        return;
+      }
+
+      acceptedRetypedEmail = enteredValue;
+      retypedEmailError.textContent = "";
+      verifyRetypedEmail.disabled = true;
+
+      if (isRetypeEmailProcessing) return;
+
+      isRetypeEmailProcessing = true;
+      retypedEmail.readOnly = true;
+      retypedEmail.setAttribute("aria-busy", "true");
+      retypeEmailProcessing.classList.add("show");
+
+      clearTimeout(retypeEmailProcessingTimer);
+      retypeEmailProcessingTimer = setTimeout(() => {
+        isRetypeEmailProcessing = false;
+        retypedEmail.readOnly = false;
+        retypedEmail.setAttribute("aria-busy", "false");
+        retypeEmailProcessing.classList.remove("show");
+        verifyRetypedEmail.disabled = !validEmail(retypedEmail.value.trim());
+        retypedEmail.focus();
+      }, 1000);
+    });
+
+    ["copy", "cut", "paste", "drop"].forEach((eventName) => {
+      retypedEmail.addEventListener(eventName, (event) => {
+        event.preventDefault();
+      });
+    });
+
+    retypedEmail.addEventListener("keydown", (event) => {
+      if (
+        (event.key === "Backspace" || event.key === "Delete") &&
+        retypedEmail.value
+      ) {
+        event.preventDefault();
+        clearRetypedEmail();
+      }
+    });
+
+    retypedEmail.addEventListener("beforeinput", (event) => {
+      const isBlockedInsert =
+        event.inputType === "insertFromPaste" ||
+        event.inputType === "insertFromDrop" ||
+        event.inputType === "insertReplacementText" ||
+        (event.inputType?.startsWith("insert") &&
+          Array.from(event.data || "").length > 1);
+
+      if (isBlockedInsert) {
+        event.preventDefault();
+        return;
+      }
+
+      if (event.inputType?.startsWith("delete") && retypedEmail.value) {
+        event.preventDefault();
+        clearRetypedEmail();
+      }
+    });
+
+    verifyRetypedEmail.addEventListener("click", () => {
+      if (retypedEmail.value.trim() !== email.value.trim()) {
+        clearRetypedEmail();
+        retypedEmailError.textContent =
+          "Emails do not match. Please retype it again.";
+        retypedEmail.focus();
+        return;
+      }
+
+      emailConfirmTitle.textContent =
+        "I still don't trust you. Enter your email backwards.";
+      emailRetypeStep.hidden = true;
+      emailBackwardStep.hidden = false;
+      clearBackwardEmail();
+      backwardEmail.readOnly = false;
+      backwardEmail.focus();
+    });
+
+    backwardEmail.addEventListener("pointerdown", () => {
+      if (!isBackwardEmailProcessing) {
+        backwardEmail.readOnly = false;
+      }
+    });
+
+    backwardEmail.addEventListener("focus", () => {
+      if (!isBackwardEmailProcessing) {
+        backwardEmail.readOnly = false;
+      }
+    });
+
+    backwardEmail.addEventListener("blur", () => {
+      if (!isBackwardEmailProcessing) {
+        backwardEmail.readOnly = true;
+      }
+    });
+
+    backwardEmail.addEventListener("input", (event) => {
+      const enteredValue = backwardEmail.value;
+
+      if (!isSingleManualCharacter(event, acceptedBackwardEmail, enteredValue)) {
+        backwardEmail.value = acceptedBackwardEmail;
+        return;
+      }
+
+      acceptedBackwardEmail = enteredValue;
+      backwardEmailError.textContent = "";
+      verifyBackwardEmail.disabled = true;
+
+      if (isBackwardEmailProcessing) return;
+
+      isBackwardEmailProcessing = true;
+      backwardEmail.readOnly = true;
+      backwardEmail.setAttribute("aria-busy", "true");
+      backwardEmailProcessing.classList.add("show");
+
+      clearTimeout(backwardEmailProcessingTimer);
+      backwardEmailProcessingTimer = setTimeout(() => {
+        isBackwardEmailProcessing = false;
+        backwardEmail.readOnly = false;
+        backwardEmail.setAttribute("aria-busy", "false");
+        backwardEmailProcessing.classList.remove("show");
+        verifyBackwardEmail.disabled =
+          Array.from(backwardEmail.value).length !==
+          Array.from(email.value.trim()).length;
+        backwardEmail.focus();
+      }, 1000);
+    });
+
+    ["copy", "cut", "paste", "drop"].forEach((eventName) => {
+      backwardEmail.addEventListener(eventName, (event) => {
+        event.preventDefault();
+      });
+    });
+
+    backwardEmail.addEventListener("keydown", (event) => {
+      if (
+        (event.key === "Backspace" || event.key === "Delete") &&
+        backwardEmail.value
+      ) {
+        event.preventDefault();
+        clearBackwardEmail();
+      }
+    });
+
+    backwardEmail.addEventListener("beforeinput", (event) => {
+      const isBlockedInsert =
+        event.inputType === "insertFromPaste" ||
+        event.inputType === "insertFromDrop" ||
+        event.inputType === "insertReplacementText" ||
+        (event.inputType?.startsWith("insert") &&
+          Array.from(event.data || "").length > 1);
+
+      if (isBlockedInsert) {
+        event.preventDefault();
+        return;
+      }
+
+      if (event.inputType?.startsWith("delete") && backwardEmail.value) {
+        event.preventDefault();
+        clearBackwardEmail();
+      }
+    });
+
+    verifyBackwardEmail.addEventListener("click", () => {
+      const expectedBackwardEmail =
+        Array.from(email.value.trim()).reverse().join("");
+
+      if (backwardEmail.value.trim() !== expectedBackwardEmail) {
+        clearBackwardEmail();
+        backwardEmailError.textContent =
+          "That is not your email backwards. Try again.";
+        backwardEmail.focus();
+        return;
+      }
+
+      isEmailReviewOpen = false;
+      isEmailConfirmed = true;
+      emailConfirmModal.classList.remove("show");
+      emailConfirmModal.setAttribute("aria-hidden", "true");
+      confirmEmail.disabled = true;
+      confirmEmail.textContent = "Email confirmed";
+      confirmEmail.classList.add("confirmed");
+      password.focus();
+    });
+
+    confirmPasswordRules.addEventListener("click", () => {
+      const passwordRule = nextPasswordRule(password.value);
+
+      passwordError.classList.remove("accepted");
+
+      if (passwordRule) {
+        isPasswordConfirmed = false;
+        showError(password, "passwordError", passwordRule);
+        password.focus();
+        return;
+      }
+
+      isPasswordConfirmed = true;
+      showError(password, "passwordError", "");
+      passwordError.textContent =
+        "Password accepted. Enter it backwards below.";
+      passwordError.classList.add("accepted");
+      confirmPasswordRules.textContent = "Password confirmed";
+      confirmPasswordRules.classList.add("confirmed");
+      confirmPasswordRules.disabled = true;
+      confirmPassword.focus();
+    });
+
+    confirmBackwardPassword.addEventListener("click", () => {
+      confirmError.classList.remove("accepted");
+
+      if (!isPasswordConfirmed) {
+        isBackwardPasswordConfirmed = false;
+        showError(
+          confirmPassword,
+          "confirmError",
+          "Confirm your original password first."
+        );
+        password.focus();
+        return;
+      }
+
+      if (
+        !confirmPassword.value ||
+        confirmPassword.value !== reversePassword(password.value)
+      ) {
+        isBackwardPasswordConfirmed = false;
+        showError(
+          confirmPassword,
+          "confirmError",
+          "That is not your password backwards."
+        );
+        confirmPassword.focus();
+        return;
+      }
+
+      isBackwardPasswordConfirmed = true;
+      showError(confirmPassword, "confirmError", "");
+      confirmError.textContent = "Backwards password verified.";
+      confirmError.classList.add("accepted");
+      confirmBackwardPassword.textContent = "Password verified";
+      confirmBackwardPassword.classList.add("confirmed");
+      confirmBackwardPassword.disabled = true;
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      let isValid = true;
+
+      showError(fullName, "nameError", "");
+      showError(email, "emailError", "");
+      showError(password, "passwordError", "");
+      showError(confirmPassword, "confirmError", "");
+      phonePicker.setAttribute("aria-invalid", "false");
+      phoneError.textContent = "";
+      dobPicker.setAttribute("aria-invalid", "false");
+      dobError.textContent = "";
+      successMessage.classList.remove("show");
+
+      if (countNameLetters(fullName.value) < 6) {
+        showError(fullName, "nameError", "Name must contain at least 6 letters.");
+        isValid = false;
+      }
+
+      if (selectedPhoneDigits.some((digit) => digit === null)) {
+        phonePicker.setAttribute("aria-invalid", "true");
+        phoneError.textContent = "Please set all 10 phone number digits.";
+        isValid = false;
+      }
+
+      if (!validEmail(email.value.trim())) {
+        showError(email, "emailError", "Please enter a valid email address.");
+        isValid = false;
+      } else if (!isEmailConfirmed) {
+        showError(email, "emailError", "Please confirm your email address.");
+        isValid = false;
+      }
+
+      if (!isDobYearConfirmed) {
+        dobPicker.setAttribute("aria-invalid", "true");
+        dobError.textContent =
+          "Please finish guessing and confirm your birth year.";
+        isValid = false;
+      } else if (!dateOfBirth.value || dobIsInFuture()) {
+        dobPicker.setAttribute("aria-invalid", "true");
+        dobError.textContent = "Please select a valid date of birth.";
+        isValid = false;
+      }
+
+      if (!isPasswordConfirmed) {
+        showError(
+          password,
+          "passwordError",
+          "Press Confirm to check your password."
+        );
+        isValid = false;
+      }
+
+      if (!isBackwardPasswordConfirmed) {
+        showError(
+          confirmPassword,
+          "confirmError",
+          "Press Confirm to verify your backwards password."
+        );
+        isValid = false;
+      }
+
+      if (!isValid) {
+        document.querySelector('[aria-invalid="true"]')?.focus();
+        return;
+      }
+
+      successMessage.textContent =
+        "Account created successfully for " + fullName.value.trim() + "!";
+      successMessage.classList.add("show");
+      form.reset();
+      resetPasswordConfirmation();
+      clearFullName();
+      clearEmail();
+      fullName.readOnly = true;
+      email.readOnly = true;
+      resetDob();
+      resetPhoneNumber(false);
+    });
+
+    [fullName, email].forEach((input) => {
+      input.addEventListener("input", () => {
+        input.setAttribute("aria-invalid", "false");
+      });
+    });
+
+    password.addEventListener("input", () => {
+      resetPasswordConfirmation();
+    });
+
+    confirmPassword.addEventListener("input", () => {
+      resetBackwardPasswordConfirmation();
+    });
+
+    resetDob();
+    resetPhoneNumber(false);
+  </script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Definitely Not Annoying CAPTCHA</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        repeating-linear-gradient(45deg, #f7f7f7 0 10px, #ececec 10px 20px);
+      color: #222;
+    }
+
+    .top {
+      background: #111;
+      color: white;
+      padding: 10px 16px;
+      font-size: 12px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .page {
+      width: min(760px, 92%);
+      margin: 35px auto;
+      background: white;
+      border: 7px double #777;
+      padding: 18px;
+      box-shadow: 12px 12px 0 #bbb;
+    }
+
+    h1 {
+      font-family: Georgia, serif;
+      font-size: 27px;
+      margin: 0 0 5px;
+      text-decoration: underline;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .captcha {
+      border: 3px dashed #222;
+      background: #ffffcc;
+      padding: 15px;
+      position: relative;
+    }
+
+    .captcha-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .status {
+      font-size: 11px;
+      color: #a00000;
+      margin-bottom: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      max-width: 440px;
+    }
+
+    .tile {
+      height: 85px;
+      border: 3px solid #333;
+      background: #ddd;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tile:nth-child(odd) { background: #c9e7ff; }
+    .tile:nth-child(3n) { background: #ffd5d5; }
+    .tile:nth-child(4n) { background: #d8ffd2; }
+
+    .tile span {
+      transform: rotate(-12deg);
+      display: inline-block;
+    }
+
+    .tile.selected {
+      border-color: red;
+      box-shadow: inset 0 0 0 5px yellow;
+    }
+
+    .confuse {
+      margin-top: 13px;
+      background: #e8e8e8;
+      border: 1px solid #999;
+      padding: 9px;
+      font-size: 11px;
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 9px 25px;
+      background: #ddd;
+      border: 3px outset #aaa;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:active {
+      border-style: inset;
+    }
+
+    .fake-link {
+      color: #00e;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 11px;
+      margin-left: 12px;
+    }
+
+    .tiny {
+      font-size: 9px;
+      color: #777;
+      margin-top: 18px;
+      line-height: 1.5;
+    }
+
+    #message {
+      display: none;
+      margin-top: 12px;
+      border: 2px solid #900;
+      background: #ffe6e6;
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .tile { height: 72px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top">
+    SECURITY CHECK • PLEASE REMAIN PATIENT • THIS SHOULD ONLY TAKE 4–7 BUSINESS DAYS
+  </div>
+
+  <main class="page">
+    <h1>Human Verification Portal™</h1>
+    <div class="subtitle">
+      We just need to make absolutely sure you are not a suspiciously efficient robot.
+    </div>
+
+    <section class="captcha">
+      <div class="captcha-title">
+        Step 1 of 14: Select ALL squares containing a traffic light.
+      </div>
+
+      <div class="status" id="status">
+        Warning: The previous user selected the wrong squares. This is now your problem.
+      </div>
+
+      <div class="grid" id="grid">
+        <div class="tile" data-correct="false"><span>🌳</span></div>
+        <div class="tile" data-correct="true"><span>🚦</span></div>
+        <div class="tile" data-correct="false"><span>🚗</span></div>
+        <div class="tile" data-correct="true"><span>🚦</span></div>
+        <div class="tile" data-correct="false"><span>🏠</span></div>
+        <div class="tile" data-correct="false"><span>🚲</span></div>
+        <div class="tile" data-correct="true"><span>🚦</span></div>
+        <div class="tile" data-correct="false"><span>☁️</span></div>
+        <div class="tile" data-correct="false"><span>🚌</span></div>
+        <div class="tile" data-correct="true"><span>🚦</span></div>
+        <div class="tile" data-correct="false"><span>🐈</span></div>
+        <div class="tile" data-correct="false"><span>🌲</span></div>
+      </div>
+
+      <div class="confuse">
+        <b>Important:</b> Some traffic lights may be partially hidden.
+        Some non-traffic-lights may look emotionally similar to traffic lights.
+        Please use your best judgment.
+      </div>
+
+      <button id="verify">VERIFY HUMANITY</button>
+      <span class="fake-link" id="newCaptcha">Get a new CAPTCHA (probably worse)</span>
+
+      <div id="message"></div>
+    </section>
+
+    <div class="tiny">
+      By clicking VERIFY HUMANITY, you agree that you are a human, probably.
+      Your selections may be stored for absolutely no useful reason.
+    </div>
+  </main>
+
+  <script>
+    const tiles = [...document.querySelectorAll(".tile")];
+    const status = document.getElementById("status");
+    const message = document.getElementById("message");
+    const verify = document.getElementById("verify");
+    const newCaptcha = document.getElementById("newCaptcha");
+
+    tiles.forEach(tile => {
+      tile.addEventListener("click", () => {
+        tile.classList.toggle("selected");
+      });
+    });
+
+    verify.addEventListener("click", () => {
+      const selected = tiles.filter(t => t.classList.contains("selected"));
+      const correct = tiles.filter(t => t.dataset.correct === "true");
+
+      const isCorrect =
+        selected.length === correct.length &&
+        selected.every(t => t.dataset.correct === "true");
+
+      message.style.display = "block";
+
+      if (isCorrect) {
+        message.textContent =
+          "Verification failed: You completed the CAPTCHA suspiciously quickly. Please try again.";
+        status.textContent =
+          "Suspiciously human behavior detected.";
+      } else {
+        message.textContent =
+          "Incorrect. Please select the traffic lights that were visible approximately 0.4 seconds ago.";
+        status.textContent =
+          "CAPTCHA rejected. Your confidence has been recorded.";
+      }
+    });
+
+    newCaptcha.addEventListener("click", () => {
+      message.style.display = "none";
+      status.textContent =
+        "New CAPTCHA generated. It contains absolutely no useful clues.";
+
+      // Randomly shuffle the tiles to make the page extra annoying.
+      const grid = document.getElementById("grid");
+      tiles.forEach(tile => {
+        tile.classList.remove("selected");
+        grid.appendChild(tile);
+      });
+
+      for (let i = tiles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        grid.appendChild(tiles[j]);
+      }
+    });
+  </script>
+
+</body>
+</html>

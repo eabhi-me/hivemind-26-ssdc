@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🔐✨Verify™ - Human Detection Portal (NEW!!)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
+  :root {
+    --bg: #f2f2f2;
+    --card: #c0c0c0;
+    --line: #808080;
+    --text: #222222;
+    --muted: #6b6b6b;
+    --step1: #ff00ff;
+    --step1-tint: #eef3fd;
+    --step2: #00cc00;
+    --step2-tint: #eef3fd;
+    --step3: #ff9900;
+    --step3-tint: #eef3fd;
+    --success: #2e8b57;
+    --success-tint: #eaf6ef;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: repeating-linear-gradient(45deg, #ff00ff, #ff00ff 10px, #00ffff 10px, #00ffff 20px);
+    color: var(--text);
+    font-family: 'Comic Sans MS', 'Comic Neue', cursive;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 140px 16px;
+    animation: bgshift 3s infinite;
+  }
+  @keyframes bgshift { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+
+  marquee {
+    background: yellow;
+    color: red;
+    font-size: 22px;
+    font-weight: bold;
+    border: 5px dashed lime;
+    padding: 8px;
+    width: 100%;
+    margin-bottom: 30px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 8px ridge #808080;
+    border-radius: 0;
+    padding: 20px 18px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 12px 12px 0px rgba(0,0,0,0.5);
+    transform: rotate(-1.5deg);
+  }
+
+  .progress {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    border: none;
+  }
+  .dot.active {
+    background: var(--dot-color, var(--step1));
+  }
+  .dot.done {
+    background: var(--success);
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: lime;
+    text-shadow: 2px 2px 0 red, -1px -1px 0 blue;
+    animation: blink 1s step-start infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+  h1 .icon {
+    font-size: 20px;
+  }
+  .sub {
+    font-size: 13px;
+    color: purple;
+    font-weight: bold;
+    margin: 0 0 18px 0;
+  }
+  .hidden { display: none !important; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .badge.b1, .badge.b2, .badge.b3 { background: var(--step1-tint); color: var(--step1); }
+
+  /* step 1 */
+  .captcha {
+    background: black;
+    border: 3px inset #444;
+    border-radius: 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 10px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #00ff00;
+    font-family: monospace;
+    filter: blur(0.6px);
+    user-select: none;
+    margin-bottom: 8px;
+  }
+  .captcha span { display: inline-block; }
+  .refresh {
+    background: linear-gradient(to bottom, #eee, #999);
+    border: 3px outset #ccc;
+    color: navy;
+    font-size: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-bottom: 16px;
+    font-family: 'Comic Sans MS', cursive;
+  }
+  .rules {
+    font-size: 12px;
+    color: red;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+    background: yellow;
+    border: 2px dashed red;
+    border-radius: 0;
+    padding: 9px 11px;
+  }
+  .rules b { color: var(--text); }
+  input[type="text"] {
+    width: 60%;
+    padding: 2px;
+    font-size: 20px;
+    border: 3px inset #444;
+    border-radius: 0;
+    margin-bottom: 16px;
+    background: #ffff99;
+    color: #ff0000;
+    text-align: right;
+    transform: skewX(-8deg);
+    font-family: 'Comic Sans MS', cursive;
+  }
+  input[type="text"]:focus { outline: 3px dotted magenta; outline-offset: 2px; }
+
+  /* step 2 */
+  .prompt {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .prompt b { font-weight: 600; color: var(--step2); }
+  .hint {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .tile {
+    aspect-ratio: 1 / 1;
+    background: #fafafa;
+    border: 2px solid var(--line);
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    cursor: pointer;
+    user-select: none;
+    transform: rotate(var(--r, 0deg));
+  }
+  .tile.selected {
+    background: lime;
+    border: 3px solid magenta;
+  }
+
+  button.primary {
+    width: 100%;
+    background: linear-gradient(to bottom, #eee, #999);
+    color: navy;
+    border: 4px outset #ccc;
+    border-radius: 0;
+    padding: 11px 0;
+    font-size: 13.5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Comic Sans MS', cursive;
+  }
+  button.primary:active { opacity: 0.85; }
+  #step2Btn, #step3Btn { background: linear-gradient(to bottom, #eee, #999); }
+
+  #status1, #status2, #status3 {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    min-height: 14px;
+  }
+  .spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 2px solid #ddd;
+    border-top-color: #888;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 0.15s;
+    max-width: 320px;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; }
+
+  /* step 3 */
+  #drawCanvas {
+    background: #fafafa;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  .success {
+    text-align: center;
+  }
+  .success .check {
+    width: 52px;
+    height: 52px;
+    background: var(--success-tint);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+    font-size: 24px;
+    color: var(--success);
+  }
+
+  .popup-ad {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: gold;
+    border: 4px double red;
+    padding: 10px;
+    font-size: 12px;
+    max-width: 150px;
+    font-weight: bold;
+    animation: shake 0.3s infinite;
+    z-index: 999;
+  }
+  @keyframes shake {
+    0% { transform: translate(1px, 0); }
+    50% { transform: translate(-1px, 2px); }
+    100% { transform: translate(1px, -1px); }
+  }
+  .popup-ad:hover { cursor: pointer; }
+  .sparkle {
+    position: fixed;
+    font-size: 22px;
+    animation: floatup 3s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes floatup {
+    from { transform: translateY(100vh) rotate(0deg); }
+    to { transform: translateY(-10vh) rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<marquee behavior="alternate" scrollamount="10">⚠️ WARNING: FAILURE TO VERIFY WITHIN 4 SECONDS WILL RESULT IN PERMANENT SUSPICION ⚠️ ROBOTS WILL BE DETECTED VIA VIBES ⚠️</marquee>
+
+<div class="card">
+
+  <div class="progress" id="progress">
+    <div class="dot active" id="dot1" style="--dot-color: var(--step1);"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <span class="badge b1">STEP 1 OF 3</span>
+    <h1><span class="icon">🔐</span>Verify you're human</h1>
+    <p class="sub">Type the text below after applying the rules underneath.</p>
+
+    <div class="captcha" id="captchaText"></div>
+    <button class="refresh" onclick="renderCaptcha()">try a different one</button>
+
+    <p class="rules">
+      Reverse it, flip every letter's case, swap O and 0 with each other, and replace any other digit with ten minus itself.
+    </p>
+
+    <input type="text" id="captcha-input" placeholder="Enter the transformed text">
+
+    <button class="primary" id="step1Btn" onmouseover="dodge(this)">Continue</button>
+    <p id="status1"></p>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" class="hidden">
+    <span class="badge b2">STEP 2 OF 3</span>
+    <h1><span class="icon">🖼️</span>One more check</h1>
+    <p class="prompt">Select all images containing a <b id="targetLabel" style="display:inline-block; min-width: 34px;"></b>.</p>
+    <p class="hint">Note: images may rearrange themselves, and what you're looking for keeps changing too — check the word right before you click verify.</p>
+
+    <div class="grid" id="grid"></div>
+
+    <button class="primary" id="step2Btn" onmouseover="dodge(this)">Verify</button>
+    <p id="status2"></p>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="step3" class="hidden">
+    <span class="badge b3">STEP 3 OF 3</span>
+    <h1><span class="icon">✍️</span>Prove it with your hand</h1>
+    <p class="sub">Draw the phrase below, exactly as shown, using your mouse or finger.</p>
+    <p class="prompt" style="font-weight:700; font-size:14px; color: var(--step3);">I am not a robot</p>
+
+    <canvas id="drawCanvas" width="304" height="140" style="width:100%; height:140px; touch-action:none; display:block; margin-bottom:8px; cursor:crosshair;"></canvas>
+    <button class="refresh" onclick="clearCanvas()">clear</button>
+
+    <button class="primary" id="step3Btn" style="margin-top:14px;" onmouseover="dodge(this)">Verify</button>
+    <p id="status3"></p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="success" class="hidden success">
+    <div class="check">🎉</div>
+    <h1 style="justify-content:center;">You're verified</h1>
+    <p class="sub">That's it. You may proceed.</p>
+  </div>
+
+</div>
+
+<div class="popup-ad" onclick="this.style.display='none'">
+  🎉 CONGRATULATIONS!!! 🎉<br>
+  You are the 1,000,000th human to attempt verification! Click to claim absolutely nothing!
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Floating sparkle emojis
+  const emojis = ["✨","💫","🌟","⭐"];
+  setInterval(() => {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left = Math.random()*100 + 'vw';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 3000);
+  }, 900);
+
+  // Title flashes with fake notification count
+  let notifCount = 0;
+  setInterval(() => {
+    notifCount++;
+    document.title = "(" + notifCount + ") 🔐✨Verify™ - Human Detection Portal (NEW!!)";
+  }, 1000);
+
+  // Buttons dodge the cursor on hover, because why make it easy
+  function dodge(btn){
+    const x = Math.floor(Math.random() * 36 - 18);
+    const y = Math.floor(Math.random() * 20 - 10);
+    btn.style.position = 'relative';
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+    showToast('The button has moved. This is normal. Probably.');
+  }
+</script>
+
+<script>
+  const toast = document.getElementById('toast');
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  function setProgress(step){
+    const colors = { 1: 'var(--step1)', 2: 'var(--step2)', 3: 'var(--step3)' };
+    for (let i = 1; i <= 3; i++){
+      const dot = document.getElementById('dot' + i);
+      dot.classList.remove('active', 'done');
+      dot.style.removeProperty('--dot-color');
+      if (i < step) dot.classList.add('done');
+      if (i === step){
+        dot.classList.add('active');
+        dot.style.setProperty('--dot-color', colors[step]);
+      }
+    }
+  }
+
+  /* ---------- STEP 1 ---------- */
+  const pool = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz123456789O0";
+  let currentCode = "";
+  let expectedAnswer = "";
+
+  function transformRules(s){
+    const chars = s.split('').reverse();
+    return chars.map(ch => {
+      if (ch === '0') return 'O';
+      if (ch.toUpperCase() === 'O') return '0';
+      if (/[1-9]/.test(ch)) return String(10 - Number(ch));
+      if (/[a-zA-Z]/.test(ch)) return (ch === ch.toUpperCase()) ? ch.toLowerCase() : ch.toUpperCase();
+      return ch;
+    }).join('');
+  }
+
+  function renderCaptcha(){
+    currentCode = "";
+    for (let i = 0; i < 5; i++) currentCode += pool[Math.floor(Math.random() * pool.length)];
+    expectedAnswer = transformRules(currentCode);
+    const box = document.getElementById('captchaText');
+    box.innerHTML = '';
+    for (const ch of currentCode){
+      const s = document.createElement('span');
+      s.textContent = ch;
+      s.style.transform = 'rotate(' + (Math.random() * 16 - 8) + 'deg) translateY(' + (Math.random() * 6 - 3) + 'px)';
+      box.appendChild(s);
+    }
+  }
+  renderCaptcha();
+  setProgress(1);
+
+  document.getElementById('step1Btn').addEventListener('click', () => {
+    const val = document.getElementById('captcha-input').value.trim();
+    const status1 = document.getElementById('status1');
+    if (!val){
+      status1.textContent = "That field is empty.";
+      return;
+    }
+    if (val === expectedAnswer){
+      status1.textContent = "Correct.";
+      setTimeout(() => {
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+        setProgress(2);
+        startShuffling();
+      }, 400);
+    } else {
+      status1.innerHTML = 'Not quite. A new code has been generated. <span class="spinner"></span>';
+      setTimeout(() => {
+        renderCaptcha();
+        document.getElementById('captcha-input').value = '';
+        status1.textContent = "Try again.";
+      }, 900);
+    }
+  });
+
+  /* ---------- STEP 2 ---------- */
+  const allCategories = [
+    { word: "cat", emoji: "🐱" },
+    { word: "house", emoji: "🏠" },
+    { word: "car", emoji: "🚗" },
+    { word: "tree", emoji: "🌳" },
+    { word: "star", emoji: "⭐" },
+    { word: "dog", emoji: "🐶" },
+    { word: "balloon", emoji: "🎈" }
+  ];
+  let activeCategories = [];
+  let activeTargetIndex = 0;
+
+  let labelTimer = null;
+  function startLabelShuffle(){
+    const label = document.getElementById('targetLabel');
+    activeTargetIndex = 0;
+    label.textContent = activeCategories[activeTargetIndex].word;
+    clearInterval(labelTimer);
+    labelTimer = setInterval(() => {
+      activeTargetIndex = (activeTargetIndex + 1) % activeCategories.length;
+      label.textContent = activeCategories[activeTargetIndex].word;
+    }, 3500);
+  }
+
+  let tiles = []; // {id, emoji, category, selected}
+  let shuffleTimer = null;
+
+  function buildTiles(){
+    activeCategories = [...allCategories].sort(() => Math.random() - 0.5).slice(0, 4);
+    tiles = [];
+    const list = [];
+    activeCategories.forEach(c => {
+      for (let i = 0; i < 4; i++) list.push({ emoji: c.emoji, category: c.word });
+    });
+    list.sort(() => Math.random() - 0.5);
+    list.forEach((item, i) => tiles.push({ id: 'tile-' + i + '-' + Math.random().toString(36).slice(2,7), emoji: item.emoji, category: item.category, selected: false }));
+  }
+
+  function renderGrid(){
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    tiles.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'tile' + (t.selected ? ' selected' : '');
+      div.textContent = t.emoji;
+      div.dataset.id = t.id;
+      div.style.setProperty('--r', (Math.random() * 20 - 10) + 'deg');
+      div.addEventListener('click', () => {
+        t.selected = !t.selected;
+        div.classList.toggle('selected');
+      });
+      grid.appendChild(div);
+    });
+  }
+
+  function shufflePositions(){
+    tiles.sort(() => Math.random() - 0.5);
+    renderGrid();
+  }
+
+  function startShuffling(){
+    buildTiles();
+    renderGrid();
+    startLabelShuffle();
+    clearInterval(shuffleTimer);
+    shuffleTimer = setInterval(shufflePositions, 1800);
+  }
+
+  document.getElementById('step2Btn').addEventListener('click', () => {
+    const status2 = document.getElementById('status2');
+    const currentTarget = activeCategories[activeTargetIndex].word;
+    const selected = tiles.filter(t => t.selected);
+    const correct = selected.length === 4 && selected.every(t => t.category === currentTarget);
+    if (correct){
+      clearInterval(shuffleTimer);
+      clearInterval(labelTimer);
+      status2.textContent = "Correct.";
+      setTimeout(() => {
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step3').classList.remove('hidden');
+        setProgress(3);
+      }, 400);
+    } else {
+      status2.innerHTML = 'Not quite. New images, new categories. <span class="spinner"></span>';
+      setTimeout(() => {
+        startShuffling();
+        status2.textContent = "Try again — watch closely.";
+      }, 800);
+    }
+  });
+
+  /* ---------- STEP 3 ---------- */
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let hasDrawn = false;
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+  function startDraw(e){
+    drawing = true;
+    hasDrawn = true;
+    const p = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    e.preventDefault();
+  }
+  function moveDraw(e){
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.strokeStyle = '#8a3d0e';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    e.preventDefault();
+  }
+  function endDraw(){ drawing = false; }
+  function clearCanvas(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawn = false;
+  }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', moveDraw);
+  window.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('touchstart', startDraw);
+  canvas.addEventListener('touchmove', moveDraw);
+  canvas.addEventListener('touchend', endDraw);
+
+  const mockLines = [
+    "Interesting interpretation of the alphabet.",
+    "A doctor couldn't read this. Neither can we.",
+    "Bold penmanship. Wrong exercise.",
+    "This looks like it was written during an earthquake.",
+    "We've seen more convincing handwriting from an actual robot.",
+    "Technically illegible. Technically impressive.",
+    "Your 'not' looks suspiciously like 'bot'.",
+    "Closer. Still not it.",
+    "That's a shape, not handwriting.",
+    "Our reviewer stepped out. Please redraw."
+  ];
+
+  let drawAttempts = 0;
+  document.getElementById('step3Btn').addEventListener('click', () => {
+    const status3 = document.getElementById('status3');
+    if (!hasDrawn){
+      status3.textContent = "You haven't drawn anything yet.";
+      return;
+    }
+    drawAttempts++;
+
+    // After several deliberately frustrating checks, the portal finally gives up.
+    if (drawAttempts >= 3){
+      status3.textContent = "Fine. You are probably human.";
+      document.getElementById('dot3').classList.add('done');
+      setTimeout(() => {
+        document.getElementById('step3').classList.add('hidden');
+        document.getElementById('success').classList.remove('hidden');
+        document.getElementById('progress').classList.add('hidden');
+      }, 700);
+      return;
+    }
+
+    const msg = mockLines[drawAttempts - 1];
+    status3.innerHTML = msg + ' <span class="spinner"></span>';
+    setTimeout(() => {
+      clearCanvas();
+      status3.textContent = "Try again.";
+    }, 1300);
+  });
+</script>
+
+</body>
+</html>

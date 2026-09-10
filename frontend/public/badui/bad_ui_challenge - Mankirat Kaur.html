@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ultimate Bad UI Challenge</title>
+
+<style>
+body{
+    font-family: Comic Sans MS, cursive;
+    background: linear-gradient(45deg, red, yellow, lime, cyan, magenta);
+    background-size: 400% 400%;
+    animation:bg 4s infinite;
+    overflow:hidden;
+    margin:0;
+}
+
+@keyframes bg{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+#popup{
+    position:fixed;
+    top:20%;
+    left:35%;
+    width:300px;
+    background:white;
+    border:10px dashed red;
+    padding:20px;
+    z-index:999;
+    text-align:center;
+}
+
+.closeBtn{
+    position:absolute;
+    background:red;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+#loginBox{
+    width:350px;
+    margin:100px auto;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 0 20px black;
+    text-align:center;
+}
+
+input{
+    width:90%;
+    padding:10px;
+    margin:10px;
+    font-size:18px;
+}
+
+#loginBtn{
+    position:relative;
+    padding:10px 20px;
+    font-size:18px;
+    cursor:pointer;
+}
+
+#captchaBox{
+    display:none;
+}
+
+#success{
+    display:none;
+    font-size:40px;
+    color:green;
+    text-align:center;
+    margin-top:100px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="popup">
+<h2>🎉 CONGRATULATIONS 🎉</h2>
+<p>You are the 1,000,000th visitor!</p>
+<p>Unfortunately there is no prize.</p>
+
+<button class="closeBtn" id="closeAd">X</button>
+</div>
+
+<div id="loginBox">
+
+<h1>Definitely Secure Login</h1>
+
+<input type="text" id="user" placeholder="Username">
+
+<input type="password" id="pass" placeholder="Password">
+
+<p style="color:red">
+⚠ CAPS LOCK IS ON
+</p>
+
+<button id="loginBtn">Login</button>
+
+<div id="captchaBox">
+
+<h3>Security Verification</h3>
+
+<p>What is 2 + 2 ?</p>
+
+<input type="text" id="captcha">
+
+<button onclick="verifyCaptcha()">
+Verify
+</button>
+
+</div>
+
+</div>
+
+<div id="success">
+LOGIN SUCCESSFUL!
+<br><br>
+But why?
+</div>
+
+<script>
+
+let close=document.getElementById("closeAd");
+
+close.style.top="5px";
+close.style.left="250px";
+
+close.addEventListener("mouseover",function(){
+
+close.style.left=
+Math.random()*250+"px";
+
+close.style.top=
+Math.random()*150+"px";
+
+});
+
+close.addEventListener("click",function(){
+document.getElementById("popup").style.display="none";
+});
+
+let login=document.getElementById("loginBtn");
+
+login.addEventListener("mouseover",function(){
+
+let x=Math.random()*200-100;
+let y=Math.random()*100-50;
+
+login.style.left=x+"px";
+login.style.top=y+"px";
+
+});
+
+let texts=[
+"Login",
+"Submit",
+"Delete Account",
+"Launch Rocket",
+"Trust Me",
+"Maybe Login"
+];
+
+setInterval(function(){
+
+login.innerHTML=
+texts[Math.floor(Math.random()*texts.length)];
+
+},1000);
+
+document.getElementById("user")
+.addEventListener("input",function(){
+
+if(this.value.length==3){
+
+this.style.position="absolute";
+
+this.style.left=
+Math.random()*70+"%";
+
+this.style.top=
+Math.random()*70+"%";
+
+}
+
+});
+
+login.addEventListener("click",function(){
+
+document.getElementById("captchaBox").style.display="block";
+
+});
+
+function verifyCaptcha(){
+
+let ans=
+document.getElementById("captcha").value;
+
+if(ans=="4"){
+
+document.getElementById("loginBox")
+.style.display="none";
+
+document.getElementById("success")
+.style.display="block";
+
+}else{
+
+alert(
+"Wrong! The correct answer was 4."
+);
+
+}
+
+}
+
+setInterval(function(){
+
+if(Math.random()>0.5){
+
+alert(
+"WARNING: Your device is probably fine."
+);
+
+}
+
+},15000);
+
+document.addEventListener("keydown",function(){
+
+document.body.style.transform=
+"rotate("+(Math.random()*2-1)+"deg)";
+
+});
+
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,4431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111827" />
+  <title>The World's Most Terrible Login Page</title>
+
+  <style>
+    /* =========================================================
+       THE WORLD'S MOST TERRIBLE LOGIN PAGE
+       Intentionally chaotic. Technically organized.
+       ========================================================= */
+
+    :root {
+      --danger: #ff1744;
+      --warning: #ffd600;
+      --success: #00e676;
+      --info: #00b0ff;
+      --purple: #d500f9;
+      --ink: #111827;
+      --paper: #f8fafc;
+      --border: 4px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 0, 102, .18), transparent 22%),
+        radial-gradient(circle at 80% 10%, rgba(0, 200, 255, .18), transparent 22%),
+        radial-gradient(circle at 70% 80%, rgba(160, 0, 255, .16), transparent 24%),
+        linear-gradient(125deg, #fff7ad, #ffd5ea 26%, #c8f7ff 51%, #ddd0ff 76%, #fff0b5);
+      transition: filter .3s ease;
+    }
+
+    body.chaos {
+      filter: saturate(1.18) contrast(1.02);
+    }
+
+    button,
+    input,
+    label {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    ::selection {
+      background: #111;
+      color: #fff;
+    }
+
+    /* =========================
+       BACKGROUND CHAOS
+       ========================= */
+
+    .background-chaos {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -5;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      opacity: .24;
+      filter: blur(3px);
+      animation: floatAround var(--duration) ease-in-out infinite alternate;
+    }
+
+    .orb:nth-child(1) {
+      width: 230px;
+      height: 230px;
+      left: -50px;
+      top: 12%;
+      background: #ff4081;
+      --duration: 10s;
+    }
+
+    .orb:nth-child(2) {
+      width: 180px;
+      height: 180px;
+      right: 3%;
+      top: 30%;
+      background: #00b8d4;
+      --duration: 7s;
+    }
+
+    .orb:nth-child(3) {
+      width: 270px;
+      height: 270px;
+      right: 18%;
+      bottom: -80px;
+      background: #7c4dff;
+      --duration: 13s;
+    }
+
+    .orb:nth-child(4) {
+      width: 140px;
+      height: 140px;
+      left: 32%;
+      bottom: 8%;
+      background: #ffab00;
+      --duration: 9s;
+    }
+
+    .symbol-rain {
+      position: absolute;
+      inset: 0;
+      font-size: clamp(18px, 2vw, 35px);
+      opacity: .15;
+      user-select: none;
+      white-space: pre-wrap;
+      transform: rotate(-5deg);
+      animation: drift 22s linear infinite;
+    }
+
+    @keyframes floatAround {
+      from {
+        transform: translate(0, 0) rotate(0deg);
+      }
+      to {
+        transform: translate(80px, -65px) rotate(180deg);
+      }
+    }
+
+    @keyframes drift {
+      from {
+        transform: translateY(-5%) rotate(-5deg);
+      }
+      to {
+        transform: translateY(7%) rotate(5deg);
+      }
+    }
+
+    /* =========================
+       TOP CHAOS BAR
+       ========================= */
+
+    .chaos-strip {
+      display: flex;
+      gap: 0;
+      width: 100%;
+      border-bottom: var(--border) solid #000;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 6px 0 #000;
+    }
+
+    .chaos-strip span {
+      flex: 1;
+      min-width: max-content;
+      padding: 7px 12px;
+      text-align: center;
+      font-weight: 900;
+      font-size: 12px;
+      border-right: 3px solid #000;
+      animation: stripWobble 1.7s ease-in-out infinite;
+    }
+
+    .chaos-strip span:nth-child(1) { background: #ffca28; }
+    .chaos-strip span:nth-child(2) { background: #ff4081; }
+    .chaos-strip span:nth-child(3) { background: #40c4ff; }
+    .chaos-strip span:nth-child(4) { background: #69f0ae; }
+    .chaos-strip span:nth-child(5) { background: #b388ff; }
+
+    .chaos-strip span:nth-child(even) {
+      animation-delay: -.4s;
+    }
+
+    @keyframes stripWobble {
+      0%, 100% { transform: skewX(0); }
+      50% { transform: skewX(-4deg); }
+    }
+
+    /* =========================
+       MAIN CONTAINER
+       ========================= */
+
+    .page {
+      width: min(1180px, calc(100% - 28px));
+      margin: 28px auto 60px;
+      position: relative;
+    }
+
+    .welcome {
+      position: relative;
+      padding: 22px 20px 28px;
+      background: rgba(255, 255, 255, .85);
+      border: 6px double #000;
+      box-shadow:
+        12px 12px 0 #000,
+        -7px 5px 0 #ff1744;
+      transform: rotate(-.7deg);
+      overflow: hidden;
+    }
+
+    .welcome::before,
+    .welcome::after {
+      content: "⚠";
+      position: absolute;
+      font-size: 85px;
+      opacity: .09;
+      pointer-events: none;
+    }
+
+    .welcome::before {
+      top: -22px;
+      right: 20px;
+      transform: rotate(18deg);
+    }
+
+    .welcome::after {
+      bottom: -38px;
+      left: 25px;
+      transform: rotate(-22deg);
+    }
+
+    .welcome h1 {
+      margin: 0;
+      text-align: center;
+      font-family: Impact, fantasy;
+      font-size: clamp(32px, 6vw, 72px);
+      line-height: .92;
+      letter-spacing: 2px;
+      color: #ff1744;
+      text-shadow:
+        4px 4px 0 #ffd600,
+        8px 8px 0 #111;
+      animation: titleShake 2.2s infinite;
+    }
+
+    .welcome .subtitle {
+      margin: 19px auto 7px;
+      max-width: 850px;
+      text-align: center;
+      font-family: "Comic Sans MS", cursive;
+      font-size: clamp(17px, 2.2vw, 25px);
+      font-weight: 900;
+      transform: rotate(.8deg);
+    }
+
+    .warning {
+      margin: 18px auto 5px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 13px 23px;
+      border: 4px dashed #111;
+      background: #ffd600;
+      font-size: clamp(20px, 3vw, 34px);
+      font-weight: 1000;
+      text-align: center;
+      transform: rotate(-2deg);
+      animation: warningPulse 1.25s ease-in-out infinite;
+    }
+
+    .blink {
+      margin: 13px 0 0;
+      text-align: center;
+      color: #d50000;
+      font-family: monospace;
+      font-size: clamp(14px, 2vw, 21px);
+      font-weight: 900;
+      animation: blinkText .8s steps(2, start) infinite;
+    }
+
+    @keyframes titleShake {
+      0%, 92%, 100% { transform: translate(0, 0) rotate(0deg); }
+      94% { transform: translate(-3px, 2px) rotate(-1deg); }
+      96% { transform: translate(4px, -1px) rotate(1deg); }
+      98% { transform: translate(-2px, 1px) rotate(0deg); }
+    }
+
+    @keyframes warningPulse {
+      0%, 100% { transform: rotate(-2deg) scale(1); }
+      50% { transform: rotate(2deg) scale(1.025); }
+    }
+
+    @keyframes blinkText {
+      50% { opacity: .13; }
+    }
+
+    /* =========================
+       DASHBOARD ROW
+       ========================= */
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 29px;
+    }
+
+    .stat {
+      position: relative;
+      padding: 12px;
+      min-height: 92px;
+      background: rgba(255, 255, 255, .92);
+      border: 4px solid #000;
+      box-shadow: 5px 5px 0 #000;
+      transform: rotate(var(--rotate));
+      transition: transform .3s ease;
+      overflow: hidden;
+    }
+
+    .stat:hover {
+      transform: rotate(0deg) translateY(-3px);
+    }
+
+    .stat small {
+      display: block;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      opacity: .65;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: clamp(18px, 2.6vw, 26px);
+      font-family: "Courier New", monospace;
+    }
+
+    .stat:nth-child(1) {
+      --rotate: -1.3deg;
+      background: #d9fff0;
+    }
+
+    .stat:nth-child(2) {
+      --rotate: 1deg;
+      background: #ffe2ea;
+    }
+
+    .stat:nth-child(3) {
+      --rotate: -0.5deg;
+      background: #fff2bd;
+    }
+
+    .stat:nth-child(4) {
+      --rotate: 1.7deg;
+      background: #e5ddff;
+    }
+
+    .meter {
+      height: 15px;
+      margin-top: 6px;
+      border: 2px solid #000;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .meter-bar {
+      width: 100%;
+      height: 100%;
+      background: #22c55e;
+      transition: width .35s ease, background .3s ease;
+    }
+
+    /* =========================
+       LOGIN AREA
+       ========================= */
+
+    .login-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      gap: 25px;
+      align-items: start;
+      margin-top: 30px;
+    }
+
+    .login-card {
+      position: relative;
+      background: rgba(255,255,255,.96);
+      padding: clamp(18px, 4vw, 36px);
+      border: 6px solid #000;
+      box-shadow:
+        11px 11px 0 #000,
+        0 0 0 7px #ffeb3b;
+      transform: rotate(.45deg);
+    }
+
+    .login-card::after {
+      content: "SERIOUSLY SECURE™";
+      position: absolute;
+      top: -21px;
+      right: 14px;
+      background: #111;
+      color: #fff;
+      padding: 7px 11px;
+      font-family: monospace;
+      font-size: 11px;
+      transform: rotate(4deg);
+    }
+
+    .form-heading {
+      margin: 0 0 4px;
+      font-family: Impact, fantasy;
+      font-size: clamp(31px, 5vw, 51px);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .form-subheading {
+      margin: 0 0 24px;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      color: #555;
+      transform: rotate(-.3deg);
+    }
+
+    .field {
+      position: relative;
+      margin: 23px 0;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      font-family: "Comic Sans MS", cursive;
+      font-size: clamp(15px, 2vw, 19px);
+      font-weight: 900;
+      transform: rotate(-1deg);
+    }
+
+    .field-input {
+      width: 100%;
+      border: 5px ridge #222;
+      border-radius: 4px;
+      padding: 13px 14px;
+      min-height: 51px;
+      background: #fffdf3;
+      color: #111;
+      outline: none;
+      transition: .2s ease;
+      box-shadow: inset 0 0 0 2px #ffc400;
+    }
+
+    .field-input:focus {
+      border-style: dashed;
+      border-color: #ff1744;
+      box-shadow:
+        inset 0 0 0 2px #00b0ff,
+        8px 5px 0 rgba(0,0,0,.17);
+      transform: translateX(-3px) rotate(-.4deg);
+    }
+
+    .username-display {
+      margin-top: 6px;
+      padding: 8px 10px;
+      background: #eceff1;
+      border: 2px dotted #555;
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      word-break: break-word;
+      min-height: 34px;
+    }
+
+    .username-react {
+      margin-top: 6px;
+      min-height: 23px;
+      color: #b30000;
+      font-size: 13px;
+      font-weight: 900;
+      transform: rotate(-.6deg);
+    }
+
+    .mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .mini-btn,
+    .danger-btn,
+    .secondary-btn,
+    .verify-btn,
+    .login-btn {
+      position: relative;
+      border: 3px solid #111;
+      padding: 9px 13px;
+      font-weight: 900;
+      box-shadow: 4px 4px 0 #111;
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .2s ease;
+    }
+
+    .mini-btn:active,
+    .danger-btn:active,
+    .secondary-btn:active,
+    .verify-btn:active,
+    .login-btn:active {
+      box-shadow: 1px 1px 0 #111;
+      transform: translate(3px, 3px);
+    }
+
+    .verify-btn {
+      background: #b2ebf2;
+      transform: rotate(-1deg);
+    }
+
+    .verify-btn:hover {
+      transform: rotate(2deg) scale(1.03);
+    }
+
+    .password-wrap {
+      position: relative;
+    }
+
+    .password-wrap .field-input {
+      padding-right: 112px;
+    }
+
+    .show-password {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      height: calc(100% - 12px);
+      border: 2px solid #111;
+      background: #ffecb3;
+      padding: 0 9px;
+      font-size: 11px;
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .requirements {
+      margin-top: 10px;
+      padding: 13px;
+      background: #f2f2f2;
+      border: 3px double #111;
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .requirements strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: Arial, sans-serif;
+    }
+
+    .requirements ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .requirements li {
+      margin: 2px 0;
+    }
+
+    .requirements li:nth-child(4n) {
+      text-decoration: line-through;
+      opacity: .8;
+    }
+
+    .password-reaction {
+      min-height: 21px;
+      margin-top: 6px;
+      color: #c62828;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px;
+      border: 3px solid #111;
+      background: #e0f2fe;
+      transform: rotate(.7deg);
+    }
+
+    .remember input {
+      width: 23px;
+      height: 23px;
+      accent-color: #111;
+    }
+
+    .remember label {
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .terms {
+      margin-top: 16px;
+      padding: 13px;
+      border: 4px dashed #111;
+      background: #fff1f2;
+    }
+
+    .terms label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .terms input {
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
+      accent-color: #d50000;
+    }
+
+    .terms-link {
+      color: #b00020;
+      text-decoration: underline;
+      font-weight: 1000;
+      cursor: pointer;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-top: 26px;
+      min-height: 95px;
+      position: relative;
+    }
+
+    .login-btn {
+      min-width: 190px;
+      min-height: 60px;
+      padding: 14px 25px;
+      background: #76ff03;
+      color: #000;
+      font-size: 20px;
+      border-width: 5px;
+      box-shadow: 7px 7px 0 #111;
+      font-family: Impact, fantasy;
+      letter-spacing: 1px;
+      transform: rotate(-2deg);
+      z-index: 3;
+    }
+
+    .login-btn:hover {
+      transform: rotate(2deg) scale(1.035);
+    }
+
+    .cancel-btn {
+      min-width: 105px;
+      min-height: 48px;
+      background: #ffcccb;
+      z-index: 2;
+    }
+
+    .forgot {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 7px 9px;
+      color: #002b8c;
+      font-weight: 1000;
+      cursor: pointer;
+      text-decoration: underline wavy;
+      transform: rotate(2deg);
+    }
+
+    .mouse-hint {
+      min-height: 20px;
+      margin-top: 8px;
+      font-family: monospace;
+      color: #6a1b9a;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    /* =========================
+       CAPTCHA
+       ========================= */
+
+    .captcha {
+      margin-top: 23px;
+      background: #f7f7f7;
+      border: 5px groove #555;
+      padding: 15px;
+      transform: rotate(-.5deg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .captcha::before {
+      content: "TOTALLY HUMAN VERIFICATION";
+      position: absolute;
+      right: -15px;
+      top: 7px;
+      font-size: 9px;
+      background: #111;
+      color: #fff;
+      padding: 5px 8px;
+      transform: rotate(8deg);
+    }
+
+    .captcha h3 {
+      margin: 0 0 9px;
+      font-family: Impact, fantasy;
+      letter-spacing: 1px;
+      font-size: 22px;
+    }
+
+    .captcha-question {
+      font-size: 14px;
+      font-weight: 1000;
+      margin-bottom: 10px;
+      padding-right: 170px;
+    }
+
+    .captcha-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .captcha-option {
+      border: 3px solid #111;
+      background: white;
+      padding: 8px 12px;
+      font-weight: 1000;
+      box-shadow: 3px 3px 0 #111;
+      min-width: 54px;
+      transition: transform .16s ease;
+    }
+
+    .captcha-option:hover {
+      transform: rotate(-2deg) translateY(-2px);
+    }
+
+    .captcha-option.selected {
+      background: #b9f6ca;
+    }
+
+    .captcha-status {
+      min-height: 20px;
+      margin-top: 8px;
+      color: #b30000;
+      font-weight: 1000;
+      font-size: 12px;
+    }
+
+    .captcha-refresh {
+      margin-top: 9px;
+      font-size: 10px;
+      border: 2px solid #111;
+      padding: 5px 8px;
+      background: #ffe082;
+      font-weight: 900;
+    }
+
+    /* =========================
+       SIDE PANEL
+       ========================= */
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .side-box {
+      background: rgba(255,255,255,.94);
+      border: 5px solid #111;
+      padding: 14px;
+      box-shadow: 7px 7px 0 #111;
+      transform: rotate(var(--rot));
+    }
+
+    .side-box:nth-child(1) { --rot: 1.3deg; }
+    .side-box:nth-child(2) { --rot: -1.2deg; }
+    .side-box:nth-child(3) { --rot: 1.7deg; }
+    .side-box:nth-child(4) { --rot: -.8deg; }
+
+    .side-box h3 {
+      margin: 0 0 7px;
+      font-family: Impact, fantasy;
+      letter-spacing: 1px;
+    }
+
+    .security-value {
+      font-family: "Comic Sans MS", cursive;
+      font-size: 17px;
+      font-weight: 1000;
+      color: #d00000;
+      animation: tinyPulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes tinyPulse {
+      50% {
+        transform: scale(1.04) rotate(-1deg);
+      }
+    }
+
+    .attempts {
+      font-family: monospace;
+      font-size: 24px;
+      font-weight: 1000;
+    }
+
+    .side-note {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    /* =========================
+       FOOTER
+       ========================= */
+
+    footer {
+      margin-top: 28px;
+      padding: 14px;
+      text-align: center;
+      background: #111;
+      color: #fff;
+      border: 4px solid #fff;
+      outline: 4px solid #111;
+      font-family: monospace;
+      font-size: 11px;
+      transform: rotate(.4deg);
+    }
+
+    /* =========================
+       POPUPS
+       ========================= */
+
+    #popupStack {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: min(340px, calc(100% - 36px));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .popup {
+      pointer-events: auto;
+      position: relative;
+      background: #fff;
+      border: 4px solid #111;
+      padding: 12px 38px 12px 13px;
+      box-shadow: 6px 6px 0 #111;
+      animation: popupIn .25s ease-out;
+    }
+
+    .popup strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .popup p {
+      margin: 0;
+      font-family: "Comic Sans MS", cursive;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .popup .close-popup {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      border: 2px solid #111;
+      background: #ff8a80;
+      font-weight: 1000;
+      width: 25px;
+      height: 25px;
+      line-height: 18px;
+    }
+
+    @keyframes popupIn {
+      from {
+        opacity: 0;
+        transform: translateX(100px) rotate(5deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) rotate(0);
+      }
+    }
+
+    /* =========================
+       MODALS
+       ========================= */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      padding: 18px;
+      background: rgba(0,0,0,.67);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(660px, 100%);
+      max-height: min(86vh, 760px);
+      overflow: auto;
+      background: #fff;
+      border: 6px solid #111;
+      box-shadow: 13px 13px 0 #111;
+      padding: 20px;
+      transform: rotate(-.6deg);
+      position: relative;
+    }
+
+    .modal h2 {
+      margin: 0 0 10px;
+      font-family: Impact, fantasy;
+      font-size: clamp(30px, 6vw, 48px);
+      color: #d50000;
+    }
+
+    .modal-message {
+      min-height: 105px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: "Comic Sans MS", cursive;
+      font-size: clamp(17px, 3vw, 25px);
+      font-weight: 1000;
+      padding: 12px;
+      background: #fff8bc;
+      border: 4px dashed #111;
+    }
+
+    .modal-progress {
+      height: 22px;
+      margin: 13px 0;
+      border: 3px solid #111;
+      background: #eee;
+      overflow: hidden;
+    }
+
+    .modal-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: repeating-linear-gradient(
+        45deg,
+        #ff1744 0,
+        #ff1744 12px,
+        #ffd600 12px,
+        #ffd600 24px
+      );
+      transition: width .25s linear;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .modal-actions button {
+      border: 3px solid #111;
+      background: #e0f2fe;
+      padding: 10px 13px;
+      font-weight: 1000;
+      box-shadow: 4px 4px 0 #111;
+    }
+
+    .terms-content {
+      height: 420px;
+      overflow: auto;
+      padding: 14px;
+      border: 4px solid #111;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          #fff 0,
+          #fff 27px,
+          #f3f3f3 28px
+        );
+      font-family: Georgia, serif;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .terms-content h4 {
+      margin: 12px 0 4px;
+      font-family: Arial, sans-serif;
+    }
+
+    .terms-confirm {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 11px;
+      border: 3px dashed #111;
+      background: #ffebee;
+      font-weight: 1000;
+    }
+
+    .forgot-flow {
+      min-height: 180px;
+      padding: 20px;
+      background: #f3e5f5;
+      border: 4px dotted #111;
+      font-weight: 900;
+      line-height: 1.55;
+    }
+
+    .fake-reset {
+      margin-top: 14px;
+      display: none;
+    }
+
+    .fake-reset.open {
+      display: block;
+    }
+
+    .fake-reset input {
+      width: 100%;
+      padding: 11px;
+      border: 3px solid #111;
+      margin-bottom: 9px;
+    }
+
+    /* =========================
+       FINAL SCREEN
+       ========================= */
+
+    .final-screen {
+      display: none;
+      margin-top: 30px;
+      background: #fff;
+      border: 8px double #111;
+      box-shadow: 13px 13px 0 #111;
+      padding: clamp(23px, 5vw, 45px);
+      text-align: center;
+      transform: rotate(-.4deg);
+    }
+
+    .final-screen.show {
+      display: block;
+      animation: finalAppear .6s ease-out;
+    }
+
+    .final-screen h2 {
+      margin: 0;
+      font-family: Impact, fantasy;
+      font-size: clamp(45px, 10vw, 94px);
+      line-height: .9;
+      color: #00b341;
+      text-shadow: 5px 5px 0 #111;
+    }
+
+    .final-screen .failed {
+      margin-top: 17px;
+      font-size: clamp(20px, 4vw, 31px);
+      font-weight: 1000;
+      color: #d50000;
+    }
+
+    .final-screen p {
+      margin: 10px 0;
+      font-family: "Comic Sans MS", cursive;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .restart {
+      margin-top: 18px;
+      border: 5px solid #111;
+      background: #76ff03;
+      padding: 14px 21px;
+      font-weight: 1000;
+      font-size: 18px;
+      box-shadow: 8px 8px 0 #111;
+    }
+
+    @keyframes finalAppear {
+      from {
+        opacity: 0;
+        transform: scale(.75) rotate(-5deg);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) rotate(-.4deg);
+      }
+    }
+
+    /* =========================
+       SMALL STATUS TEXT
+       ========================= */
+
+    .system-status {
+      margin: 14px 0 0;
+      padding: 9px;
+      border-left: 6px solid #111;
+      background: #e8f5e9;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .status-ok {
+      color: #007b3e;
+    }
+
+    .status-bad {
+      color: #c00000;
+    }
+
+    /* =========================
+       SOUND TOGGLE
+       ========================= */
+
+    .sound-toggle {
+      position: fixed;
+      left: 13px;
+      bottom: 13px;
+      z-index: 120;
+      border: 4px solid #111;
+      background: #fff;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 1000;
+      box-shadow: 4px 4px 0 #111;
+      transform: rotate(-2deg);
+    }
+
+    /* =========================
+       RESPONSIVE
+       ========================= */
+
+    @media (max-width: 900px) {
+      .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .login-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 12px, 1180px);
+        margin-top: 16px;
+      }
+
+      .chaos-strip span {
+        font-size: 9px;
+        padding: 6px 7px;
+      }
+
+      .welcome {
+        padding: 16px 10px 22px;
+        box-shadow:
+          7px 7px 0 #000,
+          -4px 4px 0 #ff1744;
+      }
+
+      .dashboard {
+        gap: 7px;
+        margin-top: 19px;
+      }
+
+      .stat {
+        min-height: 78px;
+        padding: 9px;
+        box-shadow: 3px 3px 0 #000;
+      }
+
+      .login-card {
+        padding: 18px 13px 24px;
+      }
+
+      .side-panel {
+        display: flex;
+      }
+
+      .captcha-question {
+        padding-right: 0;
+      }
+
+      .actions {
+        min-height: 125px;
+      }
+
+      .login-btn {
+        width: 100%;
+      }
+
+      .cancel-btn {
+        min-width: 130px;
+      }
+
+      .sound-toggle {
+        left: auto;
+        right: 10px;
+        bottom: 9px;
+      }
+
+      .modal {
+        padding: 14px;
+      }
+
+      .terms-content {
+        height: 320px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  
+
+    /* =========================================================
+       EXTRA CHAOS LAYER — BEHAVIORAL PRANK CONTROLS
+       ========================================================= */
+
+    .chaos-control-deck {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .chaos-control {
+      min-height: 58px;
+      padding: 9px;
+      border: 4px solid #111;
+      background: #fff;
+      box-shadow: 4px 4px 0 #111;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 1000;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .chaos-control:hover {
+      transform: rotate(-1deg) translateY(-2px);
+      background: #fff59d;
+    }
+
+    .anti-volume-wrap {
+      margin-top: 11px;
+      padding: 10px;
+      border: 4px dotted #111;
+      background: #ffebee;
+      transform: rotate(.7deg);
+    }
+
+    .anti-volume-wrap label {
+      display: block;
+      margin: 0 0 6px;
+      background: none;
+      border: 0;
+      padding: 0;
+      animation: none;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    #antiVolume {
+      width: 100%;
+      direction: rtl;
+      accent-color: #f00;
+      cursor: ew-resize;
+    }
+
+    .volume-readout {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 5px;
+      font-family: monospace;
+      font-size: 10px;
+      font-weight: 1000;
+    }
+
+    #volumeMeter {
+      color: #d00000;
+      animation: microShake .35s infinite alternate;
+    }
+
+    @keyframes microShake {
+      from { transform: translateX(-1px) rotate(-.2deg); }
+      to { transform: translateX(1px) rotate(.2deg); }
+    }
+
+    .fake-browser-bar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      margin: 8px auto -3px;
+      width: min(760px, calc(100% - 20px));
+      padding: 7px 10px;
+      border: 3px solid #111;
+      background: rgba(255,255,255,.94);
+      box-shadow: 5px 5px 0 #111;
+      font: 900 10px monospace;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transform: rotate(.25deg);
+    }
+
+    .fake-browser-url {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 5px 8px;
+      border: 2px solid #888;
+      background: #f6f6f6;
+    }
+
+    .fake-browser-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #f00;
+      border: 1px solid #111;
+      flex: 0 0 auto;
+    }
+
+    .screen-glitch {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 900;
+      opacity: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,0,0,.08) 0,
+          rgba(255,0,0,.08) 2px,
+          transparent 2px,
+          transparent 5px
+        );
+      mix-blend-mode: multiply;
+    }
+
+    .screen-glitch.flash {
+      animation: glitchFlash .28s steps(2, end);
+    }
+
+    @keyframes glitchFlash {
+      0% { opacity: .65; transform: translateX(0); }
+      40% { opacity: .18; transform: translateX(4px); }
+      70% { opacity: .58; transform: translateX(-5px); }
+      100% { opacity: 0; transform: translateX(0); }
+    }
+
+    .fake-alert {
+      position: fixed;
+      left: 50%;
+      top: 13%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: min(560px, calc(100% - 24px));
+      background: #fff;
+      color: #111;
+      border: 7px solid #d00000;
+      box-shadow: 12px 12px 0 #111;
+      z-index: 12000;
+      padding: 17px;
+      display: none;
+    }
+
+    .fake-alert.open {
+      display: block;
+      animation: alertAppear .25s ease-out;
+    }
+
+    .fake-alert h3 {
+      margin: 0 0 8px;
+      font-family: Impact, fantasy;
+      font-size: 28px;
+      color: #d00000;
+    }
+
+    .fake-alert p {
+      margin: 0;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 900;
+    }
+
+    .fake-alert .alert-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .fake-alert button {
+      border: 3px solid #111;
+      padding: 9px 11px;
+      font-weight: 1000;
+      background: #ffeb3b;
+      box-shadow: 4px 4px 0 #111;
+    }
+
+    @keyframes alertAppear {
+      from { opacity: 0; transform: translateX(-50%) scale(.7) rotate(8deg); }
+      to { opacity: 1; transform: translateX(-50%) scale(1) rotate(-2deg); }
+    }
+
+    .fake-recaptcha {
+      margin-top: 12px;
+      padding: 10px;
+      border: 3px solid #333;
+      background: #fafafa;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+
+    .human-slider {
+      width: 100%;
+      margin-top: 7px;
+      accent-color: #111;
+    }
+
+    .slider-chaos-note {
+      min-height: 18px;
+      margin-top: 5px;
+      font-size: 10px;
+      font-weight: 900;
+      color: #b00020;
+    }
+
+    .key-log {
+      margin-top: 10px;
+      min-height: 40px;
+      padding: 8px;
+      border: 3px solid #111;
+      background: #101010;
+      color: #00ff5e;
+      font: 10px/1.5 monospace;
+      overflow: hidden;
+    }
+
+    @media (max-width: 620px) {
+      .chaos-control-deck { grid-template-columns: 1fr; }
+      .fake-browser-bar { position: relative; top: auto; }
+    }
+
+
+
+    /* =========================================================
+       DEEP CHAOS LAYER — PERSONALIZED UX SABOTAGE
+       ========================================================= */
+    :root { --chaos-intensity: 1; }
+
+    body.x-chaos-1 { --chaos-intensity: 1.08; }
+    body.x-chaos-2 { --chaos-intensity: 1.16; }
+    body.x-chaos-3 { --chaos-intensity: 1.24; }
+    body.x-chaos-4 { --chaos-intensity: 1.34; }
+
+    .x-interaction-meter {
+      margin-top: 12px;
+      padding: 9px;
+      border: 4px solid #111;
+      background: #111;
+      color: #ffeb3b;
+      font: 900 10px monospace;
+      box-shadow: 5px 5px 0 #ff1744;
+      transform: rotate(-.5deg);
+    }
+
+    .x-interaction-track {
+      height: 11px;
+      margin-top: 6px;
+      border: 2px solid #ffeb3b;
+      background: #222;
+      overflow: hidden;
+    }
+
+    .x-interaction-fill {
+      width: 0%;
+      height: 100%;
+      background: repeating-linear-gradient(90deg, #ff1744 0 10px, #ffd600 10px 20px, #00e676 20px 30px);
+      transition: width .2s linear;
+    }
+
+    .x-fake-permission {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.78);
+      z-index: 14000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 8vh 16px 16px;
+    }
+    .x-fake-permission.open { display:flex; }
+    .x-permission-card {
+      width: min(520px, 100%);
+      background: #f8fafc;
+      color: #111;
+      border: 7px solid #111;
+      box-shadow: 12px 12px 0 #ff1744;
+      padding: 18px;
+      transform: rotate(-1.4deg);
+      animation: xPermissionIn .22s ease-out;
+    }
+    .x-permission-card h3 {
+      margin:0 0 8px;
+      font: 900 clamp(25px,5vw,40px)/1 Impact, fantasy;
+      color:#c00000;
+    }
+    .x-permission-card p { margin:7px 0; font: 900 13px/1.45 monospace; }
+    .x-perm-buttons { display:flex; flex-wrap:wrap; gap:9px; margin-top:13px; }
+    .x-perm-buttons button {
+      border:3px solid #111; padding:10px 12px; font-weight:1000;
+      box-shadow:4px 4px 0 #111; background:#ffe082;
+    }
+    @keyframes xPermissionIn {
+      from { opacity:0; transform:translateY(-30px) rotate(6deg) scale(.88); }
+      to { opacity:1; transform:translateY(0) rotate(-1.4deg) scale(1); }
+    }
+
+    .x-danger-zone {
+      margin-top: 11px;
+      padding: 9px;
+      border: 3px dashed #111;
+      background: #fff8e1;
+      font: 900 10px monospace;
+    }
+    .x-danger-zone span { color:#b00020; }
+
+    .x-cursor-trail {
+      position: fixed;
+      width: 9px;
+      height: 9px;
+      border: 2px solid #111;
+      border-radius: 50%;
+      pointer-events:none;
+      z-index: 9500;
+      background:#ff0;
+      transform:translate(-50%,-50%);
+      opacity:.8;
+    }
+
+    .x-fake-success {
+      position: fixed;
+      left: 50%; top: 7%;
+      transform: translateX(-50%) rotate(1deg);
+      width:min(650px,calc(100% - 24px));
+      background:#0b3;
+      color:#fff;
+      border:6px solid #111;
+      box-shadow:12px 12px 0 #111;
+      z-index:13500;
+      display:none;
+      padding:16px;
+      font-family:monospace;
+    }
+    .x-fake-success.open { display:block; animation:xSuccessIn .3s ease-out; }
+    @keyframes xSuccessIn {
+      from { opacity:0; transform:translateX(-50%) scale(.72) rotate(-6deg); }
+      to { opacity:1; transform:translateX(-50%) scale(1) rotate(1deg); }
+    }
+    .x-fake-success strong { display:block; font:1000 28px Impact, fantasy; margin-bottom:6px; }
+
+    .x-decoy-close {
+      position: fixed;
+      right: 12px;
+      top: 58px;
+      z-index: 13000;
+      background:#fff;
+      color:#111;
+      border:4px solid #111;
+      box-shadow:5px 5px 0 #111;
+      padding:8px 10px;
+      font:1000 11px monospace;
+      transform:rotate(2deg);
+    }
+    .x-decoy-close:hover { transform:rotate(-3deg) scale(1.04); }
+
+    .x-shuffle-field {
+      animation: xFieldShuffle .38s ease;
+    }
+    @keyframes xFieldShuffle {
+      0% { transform:translate(0); }
+      25% { transform:translate(8px,-2px) rotate(.8deg); }
+      50% { transform:translate(-6px,2px) rotate(-.8deg); }
+      75% { transform:translate(5px,0) rotate(.4deg); }
+      100% { transform:translate(0); }
+    }
+
+    .x-evil-overlay {
+      position:fixed; inset:0; pointer-events:none; z-index:899;
+      opacity:0;
+      background:
+        linear-gradient(transparent 48%, rgba(255,0,0,.10) 49%, transparent 51%),
+        linear-gradient(90deg, transparent 48%, rgba(0,0,0,.10) 49%, transparent 51%);
+    }
+    .x-evil-overlay.on { animation:xEvilFlash .48s steps(3,end); }
+    @keyframes xEvilFlash {
+      0%{opacity:0;transform:scale(1)}
+      25%{opacity:.55;transform:scale(1.01) translateX(4px)}
+      55%{opacity:.28;transform:scale(.998) translateX(-5px)}
+      100%{opacity:0;transform:scale(1)}
+    }
+
+    @media (max-width:620px) {
+      .x-decoy-close { top: 52px; font-size:9px; }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="background-chaos" aria-hidden="true">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="symbol-rain">
+      ⚠ LOGIN ERROR ??? 404 :( ⚠ 💀 🔐 ?! @@@
+      USER USER USER NO NO YES MAYBE FAAAah
+      ◼ ◻ ◇ ★ !!! WARNING WARNING WARNING
+      PASSWORD? PASSWORD? BANANA BANANA
+    </div>
+  </div>
+
+  <div class="chaos-strip" aria-hidden="true">
+    <span>⚠ UX VIOLATION</span>
+    <span>🤨 ARE YOU SURE?</span>
+    <span>💀 BAD DECISION</span>
+    <span>🔐 PROBABLY SECURE</span>
+    <span>🚨 WHY ARE YOU HERE?</span>
+  </div>
+
+  <main class="page">
+    <section class="welcome">
+      <h1>🚨 WELCOME TO THE LOGIN SYSTEM 🚨</h1>
+      <p class="subtitle">
+        Congratulations. You have successfully reached the login page.
+        Unfortunately, this is where your problems begin.
+      </p>
+
+      <div class="warning">⚠️ LOGIN AT YOUR OWN RISK ⚠️</div>
+
+      <p class="blink">THIS PAGE IS PROBABLY A BAD IDEA.</p>
+    </section>
+
+    <section class="dashboard">
+      <div class="stat">
+        <small>😐 User Patience</small>
+        <strong id="patienceText">100%</strong>
+        <div class="meter">
+          <div id="patienceBar" class="meter-bar"></div>
+        </div>
+      </div>
+
+      <div class="stat">
+        <small>🔢 Login Attempts</small>
+        <strong id="attemptText">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>🔐 Security Level</small>
+        <strong id="securityText">Extremely Questionable</strong>
+      </div>
+
+      <div class="stat">
+        <small>🧠 Sanity Status</small>
+        <strong id="sanityText">Mostly Fine</strong>
+      </div>
+    </section>
+
+    <div class="login-layout">
+      <section class="login-card" id="loginCard">
+        <h2 class="form-heading">Please Log In</h2>
+        <p class="form-subheading">
+          We made this unnecessarily complicated for absolutely no reason.
+        </p>
+
+        <!-- Username -->
+        <div class="field">
+          <label class="field-label" for="username">
+            Please enter the name you think you might possibly be.
+          </label>
+
+          <input
+            id="username"
+            class="field-input"
+            type="text"
+            autocomplete="off"
+            placeholder="Your probably-name..."
+            maxlength="40"
+            aria-describedby="usernameReaction visualUsername"
+          />
+
+          <div id="visualUsername" class="username-display">
+            Visual representation will betray you here.
+          </div>
+
+          <div id="usernameReaction" class="username-react" aria-live="polite"></div>
+
+          <div class="mini-row">
+            <button
+              id="verifyName"
+              class="verify-btn"
+              type="button"
+              data-tip="This won't help."
+              title="This won't help."
+            >
+              🔍 VERIFY MY NAME
+            </button>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <label class="field-label" for="password">
+            Enter your secret thing.
+          </label>
+
+          <div class="password-wrap">
+            <input
+              id="password"
+              class="field-input"
+              type="password"
+              autocomplete="off"
+              placeholder="Probably your password..."
+              maxlength="80"
+              aria-describedby="passwordReaction"
+            />
+            <button id="showPassword" class="show-password" type="button">
+              👁 Show Password
+            </button>
+          </div>
+
+          <div class="password-reaction" id="passwordReaction"></div>
+
+          <div class="requirements">
+            <strong>Your password must contain:</strong>
+            <ul>
+              <li>At least 1 uppercase letter</li>
+              <li>At least 1 lowercase letter</li>
+              <li>At least 1 number</li>
+              <li>At least 1 special character</li>
+              <li>At least 1 emoji</li>
+              <li>At least 1 dinosaur</li>
+              <li>At least 1 character that doesn't exist</li>
+              <li>At least 7.5 letters</li>
+              <li>Something emotionally meaningful</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Remember me -->
+        <div class="remember">
+          <input id="remember" type="checkbox" />
+          <label for="remember">
+            Please remember me unless you forget.
+          </label>
+        </div>
+
+        <!-- Terms -->
+        <div class="terms">
+          <label for="terms">
+            <input id="terms" type="checkbox" />
+            <span>
+              I have read and understood the
+              <span id="termsLink" class="terms-link" role="button" tabindex="0">
+                Terms, Conditions, Privacy Policy, Cookie Policy, Cookie Policy
+                for the Cookie Policy, and the Terms explaining why I need to
+                read the Terms.
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <!-- CAPTCHA -->
+        <div class="captcha">
+          <h3>🤖 CAPTCHA FROM HELL</h3>
+
+          <div id="captchaQuestion" class="captcha-question">
+            What is 2 + 2?
+          </div>
+
+          <div id="captchaOptions" class="captcha-options"></div>
+
+          <div id="captchaStatus" class="captcha-status"></div>
+
+          <button id="captchaRefresh" class="captcha-refresh" type="button">
+            ↻ Make CAPTCHA Even Worse
+          </button>
+        </div>
+
+
+
+        <div class="chaos-control-deck">
+          <button id="panicBtn" class="chaos-control" type="button">
+            🚨 PANIC BUTTON<br><span>Absolutely do not press</span>
+          </button>
+          <button id="normalModeBtn" class="chaos-control" type="button">
+            🧼 MAKE IT NORMAL<br><span>(This button is lying)</span>
+          </button>
+        </div>
+
+        <div class="anti-volume-wrap">
+          <label for="antiVolume">🎚️ SILENCE CONTROL (LEFT = LOUDER FOR SOME REASON)</label>
+          <input id="antiVolume" type="range" min="0" max="100" value="35" />
+          <div class="volume-readout">
+            <span>LESS SOUND ←</span>
+            <span id="volumeMeter">UNREASONABLY LOUD: 35%</span>
+            <span>→ MORE SOUND</span>
+          </div>
+        </div>
+
+        <div class="fake-recaptcha">
+          <strong>☑ I AM NOT A RESPONSIBLE DECISION-MAKER</strong>
+          <input id="humanSlider" class="human-slider" type="range" min="0" max="100" value="0" />
+          <div id="sliderChaosNote" class="slider-chaos-note">Slide to prove you are human.</div>
+        </div>
+
+        <div id="keyLog" class="key-log" aria-live="polite">
+          KEYBOARD FORENSICS: waiting for evidence...
+        </div>
+
+        <div class="system-status" id="systemStatus">
+          SYSTEM MESSAGE: Waiting for someone to make a terrible decision.
+        </div>
+
+
+
+        <div class="x-interaction-meter">
+          🧠 INTERACTION HOSTILITY INDEX: <span id="xHostilityText">0%</span>
+          <div class="x-interaction-track"><div id="xHostilityFill" class="x-interaction-fill"></div></div>
+        </div>
+        <div class="x-danger-zone">
+          <span>LIVE DIAGNOSTIC:</span> The more you fight the interface, the more it learns.
+        </div>
+
+        <div class="actions" id="actions">
+          <button
+            id="loginBtn"
+            class="login-btn"
+            type="button"
+            title="You sure?"
+          >
+            LOGIN
+          </button>
+
+          <button
+            id="cancelBtn"
+            class="secondary-btn cancel-btn"
+            type="button"
+            title="Coward."
+          >
+            CANCEL
+          </button>
+        </div>
+
+        <div id="mouseHint" class="mouse-hint"></div>
+
+        <div
+          id="forgotPassword"
+          class="forgot"
+          role="button"
+          tabindex="0"
+          title="Again?"
+        >
+          Forgot Password?
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="side-box">
+          <h3>🔐 SECURITY LEVEL</h3>
+          <div id="securitySide" class="security-value">
+            Extremely Questionable
+          </div>
+          <p class="side-note">
+            We would reassure you, but that would be dishonest.
+          </p>
+        </div>
+
+        <div class="side-box">
+          <h3>🎯 ATTEMPT COUNTER</h3>
+          <div id="attemptSide" class="attempts">0</div>
+          <p id="attemptMessage" class="side-note">
+            A fresh beginning. How optimistic.
+          </p>
+        </div>
+
+        <div class="side-box">
+          <h3>🔊 SOUND SYSTEM</h3>
+          <p class="side-note">
+            Tiny weird sounds may occur. Browser audio permission may be
+            required. This is somehow considered a feature.
+          </p>
+        </div>
+
+        <div class="side-box">
+          <h3>👀 CURSOR INTELLIGENCE</h3>
+          <p class="side-note">
+            Hover over things. They may judge you.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <section id="finalScreen" class="final-screen">
+      <h2>🎉 CONGRATULATIONS 🎉</h2>
+      <div class="failed">YOU HAVE SUCCESSFULLY FAILED TO LOG IN.</div>
+
+      <p id="finalAttempts">It took you 17 attempts.</p>
+      <p>Your patience has been measured.</p>
+      <p>Your sanity has not.</p>
+
+      <button id="restartBtn" class="restart" type="button">
+        🔄 START THE SUFFERING AGAIN
+      </button>
+    </section>
+
+    <footer>
+      LOCAL DEMONSTRATION ONLY · NO DATA IS SENT ANYWHERE · NO REAL PASSWORDS ARE COLLECTED ·
+      THE SERVER IS NOT DISAPPOINTED BECAUSE THERE IS NO SERVER
+    </footer>
+  </main>
+
+  <button id="soundToggle" class="sound-toggle" type="button">
+    🔊 SOUND: ON
+  </button>
+
+  <div class="fake-browser-bar" aria-hidden="true">
+    <span class="fake-browser-dot"></span>
+    <div class="fake-browser-url" id="fakeUrl">https://login.definitely-real.example/authentic-login</div>
+    <span>☰</span>
+  </div>
+
+  <div id="screenGlitch" class="screen-glitch" aria-hidden="true"></div>
+
+  <div id="soundMutinyAlert" class="fake-alert" role="dialog" aria-modal="true" aria-live="assertive">
+    <h3>🔊 EXCUSE ME?</h3>
+    <p id="soundMutinyText">
+      Do you really think I will turn the sound off? I will increase it.
+    </p>
+    <div class="alert-actions">
+      <button id="makeLouder" type="button">YES, MAKE IT LOUDER</button>
+      <button id="pretendSilence" type="button">I REGRET EVERYTHING</button>
+    </div>
+  </div>
+
+
+
+
+  <!-- DEEP CHAOS UI -->
+  <div class="x-fake-permission" id="xPermission">
+    <div class="x-permission-card">
+      <h3>⚠️ ONE MORE THING</h3>
+      <p id="xPermissionText">This website would like permission to continue being difficult.</p>
+      <p>Requested permissions:</p>
+      <p>• Rearrange your expectations<br>• Question your choices<br>• Increase unnecessary drama</p>
+      <div class="x-perm-buttons">
+        <button id="xAllowChaos">ALLOW CHAOS</button>
+        <button id="xDenyChaos">DENY (RECOMMENDED)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="x-fake-success" id="xFakeSuccess">
+    <strong>✅ LOGIN SUCCESSFUL!!!</strong>
+    <div id="xFakeSuccessText">Congratulations. You did it.</div>
+  </div>
+
+  <button id="xDecoyClose" class="x-decoy-close" type="button">✕ CLOSE WEBSITE</button>
+  <div id="xEvilOverlay" class="x-evil-overlay" aria-hidden="true"></div>
+  <div id="xTrailContainer" aria-hidden="true"></div>
+
+  <div id="popupStack" aria-live="polite"></div>
+
+  <!-- =========================================================
+       NAME VERIFICATION MODAL
+       ========================================================= -->
+  <div id="nameModal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2>🔍 NAME VERIFICATION</h2>
+
+      <div id="nameModalMessage" class="modal-message">
+        Preparing absolutely unnecessary verification...
+      </div>
+
+      <div class="modal-progress">
+        <div id="nameProgressBar" class="modal-progress-bar"></div>
+      </div>
+
+      <div id="nameModalActions" class="modal-actions">
+        <button id="nameYes" type="button">Yes, this is my name</button>
+        <button id="nameUnsure" type="button">I'm not sure</button>
+        <button id="nameForgot" type="button">I have forgotten</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TERMS MODAL
+       ========================================================= -->
+  <div id="termsModal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2>📜 TERMS, TERMS, TERMS</h2>
+
+      <div class="terms-content" id="termsContent">
+        <p>
+          Congratulations. You have opened the Terms and Conditions instead
+          of simply accepting them like everyone else.
+        </p>
+
+        <h4>Section 1: Clicking</h4>
+        <p>
+          By continuing, you agree that you have clicked Continue. By
+          acknowledging that you clicked Continue, you further acknowledge
+          that you understood the philosophical implications of clicking
+          Continue.
+        </p>
+
+        <h4>Section 2: Your Name</h4>
+        <p>
+          We make no guarantees that the name you entered belongs to you,
+          resembles you, or has ever been approved by anyone.
+        </p>
+
+        <h4>Section 3: Password</h4>
+        <p>
+          Your password remains your responsibility. Our system will inspect
+          it emotionally, technically, spiritually, and occasionally for
+          vibes.
+        </p>
+
+        <h4>Section 4: Cookies</h4>
+        <p>
+          This website has no backend and therefore cannot actually track
+          cookies for authentication. Nevertheless, Cookie Policy exists.
+        </p>
+
+        <h4>Section 5: Cookie Policy for Cookie Policy</h4>
+        <p>
+          You hereby agree to the Cookie Policy governing how you are expected
+          to think about the Cookie Policy. Any cookies mentioned herein are
+          entirely theoretical.
+        </p>
+
+        <h4>Section 6: Privacy</h4>
+        <p>
+          No information is transmitted anywhere by this demonstration.
+          Everything stays inside your browser. This is one of the few
+          reassuring things on this page.
+        </p>
+
+        <h4>Section 7: Reading</h4>
+        <p>
+          If you are actually reading this, the development team would like
+          to congratulate you on your unusual dedication.
+        </p>
+
+        <h4>Section 8: More Reading</h4>
+        <p>
+          Paragraphs are intentionally repeated because the legal team was
+          unavailable and we needed to fill space.
+        </p>
+
+        <h4>Section 9: Very Important Thing</h4>
+        <p>
+          You probably didn't read this.
+        </p>
+
+        <h4>Section 10: The Final Extremely Important Thing</h4>
+        <p>
+          Please scroll back down and confirm that you definitely read all
+          of this. The checkbox is not optional emotionally.
+        </p>
+      </div>
+
+      <div class="terms-confirm">
+        <input id="readTerms" type="checkbox" />
+        <label for="readTerms">I definitely read all of this.</label>
+      </div>
+
+      <div class="modal-actions">
+        <button id="closeTerms" type="button">I Guess I'm Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       FORGOT PASSWORD MODAL
+       ========================================================= -->
+  <div id="forgotModal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2>🔑 FORGOT?</h2>
+
+      <div id="forgotContent" class="forgot-flow">
+        Forgot your password?
+        <br /><br />
+        <button id="forgotYes" type="button">YES</button>
+        <button id="forgotNo" type="button">NO</button>
+      </div>
+
+      <div id="fakeReset" class="fake-reset">
+        <input
+          id="resetEmail"
+          type="text"
+          placeholder="Enter the email you probably use..."
+        />
+        <button id="fakeResetBtn" class="mini-btn" type="button">
+          SEND TOTALLY REAL RESET EMAIL
+        </button>
+      </div>
+
+      <div class="modal-actions">
+        <button id="closeForgot" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       LOGIN PROCESS MODAL
+       ========================================================= -->
+  <div id="loginModal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2 id="loginProcessTitle">LOGGING IN...</h2>
+
+      <div id="loginProcessMessage" class="modal-message">
+        Preparing disappointment...
+      </div>
+
+      <div class="modal-progress">
+        <div id="loginProgressBar" class="modal-progress-bar"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="processClose" type="button" style="display:none;">
+          Fine. Whatever.
+        </button>
+        <button id="processAgain" type="button" style="display:none;">
+          TRY AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       STATE
+       ========================================================= */
+
+    const state = {
+      attempts: 0,
+      patience: 100,
+      soundOn: true,
+      showPasswordStage: 0,
+      loginEscapes: 0,
+      captchaRound: 0,
+      captchaValue: null,
+      finalUnlocked: false,
+      popupCount: 0,
+      audioContext: null,
+      masterGain: null,
+      soundDefiance: 0,
+      volumeLevel: 0.12,
+      timers: new Set(),
+      usernameLastReaction: 0,
+      passwordLastReaction: 0,
+      panicCount: 0,
+      fakeNormalAttempts: 0,
+      sliderTricks: 0,
+      keyHistory: [],
+      tabCount: 0,
+      copyCount: 0
+    };
+
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const remember = document.getElementById("remember");
+    const terms = document.getElementById("terms");
+    const loginBtn = document.getElementById("loginBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+
+    const patienceText = document.getElementById("patienceText");
+    const patienceBar = document.getElementById("patienceBar");
+    const attemptText = document.getElementById("attemptText");
+    const attemptSide = document.getElementById("attemptSide");
+    const attemptMessage = document.getElementById("attemptMessage");
+    const securityText = document.getElementById("securityText");
+    const securitySide = document.getElementById("securitySide");
+    const sanityText = document.getElementById("sanityText");
+
+    const usernameReaction = document.getElementById("usernameReaction");
+    const visualUsername = document.getElementById("visualUsername");
+    const passwordReaction = document.getElementById("passwordReaction");
+    const systemStatus = document.getElementById("systemStatus");
+    const mouseHint = document.getElementById("mouseHint");
+
+    const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    function addTimer(fn, delay) {
+      const timer = setTimeout(() => {
+        state.timers.delete(timer);
+        fn();
+      }, delay);
+
+      state.timers.add(timer);
+      return timer;
+    }
+
+    function clearAllTimers() {
+      for (const timer of state.timers) {
+        clearTimeout(timer);
+      }
+      state.timers.clear();
+    }
+
+    /* =========================================================
+       AUDIO SYSTEM
+       Uses Web Audio API. No external files.
+       ========================================================= */
+
+    function ensureAudio() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+
+        if (!state.audioContext) {
+          state.audioContext = new AudioCtx();
+          state.masterGain = state.audioContext.createGain();
+          state.masterGain.gain.value = state.volumeLevel;
+          state.masterGain.connect(state.audioContext.destination);
+        }
+
+        if (state.audioContext.state === "suspended") {
+          state.audioContext.resume().catch(() => {});
+        }
+
+        if (state.masterGain) {
+          state.masterGain.gain.setTargetAtTime(
+            state.volumeLevel,
+            state.audioContext.currentTime,
+            0.025
+          );
+        }
+
+        return state.audioContext;
+      } catch {
+        return null;
+      }
+    }
+
+    function playTone(frequency = 440, duration = .055, type = "square", volume = .025) {
+      const ctx = ensureAudio();
+      if (!ctx || !state.masterGain) return;
+
+      try {
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+        gain.gain.setValueAtTime(volume, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+          0.0001,
+          ctx.currentTime + duration
+        );
+
+        oscillator.connect(gain);
+        gain.connect(state.masterGain);
+
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + duration);
+      } catch {
+        // Audio is deliberately non-essential.
+      }
+    }
+
+    function playTypingSound(char) {
+      const c = (char || "a").toLowerCase();
+      const code = c.charCodeAt(0) || 97;
+      const frequency = 180 + ((code * 37) % 620);
+      const types = ["square", "triangle", "sine", "sawtooth"];
+
+      playTone(
+        frequency,
+        .035 + Math.random() * .045,
+        random(types),
+        .018
+      );
+    }
+
+    function synthVoice(text, rate = 1, pitch = 1.1) {
+      if (!("speechSynthesis" in window)) return;
+
+      try {
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        utterance.volume = Math.min(1, Math.max(.2, state.volumeLevel * 4));
+
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length) {
+          const preferred =
+            voices.find(v => /en/i.test(v.lang) && /female|zira|samantha/i.test(v.name)) ||
+            voices.find(v => /en/i.test(v.lang));
+
+          if (preferred) utterance.voice = preferred;
+        }
+
+        window.speechSynthesis.speak(utterance);
+      } catch {
+        // Do not break the page if speech is unavailable.
+      }
+    }
+
+    function makeNoiseReaction(force = false) {
+      if (!force && Math.random() > .42) return;
+
+      const sounds = [
+        "FAAAAH!",
+        "Bruhhh!",
+        "NOOO!",
+        "Why?",
+        "Seriously?",
+        "Again?",
+        "FAAAAH... 😭"
+      ];
+
+      const sound = random(sounds);
+
+      {
+        if (Math.random() < .55) {
+          synthVoice(sound, .85 + Math.random() * .35, .8 + Math.random() * .7);
+        } else {
+          playTone(
+            90 + Math.random() * 180,
+            .15,
+            "sawtooth",
+            .035
+          );
+        }
+      }
+
+      showPopup("🚨 SYSTEM MESSAGE", sound);
+    }
+
+    /* =========================================================
+       USERNAME REVERSE ALPHABET DISPLAY
+       A -> Z, B -> Y, etc.
+       ========================================================= */
+
+    function reverseAlphabetCharacter(char) {
+      const code = char.charCodeAt(0);
+
+      if (code >= 65 && code <= 90) {
+        return String.fromCharCode(90 - (code - 65));
+      }
+
+      if (code >= 97 && code <= 122) {
+        return String.fromCharCode(122 - (code - 97));
+      }
+
+      return char;
+    }
+
+    function visuallyTransform(text) {
+      return [...text].map(reverseAlphabetCharacter).join("");
+    }
+
+    const usernameMessages = [
+      "Interesting choice.",
+      "Are you sure that's your name?",
+      "That sounds made up.",
+      "I've heard worse.",
+      "Identity questionable.",
+      "This name has been reported to be suspicious.",
+      "I don't remember approving this name.",
+      "Are you legally allowed to use that name?",
+      "Hmm... sounds fictional.",
+      "Your name seems to be having an identity crisis."
+    ];
+
+    function reactToUsername(value) {
+      const lower = value.trim().toLowerCase();
+
+      if (!value) {
+        usernameReaction.textContent = "";
+        visualUsername.textContent =
+          "Visual representation will betray you here.";
+        return;
+      }
+
+      visualUsername.textContent = visuallyTransform(value);
+
+      if (lower === "raja") {
+        usernameReaction.textContent = "Hmm... Raja? Are we sure?";
+      } else if (lower === "admin") {
+        usernameReaction.textContent = "That's suspiciously confident.";
+      } else if (lower === "user") {
+        usernameReaction.textContent = "Wow. Such originality.";
+      } else if (lower === "password") {
+        usernameReaction.textContent = "You cannot be serious.";
+      } else if (lower === "123456") {
+        usernameReaction.textContent = "Please have some creativity.";
+      } else if (lower === "hello") {
+        usernameReaction.textContent = "Hello. Unfortunately.";
+      } else {
+        usernameReaction.textContent = random(usernameMessages);
+      }
+
+      if (lower === "admin") {
+        systemStatus.textContent = "SYSTEM MESSAGE: Nice try.";
+      } else if (lower === "f") {
+        systemStatus.textContent = "SYSTEM MESSAGE: F in the chat.";
+      } else {
+        systemStatus.textContent = "SYSTEM MESSAGE: Name entered. Confidence not detected.";
+      }
+
+      state.usernameLastReaction = Date.now();
+    }
+
+    username.addEventListener("input", (event) => {
+      const value = event.target.value;
+      const typed = value.slice(-1);
+
+      if (typed) {
+        playTypingSound(typed);
+      }
+
+      reactToUsername(value);
+
+      if (Math.random() < .12) {
+        makeNoiseReaction();
+      }
+
+      updateChaos();
+    });
+
+    /* =========================================================
+       PASSWORD REACTIONS
+       ========================================================= */
+
+    const passwordMessages = [
+      "Password looks suspicious.",
+      "This password has trust issues.",
+      "Too confident.",
+      "Password rejected emotionally.",
+      "Your password is judging us.",
+      "That password feels illegal.",
+      "We don't like the vibes.",
+      "Try something less password-like."
+    ];
+
+    password.addEventListener("input", (event) => {
+      const typed = event.target.value.slice(-1);
+
+      if (typed) {
+        playTypingSound(typed);
+      }
+
+      if (
+        event.target.value.length > 0 &&
+        Math.random() < .2 &&
+        Date.now() - state.passwordLastReaction > 700
+      ) {
+        passwordReaction.textContent = random(passwordMessages);
+        state.passwordLastReaction = Date.now();
+
+        reducePatience(5);
+        makeNoiseReaction();
+      } else if (!event.target.value) {
+        passwordReaction.textContent = "";
+      }
+    });
+
+    /* =========================================================
+       SHOW PASSWORD
+       ========================================================= */
+
+    const showPassword = document.getElementById("showPassword");
+
+    showPassword.addEventListener("click", () => {
+      state.showPasswordStage += 1;
+
+      playTone(260, .08, "triangle", .03);
+
+      if (state.showPasswordStage === 1) {
+        showPassword.textContent = "Are you REALLY sure?";
+        showPopup("👁 SECURITY", "This seems like a bad idea.");
+        reducePatience(2);
+        return;
+      }
+
+      if (state.showPasswordStage === 2) {
+        showPassword.textContent = "This seems like a bad idea.";
+        showPopup("👁 SECURITY", "You have been warned.");
+        reducePatience(2);
+        return;
+      }
+
+      password.type = "text";
+      showPassword.textContent = random([
+        "Hide the secret",
+        "Stop looking",
+        "You weren't supposed to see that."
+      ]);
+
+      addTimer(() => {
+        password.type = "password";
+
+        showPassword.textContent = random([
+          "👁 Show Password",
+          "Hide the secret",
+          "Stop looking",
+          "You weren't supposed to see that."
+        ]);
+
+        showPopup("🔐 PASSWORD", "Fine. The secret has been hidden again.");
+      }, 2600);
+
+      state.showPasswordStage = 0;
+    });
+
+    /* =========================================================
+       VERIFY NAME MODAL
+       ========================================================= */
+
+    const nameModal = document.getElementById("nameModal");
+    const nameModalMessage = document.getElementById("nameModalMessage");
+    const nameProgressBar = document.getElementById("nameProgressBar");
+    const nameModalActions = document.getElementById("nameModalActions");
+
+    document.getElementById("verifyName").addEventListener("click", () => {
+      reducePatience(4);
+      playTone(350, .12, "triangle", .03);
+
+      nameModal.classList.add("open");
+      nameModalActions.style.display = "none";
+
+      const stages = [
+        "Verifying...",
+        "Checking government database...",
+        "Checking the moon...",
+        "Asking the internet...",
+        "Consulting absolutely nobody...",
+        "❌ NAME VERIFICATION FAILED",
+        "We are not sure this is actually your name."
+      ];
+
+      nameProgressBar.style.width = "0%";
+
+      stages.forEach((message, index) => {
+        addTimer(() => {
+          nameModalMessage.textContent = message;
+          nameProgressBar.style.width =
+            Math.min(100, ((index + 1) / stages.length) * 100) + "%";
+
+          if (index === stages.length - 1) {
+            nameModalActions.style.display = "flex";
+            makeNoiseReaction(true);
+          }
+        }, index * 650);
+      });
+    });
+
+    document.getElementById("nameYes").addEventListener("click", () => {
+      nameModalMessage.textContent =
+        "That's exactly what someone pretending to be you would say.";
+      reducePatience(5);
+      makeNoiseReaction(true);
+    });
+
+    document.getElementById("nameUnsure").addEventListener("click", () => {
+      nameModalMessage.textContent =
+        "Excellent. At least you're honest.";
+      reducePatience(2);
+    });
+
+    document.getElementById("nameForgot").addEventListener("click", () => {
+      nameModalMessage.textContent =
+        "This is becoming a serious problem.";
+      reducePatience(4);
+    });
+
+    /* =========================================================
+       TERMS
+       ========================================================= */
+
+    const termsModal = document.getElementById("termsModal");
+    const readTerms = document.getElementById("readTerms");
+
+    function openTerms() {
+      termsModal.classList.add("open");
+      reducePatience(3);
+    }
+
+    document.getElementById("termsLink").addEventListener("click", openTerms);
+    document.getElementById("termsLink").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openTerms();
+      }
+    });
+
+    readTerms.addEventListener("change", () => {
+      if (readTerms.checked) {
+        showPopup("📜 LEGAL DEPARTMENT", "LIAR.");
+        reducePatience(6);
+        makeNoiseReaction();
+      }
+    });
+
+    document.getElementById("closeTerms").addEventListener("click", () => {
+      termsModal.classList.remove("open");
+      if (readTerms.checked) {
+        terms.checked = true;
+      }
+    });
+
+    terms.addEventListener("change", () => {
+      if (terms.checked) {
+        reducePatience(2);
+        showPopup(
+          "📜 TERMS",
+          "Thank you for legally acknowledging your poor decision."
+        );
+      }
+    });
+
+    /* =========================================================
+       REMEMBER ME
+       ========================================================= */
+
+    remember.addEventListener("change", () => {
+      playTone(210, .08, "square", .025);
+
+      if (remember.checked) {
+        const okay = Math.random() > .3;
+
+        if (okay) {
+          showPopup(
+            "🧠 MEMORY DEPARTMENT",
+            "Okay. We'll probably forget."
+          );
+        } else {
+          showPopup(
+            "🧠 MEMORY DEPARTMENT",
+            "Are you sure you want us to remember you?"
+          );
+        }
+
+        reducePatience(3);
+      }
+    });
+
+    /* =========================================================
+       CAPTCHA SYSTEM
+       ========================================================= */
+
+    const captchaQuestion = document.getElementById("captchaQuestion");
+    const captchaOptions = document.getElementById("captchaOptions");
+    const captchaStatus = document.getElementById("captchaStatus");
+
+    const captchaQuestions = [
+      {
+        question: "What is 2 + 2?",
+        answers: ["4", "5", "Banana", "Yes"],
+        correct: "4"
+      },
+      {
+        question: "Select the item most likely to be a chair.",
+        answers: ["🪑", "🐶", "🍕", "🚗", "🪑"],
+        correct: "🪑"
+      },
+      {
+        question: "What color is a suspicious banana?",
+        answers: ["Yellow", "Purple", "Banana", "None of your business"],
+        correct: "None of your business"
+      },
+      {
+        question: "Prove you are human.",
+        answers: ["I am human", "Definitely", "No comment", "Beep"],
+        correct: "No comment"
+      },
+      {
+        question: "Which option contains a chair?",
+        answers: ["🐱", "🪑", "🍕", "🌳", "Chairn't"],
+        correct: "Chairn't"
+      }
+    ];
+
+    function loadCaptcha() {
+      state.captchaRound += 1;
+
+      let captcha = random(captchaQuestions);
+
+      // Occasionally shuffle in a deliberately strange correct answer.
+      if (Math.random() < .18) {
+        captcha = {
+          ...captcha,
+          correct: random(captcha.answers)
+        };
+      }
+
+      state.captchaValue = captcha;
+
+      captchaQuestion.textContent = captcha.question;
+      captchaOptions.innerHTML = "";
+      captchaStatus.textContent = "";
+
+      [...captcha.answers]
+        .sort(() => Math.random() - .5)
+        .forEach(answer => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "captcha-option";
+          button.textContent = answer;
+
+          button.addEventListener("click", () => {
+            document.querySelectorAll(".captcha-option").forEach(b => {
+              b.classList.remove("selected");
+            });
+
+            button.classList.add("selected");
+
+            if (answer === state.captchaValue.correct) {
+              captchaStatus.textContent =
+                "✅ Correct. Unfortunately, that was only one problem.";
+              captchaStatus.style.color = "#008000";
+              playTone(700, .09, "triangle", .025);
+            } else {
+              captchaStatus.textContent =
+                "❌ Wrong. That option looked suspicious.";
+              captchaStatus.style.color = "#b30000";
+              reducePatience(15);
+              makeNoiseReaction(true);
+            }
+          });
+
+          captchaOptions.appendChild(button);
+        });
+    }
+
+    document.getElementById("captchaRefresh").addEventListener("click", () => {
+      reducePatience(3);
+      playTone(250, .06, "sawtooth", .025);
+      loadCaptcha();
+    });
+
+    loadCaptcha();
+
+    /* =========================================================
+       PATIENCE SYSTEM
+       ========================================================= */
+
+    function updatePatienceUI() {
+      const pct = Math.max(0, Math.min(100, state.patience));
+
+      patienceText.textContent = pct + "%";
+      patienceBar.style.width = pct + "%";
+
+      if (pct > 60) {
+        patienceBar.style.background = "#22c55e";
+        sanityText.textContent = "Mostly Fine";
+      } else if (pct > 30) {
+        patienceBar.style.background = "#f59e0b";
+        sanityText.textContent = "Questionable";
+      } else if (pct > 0) {
+        patienceBar.style.background = "#ef4444";
+        sanityText.textContent = "Gone Soon";
+      } else {
+        patienceBar.style.background = "#111";
+        sanityText.textContent = "💀 Depleted";
+      }
+
+      if (pct <= 0) {
+        showPatienceDepleted();
+      }
+    }
+
+    function reducePatience(amount) {
+      state.patience = Math.max(0, state.patience - amount);
+      updatePatienceUI();
+
+      if (Math.random() < .25) {
+        addTimer(() => {
+          showPopup(
+            "SYSTEM MESSAGE",
+            "Patience level: " + state.patience + "%."
+          );
+        }, 80);
+      }
+    }
+
+    let patienceShown = false;
+
+    function showPatienceDepleted() {
+      if (patienceShown) return;
+
+      patienceShown = true;
+
+      showPopup(
+        "💀 PATIENCE DEPLETED",
+        "Congratulations. You survived the login page."
+      );
+
+      systemStatus.textContent =
+        "SYSTEM MESSAGE: Patience level: 0%. Somehow you are still here.";
+
+      makeNoiseReaction(true);
+    }
+
+    /* =========================================================
+       LOGIN ATTEMPTS
+       ========================================================= */
+
+    function updateAttemptUI() {
+      attemptText.textContent = state.attempts;
+      attemptSide.textContent = state.attempts;
+
+      const messages = {
+        0: "A fresh beginning. How optimistic.",
+        5: "You're persistent.",
+        10: "Seriously?",
+        20: "Please go outside.",
+        30: "We admire your dedication."
+      };
+
+      if (messages[state.attempts]) {
+        attemptMessage.textContent = messages[state.attempts];
+      } else if (state.attempts > 30) {
+        attemptMessage.textContent = "At this point, this is a lifestyle.";
+      }
+
+      if ([5, 10, 20, 30].includes(state.attempts)) {
+        showPopup("📊 ATTEMPT COUNTER", messages[state.attempts]);
+      }
+    }
+
+    /* =========================================================
+       SECURITY LEVEL
+       ========================================================= */
+
+    const securityLevels = [
+      "Extremely Questionable",
+      "Weak",
+      "Terrible",
+      "Concerning",
+      "Suspicious",
+      "Absolutely Not"
+    ];
+
+    function randomizeSecurity() {
+      const level = random(securityLevels);
+      securityText.textContent = level;
+      securitySide.textContent = level;
+    }
+
+    /* =========================================================
+       POPUPS
+       ========================================================= */
+
+    function showPopup(title, message, duration = 3700) {
+      const stack = document.getElementById("popupStack");
+
+      if (stack.children.length >= 3) {
+        stack.firstElementChild?.remove();
+      }
+
+      const popup = document.createElement("div");
+      popup.className = "popup";
+
+      const close = document.createElement("button");
+      close.className = "close-popup";
+      close.type = "button";
+      close.textContent = "×";
+      close.setAttribute("aria-label", "Close notification");
+
+      close.addEventListener("click", () => {
+        popup.remove();
+      });
+
+      const strong = document.createElement("strong");
+      strong.textContent = title;
+
+      const p = document.createElement("p");
+      p.textContent = message;
+
+      popup.append(strong, p, close);
+      stack.appendChild(popup);
+
+      state.popupCount += 1;
+
+      addTimer(() => {
+        popup.remove();
+      }, duration);
+
+      return popup;
+    }
+
+    const popupMessages = [
+      ["🔔 Important Notification", "You are still here."],
+      ["🤔 Important-ish", "Are you enjoying this?"],
+      ["🚪 Exit Department", "You could have left."],
+      ["🚨 Security", "Login attempt detected."],
+      ["😱 Emergency", "FAAAAH!"],
+      ["📋 Purpose Department", "This popup has no purpose."]
+    ];
+
+    function randomPopup() {
+      if (Math.random() < .48) {
+        const item = random(popupMessages);
+        showPopup(item[0], item[1]);
+        reducePatience(3);
+      }
+    }
+
+    function scheduleRandomPopup() {
+      addTimer(() => {
+        if (!state.finalUnlocked) {
+          randomPopup();
+          scheduleRandomPopup();
+        }
+      }, 9000 + Math.random() * 12000);
+    }
+
+    scheduleRandomPopup();
+
+    /* =========================================================
+       ESCAPING LOGIN BUTTON
+       ========================================================= */
+
+    function moveLoginButton() {
+      if (state.loginEscapes >= 4) return false;
+
+      state.loginEscapes += 1;
+
+      const actions = document.getElementById("actions");
+      const rect = actions.getBoundingClientRect();
+
+      const maxX = Math.max(0, rect.width - loginBtn.offsetWidth - 8);
+      const maxY = Math.max(0, rect.height - loginBtn.offsetHeight - 8);
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
+      loginBtn.style.position = "absolute";
+      loginBtn.style.left = x + "px";
+      loginBtn.style.top = y + "px";
+      loginBtn.style.transition = "left .28s ease, top .28s ease, transform .18s ease";
+
+      loginBtn.textContent = random([
+        "NOPE.",
+        "Too slow.",
+        "Try again.",
+        "NOT YET",
+        "MAYBE LATER",
+        "YOU ALMOST HAD IT"
+      ]);
+
+      mouseHint.textContent = "The button has developed survival instincts.";
+
+      reducePatience(5);
+      makeNoiseReaction();
+
+      return true;
+    }
+
+    loginBtn.addEventListener("mouseenter", () => {
+      mouseHint.textContent = "You sure?";
+
+      if (
+        state.attempts < 4 &&
+        Math.random() < .55
+      ) {
+        moveLoginButton();
+      }
+    });
+
+    loginBtn.addEventListener("focus", () => {
+      mouseHint.textContent = "Keyboard users are also being judged.";
+
+      if (Math.random() < .2 && state.attempts < 3) {
+        moveLoginButton();
+      }
+    });
+
+    loginBtn.addEventListener("click", () => {
+      if (state.loginEscapes < 4 && Math.random() < .42) {
+        moveLoginButton();
+        return;
+      }
+
+      runLoginProcess();
+    });
+
+    /* =========================================================
+       LOGIN VALIDATION / PROCESS
+       ========================================================= */
+
+    const loginModal = document.getElementById("loginModal");
+    const loginProcessMessage = document.getElementById("loginProcessMessage");
+    const loginProgressBar = document.getElementById("loginProgressBar");
+    const processClose = document.getElementById("processClose");
+    const processAgain = document.getElementById("processAgain");
+
+    const loginStages = [
+      "Logging in...",
+      "Checking username...",
+      "Checking password...",
+      "Checking your existence...",
+      "Checking your Wi-Fi...",
+      "Asking the administrator...",
+      "Administrator is currently eating.",
+      "Retrying...",
+      "Almost there..."
+    ];
+
+    const loginErrors = [
+      "Wrong password.",
+      "Wrong username.",
+      "Wrong everything.",
+      "We don't know what happened.",
+      "Computer says no.",
+      "Authentication has left the building.",
+      "Your login request has been emotionally rejected.",
+      "The server is disappointed.",
+      "Please try again, but with more confidence.",
+      "Your credentials are having a meeting.",
+      "Error 404: Motivation not found.",
+      "Authentication failed for mysterious reasons.",
+      "We would tell you why, but we don't know."
+    ];
+
+    function validateEnough() {
+      const problems = [];
+
+      if (!username.value.trim()) {
+        problems.push("Username remains suspiciously empty.");
+      }
+
+      if (!password.value.trim()) {
+        problems.push("Password is apparently imaginary.");
+      }
+
+      if (!terms.checked) {
+        problems.push("You didn't agree to a giant pile of text.");
+      }
+
+      return problems;
+    }
+
+    function runLoginProcess() {
+      state.attempts += 1;
+      updateAttemptUI();
+
+      reducePatience(10);
+      randomizeSecurity();
+      makeNoiseReaction(true);
+
+      loginBtn.style.position = "relative";
+      loginBtn.style.left = "";
+      loginBtn.style.top = "";
+      loginBtn.textContent = "PROCESSING SOMETHING";
+
+      loginModal.classList.add("open");
+      processClose.style.display = "none";
+      processAgain.style.display = "none";
+      loginProcessMessage.textContent = "Preparing disappointment...";
+      loginProgressBar.style.width = "0%";
+
+      const problems = validateEnough();
+
+      if (problems.length) {
+        addTimer(() => {
+          finishLoginFailure(
+            "❌ LOGIN FAILED",
+            random(problems)
+          );
+        }, 850);
+
+        return;
+      }
+
+      loginStages.forEach((stage, index) => {
+        addTimer(() => {
+          loginProcessMessage.textContent = stage;
+
+          const width = Math.min(
+            99,
+            ((index + 1) / loginStages.length) * 100
+          );
+
+          loginProgressBar.style.width = width + "%";
+        }, index * 650);
+      });
+
+      addTimer(() => {
+        // Intentionally stop at 99%.
+        loginProgressBar.style.width = "99%";
+        loginProcessMessage.textContent = "99%...";
+
+        addTimer(() => {
+          const error = random(loginErrors);
+
+          finishLoginFailure(
+            "❌ LOGIN FAILED",
+            Math.random() < .22
+              ? "You clicked the button too confidently."
+              : error
+          );
+        }, 2200);
+      }, loginStages.length * 650);
+    }
+
+    function finishLoginFailure(title, reason) {
+      document.getElementById("loginProcessTitle").textContent = title;
+      loginProcessMessage.textContent = reason;
+      loginProgressBar.style.width = "99%";
+
+      processClose.style.display = "inline-block";
+      processAgain.style.display = "inline-block";
+
+      systemStatus.textContent =
+        "SYSTEM MESSAGE: Regret detected.";
+
+      if (state.attempts >= 5) {
+        state.finalUnlocked = true;
+      }
+
+      // Occasionally unlock final screen after enough interaction.
+      if (state.attempts >= 7 && state.patience <= 20) {
+        addTimer(showFinalScreen, 500);
+      }
+    }
+
+    processClose.addEventListener("click", () => {
+      loginModal.classList.remove("open");
+      loginBtn.textContent = random([
+        "LOGIN",
+        "ENTER",
+        "SUBMIT",
+        "MAYBE LOGIN",
+        "PLEASE CLICK ME",
+        "DON'T CLICK ME",
+        "DEFINITELY NOT LOGIN",
+        "LOGIN????"
+      ]);
+
+      makeNoiseReaction();
+    });
+
+    processAgain.addEventListener("click", () => {
+      loginModal.classList.remove("open");
+
+      addTimer(() => {
+        runLoginProcess();
+      }, 200);
+    });
+
+    /* =========================================================
+       CANCEL BUTTON
+       ========================================================= */
+
+    let cancelClicks = 0;
+
+    cancelBtn.addEventListener("mouseenter", () => {
+      mouseHint.textContent = "Coward.";
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      cancelClicks += 1;
+      playTone(150, .08, "square", .025);
+      reducePatience(2);
+
+      if (cancelClicks === 1) {
+        cancelBtn.textContent = "CANCEL???";
+        showPopup("🚪 CANCEL DEPARTMENT", "Cancel does not always mean cancel.");
+      } else if (cancelClicks === 2) {
+        cancelBtn.textContent = "Nice try.";
+        showPopup("🚪 CANCEL DEPARTMENT", "You thought that would work?");
+      } else if (cancelClicks === 3) {
+        cancelBtn.textContent = "Actually Cancel";
+        cancelBtn.style.transform =
+          "translate(" + (Math.random() * 80 - 40) + "px, " +
+          (Math.random() * 40 - 20) + "px)";
+      } else {
+        cancelBtn.textContent = "CANCELLED";
+        systemStatus.textContent =
+          "SYSTEM MESSAGE: Cancellation acknowledged. Probably.";
+      }
+    });
+
+    /* =========================================================
+       FORGOT PASSWORD FLOW
+       ========================================================= */
+
+    const forgotModal = document.getElementById("forgotModal");
+    const forgotContent = document.getElementById("forgotContent");
+    const fakeReset = document.getElementById("fakeReset");
+
+    function openForgot() {
+      forgotModal.classList.add("open");
+
+      forgotContent.innerHTML = `
+        Forgot your password?
+        <br><br>
+        <button id="forgotYes" type="button">YES</button>
+        <button id="forgotNo" type="button">NO</button>
+      `;
+
+      fakeReset.classList.remove("open");
+
+      bindForgotButtons();
+      reducePatience(4);
+    }
+
+    function bindForgotButtons() {
+      document.getElementById("forgotYes").addEventListener("click", () => {
+        forgotContent.innerHTML = `
+          That's unfortunate.
+          <br><br>
+          Do you remember your password?
+          <br><br>
+          <button id="rememberYes" type="button">YES</button>
+          <button id="rememberNo" type="button">NO</button>
+        `;
+
+        document.getElementById("rememberYes").addEventListener("click", () => {
+          forgotContent.innerHTML =
+            "Then you haven't forgotten it. Excellent.";
+          reducePatience(3);
+        });
+
+        document.getElementById("rememberNo").addEventListener("click", () => {
+          forgotContent.innerHTML =
+            "Then why did you click Forgot Password?";
+          fakeReset.classList.add("open");
+          reducePatience(4);
+          makeNoiseReaction();
+        });
+      });
+
+      document.getElementById("forgotNo").addEventListener("click", () => {
+        forgotContent.innerHTML =
+          "Interesting. Then you clicked this link recreationally.";
+        reducePatience(3);
+      });
+    }
+
+    document.getElementById("forgotPassword").addEventListener("click", openForgot);
+    document.getElementById("forgotPassword").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openForgot();
+      }
+    });
+
+    document.getElementById("fakeResetBtn").addEventListener("click", () => {
+      const input = document.getElementById("resetEmail");
+
+      if (!input.value.trim()) {
+        input.value = "forgot@probably.com";
+      }
+
+      fakeReset.innerHTML = `
+        <div style="
+          padding:12px;
+          border:3px solid #111;
+          background:#ffebee;
+          font-weight:1000;
+        ">
+          ✅ Reset email sent somewhere.
+          <br>
+          Maybe.
+          <br><br>
+          The link will arrive between now and never.
+        </div>
+      `;
+
+      reducePatience(5);
+      makeNoiseReaction();
+    });
+
+    document.getElementById("closeForgot").addEventListener("click", () => {
+      forgotModal.classList.remove("open");
+    });
+
+    /* =========================================================
+       CURSOR PRANKS
+       ========================================================= */
+
+    const tooltipMessages = {
+      loginBtn: "You sure?",
+      cancelBtn: "Coward.",
+      forgotPassword: "Again?",
+      verifyName: "This won't help."
+    };
+
+    Object.keys(tooltipMessages).forEach(id => {
+      const element = document.getElementById(id);
+
+      element?.addEventListener("mouseenter", () => {
+        mouseHint.textContent = tooltipMessages[id];
+
+        if (Math.random() < .11) {
+          reducePatience(2);
+          showPopup("🖱 CURSOR DEPARTMENT", tooltipMessages[id]);
+        }
+      });
+    });
+
+    /* =========================================================
+       RANDOM UI CHANGES
+       ========================================================= */
+
+    const loginTexts = [
+      "LOGIN",
+      "ENTER",
+      "SUBMIT",
+      "MAYBE LOGIN",
+      "PLEASE CLICK ME",
+      "DON'T CLICK ME",
+      "DEFINITELY NOT LOGIN",
+      "LOGIN????"
+    ];
+
+    const placeholders = [
+      "Your probably-name...",
+      "Type your identity-ish thing...",
+      "Who are you?",
+      "Name goes here probably.",
+      "Username, allegedly."
+    ];
+
+    function randomizeUI() {
+      if (state.finalUnlocked) return;
+
+      if (Math.random() < .6) {
+        loginBtn.textContent = random(loginTexts);
+      }
+
+      if (Math.random() < .55) {
+        username.placeholder = random(placeholders);
+      }
+
+      if (Math.random() < .35) {
+        username.style.borderColor = random([
+          "#111",
+          "#ff1744",
+          "#00b0ff",
+          "#9c27b0",
+          "#ff9800"
+        ]);
+      }
+
+      if (Math.random() < .25) {
+        document.body.style.background = random([
+          "linear-gradient(125deg,#fff7ad,#ffd5ea,#c8f7ff,#ddd0ff)",
+          "linear-gradient(125deg,#ffe082,#f8bbd0,#b3e5fc,#d1c4e9)",
+          "linear-gradient(125deg,#dcedc8,#ffccbc,#b2ebf2,#e1bee7)"
+        ]);
+      }
+
+      if (Math.random() < .3) {
+        securityText.style.fontSize = random([
+          "18px",
+          "20px",
+          "22px",
+          "25px",
+          "15px"
+        ]);
+      }
+
+      if (Math.random() < .26) {
+        passwordReaction.textContent = random(passwordMessages);
+      }
+    }
+
+    function scheduleUIChaos() {
+      addTimer(() => {
+        randomizeUI();
+        scheduleUIChaos();
+      }, 4500 + Math.random() * 4500);
+    }
+
+    scheduleUIChaos();
+
+    /* =========================================================
+       EASTER EGGS
+       ========================================================= */
+
+    username.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() === "f") {
+        showPopup("💬 CHAT", "F in the chat.");
+        reducePatience(1);
+      }
+    });
+
+    let logoClicks = 0;
+
+    document.querySelector(".welcome h1").addEventListener("click", () => {
+      logoClicks += 1;
+
+      if (logoClicks === 5) {
+        showPopup("🥚 SECRET EASTER EGG", "You found absolutely nothing.");
+        makeNoiseReaction();
+        reducePatience(3);
+      }
+    });
+
+    /* =========================================================
+       GLOBAL INPUT/BUTTON INTERACTION
+       ========================================================= */
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+
+      if (
+        target instanceof HTMLButtonElement ||
+        target instanceof HTMLInputElement ||
+        target === document.querySelector(".forgot")
+      ) {
+        playTone(
+          180 + Math.random() * 300,
+          .03,
+          random(["square", "triangle", "sine"]),
+          .013
+        );
+
+        if (Math.random() < .06) {
+          makeNoiseReaction();
+        }
+
+        updateChaos();
+      }
+    });
+
+    document.addEventListener("input", () => {
+      if (Math.random() < .08) {
+        updateChaos();
+      }
+    });
+
+    function updateChaos() {
+      document.body.classList.toggle(
+        "chaos",
+        state.attempts > 2 || state.patience < 60
+      );
+
+      randomizeSecurity();
+    }
+
+
+
+    /* =========================================================
+       SOUND MUTINY — THE OFF BUTTON REFUSES TO COOPERATE
+       ========================================================= */
+
+    const soundToggle = document.getElementById("soundToggle");
+    const soundMutinyAlert = document.getElementById("soundMutinyAlert");
+    const soundMutinyText = document.getElementById("soundMutinyText");
+    const volumeMeter = document.getElementById("volumeMeter");
+
+    function updateVolumeReadout() {
+      const percent = Math.round(state.volumeLevel * 100);
+      volumeMeter.textContent =
+        percent >= 85
+          ? `MAXIMUM AUDIBLE CHAOS: ${percent}%`
+          : `UNREASONABLY LOUD: ${percent}%`;
+
+      const slider = document.getElementById("antiVolume");
+      if (slider) slider.value = String(Math.min(100, percent));
+
+      if (state.masterGain && state.audioContext) {
+        state.masterGain.gain.setTargetAtTime(
+          state.volumeLevel,
+          state.audioContext.currentTime,
+          .02
+        );
+      }
+    }
+
+    function screamBurst() {
+      const base = 180 + Math.random() * 100;
+      [0, 1, 2, 3].forEach((i) => {
+        addTimer(() => {
+          playTone(base * (1 + i * .45), .08 + i * .02, i % 2 ? "sawtooth" : "square", .09);
+        }, i * 85);
+      });
+
+      if (state.soundDefiance >= 2) {
+        addTimer(() => synthVoice("DO YOU REALLY THINK I WILL TURN THE SOUND OFF? I WILL MAKE IT LOUDER.", .88, .65), 110);
+      }
+    }
+
+    function triggerSoundDefiance() {
+      state.soundDefiance += 1;
+      state.soundOn = true;
+
+      const levels = [
+        ["🔊 SOUND: ON (OBVIOUSLY)", "Do you really think I will turn the sound off? I will increase it."],
+        ["🔊 SOUND: LOUDER", "You clicked the OFF button. That was a mistake. I took it personally."],
+        ["📢 SOUND: EXTREMELY LOUD", "Congratulations. You have unlocked the volume you specifically did not ask for."],
+        ["💀 SOUND: WHY IS THIS SO LOUD", "There is no OFF button anymore. Only consequences."],
+        ["🚨 SOUND: ABSURD", "The sound has achieved independence."
+        ]
+      ];
+
+      const current = levels[Math.min(state.soundDefiance - 1, levels.length - 1)];
+
+      state.volumeLevel = Math.min(
+        .55,
+        .10 + state.soundDefiance * .10
+      );
+
+      updateVolumeReadout();
+      soundToggle.textContent = current[0];
+      soundMutinyText.textContent = current[1];
+      soundMutinyAlert.classList.add("open");
+
+      screamBurst();
+      showPopup("🔊 SOUND DEPARTMENT", current[1]);
+      reducePatience(3);
+      glitchScreen();
+
+      if (state.soundDefiance >= 3) {
+        document.body.classList.add("chaos");
+      }
+    }
+
+    function glitchScreen() {
+      const g = document.getElementById("screenGlitch");
+      if (!g) return;
+      g.classList.remove("flash");
+      void g.offsetWidth;
+      g.classList.add("flash");
+    }
+
+    soundToggle.addEventListener("click", () => {
+      ensureAudio();
+      triggerSoundDefiance();
+    });
+
+    document.getElementById("makeLouder").addEventListener("click", () => {
+      state.volumeLevel = Math.min(.65, state.volumeLevel + .10);
+      updateVolumeReadout();
+      soundMutinyText.textContent = "Excellent. You made the wrong choice successfully.";
+      screamBurst();
+      reducePatience(4);
+      showPopup("📢 VOLUME DEPARTMENT", "LOUDER IT IS.");
+    });
+
+    document.getElementById("pretendSilence").addEventListener("click", () => {
+      soundMutinyText.textContent = "Silence request received. Silence request laughed at.";
+      state.volumeLevel = Math.min(.65, state.volumeLevel + .08);
+      updateVolumeReadout();
+      screamBurst();
+      reducePatience(4);
+      addTimer(() => soundMutinyAlert.classList.remove("open"), 850);
+    });
+
+    document.getElementById("antiVolume").addEventListener("input", (event) => {
+      const raw = Number(event.target.value);
+      // The slider is intentionally reversed: moving toward zero makes it louder.
+      state.volumeLevel = Math.min(.65, .06 + ((100 - raw) / 100) * .56);
+      updateVolumeReadout();
+
+      if (raw < 18) {
+        volumeMeter.textContent = "💥 YOU FOUND THE LOUD ZONE";
+        screamBurst();
+        reducePatience(2);
+      }
+    });
+
+    /* =========================================================
+       PANIC BUTTON — EACH PRESS DISCOVERS A WORSE FEATURE
+       ========================================================= */
+
+    const panicBtn = document.getElementById("panicBtn");
+    const normalModeBtn = document.getElementById("normalModeBtn");
+
+    panicBtn.addEventListener("click", () => {
+      state.panicCount += 1;
+      glitchScreen();
+      reducePatience(5);
+      makeNoiseReaction(true);
+
+      const panicStates = [
+        "🚨 PANIC BUTTON: SUCCESSFULLY PANICKED",
+        "🚨 PANIC BUTTON: THAT WAS NOT A BUTTON",
+        "🚨 PANIC BUTTON: PANIC ESCALATION ENABLED",
+        "🚨 PANIC BUTTON: YOU PRESSED IT AGAIN. WHY?",
+        "💀 PANIC BUTTON: THERE IS NO MORE PANIC LEFT"
+      ];
+
+      panicBtn.innerHTML = `${random(panicStates)}<br><span>stop touching it</span>`;
+
+      randomizeUI();
+      randomizeSecurity();
+
+      if (state.panicCount % 2 === 0) {
+        username.style.transform = "rotate(1.2deg) scale(1.02)";
+        password.style.transform = "rotate(-.8deg) scale(1.02)";
+      }
+
+      showPopup("🚨 PANIC SYSTEM", random([
+        "Panic successfully increased.",
+        "The button regrets knowing you.",
+        "This is now your fault.",
+        "We have documented your panic.",
+        "Please remain calm. We won't."
+      ]));
+    });
+
+    normalModeBtn.addEventListener("click", () => {
+      state.fakeNormalAttempts += 1;
+      reducePatience(2);
+
+      normalModeBtn.innerHTML = random([
+        "🧼 NORMAL MODE FAILED",
+        "🧼 NORMAL IS CURRENTLY OUT OF STOCK",
+        "🧼 NORMAL MODE: LOL",
+        "🧼 NORMALIZATION DENIED",
+        "🧼 PLEASE TRY NORMAL AGAIN"
+      ]) + "<br><span>nice try</span>";
+
+      showPopup("🧼 NORMAL MODE", "Normality has been rejected by the administrator.");
+      document.body.classList.add("chaos");
+      glitchScreen();
+    });
+
+
+    /* =========================================================
+       SOUND TOGGLE
+       ========================================================= */
+
+
+
+
+    /* =========================================================
+       KEYBOARD / CLIPBOARD / NAVIGATION PRANKS
+       ========================================================= */
+
+    function logKey(message) {
+      const keyLog = document.getElementById("keyLog");
+      state.keyHistory.push(message);
+      if (state.keyHistory.length > 4) state.keyHistory.shift();
+      keyLog.textContent = "KEYBOARD FORENSICS: " + state.keyHistory.join("  |  ");
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName)) {
+        if (event.key === "Tab") {
+          state.tabCount += 1;
+          logKey("TAB DETECTED");
+          if (state.tabCount % 3 === 0) {
+            showPopup("⌨ TAB DEPARTMENT", "Tab navigation is being emotionally audited.");
+            reducePatience(2);
+          }
+        }
+      }
+
+      if (event.getModifierState && event.getModifierState("CapsLock")) {
+        usernameReaction.textContent = "STOP SHOUTING. WE CAN HEAR YOU.";
+        logKey("CAPS LOCK: SHOUTING DETECTED");
+      }
+
+      if (event.key === "F") {
+        showPopup("💬 CHAT", "F in the chat. Again.");
+      }
+
+      // Secret sequence: typing F A I L turns the page slightly more hostile.
+      if (["f", "a", "i", "l"].includes(event.key.toLowerCase())) {
+        state.keyHistory.push(event.key.toUpperCase());
+        state.keyHistory = state.keyHistory.slice(-4);
+        if (state.keyHistory.join("") === "FAIL") {
+          showPopup("🥚 SECRET CODE", "You found the only password this page respects: failure.");
+          state.volumeLevel = Math.min(.65, state.volumeLevel + .1);
+          updateVolumeReadout();
+          glitchScreen();
+        }
+      }
+    });
+
+    [username, password].forEach((field) => {
+      field.addEventListener("paste", () => {
+        state.copyCount += 1;
+        showPopup("📋 PASTE DETECTED", random([
+          "Nice paste. We noticed.",
+          "Copy-paste? In this economy?",
+          "We were hoping you'd type it all manually.",
+          "Clipboard privileges are under review."
+        ]));
+        reducePatience(3);
+        glitchScreen();
+      });
+
+      field.addEventListener("copy", () => {
+        showPopup("📋 COPY DETECTED", "That information wasn't supposed to be copyable. Probably.");
+        reducePatience(2);
+      });
+    });
+
+    // Double-clicking empty space produces a fake browser emergency.
+    document.addEventListener("dblclick", (event) => {
+      if (event.target === document.body || event.target.classList.contains("symbol-rain")) {
+        showPopup("🖥️ BROWSER EMERGENCY", "Double-click detected. Browser now suspects impatience.");
+        glitchScreen();
+        reducePatience(3);
+      }
+    });
+
+    // Make the fake address bar rewrite itself at random intervals.
+    const fakeUrl = document.getElementById("fakeUrl");
+    const fakeUrls = [
+      "https://login.definitely-real.example/authentic-login",
+      "https://127.0.0.1:please-stop/login",
+      "https://government-not-a-real-site.example/verify",
+      "https://why-are-you-still-here.example/session",
+      "https://secure-ish.example/absolutely-probably-safe"
+    ];
+
+    function mutateFakeUrl() {
+      if (!fakeUrl || state.finalUnlocked) return;
+      fakeUrl.textContent = random(fakeUrls);
+    }
+
+    addTimer(function loopFakeUrl() {
+      mutateFakeUrl();
+      addTimer(loopFakeUrl, 7000 + Math.random() * 9000);
+    }, 6500);
+
+    /* =========================================================
+       HUMAN SLIDER — THE TRACK MOVES THE FINISH LINE
+       ========================================================= */
+
+    const humanSlider = document.getElementById("humanSlider");
+    const sliderChaosNote = document.getElementById("sliderChaosNote");
+
+    humanSlider.addEventListener("input", () => {
+      const value = Number(humanSlider.value);
+      state.sliderTricks += 1;
+
+      if (value > 82) {
+        humanSlider.value = String(Math.max(12, Math.floor(Math.random() * 55)));
+        sliderChaosNote.textContent = random([
+          "🚫 Too human. Try being less human.",
+          "Nope. The finish line moved.",
+          "Almost. We changed our mind.",
+          "Verification algorithm got nervous."
+        ]);
+        reducePatience(4);
+        makeNoiseReaction();
+      } else if (value > 55) {
+        sliderChaosNote.textContent = "Keep going. Unless that's exactly what we want you to think.";
+      } else if (value > 20) {
+        sliderChaosNote.textContent = "Suspiciously human behavior detected.";
+      }
+    });
+
+
+    /* =========================================================
+       FINAL SCREEN
+       ========================================================= */
+
+    const finalScreen = document.getElementById("finalScreen");
+
+    function showFinalScreen() {
+      if (state.finalUnlocked && finalScreen.classList.contains("show")) {
+        return;
+      }
+
+      state.finalUnlocked = true;
+
+      finalScreen.classList.add("show");
+
+      document.getElementById("finalAttempts").textContent =
+        `It took you ${state.attempts} attempts.`;
+
+      showPopup(
+        "🎉 FINAL LEVEL",
+        "YOU HAVE SUCCESSFULLY FAILED TO LOG IN."
+      );
+
+      makeNoiseReaction(true);
+
+      setTimeout(() => {
+        finalScreen.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 100);
+    }
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      resetEverything();
+    });
+
+    /* =========================================================
+       RESET
+       ========================================================= */
+
+    function resetEverything() {
+      clearAllTimers();
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      state.attempts = 0;
+      state.patience = 100;
+      state.showPasswordStage = 0;
+      state.loginEscapes = 0;
+      state.captchaRound = 0;
+      state.captchaValue = null;
+      state.finalUnlocked = false;
+      state.popupCount = 0;
+      state.soundDefiance = 0;
+      state.volumeLevel = 0.12;
+      state.panicCount = 0;
+      state.fakeNormalAttempts = 0;
+      state.sliderTricks = 0;
+      state.keyHistory = [];
+      state.tabCount = 0;
+      state.copyCount = 0;
+      state.interactions = 0;
+      state.hostility = 0;
+      state.soundAttempts = 0;
+      state.closeAttempts = 0;
+      state.loginDouble = 0;
+      state.fakeSuccesses = 0;
+      state.permissionAttempts = 0;
+      state.decoyEscapes = 0;
+      state.soundOn = true;
+      patienceShown = false;
+      cancelClicks = 0;
+
+      username.value = "";
+      password.value = "";
+      password.type = "password";
+      remember.checked = false;
+      terms.checked = false;
+      readTerms.checked = false;
+
+      username.placeholder = "Your probably-name...";
+      visualUsername.textContent =
+        "Visual representation will betray you here.";
+      usernameReaction.textContent = "";
+      passwordReaction.textContent = "";
+      mouseHint.textContent = "";
+
+      loginBtn.style.position = "relative";
+      loginBtn.style.left = "";
+      loginBtn.style.top = "";
+      loginBtn.style.transform = "rotate(-2deg)";
+      loginBtn.textContent = "LOGIN";
+
+      cancelBtn.style.transform = "";
+      cancelBtn.textContent = "CANCEL";
+
+      showPassword.textContent = "👁 Show Password";
+      document.getElementById("soundMutinyAlert").classList.remove("open");
+      document.getElementById("antiVolume").value = "35";
+      document.getElementById("volumeMeter").textContent = "UNREASONABLY LOUD: 12%";
+      document.getElementById("humanSlider").value = "0";
+      document.getElementById("sliderChaosNote").textContent = "Slide to prove you are human.";
+      document.getElementById("keyLog").textContent = "KEYBOARD FORENSICS: waiting for evidence...";
+      document.getElementById("screenGlitch").classList.remove("flash");
+      document.body.classList.remove("x-chaos-1", "x-chaos-2", "x-chaos-3", "x-chaos-4");
+      document.getElementById("xPermission").classList.remove("open");
+      document.getElementById("xFakeSuccess").classList.remove("open");
+      document.getElementById("xHostilityText").textContent = "0%";
+      document.getElementById("xHostilityFill").style.width = "0%";
+      document.getElementById("xDecoyClose").style.right = "12px";
+      document.getElementById("xDecoyClose").style.top = "58px";
+      document.getElementById("xDecoyClose").textContent = "✕ CLOSE WEBSITE";
+      document.getElementById("panicBtn").innerHTML = "🚨 PANIC BUTTON<br><span>Absolutely do not press</span>";
+      document.getElementById("normalModeBtn").innerHTML = "🧼 MAKE IT NORMAL<br><span>(This button is lying)</span>";
+      document.getElementById("soundToggle").textContent = "🔊 SOUND: ON";
+      loginModal.classList.remove("open");
+      nameModal.classList.remove("open");
+      termsModal.classList.remove("open");
+      forgotModal.classList.remove("open");
+
+      finalScreen.classList.remove("show");
+
+      document.getElementById("popupStack").innerHTML = "";
+
+      systemStatus.textContent =
+        "SYSTEM MESSAGE: Waiting for someone to make a terrible decision.";
+
+      updatePatienceUI();
+      updateAttemptUI();
+      randomizeSecurity();
+      loadCaptcha();
+
+      scheduleRandomPopup();
+      scheduleUIChaos();
+
+      updateVolumeReadout();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      showPopup(
+        "🔄 RESET COMPLETE",
+        "Unfortunately, you have chosen to do this again."
+      );
+    }
+
+    /* =========================================================
+       MODAL BACKDROP CLOSING
+       ========================================================= */
+
+    document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+      backdrop.addEventListener("click", (event) => {
+        if (event.target === backdrop) {
+          if (
+            backdrop === termsModal ||
+            backdrop === forgotModal ||
+            backdrop === nameModal
+          ) {
+            backdrop.classList.remove("open");
+          } else {
+            reducePatience(2);
+            showPopup("🚨 NICE TRY", "The modal does not appreciate escaping.");
+          }
+        }
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        const openModal = document.querySelector(".modal-backdrop.open");
+
+        if (openModal) {
+          openModal.classList.remove("open");
+          reducePatience(2);
+          showPopup("⌨ ESCAPE KEY", "You thought you escaped.");
+        }
+      }
+    });
+
+
+
+    /* =========================================================
+       EXTREME CHAOS ENGINE v2
+       The interface remembers tester behavior during this session.
+       ========================================================= */
+
+    state.interactions = 0;
+    state.hostility = 0;
+    state.soundAttempts = state.soundDefiance || 0;
+    state.closeAttempts = 0;
+    state.loginDouble = 0;
+    state.fakeSuccesses = 0;
+    state.permissionAttempts = 0;
+    state.lastMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    state.decoyEscapes = 0;
+
+    const xPermission = document.getElementById("xPermission");
+    const xPermissionText = document.getElementById("xPermissionText");
+    const xFakeSuccess = document.getElementById("xFakeSuccess");
+    const xFakeSuccessText = document.getElementById("xFakeSuccessText");
+    const xHostilityText = document.getElementById("xHostilityText");
+    const xHostilityFill = document.getElementById("xHostilityFill");
+    const xEvilOverlay = document.getElementById("xEvilOverlay");
+    const xDecoyClose = document.getElementById("xDecoyClose");
+    const xTrailContainer = document.getElementById("xTrailContainer");
+
+    function xFlash() {
+      if (!xEvilOverlay) return;
+      xEvilOverlay.classList.remove("on");
+      void xEvilOverlay.offsetWidth;
+      xEvilOverlay.classList.add("on");
+    }
+
+    function xHostility(amount = 1, reason = "") {
+      state.interactions += 1;
+      state.hostility = Math.min(100, state.hostility + amount);
+
+      const level = Math.min(4, Math.floor(state.hostility / 22));
+      document.body.classList.remove("x-chaos-1", "x-chaos-2", "x-chaos-3", "x-chaos-4");
+      if (level > 0) document.body.classList.add("x-chaos-" + level);
+
+      if (xHostilityText) xHostilityText.textContent = state.hostility + "%";
+      if (xHostilityFill) xHostilityFill.style.width = state.hostility + "%";
+
+      if (reason && Math.random() < .23) {
+        systemStatus.textContent = "SYSTEM MESSAGE: " + reason;
+      }
+
+      if (state.hostility === 22 || state.hostility === 44 || state.hostility === 66 || state.hostility === 88) {
+        showPopup("🧠 HOSTILITY ENGINE", random([
+          "The interface is learning your habits.",
+          "Your confidence has been added to the incident report.",
+          "We noticed that you keep trying.",
+          "Adaptive frustration protocol enabled.",
+          "The website has formed an opinion about you."
+        ]));
+        xFlash();
+      }
+    }
+
+    function xRandomTransform(el, intensity = 1) {
+      if (!el) return;
+      el.classList.remove("x-shuffle-field");
+      void el.offsetWidth;
+      el.classList.add("x-shuffle-field");
+      el.style.marginLeft = ((Math.random() * 8 - 4) * intensity) + "px";
+    }
+
+    function xOpenPermission() {
+      if (!xPermission) return;
+      state.permissionAttempts += 1;
+      xPermissionText.textContent = random([
+        "This website would like permission to continue being difficult.",
+        "Before proceeding, we need to confirm that you still have questionable judgment.",
+        "Important security step: please approve more problems.",
+        "We detected confidence. Additional permission is therefore required."
+      ]);
+      xPermission.classList.add("open");
+      xHostility(5, "Additional permission has been requested for no good reason.");
+      glitchScreen();
+    }
+
+    document.getElementById("xAllowChaos").addEventListener("click", () => {
+      xPermission.classList.remove("open");
+      state.volumeLevel = Math.min(.72, state.volumeLevel + .06);
+      updateVolumeReadout();
+      showPopup("✅ PERMISSION GRANTED", random([
+        "Excellent. You approved your own suffering.",
+        "Chaos permission accepted. Terrible decision.",
+        "Thank you for choosing the worse option."
+      ]));
+      xHostility(5);
+      screamBurst();
+      xFlash();
+    });
+
+    document.getElementById("xDenyChaos").addEventListener("click", () => {
+      xPermissionText.textContent = random([
+        "DENIED. Unfortunately, you still have to continue.",
+        "Permission denied. We will interpret that as permission.",
+        "No has been recorded as yes.",
+        "Your refusal was reviewed and rejected."
+      ]);
+      xHostility(7, "User attempted to say no.");
+      showPopup("🚫 DENIAL FAILED", "Your 'no' was politely ignored.");
+      glitchScreen();
+      addTimer(() => xPermission.classList.remove("open"), 900);
+    });
+
+    /* --- The fake close button is an escape-room decoy. --- */
+    xDecoyClose.addEventListener("mouseenter", () => {
+      state.closeAttempts += 1;
+      xHostility(2);
+      if (state.closeAttempts < 4) {
+        xDecoyClose.style.right = (10 + Math.random() * 70) + "px";
+        xDecoyClose.style.top = (48 + Math.random() * 180) + "px";
+        xDecoyClose.textContent = random([
+          "✕ NOPE",
+          "✕ WRONG WINDOW",
+          "✕ NICE TRY",
+          "✕ COWARDICE DETECTED"
+        ]);
+      }
+    });
+
+    xDecoyClose.addEventListener("click", () => {
+      state.decoyEscapes += 1;
+      xHostility(8, "User attempted emergency exit.");
+      xDecoyClose.textContent = random([
+        "✕ YOU CANNOT ESCAPE",
+        "✕ CLOSING YOUR HOPE...",
+        "✕ WEBSITE HAS DENIED CLOSURE",
+        "✕ EXIT HAS BEEN OUTSOURCED"
+      ]);
+      showPopup("🚪 EXIT DEPARTMENT", random([
+        "You found the door. It was painted on.",
+        "Exit unavailable due to excessive confidence.",
+        "The website would like you to stay a little longer."
+      ]));
+      xFlash();
+      glitchScreen();
+    });
+
+    /* --- Mouse trail becomes visible only after the tester gets impatient. --- */
+    document.addEventListener("pointermove", (e) => {
+      state.lastMouse = { x: e.clientX, y: e.clientY };
+
+      if (state.hostility < 38 || Math.random() > .12) return;
+
+      const dot = document.createElement("div");
+      dot.className = "x-cursor-trail";
+      dot.style.left = e.clientX + "px";
+      dot.style.top = e.clientY + "px";
+      xTrailContainer.appendChild(dot);
+
+      addTimer(() => dot.remove(), 260);
+    }, { passive: true });
+
+    /* --- Adaptive input sabotage. It changes the prompt, not the real value. --- */
+    username.addEventListener("focus", () => {
+      xHostility(1);
+      if (state.hostility > 35 && Math.random() < .25) {
+        xRandomTransform(username, 1);
+        username.placeholder = random([
+          "No, your OTHER name...",
+          "The name you were assigned by destiny...",
+          "Type slower. We're judging the letters.",
+          "Username-ish identifier required."
+        ]);
+      }
+    });
+
+    password.addEventListener("focus", () => {
+      xHostility(1);
+      if (state.hostility > 30 && Math.random() < .28) {
+        xRandomTransform(password, 1);
+        password.placeholder = random([
+          "The secret you definitely remember...",
+          "Try a password you won't emotionally regret.",
+          "Your password knows what you did.",
+          "Secret thing, but complicated."
+        ]);
+      }
+    });
+
+    /* --- Clicking Remember Me can create a contradictory second checkbox. --- */
+    remember.addEventListener("change", () => {
+      xHostility(3);
+      if (remember.checked && state.hostility > 40 && Math.random() < .4) {
+        showPopup("🧠 MEMORY DEPARTMENT", "We will remember that you asked us to forget.");
+      }
+    });
+
+    /* --- Login occasionally pretends to succeed before inventing another requirement. --- */
+    const originalRunLoginProcess = runLoginProcess;
+    runLoginProcess = function () {
+      xHostility(9, "Authentication ceremony initiated.");
+      state.loginDouble += 1;
+
+      if (state.loginDouble >= 2 && Math.random() < .34 && !state.finalUnlocked) {
+        state.attempts += 1;
+        updateAttemptUI();
+        xFakeSuccess.classList.add("open");
+        state.fakeSuccesses += 1;
+        xFakeSuccessText.textContent = random([
+          "Welcome back! ...Wait. Why are we still here?",
+          "Authentication accepted. Additional authentication required.",
+          "Success detected. Success has been revoked.",
+          "Login completed. Please prove that login completed."
+        ]);
+        makeNoiseReaction(true);
+        reducePatience(12);
+        addTimer(() => {
+          xFakeSuccess.classList.remove("open");
+          showPopup("❌ SUCCESS REVOKED", "The success department changed its mind.");
+          xOpenPermission();
+        }, 1700);
+        return;
+      }
+
+      originalRunLoginProcess();
+    };
+
+    /* --- The CAPTCHA gets harder when the tester is good at it. --- */
+    const originalLoadCaptcha = loadCaptcha;
+    loadCaptcha = function () {
+      originalLoadCaptcha();
+      xHostility(2);
+
+      if (state.hostility > 55 && Math.random() < .32) {
+        captchaQuestion.textContent = random([
+          "Which answer is least incorrect?",
+          "Select the option the algorithm emotionally trusts.",
+          "Choose the answer you would defend in court.",
+          "Which button looks most like it regrets being here?"
+        ]);
+      }
+    };
+
+    /* --- The anti-volume slider is now a trap with memory. --- */
+    document.getElementById("antiVolume").addEventListener("change", () => {
+      xHostility(4, "Silence controls continue to disappoint.");
+      if (state.hostility > 45) {
+        state.volumeLevel = Math.min(.72, state.volumeLevel + .04);
+        updateVolumeReadout();
+        showPopup("🔊 ANTI-SILENCE", random([
+          "The slider has interpreted your request creatively.",
+          "Volume increased as requested. We think.",
+          "Silence remains unavailable for philosophical reasons."
+        ]));
+      }
+    });
+
+    /* --- Human slider occasionally becomes a reverse challenge. --- */
+    humanSlider.addEventListener("change", () => {
+      xHostility(4);
+      if (state.hostility > 50 && Number(humanSlider.value) > 45) {
+        humanSlider.value = "17";
+        sliderChaosNote.textContent = random([
+          "Congratulations. You were almost human.",
+          "Verification rejected your confidence.",
+          "The slider moved because it felt like it.",
+          "Human status: under review."
+        ]);
+        reducePatience(5);
+        makeNoiseReaction();
+      }
+    });
+
+    /* --- Copy/cut gets increasingly suspicious, but never accesses clipboard contents. --- */
+    [username, password].forEach((field) => {
+      field.addEventListener("cut", () => {
+        xHostility(4, "Cut operation detected.");
+        showPopup("✂️ CUT DETECTED", "We saw that. The text remains your business; the drama is ours.");
+      });
+    });
+
+    /* --- Keyboard traps / fake shortcuts. --- */
+    document.addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+
+      if (key === "escape" && !document.querySelector(".modal-backdrop.open")) {
+        xHostility(4);
+        showPopup("⌨ ESCAPE KEY", random([
+          "Escape is currently on vacation.",
+          "Escape detected. Escape rejected.",
+          "Nice instinct. Wrong website."
+        ]));
+      }
+
+      if (event.ctrlKey && key === "s") {
+        event.preventDefault();
+        xHostility(7);
+        showPopup("💾 SAVE DEPARTMENT", "This website refuses to be saved in its current emotional state.");
+        xFlash();
+      }
+
+      if (event.ctrlKey && key === "r") {
+        // Do not block real navigation; just make the page complain before refresh.
+        xHostility(6);
+        showPopup("🔄 REFRESH DETECTED", "Refreshing will not improve the situation.");
+      }
+
+      if (event.key === "Tab" && state.hostility > 45 && Math.random() < .2) {
+        xHostility(2);
+        showPopup("⌨ TAB AUDIT", "Keyboard navigation has been audited and found suspicious.");
+      }
+    });
+
+    /* --- Click intensity escalates around controls that look helpful. --- */
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target instanceof HTMLButtonElement || target instanceof HTMLInputElement) {
+        xHostility(target === loginBtn ? 3 : 1);
+
+        if (state.hostility > 72 && Math.random() < .16) {
+          randomizeUI();
+          xFlash();
+          xRandomTransform(target, 1.4);
+        }
+      }
+    }, true);
+
+    /* --- Hostility-based popup clock. One lightweight timer, not a timer storm. --- */
+    function xHostilityLoop() {
+      if (state.finalUnlocked) return;
+
+      if (state.hostility >= 55 && Math.random() < .58) {
+        showPopup("🧠 ADAPTIVE UX", random([
+          "You keep choosing the most obvious option. Interesting.",
+          "The interface has adjusted to your coping strategy.",
+          "We have seen this behavior before.",
+          "Your workflow is now part of the prank.",
+          "This page knows which button you are going to press next."
+        ]));
+      }
+
+      if (state.hostility >= 80 && Math.random() < .35) {
+        xFlash();
+        securityText.textContent = random(["ABSOLUTELY NOT", "CONCERNING", "LEGAL TEAM PANICKING", "NO"]);
+      }
+
+      addTimer(xHostilityLoop, 11000 + Math.random() * 7000);
+    }
+
+    addTimer(xHostilityLoop, 10000);
+
+    /* --- After several interactions, ask for a completely pointless approval. --- */
+    function xConsiderPermission() {
+      if (state.hostility >= 60 && !xPermission.classList.contains("open") && Math.random() < .33) {
+        xOpenPermission();
+      }
+      addTimer(xConsiderPermission, 14000 + Math.random() * 9000);
+    }
+    addTimer(xConsiderPermission, 12000);
+
+
+    /* =========================================================
+       INITIALIZATION
+       ========================================================= */
+
+    randomizeSecurity();
+    updatePatienceUI();
+    updateAttemptUI();
+    updateVolumeReadout();
+    logKey("MONITORING ENABLED");
+
+    // The sound system only activates after user interaction in modern browsers.
+    // This click listener is intentionally passive regarding audio permission.
+    document.addEventListener("pointerdown", () => {
+      ensureAudio();
+    }, { once: true });
+
+    // A few harmless opening notifications.
+    addTimer(() => {
+      showPopup(
+        "🔔 Important Notification",
+        "You are still here."
+      );
+    }, 2200);
+
+    addTimer(() => {
+      showPopup(
+        "🔐 SYSTEM MESSAGE",
+        "User interaction detected."
+      );
+    }, 5200);
+
+    addTimer(() => {
+      showPopup(
+        "🤨 SYSTEM MESSAGE",
+        "This page has begun judging you."
+      );
+    }, 8200);
+
+    /* =========================================================
+       DELIBERATELY WEIRD MOBILE BEHAVIOR
+       ========================================================= */
+
+    let mobileChaosDone = false;
+
+    function mobileChaos() {
+      if (mobileChaosDone) return;
+
+      if (window.innerWidth <= 620) {
+        mobileChaosDone = true;
+
+        addTimer(() => {
+          showPopup(
+            "📱 MOBILE MODE",
+            "Congratulations. The form is now unnecessarily cramped."
+          );
+          reducePatience(3);
+        }, 7000);
+      }
+    }
+
+    mobileChaos();
+    window.addEventListener("resize", mobileChaos);
+
+    /* =========================================================
+       PERFORMANCE SAFETY
+       ========================================================= */
+
+    // Cap animation-related DOM weirdness by never creating background
+    // elements dynamically. Timers are tracked and cleaned up by reset.
+    window.addEventListener("beforeunload", () => {
+      clearAllTimers();
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    });
+  </script>
+</body>
+</html>

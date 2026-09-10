@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SELF IMPROVEMENT™ - Become Better. Probably.</title>
+<style>
+  :root{
+    --neon-green:#00FF00;
+    --hot-pink:#FF00FF;
+    --cyber-yellow:#FFFF00;
+    --electric-blue:#0000FF;
+    --danger-red:#FF0000;
+    --acid-orange:#FFA500;
+    --grape:#800080;
+    --cyan:#00FFFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(45deg, #ff00ff11 0 20px, #00ffff11 20px 40px),
+      linear-gradient(135deg,#000033,#330033,#003333);
+    background-attachment:fixed;
+    font-family:Arial, sans-serif;
+    color:#111;
+    overflow-x:hidden;
+    cursor:default;
+  }
+  ::selection{background:var(--cyber-yellow);color:red;}
+
+  /* ============ LOADING SCREEN ============ */
+  #loadingScreen{
+    position:fixed;inset:0;z-index:99999;
+    background:#000080;
+    color:var(--cyber-yellow);
+    font-family:'Courier New', monospace;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-size:20px;text-align:center;
+    padding:20px;
+  }
+  #loadingScreen h1{
+    color:#0f0;font-size:34px;text-shadow:2px 2px 0 red;
+    animation:blink 1s infinite;
+  }
+  .loadbar{
+    width:300px;max-width:80vw;height:24px;border:3px solid #fff;
+    background:#222;margin:10px 0;position:relative;
+  }
+  .loadbar-fill{
+    height:100%;background:repeating-linear-gradient(90deg,#0f0,#0f0 8px,#003300 8px,#003300 16px);
+    width:0%;
+    transition:width .3s;
+  }
+  #loadError{color:red;font-weight:bold;font-size:26px;margin-top:10px;display:none;text-shadow:1px 1px 0 yellow;}
+
+  @keyframes blink{ 50%{opacity:0;} }
+  @keyframes marquee{
+    0%{transform:translateX(100%);}
+    100%{transform:translateX(-100%);}
+  }
+  @keyframes wiggle{
+    0%,100%{transform:rotate(-3deg);}
+    50%{transform:rotate(3deg);}
+  }
+  @keyframes floaty{
+    0%{transform:translate(0,0);}
+    25%{transform:translate(20px,-30px);}
+    50%{transform:translate(-15px,10px);}
+    75%{transform:translate(30px,20px);}
+    100%{transform:translate(0,0);}
+  }
+  @keyframes spin{ to{transform:rotate(360deg);} }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+  }
+  @keyframes rainbow{
+    0%{color:red;} 16%{color:orange;} 33%{color:yellow;} 50%{color:green;}
+    66%{color:blue;} 83%{color:purple;} 100%{color:red;}
+  }
+
+  /* ============ HEADER ============ */
+  header{
+    background:linear-gradient(90deg,#ff0000,#ff00ff,#0000ff,#00ffff,#00ff00,#ffff00,#ff0000);
+    background-size:400% 100%;
+    animation:gradientmove 6s linear infinite;
+    padding:14px 8px;text-align:center;border-bottom:8px double yellow;
+  }
+  @keyframes gradientmove{ to{background-position:400% 0;} }
+  header h1{
+    font-family:Impact, sans-serif;
+    font-size:clamp(20px,5vw,48px);
+    color:#fff;
+    text-shadow:3px 3px 0 #000, -1px -1px 0 red;
+    margin:0 0 4px 0;
+    letter-spacing:1px;
+  }
+  header .sub{
+    font-family:'Comic Sans MS', cursive;
+    font-size:clamp(12px,2.5vw,20px);
+    color:#000;
+    background:yellow;
+    display:inline-block;
+    padding:4px 10px;
+    border:2px dashed red;
+    animation:blink 1.4s infinite;
+    font-weight:bold;
+  }
+  .badges{margin-top:8px;}
+  .badges span{
+    display:inline-block;background:red;color:yellow;font-weight:bold;
+    padding:3px 8px;margin:2px;border:2px solid white;
+    font-family:'Comic Sans MS',cursive;
+    animation:blink .8s infinite;
+    transform:rotate(-4deg);
+  }
+  .badges span:nth-child(2){background:green;animation:blink 1.1s infinite;transform:rotate(3deg);}
+  .badges span:nth-child(3){background:purple;color:lime;animation:blink .6s infinite;transform:rotate(-2deg);}
+
+  .marquee-wrap{
+    background:#000;color:#0f0;font-family:'Courier New',monospace;
+    overflow:hidden;white-space:nowrap;border-top:2px solid lime;border-bottom:2px solid lime;
+    padding:4px 0;
+  }
+  .marquee-wrap span{display:inline-block;padding-left:100%;animation:marquee 18s linear infinite;font-weight:bold;}
+
+  .oldweb-info{
+    background:#c0c0c0;color:#000;font-family:'Times New Roman',serif;
+    font-size:12px;padding:4px;text-align:center;border-bottom:2px solid #555;
+  }
+
+  /* ============ NAV ============ */
+  nav{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:6px;
+    padding:10px;background:#222;
+    border-bottom:6px ridge orange;
+  }
+  nav button{
+    font-family:'Comic Sans MS',cursive;font-weight:bold;cursor:pointer;
+    padding:10px 16px;border:3px outset #999;
+  }
+  nav button:nth-child(1){background:red;color:yellow;font-size:16px;}
+  nav button:nth-child(2){background:lime;color:purple;font-size:20px;}
+  nav button:nth-child(3){background:orange;color:blue;font-size:14px;}
+  nav button:nth-child(4){background:cyan;color:red;font-size:22px;}
+  nav button:nth-child(5){background:gold;color:green;font-size:15px;}
+  nav button:nth-child(6){background:magenta;color:white;font-size:18px;}
+  nav button:nth-child(7){background:blue;color:orange;font-size:13px;}
+  nav button:nth-child(8){background:black;color:lime;font-size:16px;}
+  nav button:hover{animation:shake .3s;}
+  nav button:nth-child(2):hover, nav button:nth-child(5):hover{transform:scale(1.2);}
+  nav button:nth-child(3):hover, nav button:nth-child(7):hover{transform:rotate(6deg);}
+
+  main{max-width:1000px;margin:0 auto;padding:10px;position:relative;}
+
+  section{
+    background:#fff;border:5px solid;
+    border-image:repeating-linear-gradient(45deg,red,red 10px,yellow 10px,yellow 20px) 10;
+    margin:20px 4px;padding:16px;position:relative;
+  }
+
+  /* ============ HERO ============ */
+  #hero{text-align:center;background:radial-gradient(circle,#fff0f5,#ffe4ff);}
+  #hero h2{font-family:Impact;font-size:clamp(22px,6vw,50px);color:#c00;margin:6px 0;text-shadow:2px 2px 0 gold;}
+  #hero h2.big2{color:green;font-size:clamp(30px,8vw,70px);}
+  #hero h2.big3{color:purple;font-size:clamp(20px,5vw,40px);font-family:Papyrus, fantasy;}
+  .hero-visual{
+    position:relative;height:220px;margin:20px auto;max-width:500px;
+    background:linear-gradient(to top,#333 0%,#f80 40%,#ffec3d 100%);
+    border:4px solid black;overflow:hidden;
+  }
+  .hero-visual .tag{
+    position:absolute;background:rgba(0,0,0,.75);color:#0f0;font-family:'Courier New',monospace;
+    padding:3px 6px;font-weight:bold;font-size:13px;border:1px solid lime;
+  }
+  #hugeBtn{
+    font-size:clamp(16px,3vw,26px);padding:18px 30px;margin-top:16px;
+    background:linear-gradient(180deg,#ff5,#f00);color:#000;font-family:Impact;
+    border:5px outset gold;cursor:pointer;box-shadow:0 0 20px red;
+  }
+  #hugeBtn:hover{animation:wiggle .3s infinite;}
+
+  /* ============ GENERIC SECTION HEADINGS ============ */
+  section h3{
+    font-family:'Trebuchet MS',sans-serif;background:#000;color:#0ff;
+    display:inline-block;padding:4px 10px;transform:rotate(-1deg);
+    border:2px dashed magenta;
+  }
+
+  /* ============ STATS PANEL ============ */
+  #statsPanel{
+    background:#001;color:#0f0;font-family:'Courier New',monospace;
+    border:4px double lime;font-size:14px;line-height:1.6;
+  }
+  #statsPanel .title{color:yellow;font-weight:bold;font-size:16px;}
+
+  .release-btn, .clean-btn{
+    display:block;width:100%;padding:16px;margin:10px 0;
+    font-family:Impact;font-size:clamp(16px,3vw,24px);cursor:pointer;border:5px outset;
+  }
+  .release-btn{background:red;color:yellow;border-color:#800;animation:blink 2s infinite;}
+  .clean-btn{background:lime;color:#003300;border-color:#040;}
+
+  /* ============ SELF IMPROVEMENT SCORE ============ */
+  .score-row{display:flex;align-items:center;gap:8px;margin:6px 0;font-family:'Verdana';font-size:13px;}
+  .score-row span.label{width:130px;font-weight:bold;}
+  .bar-outer{flex:1;height:16px;background:#333;border:2px solid #000;}
+  .bar-inner{height:100%;background:linear-gradient(90deg,red,orange,yellow,lime);width:0%;transition:width .8s;}
+
+  /* ============ HABIT TRACKER ============ */
+  #habitList label{display:block;font-family:'Georgia';font-size:15px;margin:4px 0;padding:4px;background:#ffe;border:1px dotted #999;}
+
+  /* ============ QUOTE ============ */
+  #quoteBox{min-height:60px;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;}
+
+  /* ============ TESTIMONIALS ============ */
+  .testimonial{background:#fffbe0;border:2px solid orange;padding:8px;margin:8px 0;font-family:'Times New Roman';}
+  .stars{color:gold;font-size:18px;}
+
+  /* ============ FLOATERS ============ */
+  .floater{
+    position:fixed;pointer-events:none;z-index:5;font-weight:bold;
+    font-family:'Comic Sans MS',cursive;color:#fff;text-shadow:1px 1px 3px #000;
+    animation:floaty 12s ease-in-out infinite;
+    font-size:14px;opacity:.85;
+  }
+
+  /* ============ UNDER CONSTRUCTION ============ */
+  #construction{text-align:center;background:repeating-linear-gradient(45deg,#ff0,#ff0 10px,#000 10px,#000 20px);color:#fff;}
+  #construction .inner{background:#fff;color:#000;display:inline-block;padding:12px;border:3px solid #000;}
+  .gear{display:inline-block;animation:spin 3s linear infinite;font-size:26px;}
+
+  /* ============ VISITOR COUNTER ============ */
+  #visitorCounter{text-align:center;cursor:pointer;font-family:'Courier New',monospace;background:#000;color:#0f0;padding:14px;border:3px solid lime;}
+  #visitorCounter .num{font-size:28px;color:yellow;font-weight:bold;}
+
+  /* ============ FOOTER ============ */
+  footer{
+    background:#111;color:#aaa;text-align:center;padding:20px 10px;
+    font-family:'Courier New',monospace;font-size:12px;border-top:6px double red;
+  }
+  footer a{color:cyan;margin:0 6px;cursor:pointer;text-decoration:underline;}
+  footer a:hover{color:magenta;}
+
+  /* ============ POPUPS ============ */
+  .popup{
+    position:fixed;z-index:1000;
+    background:#eee;
+    border:3px outset #999;
+    box-shadow:6px 6px 15px rgba(0,0,0,.6);
+    width:320px;max-width:92vw;
+    font-family:Arial,sans-serif;
+    animation:popin .25s ease;
+  }
+  @keyframes popin{ from{transform:scale(.7);opacity:0;} to{transform:scale(1);opacity:1;} }
+  .popup .titlebar{
+    background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;
+    padding:5px 8px;display:flex;justify-content:space-between;align-items:center;
+    cursor:grab;font-family:'Trebuchet MS';font-size:14px;user-select:none;
+  }
+  .popup.theme-scam .titlebar{background:linear-gradient(90deg,red,orange);}
+  .popup.theme-money .titlebar{background:linear-gradient(90deg,green,#0a0);}
+  .popup.theme-warn .titlebar{background:repeating-linear-gradient(90deg,#000,#000 10px,#f80 10px,#f80 20px);}
+  .popup.theme-cute .titlebar{background:linear-gradient(90deg,hotpink,violet);}
+  .popup .closeX{
+    background:red;color:#fff;border:2px outset #fff;font-weight:bold;cursor:pointer;
+    padding:0 7px;font-size:15px;line-height:1.4;
+  }
+  .popup .content{padding:14px;text-align:center;background:#fff;}
+  .popup .content h4{margin:4px 0;font-family:Impact;font-size:20px;color:#c00;}
+  .popup .content p{font-size:13px;margin:6px 0;}
+  .popup .content button.action{
+    font-family:'Comic Sans MS',cursive;font-weight:bold;padding:8px 14px;
+    background:linear-gradient(180deg,#0f0,#080);border:3px outset gold;cursor:pointer;
+    font-size:14px;margin-top:6px;
+  }
+  .popup .tinytext{font-size:8px;color:#888;margin-top:8px;}
+  .popup .nested-ad{
+    margin-top:10px;border:2px dashed purple;padding:8px;background:#fef0ff;font-size:11px;
+  }
+  .popup .progress-outer{height:14px;background:#333;border:1px solid #000;margin:8px 0;}
+  .popup .progress-inner{height:100%;background:lime;width:0%;}
+
+  /* Fake chat widget */
+  #chatWidget{
+    position:fixed;bottom:14px;right:14px;z-index:900;
+    background:#222;color:#fff;border:3px solid lime;border-radius:8px;
+    width:60px;height:60px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:26px;box-shadow:0 0 10px lime;
+  }
+  #chatBox{
+    position:fixed;bottom:84px;right:14px;z-index:900;width:250px;max-width:85vw;
+    background:#fff;border:3px solid #000;display:none;font-family:'Comic Sans MS',cursive;
+  }
+  #chatBox .chead{background:#000;color:#0f0;padding:6px;font-weight:bold;display:flex;justify-content:space-between;}
+  #chatBox .cbody{padding:10px;font-size:13px;}
+  #chatBox .cbody button{margin:4px 4px 0 0;padding:6px 10px;cursor:pointer;}
+
+  /* notifications */
+  #notifStack{position:fixed;top:10px;right:10px;z-index:950;display:flex;flex-direction:column;gap:6px;}
+  .notif{
+    background:#fffbcc;border:2px solid #a90;padding:8px 12px;font-size:12px;
+    font-family:Verdana;max-width:230px;box-shadow:2px 2px 5px rgba(0,0,0,.4);
+    animation:popin .3s;
+  }
+
+  #konamiBanner{
+    position:fixed;inset:0;z-index:99998;background:rgba(255,0,0,.85);color:#fff;
+    display:none;align-items:center;justify-content:center;font-family:Impact;
+    font-size:clamp(24px,6vw,60px);text-align:center;text-shadow:3px 3px 0 #000;
+  }
+
+  #chaosFlash{
+    position:fixed;inset:0;z-index:99997;background:magenta;opacity:0;pointer-events:none;
+  }
+
+  .easteregg-msg{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:black;color:lime;padding:20px;border:3px solid lime;z-index:99996;
+    font-family:'Courier New';text-align:center;
+  }
+
+  @media (max-width:600px){
+    section{margin:14px 2px;padding:10px;}
+    nav button{padding:8px 10px;font-size:13px !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loadingScreen">
+  <h1>SELF IMPROVEMENT™ LOADING...</h1>
+  <div>CALCULATING PERSONAL POTENTIAL...</div>
+  <div class="loadbar"><div class="loadbar-fill" id="loadFill1"></div></div>
+  <div id="loadLabel">Installing discipline...</div>
+  <div id="loadError">ERROR.<br>Motivation.exe could not be found.</div>
+</div>
+
+<div id="konamiBanner">MAXIMUM GRINDSET UNLOCKED.</div>
+<div id="chaosFlash"></div>
+<div id="notifStack"></div>
+
+<header>
+  <h1 id="logo">🔥🔥🔥 WELCOME TO THE ULTIMATE SELF IMPROVEMENT ZONE 🔥🔥🔥</h1>
+  <div class="sub">YOU ARE CURRENTLY 0.0001% BETTER THAN YESTERDAY!!!</div>
+  <div class="badges">
+    <span>!!! NEW !!!</span><span>!!! HOT !!!</span><span>!!! CLICK HERE !!!</span>
+  </div>
+</header>
+
+<div class="marquee-wrap"><span>⚠️ WARNING: LAZINESS DETECTED ⚠️ &nbsp;|&nbsp; GET UP &nbsp;|&nbsp; DRINK WATER &nbsp;|&nbsp; STUDY &nbsp;|&nbsp; GO GYM &nbsp;|&nbsp; STOP SCROLLING &nbsp;|&nbsp; BECOME LEGENDARY &nbsp;|</span></div>
+
+<div class="oldweb-info">
+  WEBMASTER: ONLINE??? &nbsp;|&nbsp; LAST UPDATED: 2007 &nbsp;|&nbsp; VISITORS: 69420 &nbsp;|&nbsp; SERVER: PROBABLY ONLINE &nbsp;|&nbsp; BEST VIEWED IN INTERNET EXPLORER 6
+</div>
+
+<nav>
+  <button data-target="hero">HOME</button>
+  <button data-target="hero">MOTIVATION</button>
+  <button data-target="score">GYM BRO</button>
+  <button data-target="habits">STUDY</button>
+  <button data-target="stats">MONEY $$$</button>
+  <button data-target="commandments">DISCIPLINE</button>
+  <button id="destroyLazinessBtn" data-target="stats">DESTROY LAZINESS</button>
+  <button id="contactBtn">CONTACT</button>
+</nav>
+
+<main>
+
+  <section id="hero">
+    <h2>ARE YOU TIRED OF BEING AVERAGE?</h2>
+    <h2 class="big2">GOOD.</h2>
+    <h2 class="big3">BECOME THE MAIN CHARACTER.</h2>
+    <div class="hero-visual">
+      <div class="tag" style="top:10px;left:10px;">6AM</div>
+      <div class="tag" style="top:40px;right:15px;">DISCIPLINE</div>
+      <div class="tag" style="bottom:60px;left:20px;">NO EXCUSES</div>
+      <div class="tag" style="bottom:20px;right:20px;">GRINDSET</div>
+      <div class="tag" style="top:90px;left:40%;">LOCK IN</div>
+      <div class="tag" style="bottom:100px;right:40%;">WAKE UP</div>
+    </div>
+    <button id="hugeBtn">CLICK HERE TO CHANGE YOUR LIFE</button>
+  </section>
+
+  <section id="stats">
+    <h3>POPUP STATISTICS</h3>
+    <div id="statsPanel">
+      <div class="title">================================</div>
+      <div class="title">POPUP STATISTICS</div>
+      <div>ACTIVE POPUPS: <span id="statActive">0</span></div>
+      <div>POPUPS DEFEATED: <span id="statDefeated">0</span></div>
+      <div>ADS SURVIVED: <span id="statSurvived">0</span></div>
+      <div>MONEY SPENT: ₹0</div>
+      <div>CHAOS LEVEL: <span id="statChaos">1</span></div>
+      <div class="title">================================</div>
+    </div>
+    <button class="release-btn" id="releaseBtn">🚨 RELEASE THE POPUPS 🚨</button>
+    <button class="clean-btn" id="cleanBtn">🧹 CLEAN MY SCREEN</button>
+
+    <h3>AD BLOCKER STATUS</h3>
+    <p id="adblockStatus" style="font-family:'Courier New';font-weight:bold;">❌ DISABLED</p>
+    <button id="activateAdblockBtn" class="action" style="padding:10px 16px;cursor:pointer;">ACTIVATE AD BLOCKER</button>
+  </section>
+
+  <section id="score">
+    <h3>YOUR TOTALLY SCIENTIFIC PERSONAL DEVELOPMENT SCORE™</h3>
+    <div class="score-row"><span class="label">DISCIPLINE</span><div class="bar-outer"><div class="bar-inner" id="bar1"></div></div><span id="val1">73%</span></div>
+    <div class="score-row"><span class="label">CONFIDENCE</span><div class="bar-outer"><div class="bar-inner" id="bar2"></div></div><span id="val2">42%</span></div>
+    <div class="score-row"><span class="label">FOCUS</span><div class="bar-outer"><div class="bar-inner" id="bar3"></div></div><span id="val3">18%</span></div>
+    <div class="score-row"><span class="label">RIZZ</span><div class="bar-outer"><div class="bar-inner" id="bar4"></div></div><span id="val4">91%</span></div>
+    <div class="score-row"><span class="label">PRODUCTIVITY</span><div class="bar-outer"><div class="bar-inner" id="bar5"></div></div><span id="val5">12%</span></div>
+    <div class="score-row"><span class="label">PROCRASTINATION</span><div class="bar-outer"><div class="bar-inner" id="bar6" style="background:red;"></div></div><span id="val6">147%</span></div>
+    <button id="calcPotentialBtn" class="action" style="padding:10px 16px;cursor:pointer;margin-top:10px;">CALCULATE MY POTENTIAL</button>
+  </section>
+
+  <section id="habits">
+    <h3>HABIT TRACKER</h3>
+    <div id="habitList">
+      <label><input type="checkbox"> Wake up early</label>
+      <label><input type="checkbox"> Drink water</label>
+      <label><input type="checkbox"> Exercise</label>
+      <label><input type="checkbox"> Study 2 hours</label>
+      <label><input type="checkbox"> Read 10 pages</label>
+      <label><input type="checkbox"> Touch grass</label>
+      <label><input type="checkbox"> Don't doomscroll</label>
+      <label><input type="checkbox"> Sleep before 11 PM</label>
+    </div>
+    <button id="becomeDisciplinedBtn" class="action" style="padding:10px 16px;cursor:pointer;">BECOME DISCIPLINED</button>
+    <p id="habitResult" style="font-family:Impact;font-size:20px;color:#c00;"></p>
+  </section>
+
+  <section id="quote">
+    <h3>🔥 RANDOM WISDOM FROM THE INTERNET 🔥</h3>
+    <div id="quoteBox">Click below for wisdom.</div>
+    <button id="wisdomBtn" class="action" style="padding:10px 16px;cursor:pointer;">GIVE ME WISDOM</button>
+  </section>
+
+  <section id="commandments">
+    <h3>THE 10 COMMANDMENTS</h3>
+    <ol style="font-family:'Courier New';font-size:15px;line-height:1.8;">
+      <li>WAKE UP</li><li>MAKE BED</li><li>DRINK WATER</li><li>GO GYM</li><li>STUDY</li>
+      <li>MAKE MONEY</li><li>DON'T CRY</li><li>DON'T PROCRASTINATE</li><li>DELETE INSTAGRAM</li>
+      <li style="font-size:22px;color:red;font-family:Impact;transform:rotate(-2deg);display:inline-block;">REINSTALL INSTAGRAM BECAUSE YOU GOT BORED</li>
+    </ol>
+  </section>
+
+  <section id="procrastination">
+    <h3>AM I PROCRASTINATING?</h3>
+    <button id="checkProcBtn" class="action" style="padding:10px 16px;cursor:pointer;">CHECK NOW</button>
+    <p id="procResult" style="font-family:Impact;font-size:26px;color:purple;"></p>
+    <p style="font-family:'Courier New';">TIME WASTED ON THIS WEBSITE: <span id="timeWasted">00:00:00</span></p>
+  </section>
+
+  <section id="testimonials">
+    <h3>WHAT PEOPLE ARE SAYING</h3>
+    <div class="testimonial"><div class="stars">★★★★★</div>"I clicked this popup and now I wake up at 4AM." — Definitely Real Person</div>
+    <div class="testimonial"><div class="stars">★★★★★</div>"Before this website I had no discipline. I still don't." — Another Customer</div>
+    <div class="testimonial"><div class="stars">★★★★★</div>"Please stop showing me popup ads." — Anonymous</div>
+    <p style="font-size:10px;color:#888;">*97% of billionaires recommend this website. Billionaires were not actually contacted.</p>
+    <p id="socialProof" style="font-family:'Comic Sans MS';color:red;font-weight:bold;"></p>
+  </section>
+
+  <section id="construction">
+    <div class="inner">
+      <span class="gear">⚙️</span> 🚧🚧🚧 WEBSITE UNDER CONSTRUCTION 🚧🚧🚧 <span class="gear">⚙️</span><br>
+      PLEASE COME BACK IN 2008<br>
+      EXPECTED COMPLETION: SOON™<br>
+      PROGRESS: 12%
+    </div>
+  </section>
+
+  <section id="visitorSection">
+    <div id="visitorCounter">
+      YOU ARE VISITOR # <span class="num" id="visitorNum">69420</span><br>
+      <span style="font-size:11px;">THANK YOU FOR IMPROVING YOUR LIFE WITH US SINCE 2007 — (click me)</span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>© 2007–2026 SELF IMPROVEMENT™</div>
+  <div>Made with 100% pure HTML and questionable life decisions.</div>
+  <div>Best viewed in Internet Explorer 6 at 800×600 resolution.</div>
+  <div style="margin-top:8px;">
+    <a id="privacyLink">Privacy Policy</a> | <a id="termsLink">Terms</a> | <a id="footerContactLink">Contact</a> | <a id="sigmaLink">Become Sigma</a> | <a id="reportLink">Report Website</a>
+  </div>
+  <p id="footerMsg" style="color:lime;"></p>
+</footer>
+
+<!-- FAKE COOKIE POPUP container spawned by JS -->
+<!-- FAKE CHAT WIDGET -->
+<div id="chatWidget">💬</div>
+<div id="chatBox">
+  <div class="chead"><span>COACH CHAD (ONLINE)</span><span id="chatClose" style="cursor:pointer;">[X]</span></div>
+  <div class="cbody" id="chatBody">
+    <p><b>Coach Chad:</b> "HELLO CHAMP."</p>
+    <p><b>Coach Chad:</b> "ARE YOU READY TO CHANGE YOUR LIFE?"</p>
+    <button id="chatYes">YES</button><button id="chatNo">NO</button>
+  </div>
+</div>
+
+<div id="popupLayer"></div>
+<div id="floaterLayer"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= LOADING SCREEN ================= */
+  const fill1 = document.getElementById('loadFill1');
+  const loadLabel = document.getElementById('loadLabel');
+  const loadError = document.getElementById('loadError');
+  let pct = 0;
+  const loadSteps = [
+    {p:40, label:"Installing discipline..."},
+    {p:75, label:"Removing laziness..."},
+    {p:100, label:"Loading motivation..."}
+  ];
+  let stepIdx = 0;
+  const loadInterval = setInterval(()=>{
+    pct += 6;
+    if(stepIdx < loadSteps.length && pct >= loadSteps[stepIdx].p){
+      loadLabel.textContent = loadSteps[stepIdx].label;
+      stepIdx++;
+    }
+    if(pct>=100){
+      pct=100;
+      fill1.style.width='100%';
+      clearInterval(loadInterval);
+      loadError.style.display='block';
+      setTimeout(()=>{
+        document.getElementById('loadingScreen').style.display='none';
+        initPopupInvasion();
+      }, 900);
+      return;
+    }
+    fill1.style.width = pct+'%';
+  }, 90);
+
+  /* ================= UTILITIES ================= */
+  function $(id){return document.getElementById(id);}
+  function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+  /* ================= NOTIFICATIONS ================= */
+  const notifPool = [
+    "🔔 Someone somewhere just became more productive than you.",
+    "SYSTEM ALERT: Motivation.exe has stopped responding.",
+    "IMPORTANT: You have been scrolling for too long.",
+    "NEW ACHIEVEMENT: You closed an advertisement."
+  ];
+  function showNotif(text){
+    const n = document.createElement('div');
+    n.className='notif';
+    n.textContent = text || notifPool[rand(0,notifPool.length-1)];
+    $('notifStack').appendChild(n);
+    setTimeout(()=>{ n.remove(); }, 4200);
+  }
+  setInterval(()=>{ if(Math.random()<0.5) showNotif(); }, 14000);
+
+  /* ================= STATS ================= */
+  let activePopups = 0, defeated = 0, survived = 0, chaos = 1;
+  const MAX_POPUPS = 7;
+  function refreshStats(){
+    $('statActive').textContent = activePopups;
+    $('statDefeated').textContent = defeated;
+    $('statSurvived').textContent = survived;
+    $('statChaos').textContent = chaos;
+  }
+
+  /* ================= POPUP TEMPLATES ================= */
+  const themes = ['theme-scam','theme-money','theme-warn','theme-cute',''];
+
+  const templates = [
+    { // 1
+      title:"CONGRATULATIONS.exe", theme:"theme-money",
+      body:`<h4>🚨 CONGRATULATIONS!!!</h4><p>YOU ARE THE <b>999,999TH VISITOR!!!</b></p><p>YOU HAVE WON:</p><h4 style="color:green;">₹50,00,000</h4>`,
+      btn:"CLAIM NOW",
+      onAction:(el)=>{ setContent(el, `<h4>CONGRATULATIONS.</h4><p>You have won absolutely nothing.</p>`); }
+    },
+    { // 2
+      title:"GET RICH POPUP", theme:"theme-scam",
+      body:`<h4>BECOME A BILLIONAIRE BY TUESDAY!!!</h4><p>Our revolutionary 3-step method:</p><p>1. WAKE UP<br>2. BUY OUR COURSE<br>3. BECOME RICH</p><p><b>TODAY ONLY: ₹99,999</b></p>`,
+      btn:"BECOME RICH",
+      onAction:(el)=>{ setContent(el, `<h4>Congratulations.</h4><p>You have successfully wasted another 30 seconds.</p>`); }
+    },
+    { // 3
+      title:"MOTIVATION WARNING", theme:"theme-warn",
+      body:`<h4>⚠️ MOTIVATION WARNING ⚠️</h4><p>YOUR MOTIVATION LEVEL:</p><h4 style="color:red;">7%</h4><p>Recommended solution: BUY MOTIVATION PRO MAX™</p>`,
+      btn:"FIX MY LIFE",
+      onAction:(el)=>{ setContent(el, `<h4>Motivation cannot be purchased.</h4><p>Probably.</p>`); }
+    },
+    { // 4
+      title:"DOCTORS HATE THIS", theme:"theme-scam",
+      body:`<h4>DOCTORS HATE THIS!!!</h4><p>One weird trick to become productive.</p><p><b>THE SECRET:</b> TURN OFF INSTAGRAM.</p>`,
+      btn:"SHOW ME THE SECRET",
+      onAction:(el)=>{ setContent(el, `<h4>You already knew this.</h4>`); }
+    },
+    { // 5
+      title:"WEIGHT LOSS AD", theme:"theme-scam",
+      body:`<h4>LOSE 47 KG IN 3 DAYS!!!</h4><p class="tinytext">This advertisement makes absolutely no medical claims and should not be trusted.</p>`,
+      btn:"CLICK ANYWAY",
+      onAction:(el)=>{ setContent(el, `<h4>You clicked a fake advertisement.</h4>`); }
+    },
+    { // 6
+      title:"DISCIPLINE PREMIUM", theme:"theme-money",
+      body:`<h4>DISCIPLINE PREMIUM™</h4><p>₹19,999 / MONTH</p><p>✓ Waking up<br>✓ Drinking water<br>✓ Going outside<br>✓ Looking at motivational quotes</p>`,
+      btn:"SUBSCRIBE",
+      onAction:(el)=>{ setContent(el, `<h4>You already have all these features for free.</h4>`); }
+    },
+    { // 7
+      title:"SIGMA PRO MAX", theme:"theme-cute",
+      body:`<h4>SIGMA PRO MAX ULTRA™</h4><p>✓ Black-and-white profile picture<br>✓ Mysterious music<br>✓ Looking at the distance<br>✓ Saying "grindset"<br>✓ Avoiding eye contact</p><p><b>ONLY ₹49,999</b></p>`,
+      btn:"BECOME SIGMA",
+      onAction:(el)=>{ setContent(el, `<h4>SIGMA MODE ACTIVATED.</h4>`); document.title="SIGMA MODE ACTIVATED."; setTimeout(()=>document.title="SELF IMPROVEMENT™ - Become Better. Probably.",4000); }
+    },
+    { // 8
+      title:"SYSTEM WARNING", theme:"theme-warn",
+      body:`<h4>⚠️ YOUR COMPUTER IS LAZY ⚠️</h4><p>Detected problems:<br>Laziness<br>Doomscrolling<br>Procrastination<br>Opening this website</p>`,
+      btn:"REPAIR NOW",
+      onAction:(el)=>{ setContent(el, `<h4>REPAIR FAILED.</h4><p>User must work manually.</p>`); }
+    },
+    { // 9 - download simulation
+      title:"discipline_final_REAL_v7_FIXED.zip", theme:"theme-scam",
+      body:`<h4>DOWNLOAD DISCIPLINE.EXE</h4><p>File: discipline_final_REAL_v7_FIXED.zip<br>Size: 999 MB<br>Download speed: 0 KB/s</p><div class="progress-outer"><div class="progress-inner" id="dlbar"></div></div>`,
+      btn:null,
+      custom:"download"
+    },
+    { // 10
+      title:"DON'T LEAVE", theme:"theme-cute",
+      body:`<h4>DON'T LEAVE!!!</h4><p>You haven't purchased:<br>✓ Confidence<br>✓ Discipline<br>✓ Rizz<br>✓ Success<br>✓ Premium Oxygen</p>`,
+      btn:"CONTINUE",
+      onAction:(el)=>{ closePopupEl(el, true); }
+    },
+    { // 11 - countdown
+      title:"LIMITED TIME OFFER", theme:"theme-warn",
+      body:`<h4>LIMITED TIME OFFER!!!</h4><p>OFFER EXPIRES IN:</p><h4 id="cdown" style="color:red;">00:00:10</h4>`,
+      btn:null,
+      custom:"countdown"
+    },
+    { // 12
+      title:"INCOMING CALL", theme:"theme-cute",
+      body:`<h4>YOUR FUTURE IS CALLING</h4><p style="font-size:34px;">📞</p><p>Answer?</p>`,
+      custom:"future"
+    },
+    { // 13 - captcha
+      title:"VERIFY YOU ARE HUMAN", theme:"theme-warn",
+      body:`<h4>FAKE CAPTCHA</h4><p>PROVE YOU ARE NOT LAZY:</p><label><input type="checkbox" id="captchaBox"> I am willing to stand up from my chair.</label><p id="captchaMsg" style="color:red;font-size:12px;"></p>`,
+      custom:"captcha"
+    },
+    { // 14 - newsletter
+      title:"NEWSLETTER SIGNUP", theme:"theme-money",
+      body:`<h4>SUBSCRIBE TO OUR NEWSLETTER</h4><p>Receive 700 motivational emails per hour.</p><input type="email" placeholder="your@email.com" style="width:80%;padding:6px;margin:6px 0;">`,
+      btn:"DESTROY MY INBOX",
+      onAction:(el)=>{ setContent(el, `<h4>GREAT NEWS!</h4><p>We forgot to build the backend.</p>`); }
+    },
+    { // 15 - ad blocker required
+      title:"AD BLOCKER REQUIRED", theme:"theme-warn",
+      body:`<h4>AD BLOCKER REQUIRED</h4><p>Your browser contains too many advertisements.</p>`,
+      btn:"INSTALL AD BLOCKER",
+      custom:"fakeblocker"
+    },
+    { // 16 - nested ad example
+      title:"BUY PRODUCTIVITY PRO", theme:"theme-money",
+      body:`<h4>BUY PRODUCTIVITY PRO™</h4><p>Unlock your true potential today.</p>
+        <div class="nested-ad"><b>ADVERTISEMENT</b><br>BUY OUR COURSE ABOUT BUYING COURSES.<br><button class="action" style="margin-top:6px;padding:4px 8px;font-size:11px;" onclick="this.parentElement.innerHTML='<b>Nice try.</b>'">LEARN MORE</button></div>`,
+      btn:"BUY NOW",
+      onAction:(el)=>{ setContent(el, `<h4>Purchase successful.</h4><p>You now own nothing new.</p>`); }
+    }
+  ];
+
+  function setContent(popupEl, html){
+    const c = popupEl.querySelector('.content');
+    c.innerHTML = html + `<br><button class="action closeAfter">OK</button>`;
+    c.querySelector('.closeAfter').addEventListener('click', ()=> closePopupEl(popupEl, true));
+  }
+
+  /* ================= POPUP CREATION ================= */
+  let zTop = 1000;
+  function spawnPopup(forcedTemplate){
+    if(activePopups >= MAX_POPUPS) return;
+    const tpl = forcedTemplate || templates[rand(0, templates.length-1)];
+    const el = document.createElement('div');
+    el.className = 'popup ' + (tpl.theme||'');
+    const w = 300 + rand(0,60);
+    el.style.width = w+'px';
+    const vw = Math.max(window.innerWidth, 320);
+    const vh = Math.max(window.innerHeight, 480);
+    const left = rand(10, Math.max(10, vw - w - 20));
+    const top = rand(70, Math.max(80, vh - 260));
+    el.style.left = (window.innerWidth<=600 ? '4vw' : left+'px');
+    el.style.top = top+'px';
+    zTop++;
+    el.style.zIndex = zTop;
+    if(Math.random()<0.3){ el.style.transform = 'rotate('+rand(-3,3)+'deg)'; }
+
+    let closeStage = 0;
+    const twoStep = Math.random() < 0.25;
+
+    el.innerHTML = `
+      <div class="titlebar">
+        <span>${tpl.title}</span>
+        <span class="closeX">X</span>
+      </div>
+      <div class="content">
+        ${tpl.body}
+        ${tpl.btn ? `<br><button class="action mainAction">${tpl.btn}</button>` : ''}
+        <div class="tinytext">*Results not guaranteed. This is a fake advertisement for demonstration purposes.</div>
+      </div>
+    `;
+    $('popupLayer').appendChild(el);
+    activePopups++; survived++;
+    refreshStats();
+
+    // dragging
+    makeDraggable(el);
+
+    // bring to front
+    el.addEventListener('mousedown', ()=>{ zTop++; el.style.zIndex = zTop; });
+
+    // close logic
+    const closeBtn = el.querySelector('.closeX');
+    closeBtn.addEventListener('click', ()=>{
+      if(twoStep && closeStage===0){
+        closeStage=1;
+        const content = el.querySelector('.content');
+        content.innerHTML = `<h4>WHY ARE YOU RUNNING FROM SUCCESS???</h4><button class="action" id="reallyClose">CLOSE FOR REAL</button>`;
+        content.querySelector('#reallyClose').addEventListener('click', ()=> closePopupEl(el, true));
+      } else {
+        closePopupEl(el, true);
+      }
+    });
+
+    // main action
+    const mainBtn = el.querySelector('.mainAction');
+    if(mainBtn && tpl.onAction){
+      mainBtn.addEventListener('click', ()=> tpl.onAction(el));
+    }
+
+    // custom behaviors
+    if(tpl.custom === 'download'){
+      let dp = 0;
+      const bar = el.querySelector('#dlbar');
+      const iv = setInterval(()=>{
+        dp += rand(3,9);
+        if(dp>=99){ dp=99; clearInterval(iv);
+          setTimeout(()=>{
+            const c = el.querySelector('.content');
+            c.innerHTML = `<h4>ERROR.</h4><p>Discipline must be installed manually.</p><button class="action closeAfter">OK</button>`;
+            c.querySelector('.closeAfter').addEventListener('click', ()=>closePopupEl(el,true));
+          }, 700);
+        }
+        if(bar) bar.style.width = dp+'%';
+      }, 250);
+    }
+    if(tpl.custom === 'countdown'){
+      let t = 10;
+      const cd = el.querySelector('#cdown');
+      const iv = setInterval(()=>{
+        t--;
+        if(t<=0){
+          cd.textContent = "OFFER EXTENDED!!!";
+          t = 10;
+        } else {
+          cd.textContent = "00:00:"+(t<10?'0'+t:t);
+        }
+      }, 1000);
+      el._interval = iv;
+    }
+    if(tpl.custom === 'future'){
+      const c = el.querySelector('.content');
+      c.innerHTML += `<br><button class="action" id="futYes">YES</button><button class="action" id="futNo">NO</button>`;
+      c.querySelector('#futYes').addEventListener('click', ()=> setContent(el, `<h4>Your future says:</h4><p>"GET OFF THIS WEBSITE AND STUDY."</p>`));
+      c.querySelector('#futNo').addEventListener('click', ()=> setContent(el, `<h4>Your future is disappointed.</h4>`));
+    }
+    if(tpl.custom === 'captcha'){
+      const c = el.querySelector('.content');
+      c.innerHTML += `<br><button class="action" id="trustBtn">TRUST ME BRO</button>`;
+      const box = c.querySelector('#captchaBox');
+      const msg = c.querySelector('#captchaMsg');
+      box.addEventListener('change', ()=>{
+        msg.textContent = "VERIFICATION FAILED. Reason: You must actually stand up.";
+        box.checked = false;
+      });
+      c.querySelector('#trustBtn').addEventListener('click', ()=> closePopupEl(el,true));
+    }
+    if(tpl.custom === 'fakeblocker'){
+      mainBtn.addEventListener('click', ()=>{
+        const c = el.querySelector('.content');
+        c.innerHTML = `<h4>INSTALLING...</h4><div class="progress-outer"><div class="progress-inner" id="abbar"></div></div>`;
+        const bar = c.querySelector('#abbar');
+        let steps = [10,37,83,99];
+        let i=0;
+        const iv = setInterval(()=>{
+          if(i<steps.length){ bar.style.width = steps[i]+'%'; i++; }
+          else {
+            clearInterval(iv);
+            c.innerHTML = `<h4>ERROR.</h4><p>THE AD BLOCKER WAS ANOTHER ADVERTISEMENT.</p><button class="action closeAfter">OK</button>`;
+            c.querySelector('.closeAfter').addEventListener('click', ()=>{ closePopupEl(el,true); spawnPopup(templates[5]); });
+          }
+        }, 500);
+      });
+    }
+
+    return el;
+  }
+
+  function closePopupEl(el, wasDefeated){
+    if(el._interval) clearInterval(el._interval);
+    el.remove();
+    activePopups = Math.max(0, activePopups-1);
+    if(wasDefeated) defeated++;
+    refreshStats();
+  }
+
+  /* ================= DRAGGING ================= */
+  function makeDraggable(el){
+    const bar = el.querySelector('.titlebar');
+    let dragging=false, offX=0, offY=0;
+    const isMobile = window.innerWidth <= 600;
+    if(isMobile) return;
+    bar.addEventListener('mousedown', (e)=>{
+      dragging = true;
+      offX = e.clientX - el.getBoundingClientRect().left;
+      offY = e.clientY - el.getBoundingClientRect().top;
+      bar.style.cursor='grabbing';
+    });
+    document.addEventListener('mousemove', (e)=>{
+      if(!dragging) return;
+      let nx = e.clientX - offX;
+      let ny = e.clientY - offY;
+      nx = Math.max(0, Math.min(window.innerWidth - el.offsetWidth, nx));
+      ny = Math.max(0, Math.min(window.innerHeight - el.offsetHeight, ny));
+      el.style.left = nx+'px';
+      el.style.top = ny+'px';
+    });
+    document.addEventListener('mouseup', ()=>{ dragging=false; bar.style.cursor='grab'; });
+  }
+
+  /* ================= SPAWN LOGIC ================= */
+  function initPopupInvasion(){
+    spawnPopup(); spawnPopup();
+    if(Math.random()<0.7) spawnPopup();
+    spawnCookiePopup();
+
+    setTimeout(()=>{ spawnPopup(); }, rand(6000,10000));
+
+    let scrolled = false;
+    window.addEventListener('scroll', ()=>{
+      if(!scrolled){
+        scrolled = true;
+        if(Math.random()<0.5) spawnPopup();
+        setTimeout(()=> scrolled=false, 4000);
+      }
+    });
+  }
+
+  function spawnCookiePopup(){
+    const el = document.createElement('div');
+    el.className = 'popup theme-cute';
+    el.style.left = '50%'; el.style.bottom='10px'; el.style.top='auto';
+    el.style.transform = 'translateX(-50%)';
+    zTop++; el.style.zIndex = zTop;
+    el.innerHTML = `
+      <div class="titlebar"><span>🍪 IMPORTANT COOKIE MESSAGE</span><span class="closeX">X</span></div>
+      <div class="content">
+        <p>We use cookies because apparently every website does.</p>
+        <button class="action" id="cookAccept">ACCEPT</button>
+        <button class="action" id="cookMore">ACCEPT MORE</button>
+        <button class="action" id="cookReal">GIVE ME ACTUAL COOKIES</button>
+      </div>`;
+    $('popupLayer').appendChild(el);
+    activePopups++; refreshStats();
+    el.querySelector('.closeX').addEventListener('click', ()=> closePopupEl(el, true));
+    el.querySelector('#cookAccept').addEventListener('click', ()=> closePopupEl(el, true));
+    el.querySelector('#cookMore').addEventListener('click', ()=> closePopupEl(el, true));
+    el.querySelector('#cookReal').addEventListener('click', ()=>{
+      el.querySelector('.content').innerHTML = `<p style="font-size:26px;">🍪 🍪 🍪 🍪 🍪</p><p>Best we can do.</p><button class="action closeAfter">OK</button>`;
+      el.querySelector('.closeAfter').addEventListener('click', ()=> closePopupEl(el,true));
+    });
+  }
+
+  /* ================= NAV ================= */
+  document.querySelectorAll('nav button[data-target]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const t = document.getElementById(btn.dataset.target);
+      if(t) t.scrollIntoView({behavior:'smooth'});
+      if(Math.random()<0.4) spawnPopup();
+    });
+  });
+
+  $('contactBtn').addEventListener('click', ()=>{
+    showEasterEgg("WE DON'T HAVE A CUSTOMER SUPPORT DEPARTMENT.");
+  });
+  $('footerContactLink').addEventListener('click', ()=>{
+    $('footerMsg').textContent = "We don't have a customer support department.";
+  });
+
+  /* ================= HERO BUTTON ================= */
+  $('hugeBtn').addEventListener('click', ()=>{
+    const el = spawnPopup({
+      title:"FIRST STEP", theme:"theme-cute",
+      body:`<h4>CONGRATULATIONS!!!</h4><p>YOU HAVE TAKEN THE FIRST STEP.</p><p>NOW TAKE 47 MORE.</p>`,
+      btn:"OK",
+      onAction:(el)=> closePopupEl(el, true)
+    });
+  });
+
+  /* ================= RELEASE / CLEAN ================= */
+  $('releaseBtn').addEventListener('click', ()=>{
+    const n = rand(3,5);
+    for(let i=0;i<n;i++) spawnPopup();
+    chaos++;
+    refreshStats();
+    showNotif("BAD DECISION DETECTED.");
+    flashChaos();
+  });
+  function flashChaos(){
+    const f = $('chaosFlash');
+    f.style.transition='none'; f.style.opacity='.5';
+    setTimeout(()=>{ f.style.transition='opacity .6s'; f.style.opacity='0'; }, 60);
+  }
+  $('cleanBtn').addEventListener('click', ()=>{
+    const layer = $('popupLayer');
+    const count = activePopups;
+    Array.from(layer.children).forEach(el=>{ if(el._interval) clearInterval(el._interval); });
+    layer.innerHTML='';
+    defeated += count;
+    activePopups = 0;
+    refreshStats();
+    showNotif("SCREEN CLEANED. Popups defeated: "+count);
+    setTimeout(()=>{ if(Math.random()<0.6) spawnPopup(); }, 3500);
+  });
+
+  /* ================= AD BLOCKER FAKE ================= */
+  $('activateAdblockBtn').addEventListener('click', ()=>{
+    $('adblockStatus').textContent = "INSTALLING...";
+    let steps=[10,37,83,99];
+    let i=0;
+    const iv = setInterval(()=>{
+      if(i<steps.length){ $('adblockStatus').textContent = "INSTALLING... "+steps[i]+"%"; i++; }
+      else{
+        clearInterval(iv);
+        $('adblockStatus').innerHTML = "ERROR.<br>THE AD BLOCKER HAS BEEN BLOCKED BY AN ADVERTISEMENT.";
+        spawnPopup(templates[5]);
+      }
+    }, 450);
+  });
+
+  /* ================= SCORE CALCULATOR ================= */
+  function animateBar(id, valId, target){
+    $(id).style.width = target+'%';
+    $(valId).textContent = target+'%';
+  }
+  $('calcPotentialBtn').addEventListener('click', ()=>{
+    const vals = [rand(0,100),rand(0,100),rand(0,100),rand(0,100),rand(0,100),rand(100,200)];
+    animateBar('bar1','val1',vals[0]);
+    animateBar('bar2','val2',vals[1]);
+    animateBar('bar3','val3',vals[2]);
+    animateBar('bar4','val4',vals[3]);
+    animateBar('bar5','val5',vals[4]);
+    animateBar('bar6','val6',vals[5]);
+    const results = ["SCIENCE HAS BEEN CONFUSED.","YOUR POTENTIAL IS QUESTIONABLE.","INCREDIBLE. SOMEHOW."];
+    const chosen = results[rand(0,results.length-1)];
+    spawnPopup({
+      title:"RESULTS", theme:"theme-cute",
+      body:`<h4>${chosen}</h4>`, btn:"OK",
+      onAction:(el)=> closePopupEl(el, true)
+    });
+  });
+
+  /* ================= HABIT TRACKER ================= */
+  $('becomeDisciplinedBtn').addEventListener('click', ()=>{
+    const boxes = document.querySelectorAll('#habitList input[type=checkbox]');
+    let checked = 0;
+    boxes.forEach(b=>{ if(b.checked) checked++; });
+    const pct = Math.round((checked/boxes.length)*100);
+    let msg;
+    if(pct<=20) msg="BRO YOU DID NOTHING 💀";
+    else if(pct<=50) msg="Technically this counts.";
+    else if(pct<=80) msg="Okay, you're cooking.";
+    else msg="ABSOLUTELY UNHINGED PRODUCTIVITY.";
+    $('habitResult').textContent = pct+"% — "+msg;
+    if(Math.random()<0.4) spawnPopup();
+  });
+
+  /* ================= QUOTE GENERATOR ================= */
+  const quotes = [
+    "Your future self is watching you. Probably disappointed.",
+    "Discipline beats motivation. Unless you are tired. Then sleep.",
+    "Stop scrolling. You are literally scrolling right now.",
+    "Dream big. Wake up bigger.",
+    "Success is 1% inspiration and 99% opening this website."
+  ];
+  const fonts = ["Comic Sans MS","Impact","Papyrus","Times New Roman","Courier New","Georgia"];
+  const colors = ["red","green","purple","blue","orange","magenta","teal"];
+  $('wisdomBtn').addEventListener('click', ()=>{
+    const q = quotes[rand(0,quotes.length-1)];
+    const box = $('quoteBox');
+    box.textContent = '"'+q+'"';
+    box.style.fontFamily = fonts[rand(0,fonts.length-1)];
+    box.style.color = colors[rand(0,colors.length-1)];
+    box.style.fontSize = rand(14,26)+'px';
+    box.style.transform = 'rotate('+rand(-4,4)+'deg)';
+    if(Math.random()<0.3) spawnPopup();
+  });
+
+  /* ================= PROCRASTINATION DETECTOR ================= */
+  $('checkProcBtn').addEventListener('click', ()=>{
+    $('procResult').textContent = '';
+    setTimeout(()=>{
+      $('procResult').textContent = "YES.";
+    }, 900);
+  });
+  let startTime = Date.now();
+  setInterval(()=>{
+    const s = Math.floor((Date.now()-startTime)/1000);
+    const hh = String(Math.floor(s/3600)).padStart(2,'0');
+    const mm = String(Math.floor((s%3600)/60)).padStart(2,'0');
+    const ss = String(s%60).padStart(2,'0');
+    $('timeWasted').textContent = `${hh}:${mm}:${ss}`;
+  }, 1000);
+
+  /* ================= SOCIAL PROOF RANDOMIZER ================= */
+  function updateSocialProof(){
+    $('socialProof').textContent = `${rand(20000,60000)} people are viewing this offer RIGHT NOW. ${rand(200,900)} people purchased this in the last 12 seconds.`;
+  }
+  updateSocialProof();
+  setInterval(updateSocialProof, 8000);
+
+  /* ================= VISITOR COUNTER ================= */
+  const visitorNumEl = $('visitorNum');
+  visitorNumEl.textContent = rand(10000,99999);
+  $('visitorCounter').addEventListener('click', ()=>{
+    visitorNumEl.textContent = "69";
+  });
+
+  /* ================= CHAT WIDGET ================= */
+  $('chatWidget').addEventListener('click', ()=>{
+    $('chatBox').style.display = $('chatBox').style.display==='block' ? 'none':'block';
+  });
+  $('chatClose').addEventListener('click', ()=> $('chatBox').style.display='none');
+  $('chatYes').addEventListener('click', ()=>{
+    $('chatBody').innerHTML = `<p><b>Coach Chad:</b> "THEN CLOSE THIS WEBSITE AND START WORKING."</p>`;
+  });
+  $('chatNo').addEventListener('click', ()=>{
+    $('chatBody').innerHTML = `<p><b>Coach Chad:</b> "At least you're honest."</p>`;
+  });
+
+  /* ================= FLOATING ADS ================= */
+  const floaterTexts = ["🔥 GRIND","💪 NO EXCUSES","BUY MY COURSE","WAKE UP","STUDY","GO GYM","WHY ARE YOU HERE?","STOP SCROLLING","SALE!!!","LIMITED!!!"];
+  floaterTexts.forEach((t,i)=>{
+    const f = document.createElement('div');
+    f.className='floater';
+    f.textContent = t;
+    f.style.left = rand(5,85)+'vw';
+    f.style.top = rand(10,85)+'vh';
+    f.style.animationDuration = rand(9,16)+'s';
+    f.style.animationDelay = (i*0.4)+'s';
+    $('floaterLayer').appendChild(f);
+  });
+
+  /* ================= FOOTER LINKS ================= */
+  $('privacyLink').addEventListener('click', ()=> $('footerMsg').textContent = "We collect absolutely nothing except your attention.");
+  $('termsLink').addEventListener('click', ()=> $('footerMsg').textContent = "By entering this website you agree to become slightly better.");
+  $('reportLink').addEventListener('click', ()=> $('footerMsg').textContent = "Report successfully submitted to nobody.");
+  $('sigmaLink').addEventListener('click', ()=>{
+    $('footerMsg').textContent = "SIGMA MODE ACTIVATED.";
+    document.title = "SIGMA MODE ACTIVATED.";
+    setTimeout(()=>document.title="SELF IMPROVEMENT™ - Become Better. Probably.",4000);
+  });
+
+  /* ================= EASTER EGGS ================= */
+  function showEasterEgg(text){
+    const msg = document.createElement('div');
+    msg.className='easteregg-msg';
+    msg.innerHTML = text;
+    document.body.appendChild(msg);
+    setTimeout(()=> msg.remove(), 2600);
+  }
+
+  let logoClicks = 0;
+  $('logo').style.cursor='pointer';
+  $('logo').addEventListener('click', ()=>{
+    logoClicks++;
+    if(logoClicks>=5){
+      showEasterEgg("YOU FOUND THE SECRET.<br>NOW GO STUDY.");
+      logoClicks=0;
+    }
+  });
+
+  let typedBuffer = '';
+  document.addEventListener('keydown', (e)=>{
+    if(e.key.length===1){
+      typedBuffer += e.key.toLowerCase();
+      if(typedBuffer.length>20) typedBuffer = typedBuffer.slice(-20);
+      if(typedBuffer.includes('discipline')){
+        showEasterEgg("THE ALGORITHM HAS DETECTED DISCIPLINE.");
+        typedBuffer='';
+      }
+    }
+  });
+
+  // Konami code
+  const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let konamiPos = 0;
+  document.addEventListener('keydown', (e)=>{
+    const key = e.key.length===1 ? e.key.toLowerCase() : e.key;
+    if(key === konami[konamiPos]){
+      konamiPos++;
+      if(konamiPos === konami.length){
+        konamiPos = 0;
+        const banner = $('konamiBanner');
+        banner.style.display='flex';
+        setTimeout(()=> banner.style.display='none', 2000);
+        chaos += 2;
+        for(let i=0;i<3;i++) spawnPopup();
+        refreshStats();
+      }
+    } else {
+      konamiPos = (key === konami[0]) ? 1 : 0;
+    }
+  });
+
+  refreshStats();
+})();
+</script>
+
+</body>
+</html>

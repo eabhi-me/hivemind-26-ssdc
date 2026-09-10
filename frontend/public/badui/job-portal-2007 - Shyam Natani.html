@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOB PORTAL 2007 — PLEASE HIRE ME</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+    background: linear-gradient(45deg, #ffff00, #ff00ff, #00ff88, #ff0000, #0000ff);
+    background-size: 400% 400%;
+    animation: bgshift 6s ease infinite;
+    color: #000080;
+    min-height: 100vh;
+  }
+
+  @keyframes bgshift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .marquee-bar {
+    background: red;
+    color: yellow;
+    font-weight: bold;
+    padding: 8px;
+    text-align: center;
+    border: 4px dashed black;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    box-shadow: 5px 5px 0px purple, -5px -5px 0px lime;
+  }
+
+  .notification {
+    background: orange;
+    border: 5px double black;
+    color: black;
+    text-align: center;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 18px;
+    box-shadow: 8px 8px 0px #000;
+  }
+
+  h1 {
+    text-align: center;
+    color: red;
+    text-shadow: 3px 3px 0 blue, -2px -2px 0 yellow;
+    font-size: 42px;
+    background: white;
+    border: 6px ridge purple;
+    padding: 15px;
+    transform: rotate(-1deg);
+    box-shadow: 10px 10px 0px black;
+  }
+
+  h2.subtitle {
+    text-align: center;
+    color: darkgreen;
+    background: pink;
+    border: 3px dotted blue;
+    padding: 8px;
+    font-size: 20px;
+    transform: rotate(1deg);
+    width: fit-content;
+    margin: 10px auto 25px auto;
+  }
+
+  .blink {
+    animation: blinker 1s step-start infinite;
+    color: red;
+    font-weight: bold;
+  }
+
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .card {
+    background: #f0f0f0;
+    border: 8px groove gray;
+    box-shadow: 12px 12px 0px rgba(0,0,0,0.5);
+    padding: 25px;
+    width: 340px;
+    max-width: 95vw;
+    transform: rotate(0.5deg);
+  }
+
+  .stats-card {
+    background: #ffff99;
+    border: 6px dashed red;
+    box-shadow: -10px 10px 0px purple;
+    padding: 20px;
+    width: 300px;
+    max-width: 95vw;
+    transform: rotate(-0.7deg);
+  }
+
+  .stats-card p {
+    background: white;
+    border: 2px solid black;
+    padding: 6px;
+    margin: 6px 0;
+    font-size: 14px;
+    box-shadow: 3px 3px 0 gray;
+  }
+
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: purple;
+    font-size: 18px;
+  }
+
+  input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 4px inset navy;
+    background: lightyellow;
+    font-size: 16px;
+    font-family: inherit;
+  }
+
+  .checkbox-row {
+    margin-top: 15px;
+    font-size: 14px;
+    color: darkred;
+    font-weight: bold;
+  }
+
+  .big-button {
+    display: block;
+    width: 100%;
+    margin-top: 25px;
+    padding: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to bottom, red, darkred);
+    border: 6px outset yellow;
+    box-shadow: 6px 6px 0px black;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: inherit;
+  }
+
+  .big-button:hover {
+    background: linear-gradient(to bottom, orange, red);
+    transform: scale(1.03);
+  }
+
+  .big-button:active {
+    transform: scale(0.97);
+  }
+
+  .small-links {
+    text-align: center;
+    margin-top: 15px;
+  }
+
+  .small-links a {
+    color: blue;
+    text-decoration: underline;
+    font-size: 14px;
+    display: block;
+    margin: 5px 0;
+    cursor: pointer;
+  }
+
+  .create-account {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    background: lime;
+    border: 5px ridge green;
+    box-shadow: 4px 4px 0px black;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .hire-me-btn {
+    margin-top: 20px;
+    padding: 6px 10px;
+    font-size: 11px;
+    background: silver;
+    border: 3px outset gray;
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .loader {
+    display: none;
+    margin: 15px auto;
+    width: 100%;
+    text-align: center;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 8px solid magenta;
+    border-top: 8px solid yellow;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .progress-wrap {
+    width: 100%;
+    background: white;
+    border: 3px solid black;
+    margin-top: 10px;
+    height: 25px;
+    box-shadow: 3px 3px 0 gray;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: repeating-linear-gradient(45deg, lime, lime 10px, green 10px, green 20px);
+    transition: width 0.3s linear;
+  }
+
+  .quote-box {
+    background: #ccffff;
+    border: 5px dotted purple;
+    padding: 15px;
+    text-align: center;
+    font-style: italic;
+    margin-top: 20px;
+    box-shadow: 6px 6px 0 black;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-box {
+    background: white;
+    border: 8px double red;
+    padding: 25px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 15px 15px 0px purple;
+    text-align: center;
+    transform: rotate(-1deg);
+  }
+
+  .modal-box h2 {
+    color: red;
+    text-shadow: 2px 2px yellow;
+  }
+
+  .modal-box p {
+    text-align: left;
+    background: #eee;
+    padding: 8px;
+    border: 2px solid black;
+    margin: 6px 0;
+    font-size: 14px;
+  }
+
+  .try-again-btn {
+    margin-top: 15px;
+    padding: 12px 20px;
+    background: orange;
+    border: 4px outset red;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 12px;
+    color: black;
+    background: white;
+    border-top: 5px solid purple;
+    padding: 15px;
+    cursor: pointer;
+  }
+
+  .footer-msg {
+    display: none;
+    color: red;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+
+  .redirect-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: black;
+    color: lime;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: "Courier New", monospace;
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .redirect-overlay .spinner2 {
+    width: 40px;
+    height: 40px;
+    border: 6px solid lime;
+    border-top: 6px solid black;
+    border-radius: 50%;
+    animation: spin 0.5s linear infinite;
+    margin-bottom: 15px;
+  }
+
+  .emoji-border {
+    letter-spacing: 4px;
+    text-align: center;
+    font-size: 20px;
+  }
+
+  @media (max-width: 500px) {
+    h1 { font-size: 26px; }
+    .card, .stats-card { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="marquee-bar">⭐️🚀 WELCOME TO THE #1 JOB PORTAL FOR THE PROFESSIONALLY UNEMPLOYED 🚀⭐️</div>
+
+<a id="topAnchor"></a>
+<div class="notification" id="notifBar">🚨 URGENT: New job opportunity detected!</div>
+
+<h1>💼 JOB PORTAL 2007 — PLEASE HIRE ME 💼</h1>
+<h2 class="subtitle">Welcome back, future employee (hopefully) 🙏</h2>
+
+<div class="emoji-border">📎📠💾📟📼☎️📠💾📟📼📎</div>
+
+<div class="container">
+
+  <div class="card">
+    <p class="blink">⚠️ Your résumé has been viewed by nobody.</p>
+
+    <form id="loginForm">
+      <label for="email">📧 Email:</label>
+      <input type="email" id="email" placeholder="your.email@pleasehireme.com">
+
+      <label for="password">🔑 Password:</label>
+      <input type="password" id="password" placeholder="my-last-hope">
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="rememberme">
+        <label style="display:inline; font-size:14px;" for="rememberme">Remember me (nobody else will)</label>
+      </div>
+
+      <button type="submit" class="big-button" id="loginBtn">PLEASE LET ME WORK 🙏</button>
+    </form>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="small-links">
+      <a id="forgotPass">Forgot password? Same.</a>
+      <a id="createAccount">Create account (why not, everything else failed)</a>
+    </div>
+
+    <button class="hire-me-btn" id="hireMeBtn">Hire me</button>
+    <p id="hireMeMsg" style="display:none; text-align:center; font-size:12px; color:green; font-weight:bold;"></p>
+  </div>
+
+  <div class="stats-card">
+    <a id="statsAnchor"></a>
+    <p>🔴 0 employers are currently interested</p>
+    <p>📅 Your unemployment streak: <strong>847 days</strong></p>
+    <p>💼 Dream job status: still dreaming</p>
+    <p>📧 We promise not to send you rejection emails. Probably.</p>
+    <p>🔥 Motivation level: <span id="motivation" style="cursor:pointer; text-decoration:underline;">2%</span></p>
+    <p>💰 Current salary: $<span id="salary" style="cursor:pointer; text-decoration:underline;">0.00</span></p>
+    <p id="richMsg" style="display:none; color:green; font-weight:bold;">WE'RE RICH!!! 🤑</p>
+    <p>☕ Coffees consumed today: 7</p>
+    <p>🔗 LinkedIn connection requests sent: 193</p>
+    <p>🙈 Recruiters ignored: 193 (mutual)</p>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p id="progressLabel" style="font-size:13px; text-align:center;">Searching for jobs...</p>
+  </div>
+
+</div>
+
+<a id="quoteAnchor"></a>
+<div class="quote-box">
+  "Success is not final, failure is not fatal, and unemployment is apparently permanent."<br>
+  — Definitely Not Abraham Lincoln
+</div>
+
+<a id="footerAnchor"></a>
+<footer id="pageFooter">
+  Made with ❤️ and financial desperation
+  <div class="footer-msg" id="footerMsg">Why did you click this?</div>
+  <br><br>
+  © 2007-2026 PLEASE HIRE ME INC.<br>
+  No employers were harmed during the creation of this website.<br>
+  Made with ❤️, desperation, and free Wi-Fi.
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h2>📋 EMPLOYABILITY REPORT</h2>
+    <p>Professionalism: 12%</p>
+    <p>Experience: "We don't talk about that."</p>
+    <p>Networking: 4%</p>
+    <p>Motivation: 89% (questionable)</p>
+    <p>Money: $3.72</p>
+    <p>Chance of getting hired: 0.0007%</p>
+    <p style="text-align:center; font-weight:bold; background:none; border:none;">Congratulations! Your application has been sent directly into the void. 🕳️</p>
+    <button class="try-again-btn" id="tryAgainBtn">Try Again</button>
+  </div>
+</div>
+
+<div class="redirect-overlay" id="redirectOverlay">
+  <div class="spinner2"></div>
+  <div id="redirectText">Redirecting you to your future...</div>
+</div>
+
+<script>
+  // ===== INTENTIONALLY BAD UI: RANDOM MISDIRECTS =====
+  const redirectMessages = [
+    "Redirecting you to your future...",
+    "Locating available jobs (none found)...",
+    "Connecting to opportunity.exe...",
+    "Please wait, buffering hope...",
+    "Rerouting through 1998 dial-up...",
+    "Finding a page that definitely exists...",
+    "Establishing connection to the void..."
+  ];
+
+  const fakeAnchors = ["#topAnchor", "#statsAnchor", "#quoteAnchor", "#footerAnchor"];
+
+  function fakeRedirect(callback) {
+    const overlay = document.getElementById('redirectOverlay');
+    const text = document.getElementById('redirectText');
+    text.textContent = redirectMessages[Math.floor(Math.random() * redirectMessages.length)];
+    overlay.style.display = "flex";
+    setTimeout(function() {
+      overlay.style.display = "none";
+      const target = fakeAnchors[Math.floor(Math.random() * fakeAnchors.length)];
+      const el = document.querySelector(target);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      if (callback) callback();
+    }, 1200);
+  }
+
+  // Fake urgent notification switcheroo
+  setTimeout(function() {
+    document.getElementById('notifBar').textContent = "Never mind. It was a newsletter. 📰";
+  }, 3000);
+
+  // Login form handling
+  const loginForm = document.getElementById('loginForm');
+  const loginBtn = document.getElementById('loginBtn');
+  const loader = document.getElementById('loader');
+  const modalOverlay = document.getElementById('modalOverlay');
+
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    loginBtn.textContent = "CALCULATING YOUR EMPLOYABILITY...";
+    loginBtn.disabled = true;
+    loader.style.display = "block";
+
+    fakeRedirect(function() {
+      loader.style.display = "none";
+      modalOverlay.style.display = "flex";
+    });
+  });
+
+  // Bad UI: the button dodges your cursor on hover, sometimes, because why should hiring be easy
+  loginBtn.addEventListener('mouseover', function() {
+    if (!loginBtn.disabled && Math.random() < 0.5) {
+      const dodgeX = (Math.random() * 40 - 20).toFixed(0);
+      const dodgeY = (Math.random() * 10 - 5).toFixed(0);
+      loginBtn.style.transform = `translate(${dodgeX}px, ${dodgeY}px) scale(1.03)`;
+    }
+  });
+  loginBtn.addEventListener('mouseleave', function() {
+    loginBtn.style.transform = "";
+  });
+
+  document.getElementById('tryAgainBtn').addEventListener('click', function() {
+    modalOverlay.style.display = "none";
+    loginBtn.textContent = "PLEASE LET ME WORK 🙏";
+    loginBtn.disabled = false;
+  });
+
+  // Forgot password / create account — bad UI: clicking "redirects" you somewhere random on the page
+  document.getElementById('forgotPass').addEventListener('click', function(e) {
+    e.preventDefault();
+    fakeRedirect(function() {
+      alert("Forgot password? Same. We can't help you there either.");
+    });
+  });
+
+  document.getElementById('createAccount').addEventListener('click', function(e) {
+    e.preventDefault();
+    fakeRedirect(function() {
+      alert("Account created! It will be just as unemployed as your old one.");
+    });
+  });
+
+  // Hire me easter egg — also "redirects" you before telling you the good news
+  document.getElementById('hireMeBtn').addEventListener('click', function() {
+    fakeRedirect(function() {
+      const msg = document.getElementById('hireMeMsg');
+      msg.style.display = "block";
+      msg.textContent = "You have successfully hired yourself. Congratulations, boss.";
+    });
+  });
+
+  // Salary click easter egg
+  let salaryClicked = false;
+  document.getElementById('salary').addEventListener('click', function() {
+    if (!salaryClicked) {
+      this.textContent = "0.01";
+      document.getElementById('richMsg').style.display = "block";
+      salaryClicked = true;
+    }
+  });
+
+  // Motivation click easter egg
+  const motivationOptions = ["3%", "-4%", "Please restart human", "1%", "0.5%", "undefined%"];
+  document.getElementById('motivation').addEventListener('click', function() {
+    const random = motivationOptions[Math.floor(Math.random() * motivationOptions.length)];
+    this.textContent = random;
+  });
+
+  // Footer click easter egg — also misdirects first, because consistency is for professionals
+  document.getElementById('pageFooter').addEventListener('click', function(e) {
+    fakeRedirect(function() {
+      document.getElementById('footerMsg').style.display = "block";
+    });
+  });
+
+  // Fake job search progress bar
+  const progressBar = document.getElementById('progressBar');
+  const progressLabel = document.getElementById('progressLabel');
+  let progress = 0;
+
+  function runProgress() {
+    progress = 0;
+    progressBar.style.width = "0%";
+    progressLabel.textContent = "Searching for jobs...";
+    const interval = setInterval(function() {
+      progress += Math.random() * 15;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        progressBar.style.width = "100%";
+        progressLabel.textContent = "Found 0 jobs matching your requirements.";
+        setTimeout(function() {
+          progressLabel.textContent = "Requirements: Remote, $200k salary, 4-day work week, no experience required.";
+        }, 1500);
+      } else {
+        progressBar.style.width = progress + "%";
+      }
+    }, 400);
+  }
+
+  runProgress();
+  // Restart the depressing job search loop every so often
+  setInterval(runProgress, 15000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Bad UI CAPTCHA - Extreme Edition</title>
+    <style>
+        /* --- GLOBAL & DARK MODE TRANSITIONS --- */
+        body {
+            font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f1f2f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+            padding: 0;
+            margin: 0;
+            color: #333;
+            transition: background-color 0.1s, color 0.1s; 
+            overflow: hidden; 
+        }
+
+        body.dark-mode {
+            background-color: #0a0a0a;
+            color: #fff;
+        }
+
+        .captcha-container {
+            width: 95%;
+            max-width: 600px;
+            text-align: center;
+            transition: max-width 0.4s ease;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .captcha-container.stage2-layout {
+            max-width: 1200px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            transition: color 0.1s;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            transition: color 0.1s;
+        }
+        
+        body.dark-mode .subtitle { color: #aaa; }
+
+        /* --- THE HIDEOUS COOKIE BANNER --- */
+        #cookieBanner {
+            position: fixed;
+            top: -150%;
+            left: 0;
+            width: 100%;
+            background-color: #00ff00; 
+            color: #000;
+            border-bottom: 8px dashed #ff0000;
+            z-index: 999999;
+            text-align: center;
+            padding: 40px 20px;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+            transition: none; 
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        }
+
+        #cookieBanner h1 {
+            font-size: 24px;
+            text-decoration: underline;
+        }
+
+        #cookieBanner button {
+            font-size: 20px;
+            padding: 10px 30px;
+            margin: 20px;
+            border: 4px solid #000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #cookieBanner button.blue-btn {
+            background-color: #0000ff;
+            color: #fff;
+        }
+
+        /* --- STAGE 1: Checkbox Game --- */
+        #stage1 { 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .initial-box {
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        body.dark-mode .initial-box { background: #222; border-color: #444; }
+
+        .checkbox-fake {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #c1c1c1;
+            border-radius: 3px;
+            margin-right: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.dark-mode .checkbox-fake { background: #333; border-color: #555; }
+        
+        .checkbox-fake.checked::after {
+            content: '';
+            width: 8px;
+            height: 16px;
+            border: solid #4285f4;
+            border-width: 0 4px 4px 0;
+            transform: rotate(45deg);
+            margin-bottom: 4px;
+        }
+
+        .label-text {
+            font-size: 16px;
+            font-weight: 500;
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .game-card {
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none; 
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        body.dark-mode .game-card { background: #1a1a1a; border-color: #333; }
+
+        .game-header {
+            background: #4285f4;
+            color: #fff;
+            padding: 12px 18px;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .game-body {
+            padding: 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 280px; 
+        }
+
+        .grid-container {
+            position: relative;
+            width: 360px; /* Wider to accommodate larger gaps */
+            height: 210px; /* Height for 2 rows */
+        }
+
+        .target-box {
+            width: 80px; 
+            height: 80px;
+            border: 4px solid #555;
+            border-radius: 4px;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            /* Slowed down shuffle animation */
+            transition: left 0.6s ease-in-out, top 0.6s ease-in-out, background-color 0.1s, border-color 0.1s;
+            user-select: none;
+            cursor: pointer;
+            color: transparent; 
+        }
+
+        .target-box.highlight { border-color: #4285f4 !important; background-color: #e8f0fe !important; }
+        .target-box.highlight::after {
+            content: '';
+            width: 12px;
+            height: 24px;
+            border: solid #4285f4;
+            border-width: 0 5px 5px 0;
+            transform: rotate(45deg);
+            margin-bottom: 6px;
+        }
+        .target-box.success { border-color: #34a853 !important; background-color: #e6f4ea !important; }
+        .target-box.error { border-color: #ea4335 !important; background-color: #fce8e6 !important; }
+
+        #phantomDecoy {
+            position: absolute;
+            width: 80px; /* Match box size */
+            height: 80px;
+            border: 4px dashed #ff00ff;
+            border-radius: 4px;
+            background: #ffcccc;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 50;
+            box-shadow: 0 0 15px rgba(255,0,255,0.7);
+            color: #000;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        /* --- STAGE 2: Literally Terrible UI --- */
+        #stage2 { 
+            display: none; 
+            width: 100%;
+        }
+        
+        #stage2.active {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            align-items: stretch;
+            text-align: left;
+        }
+
+        .stage2-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stage2-right {
+            flex: 2; 
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .stage2-card {
+            background: #ffffee;
+            border: 7px ridge #ff00ff;
+            border-radius: 12px;
+            box-shadow: 8px 8px 0px #00ffff;
+            overflow: hidden;
+            padding-bottom: 10px;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instruction-box {
+            background-color: #000;
+            color: #fff;
+            padding: 10px;
+            border: 3px solid #ff00ff;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            text-align: center;
+            box-shadow: 4px 4px 0 #ffff00;
+        }
+
+        .captcha-image-container {
+            background: #ff9999;
+            border: 4px dotted #00ff00;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transform: rotate(-1deg);
+            width: 85%;
+        }
+
+        .captcha-digit {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ff0000;
+            text-shadow: 2px 2px 0px #ffff00;
+            user-select: none;
+            font-family: monospace;
+            letter-spacing: 2px;
+            background: #fff;
+            border: 2px solid #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* DECODER BUTTON & RESULT */
+        #decodeMorseBtn {
+            background: #8B008B;
+            color: #7FFF00;
+            border: 5px dotted #FF4500;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-transform: uppercase;
+            font-weight: 900;
+            font-family: "Comic Sans MS", cursive;
+            transition: transform 0.1s;
+        }
+        #decodeMorseBtn:hover { transform: scale(1.1) rotate(2deg); background: #000; }
+        
+        #decodedResult {
+            display: none;
+            font-size: 20px;
+            font-weight: 900;
+            color: #FF0000;
+            margin-top: 10px;
+            background: #00FFFF;
+            border: 5px dashed #000;
+            padding: 8px;
+            font-family: "Comic Sans MS", cursive;
+            transform: rotate(2deg);
+            text-align: center;
+        }
+
+        /* DECODER MODAL */
+        #decoderModalOverlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 0, 255, 0.6);
+            z-index: 100000; display: none; justify-content: center; align-items: center;
+        }
+        .decoder-content {
+            background: repeating-radial-gradient(circle, #00FF00, #00FF00 15px, #FF00FF 15px, #FF00FF 30px);
+            padding: 30px; border: 12px dashed #000;
+            transform: rotate(-3deg);
+            text-align: center;
+            box-shadow: 20px 20px 0px #FFFF00;
+        }
+        .decoder-content h2 { 
+            background: #000; color: #FFF; padding: 10px; 
+            font-size: 22px; border: 4px solid #FFF; font-family: "Comic Sans MS"; 
+        }
+        .numpad { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
+            margin-top: 15px;
+        }
+        .num-btn {
+            background: #FFFF00; color: #FF0000; font-size: 28px; font-weight: bold;
+            padding: 15px; border: 6px outset #0000FF; cursor: crosshair;
+            box-shadow: 5px 5px 0px #000;
+        }
+        .num-btn:nth-child(even) { transform: rotate(12deg); }
+        .num-btn:nth-child(odd) { transform: rotate(-8deg); }
+        .num-btn.zero-btn { grid-column: span 3; transform: rotate(0deg); }
+        
+        /* CONFIRM DECODE MODAL */
+        #confirmModalOverlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: #0000FF;
+            z-index: 100001; display: none; justify-content: center; align-items: center;
+        }
+        .confirm-content {
+            background: #FF0000; padding: 40px; color: #FFFF00;
+            text-align: center; border: 20px ridge #00FF00;
+        }
+        #confirmOkBtn {
+            font-size: 40px; padding: 20px 80px; background: #FFF; color: #000;
+            border: 15px inset #808080; cursor: grab; margin-top: 20px; font-weight: 900;
+        }
+
+        .physics-container {
+            position: relative;
+            width: calc(100% - 20px);
+            flex-grow: 1; 
+            min-height: 400px;
+            margin: 10px auto;
+            border: 5px dashed #0000ff;
+            background: #ffffcc; 
+            border-radius: 0px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 12px rgba(255,0,0,0.3);
+            cursor: none; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .physics-container::before {
+            content: "Enter Captcha Here";
+            position: absolute;
+            font-size: 32px;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            transform: rotate(-15deg);
+            pointer-events: none;
+            font-family: Arial, sans-serif;
+            z-index: 0;
+        }
+
+        #fakeCursor {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            transform: translate(-4px, -2px);
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+        }
+
+        .bubble {
+            position: absolute;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 900;
+            color: #000; 
+            cursor: none; 
+            user-select: none;
+            border: 4px solid #ff00ff; 
+            box-shadow: inset -4px -4px 10px rgba(0,0,0,0.3), inset 4px 4px 12px rgba(255,255,255,0.9), 0 6px 12px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        
+        .bubble-0 { background: radial-gradient(circle at 30% 30%, #ff8a80, #ea4335); } 
+        .bubble-1 { background: radial-gradient(circle at 30% 30%, #8c9eff, #4285f4); } 
+        .bubble-2 { background: radial-gradient(circle at 30% 30%, #ffe57f, #fbbc05); } 
+        .bubble-3 { background: radial-gradient(circle at 30% 30%, #b9f6ca, #34a853); } 
+        .bubble-4 { background: radial-gradient(circle at 30% 30%, #ea80fc, #9c27b0); } 
+
+        .tc-container {
+            width: calc(100% - 20px);
+            margin: 0 auto;
+            text-align: left;
+        }
+        
+        .read-tc-btn {
+            background: #ff00ff;
+            color: #fff;
+            border: 2px solid #000;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 4px;
+            border-radius: 4px;
+        }
+        .read-tc-btn:hover { background: #cc00cc; }
+
+        .tc-warning {
+            color: #ea4335;
+            font-size: 11px;
+            font-weight: bold;
+            height: 14px;
+        }
+
+        /* Modal for Long T&C */
+        #tcModalOverlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .tc-modal-content {
+            background: #ffffee;
+            border: 6px ridge #ff00ff;
+            width: 85%;
+            max-width: 650px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .long-tc-box {
+            height: 300px;
+            border: 3px dashed #ff0000;
+            background: #ffcccc;
+            overflow-y: scroll;
+            font-size: 12px;
+            padding: 12px;
+            color: #990000;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+        .close-modal-btn {
+            background: #00ff00;
+            color: #000;
+            border: 3px solid #000;
+            padding: 8px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-wrapper {
+            position: relative;
+            height: 50px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background: #ff00ff;
+            color: yellow;
+            border: 3px solid #000;
+            padding: 10px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 0px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s;
+            transform-origin: center;
+        }
+        
+        .submit-btn:hover { background: #00ffff; color: #000; }
+
+        .submit-btn.evading {
+            position: fixed;
+            z-index: 9999;
+            margin: 0;
+            transition: none; 
+        }
+
+        .message-area {
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 5px;
+            height: 20px;
+            text-align: center;
+        }
+
+        #distractionOverlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 999;
+            display: none;
+        }
+
+        .floating-cursive {
+            position: absolute;
+            font-family: 'Brush Script MT', cursive, fantasy;
+            font-weight: bold;
+            opacity: 0.7;
+            user-select: none;
+            animation: floatCursive 2s forwards linear;
+        }
+
+        @keyframes floatCursive {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.9; }
+            100% { transform: translateY(-100px) rotate(45deg); opacity: 0; }
+        }
+
+        #successScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        @keyframes weirdText {
+            0% { transform: scale(1) rotate(0deg) skewX(0deg); color: #fff; filter: hue-rotate(0deg); }
+            25% { transform: scale(1.8) rotate(15deg) skewX(25deg); color: #ff00ff; filter: hue-rotate(90deg); }
+            50% { transform: scale(0.6) rotate(-25deg) skewX(-15deg); color: #00ffff; filter: hue-rotate(180deg); }
+            75% { transform: scale(2.2) rotate(10deg) skewX(35deg); color: #ffff00; filter: hue-rotate(270deg); }
+            100% { transform: scale(1) rotate(0deg) skewX(0deg); color: #fff; filter: hue-rotate(360deg); }
+        }
+
+        .weird-text {
+            font-size: 60px;
+            font-weight: 900;
+            text-shadow: 4px 4px 0 #000, -4px -4px 0 #000, 4px -4px 0 #000, -4px 4px 0 #000;
+            animation: weirdText 0.4s infinite linear;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="cookieBanner">
+    <h1>This Website use cookies , a lot of cookies, a lot literally, <br> are you OK with this ???</h1>
+    <button onclick="acceptCookies()">OK</button>
+    <button class="blue-btn" onclick="acceptCookies()">OK in Blue</button>
+</div>
+
+<!-- T&C Modal Window -->
+<div id="tcModalOverlay">
+    <div class="tc-modal-content">
+        <h2>MANDATORY EXTENDED TERMS & CONDITIONS</h2>
+        <p>Please scroll all the way to the bottom to agree. Reading speed is monitored.</p>
+        <div class="long-tc-box" id="longTcBox">
+            <strong>SECTION 1: INTRODUCTION</strong><br>
+            By opening this terms window, you have legally bound your soul, digital footprint, and first-born child to our terms of agreement. You acknowledge that scrolling is arduous and intentionally painful.<br><br>
+            <strong>SECTION 2: DATA HARVESTING</strong><br>
+            We collect everything. Your browser history, your emotional state while looking at bouncing balls, the number of times you cursed at your monitor, and your approximate keyboard slamming frequency.<br><br>
+            <strong>SECTION 3: LIABILITY WAIVER</strong><br>
+            We are not responsible for broken mice, shattered sanity, wrist strain, keyboard destruction, or existential crises resulting from Morse code translation errors.<br><br>
+            <strong>SECTION 4: EXTENDED LEGAL JARGON</strong><br>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br>
+            Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat. Curabitur augue lorem, dapibus quis, laoreet et, pretium ac, nisi. Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac habitasse platea dictumst.<br>
+            <strong>SECTION 5: FINAL WARNING</strong><br>
+            You are almost at the bottom. Keep scrolling slowly. Do not attempt to scroll too fast or the window will reset. Thank you for your cooperation and compliance.<br>
+            <em>End of Extended Terms. You may now close this window.</em>
+        </div>
+        <div class="tc-warning" id="tcModalWarning"></div>
+        <br>
+        <button class="close-modal-btn" onclick="closeTcModal()">I Agree / Close</button>
+    </div>
+</div>
+
+<!-- MORSE DECODER MODALS -->
+<div id="decoderModalOverlay">
+    <div class="decoder-content">
+        <h2 id="decoderTitle">Guess First Digit</h2>
+        <div class="numpad">
+            <button class="num-btn" onclick="selectDecodeDigit(1)">1</button>
+            <button class="num-btn" onclick="selectDecodeDigit(2)">2</button>
+            <button class="num-btn" onclick="selectDecodeDigit(3)">3</button>
+            <button class="num-btn" onclick="selectDecodeDigit(4)">4</button>
+            <button class="num-btn" onclick="selectDecodeDigit(5)">5</button>
+            <button class="num-btn" onclick="selectDecodeDigit(6)">6</button>
+            <button class="num-btn" onclick="selectDecodeDigit(7)">7</button>
+            <button class="num-btn" onclick="selectDecodeDigit(8)">8</button>
+            <button class="num-btn" onclick="selectDecodeDigit(9)">9</button>
+            <button class="num-btn zero-btn" onclick="selectDecodeDigit(0)">0</button>
+        </div>
+        <button onclick="closeDecoder()" style="margin-top: 25px; padding: 10px 25px; font-size: 18px; font-weight: 900; background: #FF0000; color: #FFF; border: 6px double #000; cursor: pointer; box-shadow: -5px 5px 0px #000; transform: rotate(-5deg); font-family: 'Comic Sans MS', cursive;">Take Me Back!</button>
+    </div>
+</div>
+
+<div id="confirmModalOverlay">
+    <div class="confirm-content">
+        <h2>Confirm this selection?</h2>
+        <h1 id="confirmDigitDisplay" style="font-size: 80px; margin: 15px 0;"></h1>
+        <button id="confirmOkBtn" onclick="processConfirm()">OK</button>
+    </div>
+</div>
+
+<div id="distractionOverlay"></div>
+
+<div class="captcha-container" id="mainContainer">
+    
+    <!-- STAGE 1 CONTAINER -->
+    <div id="stage1">
+        <div class="title">STAGE 1: Checking if you are human</div>
+        <div class="subtitle">Complete this verification to continue. Click on the box again to confirm!</div>
+
+        <div class="initial-box" id="initialBox" onclick="startStage1()">
+            <div class="checkbox-fake" id="mainCheck"></div>
+            <div class="label-text">I'm not a robot</div>
+        </div>
+
+        <div class="game-card" id="gameCard">
+            <div class="game-header" id="gameInstruction">
+                Select a checkbox to follow. Click on the box again to confirm!
+            </div>
+            
+            <div class="game-body">
+                <div class="grid-container" id="gridContainer">
+                    <div id="phantomDecoy" onclick="hitDecoy()">FAKE</div>
+                </div>
+            </div>
+        </div>
+        <div class="message-area" id="stage1Message"></div>
+    </div>
+
+    <!-- STAGE 2 CONTAINER -->
+    <div id="stage2">
+        <div class="stage2-left">
+            <div class="title">STAGE 2: Almost convinced...</div>
+            <div class="instruction-box">
+                Note: This CAPTCHA is in Morse code!<br>
+                Read each digit box top-to-bottom.<br>
+                Click a bubble to bounce it and change its number!<br>
+                Keep them in the air and arrange them left-to-right!
+            </div>
+            
+            <div class="captcha-image-container" id="captchaImage"></div>
+            <button id="decodeMorseBtn" onclick="openDecoder()">Don't know morse? Decode!</button>
+            <div id="decodedResult"></div>
+        </div>
+
+        <div class="stage2-right">
+            <div class="stage2-card">
+                <div class="physics-container" id="physicsBox">
+                    <svg id="fakeCursor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0 L0 24 L6 18 L12 28 L16 26 L10 16 L20 16 Z" fill="black" stroke="white" stroke-width="2"/>
+                    </svg>
+                </div>
+                
+                <div class="tc-container">
+                    <button class="read-tc-btn" onclick="openTcModal()">📖 Read Terms & Conditions</button>
+                    <div class="tc-warning" id="tcWarning">Terms not viewed/accepted yet.</div>
+                </div>
+
+                <div class="btn-wrapper">
+                    <button class="submit-btn" id="doneBtn" onclick="checkStage2()">Done</button>
+                </div>
+            </div>
+            <div class="message-area" id="stage2Message"></div>
+        </div>
+    </div>
+</div>
+
+<div id="successScreen">
+    <div class="weird-text">WELCOME HUMAN<br>YOU PASSED</div>
+</div>
+
+<script>
+    /* =========================================
+       GLOBAL: BUTTON SIZE DECAY MECHANIC
+       ========================================= */
+    let btnScale = 1.0;
+    document.addEventListener('mousedown', () => {
+        if (document.getElementById('stage2').style.display === 'flex') {
+            btnScale *= 0.98; 
+            const btn = document.getElementById('doneBtn');
+            btn.style.transform = `scale(${btnScale})`;
+        }
+    });
+
+    /* =========================================
+       AUDIO SYNTHESIS FOR AUDIO GASLIGHTER
+       ========================================= */
+    function playAudioPing() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.12);
+        } catch(e) {}
+    }
+
+    /* =========================================
+       STAGE 1: COOKIE BANNER, INCEPTION CLICK, DECOY & SHUFFLE
+       ========================================= */
+    const GRID_COLS = 3;
+    const GRID_ROWS = 2; 
+    const SPACING_X = 140; 
+    const SPACING_Y = 120; 
+    
+    let boxes = [];
+    let currentPositions = []; 
+    let s1State = 'idle'; 
+    let flashIntervalId = null;
+    let cookiePopupShownOnce = false;
+    let inceptionTimer = null;
+    let decoyTimer = null;
+
+    function getDarkRandomColor() {
+        const r = Math.floor(Math.random() * 90) + 15; 
+        const g = Math.floor(Math.random() * 90) + 15;
+        const b = Math.floor(Math.random() * 90) + 15;
+        return `rgb(${r},${g},${b})`;
+    }
+
+    function startStage1() {
+        if (s1State !== 'idle') return;
+        
+        if (!cookiePopupShownOnce) {
+            cookiePopupShownOnce = true;
+            document.getElementById('cookieBanner').style.top = '0';
+        } else {
+            acceptCookies();
+        }
+    }
+
+    function acceptCookies() {
+        document.getElementById('cookieBanner').style.top = '-150%';
+        document.getElementById('mainCheck').classList.add('checked');
+        s1State = 'accepted_cookies';
+
+        setTimeout(() => {
+            const card = document.getElementById('gameCard');
+            card.style.display = 'block';
+            setTimeout(() => {
+                card.style.opacity = '1';
+                initStage1Game();
+            }, 50);
+        }, 500);
+    }
+
+    function initStage1Game() {
+        s1State = 'selecting';
+        const container = document.getElementById('gridContainer');
+        const decoy = document.getElementById('phantomDecoy');
+        container.innerHTML = '';
+        container.appendChild(decoy);
+        
+        boxes = [];
+        currentPositions = [];
+        
+        for (let i = 0; i < (GRID_COLS * GRID_ROWS); i++) {
+            const box = document.createElement('div');
+            box.className = 'target-box';
+            const col = i % GRID_COLS;
+            const row = Math.floor(i / GRID_COLS);
+            box.style.left = `${col * SPACING_X}px`;
+            box.style.top = `${row * SPACING_Y}px`;
+            box.dataset.isTarget = "false";
+            
+            box.style.backgroundColor = getDarkRandomColor();
+            box.onmousedown = (e) => { e.preventDefault(); handleS1Click(box); };
+            
+            container.appendChild(box);
+            boxes.push(box);
+            currentPositions.push(i);
+        }
+    }
+
+    function handleS1Click(box) {
+        if (s1State === 'selecting') {
+            s1State = 'inception_pending';
+            document.getElementById('gameInstruction').innerText = "⚠️ ARE YOU SURE? Click on the box again to confirm! (2s to hesitate...)";
+            
+            inceptionTimer = setTimeout(() => {
+                if (s1State === 'inception_pending') {
+                    let otherBoxes = boxes.filter(b => b !== box);
+                    let newTarget = otherBoxes[Math.floor(Math.random() * otherBoxes.length)];
+                    boxes.forEach(b => b.dataset.isTarget = "false");
+                    newTarget.dataset.isTarget = "true";
+                    
+                    document.getElementById('gameInstruction').innerText = "Too slow! The box felt rejected, target changed!";
+                    setTimeout(() => {
+                        startS1Shuffle();
+                    }, 1000);
+                }
+            }, 2000);
+
+            box.dataset.isTarget = "true";
+            box.classList.add('highlight');
+            
+            box.onmousedown = (e) => {
+                e.preventDefault();
+                if (s1State === 'inception_pending') {
+                    clearTimeout(inceptionTimer);
+                    s1State = 'waiting';
+                    document.getElementById('gameInstruction').innerText = "Keep your eye on it...";
+                    setTimeout(() => {
+                        box.classList.remove('highlight');
+                        startS1Shuffle();
+                    }, 1000);
+                } else if (s1State === 'guessing') {
+                    evaluateS1Guess(box);
+                }
+            };
+
+        } else if (s1State === 'guessing') {
+            evaluateS1Guess(box);
+        }
+    }
+
+    function hitDecoy() {
+        if (s1State === 'shuffling') {
+            s1State = 'locked_out';
+            document.getElementById('gameInstruction').innerText = "❌ Decoy clicked! Locked out for 10s.";
+            document.getElementById('phantomDecoy').style.display = 'none';
+            
+            let countdown = 10;
+            let lockInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('gameInstruction').innerText = `❌ Decoy clicked! Locked out for ${countdown}s.`;
+                if (countdown <= 0) {
+                    clearInterval(lockInterval);
+                    document.getElementById('gameInstruction').innerText = "Select a checkbox to follow. Click on the box again to confirm!";
+                    s1State = 'selecting';
+                }
+            }, 1000);
+        }
+    }
+
+    function startS1Shuffle() {
+        s1State = 'shuffling';
+        let shuffles = 0;
+        const maxShuffles = 10; 
+        
+        // SLOWED DOWN SHUFFLE INTERVAL
+        const intervalTime = 600; 
+
+        flashIntervalId = setInterval(() => {
+            document.body.classList.toggle('dark-mode');
+            if (Math.random() > 0.4) playAudioPing();
+        }, 150);
+
+        decoyTimer = setTimeout(() => {
+            if (s1State === 'shuffling') {
+                const decoy = document.getElementById('phantomDecoy');
+                decoy.style.display = 'flex';
+                decoy.style.left = `${Math.floor(Math.random() * 3) * SPACING_X}px`;
+                decoy.style.top = `${Math.floor(Math.random() * 2) * SPACING_Y}px`;
+                setTimeout(() => { decoy.style.display = 'none'; }, 1200);
+            }
+        }, 1500);
+
+        const interval = setInterval(() => {
+            if (shuffles >= maxShuffles) {
+                clearInterval(interval);
+                clearInterval(flashIntervalId);
+                clearTimeout(decoyTimer);
+                document.getElementById('phantomDecoy').style.display = 'none';
+                document.body.classList.remove('dark-mode');
+                
+                s1State = 'guessing';
+                document.getElementById('gameInstruction').innerText = "Click the checkbox you selected.";
+                return;
+            }
+            
+            let newPos = [...currentPositions];
+            let deranged = false;
+            while (!deranged) {
+                for (let i = newPos.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newPos[i], newPos[j]] = [newPos[j], newPos[i]];
+                }
+                deranged = currentPositions.every((pos, i) => pos !== newPos[i]);
+            }
+            
+            currentPositions = newPos;
+            boxes.forEach((b, i) => {
+                const pos = currentPositions[i];
+                b.style.left = `${(pos % GRID_COLS) * SPACING_X}px`;
+                b.style.top = `${Math.floor(pos / GRID_COLS) * SPACING_Y}px`;
+                b.style.backgroundColor = getDarkRandomColor();
+            });
+            shuffles++;
+        }, intervalTime);
+    }
+
+    function evaluateS1Guess(box) {
+        s1State = 'done';
+        if (box.dataset.isTarget === "true") {
+            box.classList.add('success');
+            document.getElementById('stage1Message').innerText = "Success! Transitioning...";
+            document.getElementById('stage1Message').style.color = "#34a853";
+            
+            setTimeout(() => {
+                document.getElementById('stage1').style.display = 'none';
+                initStage2();
+            }, 1500);
+        } else {
+            box.classList.add('error');
+            document.getElementById('stage1Message').innerText = "Failed. Try again.";
+            document.getElementById('stage1Message').style.color = "#ea4335";
+            setTimeout(() => {
+                document.getElementById('mainCheck').classList.remove('checked');
+                document.getElementById('gameCard').style.opacity = '0';
+                document.getElementById('stage1Message').innerText = "";
+                setTimeout(() => {
+                    document.getElementById('gameCard').style.display = 'none';
+                    s1State = 'idle';
+                }, 300);
+            }, 2000);
+        }
+    }
+
+    /* =========================================
+       STAGE 2: MORSE CODE CAPTCHA & BUBBLES
+       ========================================= */
+    const morseMap = ['-----', '.----', '..---', '...--', '....-', '.....', '-....', '--...', '---..', '----.'];
+    let targetCode = [];
+    let bubblesData = [];
+    let physicsAnimationId;
+    let fakeX = 0, fakeY = 0;
+    
+    const RADIUS = 26; 
+    
+    // INCREASED GRAVITY slightly to drop faster, but kept low enough to still feel like bubbles
+    const GRAVITY = 0.07; 
+    const FRICTION = 0.96; 
+    const WALL_DAMPING = 0.3; 
+
+    // Cheat code tracking for 'k' key
+    let isKPressed = false;
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'KeyK' || e.key.toLowerCase() === 'k') isKPressed = true;
+    });
+    window.addEventListener('keyup', (e) => {
+        if (e.code === 'KeyK' || e.key.toLowerCase() === 'k') isKPressed = false;
+    });
+    window.addEventListener('blur', () => { isKPressed = false; });
+
+    let lastTcTime = Date.now();
+    let lastTcScroll = 0;
+    let tcAccepted = false;
+
+    let isBtnEvading = false;
+    let btnX = 0, btnY = 0;
+
+    let annoyanceInterval, textDistractionInterval;
+
+    /* DECODER LOGIC */
+    let decodeStageIndex = 0;
+    let pendingDecodeDigit = null;
+    const digitNames = ["First", "Second", "Third", "Fourth", "Fifth"];
+
+    function openDecoder() {
+        decodeStageIndex = 0;
+        updateDecoderTitle();
+        document.getElementById('decoderModalOverlay').style.display = 'flex';
+    }
+
+    function closeDecoder() {
+        document.getElementById('decoderModalOverlay').style.display = 'none';
+    }
+
+    function updateDecoderTitle() {
+        if(decodeStageIndex < 5) {
+            document.getElementById('decoderTitle').innerText = `Guess ${digitNames[decodeStageIndex]} Digit`;
+        }
+    }
+
+    function selectDecodeDigit(n) {
+        pendingDecodeDigit = n;
+        document.getElementById('confirmDigitDisplay').innerText = n;
+        document.getElementById('confirmModalOverlay').style.display = 'flex';
+    }
+
+    function processConfirm() {
+        document.getElementById('confirmModalOverlay').style.display = 'none';
+        if (pendingDecodeDigit === targetCode[decodeStageIndex]) {
+            decodeStageIndex++;
+            if (decodeStageIndex >= 5) {
+                document.getElementById('decodedResult').innerText = "ACTUAL CODE:\n" + targetCode.join(" ");
+                document.getElementById('decodedResult').style.display = 'block';
+                document.getElementById('decoderModalOverlay').style.display = 'none';
+            } else {
+                updateDecoderTitle();
+            }
+        } else {
+            alert("WRONG GUESS! STARTING OVER, FOOL.");
+            decodeStageIndex = 0;
+            updateDecoderTitle();
+        }
+    }
+
+    /* MODAL LOGIC */
+    function openTcModal() {
+        document.getElementById('tcModalOverlay').style.display = 'flex';
+    }
+
+    function closeTcModal() {
+        if (!tcAccepted) {
+            alert("You must scroll all the way to the bottom of the Terms & Conditions first!");
+            return;
+        }
+        document.getElementById('tcModalOverlay').style.display = 'none';
+    }
+
+    function initStage2() {
+        document.getElementById('mainContainer').classList.add('stage2-layout');
+        const s2 = document.getElementById('stage2');
+        s2.style.display = 'flex';
+        s2.classList.add('active');
+        document.getElementById('distractionOverlay').style.display = 'block';
+
+        startStage2Annoyances();
+        
+        targetCode = [];
+        const captchaContainer = document.getElementById('captchaImage');
+        captchaContainer.innerHTML = '';
+        
+        for(let i=0; i<5; i++) {
+            let digit = Math.floor(Math.random() * 10);
+            targetCode.push(digit);
+            
+            let div = document.createElement('div');
+            div.className = 'captcha-digit';
+            div.innerText = morseMap[digit]; 
+            
+            let rot = (Math.random() - 0.5) * 10; 
+            let scale = 0.9 + Math.random() * 0.2;
+            div.style.transform = `rotate(${rot}deg) scale(${scale})`;
+            
+            captchaContainer.appendChild(div);
+        }
+
+        const physicsBox = document.getElementById('physicsBox');
+        const fakeCursor = document.getElementById('fakeCursor');
+        
+        const boxWidth = physicsBox.clientWidth || 600; 
+        const boxHeight = 400; 
+        
+        Array.from(physicsBox.children).forEach(child => {
+            if(child.id !== 'fakeCursor') child.remove();
+        });
+        
+        bubblesData = [];
+
+        let startGap = (boxWidth - 70) / 4; 
+
+        for(let i=0; i<5; i++) {
+            let el = document.createElement('div');
+            el.className = `bubble bubble-${i}`;
+            el.innerText = '0';
+            
+            physicsBox.appendChild(el);
+
+            let bubble = {
+                id: i,
+                el: el,
+                val: 0,
+                x: 35 + i * startGap,
+                y: boxHeight - RADIUS - 5, 
+                vx: 0,
+                vy: 0,
+                hasLanded: false 
+            };
+            bubblesData.push(bubble);
+        }
+
+        physicsBox.addEventListener('mousemove', (e) => {
+             const rect = physicsBox.getBoundingClientRect();
+             const realX = e.clientX - rect.left;
+             const realY = e.clientY - rect.top;
+             
+             const fX = rect.width - realX;
+             const fY = rect.height - realY;
+             
+             fakeCursor.style.left = `${fX}px`;
+             fakeCursor.style.top = `${fY}px`;
+        });
+        
+        physicsBox.addEventListener('mouseenter', () => fakeCursor.style.display = 'block');
+        physicsBox.addEventListener('mouseleave', () => fakeCursor.style.display = 'none');
+
+        physicsBox.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const rect = physicsBox.getBoundingClientRect();
+            const realX = e.clientX - rect.left;
+            const realY = e.clientY - rect.top;
+            const clickX = rect.width - realX;
+            const clickY = rect.height - realY;
+
+            bubblesData.forEach(bubble => {
+                let dist = Math.hypot(bubble.x - clickX, bubble.y - clickY);
+                if (dist <= RADIUS) {
+                    if (bubble.hasLanded) {
+                        bubble.val = 0;
+                        bubble.hasLanded = false;
+                    } else {
+                        bubble.val = (bubble.val + 1) % 10;
+                    }
+                    bubble.el.innerText = bubble.val;
+                    
+                    if (!isKPressed) {
+                        bubble.vy = -4 + (Math.random() * 2 - 1); 
+                        bubble.vx = (Math.random() - 0.5) * 4; 
+                    }
+                }
+            });
+        });
+
+        const longTcBox = document.getElementById('longTcBox');
+        const tcModalWarning = document.getElementById('tcModalWarning');
+        const tcWarning = document.getElementById('tcWarning');
+        
+        longTcBox.addEventListener('scroll', () => {
+            let now = Date.now();
+            let dt = now - lastTcTime;
+            let dy = longTcBox.scrollTop - lastTcScroll;
+            
+            if (dt > 0 && dy > 0) {
+                let speed = (dy / dt) * 1000; 
+                if (speed > 80) { 
+                    tcModalWarning.innerText = "Please read carefully. Scrolling too fast.";
+                    longTcBox.scrollTop = 0;
+                    tcAccepted = false;
+                } else {
+                    tcModalWarning.innerText = "";
+                }
+            }
+            lastTcTime = now;
+            lastTcScroll = longTcBox.scrollTop;
+
+            if (longTcBox.scrollHeight - longTcBox.scrollTop <= longTcBox.clientHeight + 5) {
+                tcAccepted = true;
+                tcModalWarning.innerText = "Terms Accepted Successfully!";
+                tcModalWarning.style.color = "#34a853";
+                tcWarning.innerText = "Terms Accepted.";
+                tcWarning.style.color = "#34a853";
+            }
+        });
+
+        if(physicsAnimationId) cancelAnimationFrame(physicsAnimationId);
+        updatePhysics();
+    }
+
+    function startStage2Annoyances() {
+        const darkColors = ['#8B0000', '#00008B', '#006400', '#4B0082', '#8B4513', '#2F4F4F', '#800000', '#000080', '#483D8B', '#556B2F'];
+        annoyanceInterval = setInterval(() => {
+            const randomColor = darkColors[Math.floor(Math.random() * darkColors.length)];
+            document.body.style.backgroundColor = randomColor;
+        }, 500);
+
+        const distContainer = document.getElementById('distractionOverlay');
+        const phrases = [
+            "Are you human?", 
+            "Click faster!", 
+            "Focus here...", 
+            "Why try?", 
+            "Math is hard", 
+            "Error 404", 
+            "Too slow!", 
+            "Cursive chaos", 
+            "Lost focus?"
+        ];
+        textDistractionInterval = setInterval(() => {
+            const span = document.createElement('div');
+            span.className = 'floating-cursive';
+            span.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+            span.style.left = `${Math.random() * 85}%`;
+            span.style.top = `${20 + Math.random() * 60}%`;
+            span.style.fontSize = `${18 + Math.random() * 22}px`;
+            span.style.color = `rgb(${150 + Math.random()*105}, ${150 + Math.random()*105}, ${150 + Math.random()*105})`;
+            span.style.transform = `rotate(${(Math.random()-0.5)*70}deg)`;
+            distContainer.appendChild(span);
+            setTimeout(() => span.remove(), 2000);
+        }, 350);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        const doneBtn = document.getElementById('doneBtn');
+        if (!doneBtn || document.getElementById('stage2').style.display !== 'flex') return;
+        
+        const rect = doneBtn.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const dx = centerX - e.clientX;
+        const dy = centerY - e.clientY;
+        const dist = Math.hypot(dx, dy);
+        
+        if (dist < 120) {
+            if (!isBtnEvading) {
+                doneBtn.classList.add('evading');
+                btnX = rect.left;
+                btnY = rect.top;
+                isBtnEvading = true;
+            }
+            
+            const force = (120 - dist) / 4; 
+            const angle = Math.atan2(dy, dx);
+            
+            btnX += Math.cos(angle) * force * 5;
+            btnY += Math.sin(angle) * force * 5;
+            
+            btnX = Math.max(10, Math.min(window.innerWidth - rect.width - 10, btnX));
+            btnY = Math.max(10, Math.min(window.innerHeight - rect.height - 10, btnY));
+            
+            // PHYSICS BOX COLLISION AVOIDANCE
+            const physRect = document.getElementById('physicsBox').getBoundingClientRect();
+            if (btnX < physRect.right && btnX + rect.width > physRect.left &&
+                btnY < physRect.bottom && btnY + rect.height > physRect.top) {
+                btnY = physRect.bottom + 10;
+            }
+
+            doneBtn.style.left = `${btnX}px`;
+            doneBtn.style.top = `${btnY}px`;
+        }
+    });
+
+    function updatePhysics() {
+        const physicsBox = document.getElementById('physicsBox');
+        const boxWidth = physicsBox.clientWidth || 600;
+        const boxHeight = physicsBox.clientHeight || 400;
+
+        bubblesData.forEach(b => {
+            b.vy += GRAVITY;
+            b.vx *= FRICTION;
+            b.vy *= FRICTION; 
+            
+            b.vx += Math.sin(Date.now() / 400 + b.id) * 0.1;
+            b.vy += Math.cos(Date.now() / 300 + b.id) * 0.05;
+
+            b.x += b.vx;
+            b.y += b.vy;
+        });
+
+        for (let i = 0; i < bubblesData.length; i++) {
+            for (let j = i + 1; j < bubblesData.length; j++) {
+                let b1 = bubblesData[i];
+                let b2 = bubblesData[j];
+
+                let dx = b2.x - b1.x;
+                let dy = b2.y - b1.y;
+                let dist = Math.hypot(dx, dy);
+                let minDist = RADIUS * 2;
+
+                if (dist < minDist) {
+                    if (dist === 0) { dx = 0.1; dist = 0.1; }
+
+                    let nx = dx / dist;
+                    let ny = dy / dist;
+                    let dvx = b1.vx - b2.vx;
+                    let dvy = b1.vy - b2.vy;
+                    let p = dvx * nx + dvy * ny;
+
+                    if (p > 0) {
+                        let restitution = 0.8; 
+                        let impulse = -(1 + restitution) * p / 2; 
+
+                        b1.vx += impulse * nx;
+                        b1.vy += impulse * ny;
+                        b2.vx -= impulse * nx;
+                        b2.vy -= impulse * ny;
+                    }
+
+                    let overlap = minDist - dist;
+                    b1.x -= (overlap / 2) * nx;
+                    b1.y -= (overlap / 2) * ny;
+                    b2.x += (overlap / 2) * nx;
+                    b2.y += (overlap / 2) * ny;
+                }
+            }
+        }
+
+        bubblesData.forEach(b => {
+            if (b.y >= boxHeight - RADIUS) {
+                b.y = boxHeight - RADIUS;
+                b.vy *= -WALL_DAMPING;
+                b.hasLanded = true;
+            }
+            if (b.y <= RADIUS) {
+                b.y = RADIUS;
+                b.vy *= -WALL_DAMPING;
+            }
+            if (b.x >= boxWidth - RADIUS) {
+                b.x = boxWidth - RADIUS;
+                b.vx *= -WALL_DAMPING;
+            }
+            if (b.x <= RADIUS) {
+                b.x = RADIUS;
+                b.vx *= -WALL_DAMPING;
+            }
+
+            b.el.style.left = `${b.x - RADIUS}px`;
+            b.el.style.top = `${b.y - RADIUS}px`;
+        });
+
+        physicsAnimationId = requestAnimationFrame(updatePhysics);
+    }
+
+    function checkStage2() {
+        const msg = document.getElementById('stage2Message');
+        const doneBtn = document.getElementById('doneBtn');
+        
+        if (!tcAccepted) {
+            msg.innerText = "Read and accept the Terms & Conditions via the Read T&C button!";
+            msg.style.color = "#ea4335";
+            setTimeout(() => { msg.innerText = ""; }, 3000);
+            return;
+        }
+
+        let sortedBubbles = [...bubblesData].sort((a, b) => a.x - b.x);
+        let currentCode = sortedBubbles.map(b => b.val);
+        
+        if (currentCode.join('') === targetCode.join('')) {
+            cancelAnimationFrame(physicsAnimationId);
+            clearInterval(annoyanceInterval);
+            clearInterval(textDistractionInterval);
+            document.getElementById('distractionOverlay').style.display = 'none';
+            
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('successScreen').style.display = 'flex';
+            
+            setInterval(() => {
+                const r = Math.floor(Math.random() * 256);
+                const g = Math.floor(Math.random() * 256);
+                const b = Math.floor(Math.random() * 256);
+                document.body.style.backgroundColor = `rgb(${r},${g},${b})`;
+            }, 120);
+
+        } else {
+            msg.innerText = "Sequence incorrect! Left-to-Right order matters.";
+            msg.style.color = "#ea4335";
+            
+            bubblesData.forEach(b => {
+                b.val = 0;
+                b.el.innerText = '0';
+                b.hasLanded = true;
+            });
+            setTimeout(() => { msg.innerText = ""; }, 3000);
+            
+            isBtnEvading = false;
+            doneBtn.classList.remove('evading');
+            doneBtn.style.left = '';
+            doneBtn.style.top = '';
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>::: Aegis Access - Secure Login System :::</title>
+<style>
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    font-family: 'Times New Roman', Times, serif;
+    background:#ffffff;
+    color:#000000;
+    overflow-x:hidden;
+  }
+
+  body{
+    background-image:
+      radial-gradient(#d9e6ff 1px, transparent 1px),
+      radial-gradient(#ffe0e0 1px, transparent 1px);
+    background-size: 26px 26px, 26px 26px;
+    background-position: 0 0, 13px 13px;
+    min-height:100vh;
+    padding:26px 12px 60px;
+  }
+
+  /* ---------- decorative floating layer ---------- */
+  #floatLayer{ position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+  .float-window{
+    position:absolute; width:170px;
+    background:#c0c0c0;
+    border:2px solid #808080;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, 3px 3px 0 rgba(0,0,0,0.35);
+    font-family: 'Tahoma','Verdana',sans-serif;
+    font-size:11px;
+  }
+  .float-window .titlebar{
+    background: linear-gradient(90deg,#000080,#1084d0);
+    color:#fff; padding:3px 5px; display:flex; justify-content:space-between; align-items:center;
+    font-weight:bold; letter-spacing:0.2px;
+  }
+  .float-window .titlebar .dots span{
+    display:inline-block; width:12px; height:11px; background:#c0c0c0; border:1px solid #808080;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff;
+    text-align:center; line-height:9px; color:#000; margin-left:2px; font-size:9px;
+  }
+  .float-window .body{ padding:8px; color:#000; background:#fff; margin:2px; }
+
+  .float-btn{
+    position:absolute;
+    padding:10px 16px;
+    font-family:'Comic Sans MS','Tahoma',sans-serif;
+    font-weight:bold; font-size:13px;
+    color:#fff; text-shadow:1px 1px 0 rgba(0,0,0,0.4);
+    border-radius:6px;
+    border:2px solid #000;
+    box-shadow: 2px 2px 0 #000;
+    white-space:nowrap;
+  }
+
+  /* ---------- marquee banner ---------- */
+  .marquee-bar{
+    position:relative; z-index:2;
+    background:#000080; color:#ffff00;
+    border:2px solid #000;
+    padding:5px 0; margin:0 auto 14px; max-width:640px;
+    overflow:hidden; white-space:nowrap; font-family:'Comic Sans MS','Tahoma',sans-serif;
+    font-size:13px; font-weight:bold;
+  }
+  .marquee-track{ display:inline-block; padding-left:100%; animation: marquee 14s linear infinite; }
+  @keyframes marquee{ 0%{ transform: translateX(0); } 100%{ transform: translateX(-100%); } }
+
+  .stripes-bar{
+    max-width:640px; margin:0 auto 14px; height:14px;
+    background: repeating-linear-gradient(45deg, #ffcc00, #ffcc00 10px, #000 10px, #000 20px);
+    border:2px solid #000; position:relative; z-index:2;
+  }
+
+  /* ---------- page wrap ---------- */
+  .page{ position:relative; z-index:2; max-width:640px; margin:0 auto; }
+
+  .top-banner{
+    text-align:center; margin-bottom:10px;
+  }
+  .top-banner .blink{ animation: blink 1s steps(1) infinite; color:#ff0000; font-weight:bold; font-family:'Comic Sans MS',sans-serif; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .visitor-counter{
+    display:inline-block; background:#000; color:#00ff00; font-family:'Courier New',monospace;
+    padding:4px 10px; border:2px inset #888; font-size:14px; letter-spacing:2px; margin-top:6px;
+  }
+
+  /* ---------- window/card ---------- */
+  .win{
+    background:#c0c0c0;
+    border:2px solid #dfdfdf;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, 4px 4px 0 rgba(0,0,0,0.3);
+    max-width:420px; margin:0 auto;
+    animation: winDrift 8s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes winDrift{
+    0%   { transform: translate(0px, 0px) rotate(0deg); }
+    20%  { transform: translate(7px, -6px) rotate(0.35deg); }
+    40%  { transform: translate(-9px, 5px) rotate(-0.4deg); }
+    60%  { transform: translate(6px, 8px) rotate(0.25deg); }
+    80%  { transform: translate(-5px, -7px) rotate(-0.25deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
+  }
+  .win.jolt{ animation: winDrift 8s ease-in-out infinite, winJolt 0.4s ease; }
+  @keyframes winJolt{
+    0%{ transform: translate(0,0); }
+    25%{ transform: translate(-16px, 7px) rotate(-1.1deg); }
+    50%{ transform: translate(12px, -9px) rotate(1.1deg); }
+    75%{ transform: translate(-7px, 5px) rotate(-0.5deg); }
+    100%{ transform: translate(0,0) rotate(0); }
+  }
+
+  /* ---------- step gate ---------- */
+  .step-panel{
+    background:#fffbcc; border:2px solid #cc9900; padding:10px 12px; margin-bottom:14px;
+    font-size:12px; color:#5a4600; line-height:1.6;
+  }
+  .step-panel .step-title{ font-weight:bold; color:#7a3c00; margin-bottom:3px; }
+  .step-panel .step-done{ color:#006600; font-weight:bold; }
+  .locked{ opacity:0.45; filter:grayscale(40%); pointer-events:none; }
+  input:disabled{ background:#e8e8e8; color:#888; cursor:not-allowed; }
+  .btn-3d:disabled{ background:#d8d8d8; color:#999; cursor:not-allowed; box-shadow:none; border-style:outset; }
+  .win-titlebar{
+    background: linear-gradient(90deg,#000080,#1084d0);
+    color:#fff; padding:5px 8px; display:flex; justify-content:space-between; align-items:center;
+    font-family:'Tahoma','Verdana',sans-serif; font-size:13px; font-weight:bold;
+  }
+  .win-titlebar .dots span{
+    display:inline-block; width:16px; height:14px; background:#c0c0c0; border:1px solid #808080;
+    box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff;
+    text-align:center; line-height:12px; color:#000; margin-left:3px; font-size:11px; font-weight:bold;
+    font-family:Tahoma,sans-serif;
+  }
+  .win-body{ background:#fff; margin:3px; padding:18px 20px 16px; font-family:'Tahoma','Verdana',sans-serif; }
+
+  h1{ font-size:18px; margin:0 0 4px; color:#000080; font-family:'Comic Sans MS',sans-serif; }
+  .lede{ font-size:12.5px; color:#333; margin:0 0 16px; line-height:1.5; }
+  hr.rule{ border:none; border-top:2px groove #999; margin:12px 0; }
+
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12px; color:#000; margin-bottom:4px; font-weight:bold; }
+  .field label .req{ color:#ff0000; }
+  .input-shell{ position:relative; }
+  input[type="text"], input[type="email"], input[type="password"]{
+    width:100%; padding:6px 8px; font-size:13px; font-family:'Tahoma',sans-serif;
+    border: 2px inset #888;
+    background:#ffffff; color:#000;
+    outline:none;
+  }
+  input.flash{ animation: flashField 0.5s ease; }
+  @keyframes flashField{ 0%{ background:#fff2a8; } 100%{ background:#fff; } }
+
+  .eye-btn{
+    position:absolute; right:3px; top:3px; bottom:3px;
+    width:26px; border:2px outset #ddd; background:#c0c0c0; cursor:pointer;
+    color:#000; display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .eye-btn:active{ border-style:inset; }
+
+  .row-between{ display:flex; align-items:center; justify-content:space-between; margin:10px 0 14px; font-size:12px; }
+  .remember{ display:flex; align-items:center; gap:6px; color:#000; }
+  .link{ color:#0000ee; text-decoration:underline; cursor:pointer; }
+  .link:visited{ color:#551a8b; }
+
+  .btn-3d{
+    padding:9px 18px; font-family:'Tahoma',sans-serif; font-weight:bold; font-size:13px;
+    background: linear-gradient(180deg,#e8e8e8,#c0c0c0);
+    border: 2px outset #fff;
+    color:#000; cursor:pointer;
+  }
+  .btn-3d:active{ border-style:inset; }
+
+  #loginBtnHolder{ position:relative; height:60px; margin-top:8px; }
+  #loginBtn{ position:absolute; left:0; top:0; }
+  .btn-note{ text-align:center; font-size:12px; color:#ff0000; margin-top:8px; min-height:16px; font-weight:bold; }
+
+  .divider-text{ text-align:center; font-size:11.5px; color:#666; margin:16px 0 10px; }
+  .socials{ display:flex; gap:6px; margin-bottom:6px; }
+  .social-btn{ flex:1; padding:7px; font-size:11.5px; }
+
+  .terms{ display:flex; align-items:flex-start; gap:6px; margin-top:14px; font-size:11.5px; color:#000; }
+
+  /* ---------- password panel ---------- */
+  .pw-panel{
+    margin-top:8px; padding:8px 10px; font-size:11.5px; color:#333;
+    background:#ffffe0; border:1px solid #d4c07a;
+    max-height:0; overflow:hidden; transition: max-height 0.3s ease;
+  }
+  .pw-panel.open{ max-height:400px; }
+  .pw-req{ display:flex; align-items:center; gap:6px; padding:2px 0; }
+  .pw-req .dot{ width:8px; height:8px; background:#ff0000; flex-shrink:0; }
+  .pw-req.ok{ color:#006600; }
+  .pw-req.ok .dot{ background:#008000; }
+
+  .pw-strength{ margin-top:8px; }
+  .pw-strength-bar{ height:12px; border:2px inset #888; background:#fff; overflow:hidden; }
+  .pw-strength-fill{ height:100%; width:5%; background:#ff0000; }
+  .pw-strength-label{ font-size:11px; margin-top:3px; color:#333; text-align:right; }
+
+  /* ---------- activity / lockout ---------- */
+  .activity{
+    margin-top:16px; padding:10px 12px; font-size:11.5px; color:#333;
+    background:#f0f0f0; border:2px inset #ccc; line-height:1.6;
+  }
+  .activity strong{ color:#000; }
+  .lock-line{ color:#ff0000; font-weight:bold; font-family:'Courier New',monospace; }
+
+  .attempt-counter{ text-align:center; margin-top:12px; font-size:11px; color:#555; }
+  .self-aware{ text-align:center; margin-top:6px; font-size:12px; color:#000080; min-height:16px; font-weight:bold; }
+
+  /* ---------- toasts ---------- */
+  #toastHost{ position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:999; display:flex; flex-direction:column; gap:6px; align-items:center; width:min(92vw, 380px); }
+  .toast{
+    background:#ffffcc; border:2px solid #000; color:#000; padding:8px 14px; font-size:12.5px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.4); font-family:'Tahoma',sans-serif;
+    animation: toastIn 0.25s ease, toastOut 0.3s ease 2.8s forwards; text-align:center;
+  }
+  @keyframes toastIn{ from{ opacity:0; transform: translateY(-10px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes toastOut{ to{ opacity:0; transform: translateY(-8px); } }
+
+  /* ---------- modal ---------- */
+  .modal-overlay{ position:fixed; inset:0; background: rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:900; opacity:0; pointer-events:none; transition: opacity 0.2s ease; padding:16px; }
+  .modal-overlay.show{ opacity:1; pointer-events:auto; }
+  .modal{
+    background:#c0c0c0; border:2px solid #dfdfdf; box-shadow: inset -1px -1px 0 #000, inset 1px 1px 0 #fff, 4px 4px 0 rgba(0,0,0,0.4);
+    width:100%; max-width:340px; font-family:'Tahoma',sans-serif;
+  }
+  .modal .win-titlebar{ }
+  .modal .m-body{ background:#fff; margin:3px; padding:18px; text-align:center; }
+  .modal h3{ margin:0 0 8px; font-size:14.5px; color:#000080; }
+  .modal p{ margin:0 0 16px; font-size:12px; color:#333; line-height:1.5; }
+  .modal-actions{ display:flex; gap:8px; justify-content:center; }
+  .modal-btn{ flex:1; }
+  .modal input{ width:100%; margin-bottom:14px; }
+
+  .captcha-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin:14px 0; }
+  .captcha-tile{
+    aspect-ratio:1; border:2px outset #ddd; background:#e8e8f8; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .captcha-tile.selected{ border-style:inset; background:#c8e6c8; }
+  .captcha-icon{ width:60%; height:60%; }
+
+  .auth-progress-track{ height:16px; border:2px inset #888; background:#fff; overflow:hidden; margin:14px 0 10px; }
+  .auth-progress-fill{ height:100%; background: repeating-linear-gradient(45deg,#1084d0,#1084d0 8px,#5cb8ff 8px,#5cb8ff 16px); width:0%; transition: width 0.4s ease; }
+  .auth-status{ font-size:12px; color:#333; text-align:center; min-height:16px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .marquee-track{ animation:none !important; }
+    .top-banner .blink{ animation:none !important; }
+    *{ transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+
+  @media (max-width:480px){ .win-body{ padding:14px 14px 12px; } .float-window{ display:none; } }
+
+  .success-screen{ text-align:center; font-family:'Tahoma',sans-serif; }
+  .success-icon{ width:56px; height:56px; margin:0 auto 14px; background:#008000; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; border:3px solid #003d00; }
+  .stat-row{ display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px dashed #999; color:#333; }
+  .stat-row span:last-child{ color:#000; font-weight:bold; }
+
+  .dash{ text-align:left; font-family:'Tahoma',sans-serif; }
+  .dash-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .dash-title{ font-size:16px; font-weight:bold; color:#000080; }
+  .dash-pill{ font-size:10.5px; padding:3px 8px; background:#d6f5d6; border:1px solid #008000; color:#006600; }
+  .dash-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .dash-card{ padding:10px 12px; background:#f5f5f5; border:2px inset #ccc; }
+  .dash-card .num{ font-size:18px; font-weight:bold; }
+  .dash-card .lbl{ font-size:10.5px; color:#555; }
+  .dash-bars{ display:flex; align-items:flex-end; gap:4px; height:50px; margin-top:8px; }
+  .dash-bars i{ flex:1; background: linear-gradient(180deg,#1084d0,#000080); }
+  .dash-list{ margin-top:12px; }
+  .dash-item{ display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed #999; font-size:12px; color:#333; }
+  .dash-item span:last-child{ color:#000; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<div id="floatLayer"></div>
+<div id="toastHost"></div>
+
+<div class="page">
+  <div class="top-banner">
+    <span class="blink">*** SECURE AUTHENTICATION PORTAL ***</span><br>
+    <span style="font-size:11px; color:#555;">Best viewed at 800x600. Please disable pop-up blockers.</span><br>
+    <div class="visitor-counter" id="visitorCounter">0000042</div>
+  </div>
+
+  <div class="marquee-bar">
+    <span class="marquee-track" id="marqueeTrack">Welcome to Aegis Access — the most secure login system on the entire web wide web — sign in below to continue — your patience is greatly appreciated — thank you for visiting —&nbsp;</span>
+  </div>
+
+  <div class="stripes-bar"></div>
+
+  <div class="win" id="mainWin">
+    <div class="win-titlebar">
+      <span>Secure Login - Aegis Access</span>
+      <span class="dots"><span>_</span><span>o</span><span>x</span></span>
+    </div>
+    <div class="win-body">
+
+      <!-- LOGIN VIEW -->
+      <div id="loginView">
+        <h1>Welcome Back!</h1>
+        <p class="lede">Please sign in to continue to your workspace. All fields marked <span style="color:#ff0000;">*</span> are required.</p>
+
+        <div class="step-panel" id="stepPanel">
+          <div class="step-title" id="stepTitle">STEP 1 OF 2: Verify your email domain</div>
+          <div id="stepBody">Before anything else works on this page, enter an email address that ends in <strong>.potato</strong> (yes, really — for example <em>you@example.potato</em>). It does not need to be a real address.</div>
+        </div>
+
+        <hr class="rule">
+
+        <div class="field">
+          <label for="email">Email Address <span class="req">*</span></label>
+          <div class="input-shell">
+            <input type="email" id="email" placeholder="you@example.potato" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="field" id="passwordField">
+          <label for="password">Password <span class="req">*</span></label>
+          <div class="input-shell">
+            <input type="password" id="password" placeholder="Locked until Step 1 is complete" autocomplete="off" style="padding-right:32px;" disabled>
+            <button type="button" class="eye-btn" id="eyeBtn" aria-label="Toggle password visibility" disabled>o</button>
+          </div>
+          <div class="pw-panel" id="pwPanel">
+            <div id="pwReqList"></div>
+            <div class="pw-strength">
+              <div class="pw-strength-bar"><div class="pw-strength-fill" id="pwFill"></div></div>
+              <div class="pw-strength-label" id="pwLabel">Strength: --</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-between locked" id="rowBetween">
+          <label class="remember"><input type="checkbox" id="rememberMe" disabled> Remember me</label>
+          <span class="link" id="forgotLink">Forgot password?</span>
+        </div>
+
+        <div id="loginBtnHolder">
+          <button class="btn-3d" id="loginBtn" style="width:100%; padding:12px; font-size:14px;" disabled>SIGN IN &gt;&gt;</button>
+        </div>
+        <div class="btn-note" id="btnNote"></div>
+
+        <div class="terms locked" id="termsRow">
+          <input type="checkbox" id="termsCheck" disabled>
+          <label for="termsCheck">I agree to the Terms &amp; Conditions and Privacy Policy</label>
+        </div>
+
+        <div class="divider-text">-- or continue with --</div>
+        <div class="socials locked" id="socialsRow">
+          <button class="btn-3d social-btn" data-provider="Google" disabled>Google</button>
+          <button class="btn-3d social-btn" data-provider="Apple" disabled>Apple</button>
+          <button class="btn-3d social-btn" data-provider="GitHub" disabled>GitHub</button>
+        </div>
+
+        <div class="activity" id="activityPanel">
+          <div><strong>Security Activity Log</strong></div>
+          <div>Last attempted login: <span id="lastAttemptTime">just now</span></div>
+          <div>Browser: <span id="browserName">this one</span> | Device: Desktop</div>
+          <div>Security status: <span id="securityStatus">Nominal</span></div>
+          <div id="lockLine" class="lock-line" style="display:none;"></div>
+        </div>
+
+        <div class="attempt-counter" id="attemptCounter">Authentication attempts: 0</div>
+        <div class="self-aware" id="selfAware"></div>
+      </div>
+
+      <!-- SUCCESS VIEW -->
+      <div id="successView" class="success-screen" style="display:none;">
+        <div class="success-icon">OK</div>
+        <h1>Authentication Complete</h1>
+        <p class="lede">You have successfully defeated the login page.</p>
+        <div class="stat-row"><span>Attempts</span><span id="statAttempts">0</span></div>
+        <div class="stat-row"><span>Time survived</span><span id="statTime">0s</span></div>
+        <div class="stat-row"><span>Patience level</span><span id="statPatience">--</span></div>
+        <div style="margin-top:20px;">
+          <button class="btn-3d" id="enterDashBtn" style="width:100%; padding:11px;">ENTER DASHBOARD &gt;&gt;</button>
+        </div>
+      </div>
+
+      <!-- DASHBOARD VIEW -->
+      <div id="dashView" class="dash" style="display:none;">
+        <div class="dash-top">
+          <div class="dash-title">Welcome, Survivor.</div>
+          <div class="dash-pill">All systems fictional</div>
+        </div>
+        <div class="dash-grid">
+          <div class="dash-card"><div class="num" id="dashAttemptsNum">0</div><div class="lbl">Login attempts endured</div></div>
+          <div class="dash-card"><div class="num" id="dashTimeNum">0s</div><div class="lbl">Time in the gauntlet</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="lbl" style="margin-bottom:6px;">Frustration over time</div>
+          <div class="dash-bars" id="dashBars"></div>
+        </div>
+        <div class="dash-list">
+          <div class="dash-item"><span>CAPTCHAs solved</span><span id="dashCaptchas">0</span></div>
+          <div class="dash-item"><span>Password requirements survived</span><span id="dashReqs">9</span></div>
+          <div class="dash-item"><span>Confirmations clicked</span><span id="dashConfirms">0</span></div>
+          <div class="dash-item"><span>Real credentials stored</span><span>0 - none, ever</span></div>
+        </div>
+        <p class="lede" style="margin-top:16px; font-size:11.5px;">This dashboard, and everything before it, is a front-end UX experiment. Nothing was ever sent anywhere.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:16px; font-size:11px; color:#777;">
+    &copy; 1999-2026 Aegis Access Corp. This page works best with frames enabled.
+  </div>
+</div>
+
+<!-- CAPTCHA MODAL -->
+<div class="modal-overlay" id="captchaOverlay">
+  <div class="modal">
+    <div class="win-titlebar"><span>Human Verification</span><span class="dots"><span>x</span></span></div>
+    <div class="m-body">
+      <h3 id="captchaTitle">Select all images containing traffic lights</h3>
+      <p id="captchaSub">This helps us confirm you are not a robot.</p>
+      <div class="captcha-grid" id="captchaGrid"></div>
+      <div class="modal-actions">
+        <button class="btn-3d modal-btn" id="captchaSubmit">Verify</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ARE YOU SURE MODAL -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal">
+    <div class="win-titlebar"><span>Confirmation Required</span><span class="dots"><span>x</span></span></div>
+    <div class="m-body">
+      <h3 id="confirmTitle">Are you sure you want to continue?</h3>
+      <p id="confirmSub">Please confirm this action.</p>
+      <div class="modal-actions">
+        <button class="btn-3d modal-btn" id="confirmCancel">Cancel</button>
+        <button class="btn-3d modal-btn" id="confirmYes">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgotOverlay">
+  <div class="modal">
+    <div class="win-titlebar"><span>Password Recovery</span><span class="dots"><span>x</span></span></div>
+    <div class="m-body">
+      <h3 id="forgotTitle">Do not worry. We remember your password.</h3>
+      <p id="forgotSub">Unfortunately, we cannot tell you what it is.</p>
+      <div id="forgotInputWrap" style="display:none;">
+        <input type="password" id="forgotPwInput" placeholder="Enter your current password">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-3d modal-btn" id="forgotClose">Close</button>
+        <button class="btn-3d modal-btn" id="forgotAction">Recover Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL LOGIN MODAL -->
+<div class="modal-overlay" id="socialOverlay">
+  <div class="modal">
+    <div class="win-titlebar"><span>Please Wait</span><span class="dots"><span>x</span></span></div>
+    <div class="m-body">
+      <h3 id="socialTitle">Redirecting...</h3>
+      <p id="socialSub">One moment please.</p>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH PROGRESS MODAL -->
+<div class="modal-overlay" id="authOverlay">
+  <div class="modal">
+    <div class="win-titlebar"><span>Authenticating</span><span class="dots"><span>x</span></span></div>
+    <div class="m-body">
+      <h3>Please wait</h3>
+      <div class="auth-progress-track"><div class="auth-progress-fill" id="authFill"></div></div>
+      <div class="auth-status" id="authStatus">Starting...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ Config ============ */
+  const LOCK_DURATION_MS = 15 * 60 * 1000; /* hard minimum: 15 minutes */
+
+  /* ============ State ============ */
+  const state = {
+    attempts: 0,
+    revealedReqs: [],
+    satisfiedOnce: false,
+    extraReqAdded: false,
+    eyeState: 0,
+    captchaLevel: 0,
+    captchasSolved: 0,
+    confirmsClicked: 0,
+    termsClicks: 0,
+    startTime: Date.now(),
+    evasionUses: 0,
+    step1Complete: false,
+    step2Complete: false,
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  /* ============ Toasts ============ */
+  function toast(msg){
+    const host = $('toastHost');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    host.appendChild(el);
+    setTimeout(()=> el.remove(), 3100);
+  }
+
+  /* ============ Modal helpers ============ */
+  function openModal(id){ $(id).classList.add('show'); }
+  function closeModal(id){ $(id).classList.remove('show'); }
+
+  /* ============ Window jolt ============ */
+  const mainWin = $('mainWin');
+  function joltWin(){
+    mainWin.classList.remove('jolt');
+    void mainWin.offsetWidth;
+    mainWin.classList.add('jolt');
+  }
+
+  /* ============ Visitor counter ============ */
+  let visitorCount = 41;
+  function bumpVisitorCounter(){
+    visitorCount += Math.floor(Math.random()*3);
+    $('visitorCounter').textContent = String(visitorCount).padStart(7,'0');
+  }
+  setInterval(bumpVisitorCounter, 4000);
+
+  /* ============ Floating background windows and buttons ============ */
+  const floatLayer = $('floatLayer');
+  const floaters = [];
+
+  function makeFloatWindow(title, text){
+    const el = document.createElement('div');
+    el.className = 'float-window';
+    el.innerHTML = '<div class="titlebar"><span>' + title + '</span><span class="dots"><span>x</span></span></div><div class="body">' + text + '</div>';
+    floatLayer.appendChild(el);
+    return el;
+  }
+  function makeFloatButton(text, bg){
+    const el = document.createElement('div');
+    el.className = 'float-btn';
+    el.style.background = bg;
+    el.textContent = text;
+    floatLayer.appendChild(el);
+    return el;
+  }
+
+  function addFloater(el, speed){
+    const w = window.innerWidth, h = window.innerHeight;
+    const obj = {
+      el: el,
+      x: Math.random() * (w - 180),
+      y: Math.random() * (h - 100),
+      vx: (Math.random() > 0.5 ? 1 : -1) * speed,
+      vy: (Math.random() > 0.5 ? 1 : -1) * speed
+    };
+    floaters.push(obj);
+  }
+
+  const winTexts = [
+    ['System Notice', 'Your session is being monitored for security purposes.'],
+    ['Tip of the Day', 'Use a strong password with a planet name in it.'],
+    ['Security Alert', 'New login policy in effect as of today.'],
+    ['Fun Fact', 'This page has no backend. Nothing you type is sent anywhere.']
+  ];
+  winTexts.forEach(function(t){
+    addFloater(makeFloatWindow(t[0], t[1]), 0.35 + Math.random()*0.4);
+  });
+
+  const btnDefs = [
+    ['LOGIN NOW!', '#ff3b3b'],
+    ['SIGN IN HERE!', '#1084d0'],
+    ['CLICK TO SIGN UP', '#28a428'],
+    ['FREE ACCESS!', '#c86edb'],
+    ['ENTER SITE >>', '#ff9900']
+  ];
+  btnDefs.forEach(function(b){
+    const btn = makeFloatButton(b[0], b[1]);
+    btn.style.pointerEvents = 'auto';
+    btn.style.cursor = 'pointer';
+    btn.addEventListener('click', function(){ toast('That is not the real login button.'); });
+    addFloater(btn, 0.5 + Math.random()*0.6);
+  });
+
+  function stepFloaters(){
+    const w = window.innerWidth, h = window.innerHeight;
+    floaters.forEach(function(f){
+      const rect = f.el.getBoundingClientRect();
+      f.x += f.vx;
+      f.y += f.vy;
+      if(f.x <= 0 || f.x + rect.width >= w){ f.vx *= -1; f.x = Math.max(0, Math.min(f.x, w - rect.width)); }
+      if(f.y <= 0 || f.y + rect.height >= h){ f.vy *= -1; f.y = Math.max(0, Math.min(f.y, h - rect.height)); }
+      f.el.style.transform = 'translate(' + Math.round(f.x) + 'px,' + Math.round(f.y) + 'px)';
+    });
+    requestAnimationFrame(stepFloaters);
+  }
+  requestAnimationFrame(stepFloaters);
+
+  /* ============ Password requirements from hell ============ */
+  const ALL_REQS = [
+    { id:'len', label:'At least 12 characters', test:(p)=> p.length >= 12 },
+    { id:'upper', label:'One uppercase letter', test:(p)=> /[A-Z]/.test(p) },
+    { id:'lower', label:'One lowercase letter', test:(p)=> /[a-z]/.test(p) },
+    { id:'num', label:'One number', test:(p)=> /[0-9]/.test(p) },
+    { id:'special', label:'One special character', test:(p)=> /[^A-Za-z0-9]/.test(p) },
+    { id:'prime', label:'Contains a prime number, such as 2, 3, 5, 7, 11 or 13', test:(p)=> /(2|3|5|7|11|13|17|19|23)/.test(p) },
+    { id:'planet', label:'Contains a planet name', test:(p)=> /(mercury|venus|earth|mars|jupiter|saturn|uranus|neptune)/i.test(p) },
+    { id:'norepeat', label:'No character repeated consecutively', test:(p)=> !/(.)\1/.test(p) },
+    { id:'nopassword', label:'Contains a letter not found in the word password', test:(p)=> /[b-eg-oq-z]/i.test(p.replace(/[^a-zA-Z]/g,'')) || /[^a-zA-Z]/.test(p) },
+  ];
+
+  function updatePasswordPanel(){
+    const pw = $('password').value;
+    const panel = $('pwPanel');
+    if(pw.length === 0){ panel.classList.remove('open'); return; }
+    panel.classList.add('open');
+
+    const baseCount = 3;
+    if(state.revealedReqs.length === 0){
+      state.revealedReqs = ALL_REQS.slice(0, baseCount).map(r=>r.id);
+    }
+    const revealedObjs = ALL_REQS.filter(r => state.revealedReqs.includes(r.id));
+    const allSatisfied = revealedObjs.every(r => r.test(pw));
+    if(allSatisfied && state.revealedReqs.length < ALL_REQS.length){
+      const nextReq = ALL_REQS.find(r => !state.revealedReqs.includes(r.id));
+      if(nextReq) state.revealedReqs.push(nextReq.id);
+    }
+
+    const list = $('pwReqList');
+    list.innerHTML = '';
+    ALL_REQS.filter(r=> state.revealedReqs.includes(r.id)).forEach(r=>{
+      const ok = r.test(pw);
+      const row = document.createElement('div');
+      row.className = 'pw-req' + (ok ? ' ok' : '');
+      row.innerHTML = '<span class="dot"></span><span>' + r.label + '</span>';
+      list.appendChild(row);
+    });
+
+    const allCurrentSatisfied = ALL_REQS.filter(r=> state.revealedReqs.includes(r.id)).every(r=>r.test(pw));
+    if(allCurrentSatisfied && state.revealedReqs.length === ALL_REQS.length && !state.satisfiedOnce){
+      state.satisfiedOnce = true;
+      toast('Password requirements satisfied');
+      setTimeout(()=>{
+        toast('New security requirement detected.');
+        if(!state.extraReqAdded){
+          state.extraReqAdded = true;
+          ALL_REQS.push({ id:'evenlen', label:'Character count must be an even number', test:(p)=> p.length % 2 === 0 });
+          updatePasswordPanel();
+        }
+      }, 1200);
+    }
+
+    updateStrengthMeter(pw);
+  }
+
+  const STRENGTH_LABELS = ['Weak','Extremely weak','Suspicious','Questionable','Concerning','Emotionally unstable','Almost acceptable','Technically alive','Weak again','Unknowable'];
+
+  function updateStrengthMeter(pw){
+    const fill = $('pwFill');
+    const label = $('pwLabel');
+    if(pw.length === 0){ fill.style.width = '5%'; fill.style.background = '#ff0000'; label.textContent = 'Strength: --'; return; }
+    let seed = 0;
+    for(let i=0;i<pw.length;i++){ seed += pw.charCodeAt(i) * (i+1); }
+    const idx = (seed + pw.length * 7) % STRENGTH_LABELS.length;
+    const pct = 15 + ((seed * 13) % 70);
+    fill.style.width = pct + '%';
+    const colors = ['#ff0000','#ff9900','#008000'];
+    fill.style.background = colors[Math.floor((pct/100)*colors.length) % colors.length];
+    label.textContent = 'Strength: ' + STRENGTH_LABELS[idx];
+  }
+
+  const pwInput = $('password');
+  const emailInput = $('email');
+  const eyeBtn = $('eyeBtn');
+
+  /* ============ Step gate: .potato email, then an all-at-once password ============ */
+  function setControlsLocked(locked){
+    ['rowBetween','termsRow','socialsRow'].forEach(function(id){
+      const el = $(id);
+      if(locked) el.classList.add('locked'); else el.classList.remove('locked');
+    });
+    $('rememberMe').disabled = locked;
+    $('termsCheck').disabled = locked;
+    document.querySelectorAll('.social-btn').forEach(function(b){ b.disabled = locked; });
+    loginBtn.disabled = locked || !state.step1Complete || !state.step2Complete;
+  }
+
+  function checkEmailStep(){
+    const val = emailInput.value.trim();
+    const ok = /.+@.+\.potato$/i.test(val);
+    if(ok && !state.step1Complete){
+      state.step1Complete = true;
+      pwInput.disabled = false;
+      eyeBtn.disabled = false;
+      pwInput.placeholder = 'Enter your password';
+      $('stepTitle').textContent = 'STEP 2 OF 2: Choose a password';
+      $('stepBody').innerHTML = 'Good — your email checks out. Now enter a password that satisfies every requirement shown below the password field. All of them. At the same time.';
+      toast('Step 1 complete. Password field unlocked.');
+    } else if(!ok && state.step1Complete){
+      state.step1Complete = false;
+      state.step2Complete = false;
+      pwInput.disabled = true;
+      eyeBtn.disabled = true;
+      pwInput.value = '';
+      pwInput.placeholder = 'Locked until Step 1 is complete';
+      $('pwPanel').classList.remove('open');
+      setControlsLocked(true);
+      $('stepTitle').textContent = 'STEP 1 OF 2: Verify your email domain';
+      $('stepBody').innerHTML = 'Before anything else works on this page, enter an email address that ends in <strong>.potato</strong> (yes, really — for example <em>you@example.potato</em>). It does not need to be a real address.';
+      toast('Email no longer ends in .potato. Step 1 is incomplete again.');
+    }
+  }
+  emailInput.addEventListener('input', checkEmailStep);
+
+  function refreshPasswordGate(){
+    const pw = pwInput.value;
+    const allSatisfied = state.revealedReqs.length === ALL_REQS.length && ALL_REQS.every(function(r){ return r.test(pw); });
+    const shouldUnlock = state.step1Complete && allSatisfied;
+    if(shouldUnlock && !state.step2Complete){
+      state.step2Complete = true;
+      setControlsLocked(false);
+      $('stepTitle').textContent = 'STEP 2 COMPLETE';
+      $('stepBody').innerHTML = 'Every requirement is satisfied. You may now sign in.';
+    } else if(!shouldUnlock && state.step2Complete){
+      state.step2Complete = false;
+      setControlsLocked(true);
+      $('stepTitle').textContent = 'STEP 2 OF 2: One more thing';
+      $('stepBody').innerHTML = 'A new requirement just appeared below. Please satisfy it to continue.';
+      toast('Not so fast — one more requirement to meet.');
+    }
+  }
+
+  pwInput.addEventListener('input', ()=>{
+    updatePasswordPanel();
+    maybeBetrayFocus();
+    refreshPasswordGate();
+  });
+
+  /* ============ Typing betrayal: jump focus to username ============ */
+  function maybeBetrayFocus(){
+    const len = pwInput.value.length;
+    if(len < 2) return;
+    const chance = Math.min(0.06 + state.attempts * 0.02, 0.16);
+    if(Math.random() < chance){
+      emailInput.classList.add('flash');
+      setTimeout(()=> emailInput.classList.remove('flash'), 500);
+      emailInput.focus();
+      const messages = ['Wait, confirm your email first.','Please re-verify your email address.','Checking your email field...','One moment, focus shifted for a security check.'];
+      toast(messages[Math.floor(Math.random()*messages.length)]);
+    }
+  }
+
+  /* ============ Lying eye button ============ */
+  const EYE_LABELS = ['o','O','p','?'];
+  eyeBtn.addEventListener('click', ()=>{
+    state.eyeState = (state.eyeState + 1) % 4;
+    eyeBtn.textContent = EYE_LABELS[state.eyeState];
+    const real = pwInput.value;
+    switch(state.eyeState){
+      case 0: pwInput.type = 'password'; break;
+      case 1: pwInput.type = 'text'; break;
+      case 2:
+        pwInput.type = 'text';
+        pwInput.dataset.real = real;
+        pwInput.value = real.split('').reverse().join('');
+        break;
+      case 3:
+        pwInput.type = 'text';
+        pwInput.dataset.real = real;
+        pwInput.value = real.length > 2 ? real.slice(0, Math.ceil(real.length/2)) + '*'.repeat(Math.floor(real.length/2)) : real;
+        break;
+    }
+  });
+
+  pwInput.addEventListener('keydown', ()=>{
+    if(state.eyeState === 2 || state.eyeState === 3){
+      const real = pwInput.dataset.real;
+      if(real !== undefined){
+        pwInput.value = real;
+        pwInput.type = 'text';
+        state.eyeState = 1;
+        eyeBtn.textContent = EYE_LABELS[1];
+      }
+    }
+  });
+
+  /* ============ Moving login button ============ */
+  const holder = $('loginBtnHolder');
+  const loginBtn = $('loginBtn');
+  const btnNote = $('btnNote');
+  const evasionMessages = ['Almost.','You were close.','Try again.','So close.','Nice try.','Not quite.'];
+
+  function ambientButtonFloat(){
+    const t = Date.now() / 1000;
+    if(!holder.dataset.hovering){
+      const amp = 2 + Math.min(state.attempts, 5);
+      const fx = Math.sin(t * 1.4) * amp;
+      const fy = Math.cos(t * 1.1) * (amp * 0.6);
+      loginBtn.style.transform = 'translate(' + fx + 'px,' + fy + 'px)';
+    }
+    requestAnimationFrame(ambientButtonFloat);
+  }
+  ambientButtonFloat();
+
+  function maybeEvade(e){
+    const rect = loginBtn.getBoundingClientRect();
+    const holderRect = holder.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const threshold = 60 + Math.min(state.attempts * 6, 40);
+    if(dist < threshold){
+      state.evasionUses++;
+      holder.dataset.hovering = '1';
+      const maxOffsetX = Math.min(150, holderRect.width - rect.width) / 2 + 24 + Math.min(state.evasionUses*3, 70) + state.attempts*4;
+      const maxOffsetY = 12 + Math.min(state.evasionUses*1.4, 22) + state.attempts*2;
+      const offX = (Math.random()*2-1) * maxOffsetX;
+      const offY = (Math.random()*2-1) * maxOffsetY;
+      loginBtn.style.transform = 'translate(' + offX + 'px,' + offY + 'px)';
+      if(state.evasionUses % 2 === 0){
+        btnNote.textContent = evasionMessages[Math.floor(Math.random()*evasionMessages.length)];
+      }
+    }
+  }
+  holder.addEventListener('mousemove', maybeEvade);
+  holder.addEventListener('mouseleave', ()=>{ delete holder.dataset.hovering; });
+
+  /* ============ CAPTCHA ============ */
+  const CAPTCHA_LEVELS = [
+    { title:'Select all images containing traffic lights', sub:'This helps us confirm you are not a robot.', icon:'traffic' },
+    { title:'Select everything that could potentially be considered a vehicle', sub:'Interpretation is up to you.', icon:'vehicle' },
+    { title:'Select the images that feel like they contain a vehicle', sub:'Trust your instincts.', icon:'vehicle' },
+  ];
+
+  function drawTile(kind, on){
+    if(kind === 'traffic'){
+      return '<svg class="captcha-icon" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="20" rx="2" fill="#333"/><circle cx="12" cy="6" r="2.2" fill="' + (on? '#ff0000':'#888') + '"/><circle cx="12" cy="12" r="2.2" fill="' + (on? '#ff9900':'#888') + '"/><circle cx="12" cy="18" r="2.2" fill="' + (on? '#008000':'#888') + '"/></svg>';
+    }
+    return '<svg class="captcha-icon" viewBox="0 0 24 24"><rect x="3" y="10" width="18" height="7" rx="2" fill="' + (on?'#1084d0':'#555') + '"/><circle cx="7" cy="18" r="2" fill="#222"/><circle cx="17" cy="18" r="2" fill="#222"/><rect x="6" y="6" width="9" height="6" rx="1.5" fill="' + (on?'#c86edb':'#777') + '"/></svg>';
+  }
+
+  function buildCaptcha(){
+    const lvl = CAPTCHA_LEVELS[Math.min(state.captchaLevel, CAPTCHA_LEVELS.length-1)];
+    $('captchaTitle').textContent = lvl.title;
+    $('captchaSub').textContent = lvl.sub;
+    const grid = $('captchaGrid');
+    grid.innerHTML = '';
+    const correctSet = new Set();
+    const total = 9;
+    const correctCount = 3 + Math.floor(Math.random()*2);
+    while(correctSet.size < correctCount){ correctSet.add(Math.floor(Math.random()*total)); }
+    for(let i=0;i<total;i++){
+      const tile = document.createElement('div');
+      tile.className = 'captcha-tile';
+      const isCorrect = correctSet.has(i);
+      tile.dataset.correct = isCorrect ? '1':'0';
+      tile.innerHTML = drawTile(lvl.icon, isCorrect);
+      tile.addEventListener('click', ()=> tile.classList.toggle('selected'));
+      grid.appendChild(tile);
+    }
+  }
+
+  function runCaptchaFlow(onDone){
+    buildCaptcha();
+    openModal('captchaOverlay');
+    const submitBtn = $('captchaSubmit');
+    const handler = ()=>{
+      closeModal('captchaOverlay');
+      submitBtn.removeEventListener('click', handler);
+      state.captchasSolved++;
+      toast('Verification successful');
+      setTimeout(()=>{
+        if(state.captchaLevel < 2){
+          toast('Verification expired. Please try again.');
+          state.captchaLevel++;
+          setTimeout(()=> runCaptchaFlow(onDone), 500);
+        } else if(state.captchaLevel === 2){
+          state.captchaLevel++;
+          setTimeout(()=> runHumanCheck(onDone), 500);
+        } else {
+          onDone();
+        }
+      }, 900);
+    };
+    submitBtn.addEventListener('click', handler);
+  }
+
+  function runHumanCheck(onDone){
+    $('confirmTitle').textContent = 'Are you human?';
+    $('confirmSub').textContent = 'Choose the option that best applies.';
+    $('confirmCancel').textContent = 'No';
+    $('confirmYes').textContent = 'Yes';
+    openModal('confirmOverlay');
+    let humanAttempts = 0;
+    function yesHandler(){
+      humanAttempts++;
+      state.confirmsClicked++;
+      if(humanAttempts < 2){
+        toast('Confidence insufficient.');
+      } else {
+        closeModal('confirmOverlay');
+        $('confirmYes').removeEventListener('click', yesHandler);
+        $('confirmCancel').removeEventListener('click', noHandler);
+        $('confirmTitle').textContent = 'Are you sure you want to continue?';
+        $('confirmCancel').textContent = 'Cancel';
+        $('confirmYes').textContent = 'Yes';
+        onDone();
+      }
+    }
+    function noHandler(){ toast('That answer requires further review.'); }
+    $('confirmYes').addEventListener('click', yesHandler);
+    $('confirmCancel').addEventListener('click', noHandler);
+  }
+
+  /* ============ Are-you-sure loop ============ */
+  const confirmSequence = [
+    { title:'Are you sure you want to continue?', sub:'Please confirm this action.' },
+    { title:'Are you really sure?', sub:'This cannot be undone. Probably.' },
+    { title:'This action requires confirmation.', sub:'Please confirm once more.' },
+    { title:'Final confirmation required.', sub:'This is the last one, we promise.' },
+  ];
+
+  function runConfirmLoop(onDone){
+    if(state.attempts < 2){ onDone(); return; }
+    let step = 0;
+    $('confirmCancel').textContent = 'Cancel';
+    function showStep(){
+      const s = confirmSequence[Math.min(step, confirmSequence.length-1)];
+      $('confirmTitle').textContent = s.title;
+      $('confirmSub').textContent = s.sub;
+      $('confirmYes').textContent = 'Yes';
+      openModal('confirmOverlay');
+    }
+    function yesHandler(){
+      state.confirmsClicked++;
+      step++;
+      if(step >= confirmSequence.length){
+        closeModal('confirmOverlay');
+        cleanup();
+        onDone();
+      } else {
+        showStep();
+      }
+    }
+    function cancelHandler(){
+      closeModal('confirmOverlay');
+      cleanup();
+    }
+    function cleanup(){
+      $('confirmYes').removeEventListener('click', yesHandler);
+      $('confirmCancel').removeEventListener('click', cancelHandler);
+    }
+    $('confirmYes').addEventListener('click', yesHandler);
+    $('confirmCancel').addEventListener('click', cancelHandler);
+    showStep();
+  }
+
+  /* ============ Fake authentication progress with hard 15-minute lock ============ */
+  const AUTH_STEPS = ['Authenticating...','Checking credentials...','Verifying identity...','Checking security policy...','Analyzing confidence...','Confirming intent...','Almost there...'];
+
+  function formatCountdown(ms){
+    const total = Math.max(0, Math.ceil(ms/1000));
+    const m = Math.floor(total/60);
+    const s = total%60;
+    return (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }
+
+  function runAuthProgress(onDone){
+    openModal('authOverlay');
+    const fill = $('authFill');
+    const status = $('authStatus');
+    let i = 0;
+    let pct = 0;
+    fill.style.width = '0%';
+    const interval = setInterval(()=>{
+      if(i < AUTH_STEPS.length){
+        status.textContent = AUTH_STEPS[i];
+        pct = Math.min(92, pct + 14);
+        fill.style.width = pct + '%';
+        i++;
+      } else {
+        clearInterval(interval);
+        const elapsed = Date.now() - state.startTime;
+        const stillLocked = elapsed < LOCK_DURATION_MS;
+        if(stillLocked || state.attempts < 3){
+          let revPct = pct;
+          const rev = setInterval(()=>{
+            revPct -= 20;
+            fill.style.width = Math.max(revPct,8) + '%';
+            if(revPct <= 8){
+              clearInterval(rev);
+              if(stillLocked){
+                status.textContent = 'Security lockout in effect.';
+              } else {
+                status.textContent = 'Authentication delayed.';
+              }
+              setTimeout(()=>{
+                status.textContent = 'Something went wrong.';
+                setTimeout(()=>{
+                  closeModal('authOverlay');
+                  onDone(false, stillLocked);
+                }, 900);
+              }, 800);
+            }
+          }, 200);
+        } else {
+          fill.style.width = '100%';
+          status.textContent = 'Authentication complete.';
+          setTimeout(()=>{
+            closeModal('authOverlay');
+            onDone(true, false);
+          }, 700);
+        }
+      }
+    }, 340);
+  }
+
+  /* ============ Judgmental error messages ============ */
+  const ERROR_MESSAGES = ['Incorrect password.','That was not it.','Still incorrect.','We expected better.','Please reconsider your choices.','Your credentials remain unconvinced.','The password disagrees.','Try remembering harder.'];
+  function showError(){
+    joltWin();
+    toast(ERROR_MESSAGES[Math.min(state.attempts-1, ERROR_MESSAGES.length-1)] || ERROR_MESSAGES[ERROR_MESSAGES.length-1]);
+  }
+
+  /* ============ Self-aware UI ============ */
+  const SELF_AWARE_MESSAGES = ['You have been here for a while.','We admire your persistence.','You could have left.','Still here?','Fine. Let us try this one more time.'];
+  function showSelfAware(){
+    if(state.attempts < 3) return;
+    const el = $('selfAware');
+    const idx = Math.min(state.attempts - 3, SELF_AWARE_MESSAGES.length - 1);
+    el.textContent = SELF_AWARE_MESSAGES[idx];
+  }
+
+  /* ============ Attempt counter, activity panel, lock timer ============ */
+  function updateAttemptCounter(){
+    $('attemptCounter').textContent = 'Authentication attempts: ' + state.attempts;
+    $('lastAttemptTime').textContent = state.attempts === 0 ? 'just now' : (Math.floor(Math.random()*50)+3) + ' seconds ago';
+    $('securityStatus').textContent = state.attempts < 2 ? 'Nominal' : state.attempts < 4 ? 'Questionable' : 'Elevated concern';
+  }
+
+  function updateLockLine(){
+    const elapsed = Date.now() - state.startTime;
+    const remaining = LOCK_DURATION_MS - elapsed;
+    const lockLine = $('lockLine');
+    if(remaining > 0 && state.attempts >= 1){
+      lockLine.style.display = 'block';
+      lockLine.textContent = 'Security lockout active. Retry allowed in: ' + formatCountdown(remaining);
+    } else {
+      lockLine.style.display = 'none';
+    }
+  }
+  setInterval(updateLockLine, 500);
+
+  /* ============ Main login flow ============ */
+  loginBtn.addEventListener('click', ()=>{
+    if(!state.step1Complete || !state.step2Complete){
+      toast('Complete both steps above first.');
+      return;
+    }
+    state.attempts++;
+    updateAttemptCounter();
+    showSelfAware();
+    btnNote.textContent = '';
+
+    const email = emailInput.value.trim();
+    const password = pwInput.value;
+
+    if(!email || !password){
+      toast('Please fill in both fields.');
+      state.attempts--;
+      updateAttemptCounter();
+      return;
+    }
+
+    proceedToChecks();
+  });
+
+  function proceedToChecks(){
+    if(state.attempts >= 1){
+      runCaptchaFlow(afterCaptcha);
+    } else {
+      afterCaptcha();
+    }
+  }
+  function afterCaptcha(){ runConfirmLoop(afterConfirm); }
+  function afterConfirm(){
+    runAuthProgress((success, wasLocked)=>{
+      if(success){
+        finishSuccess();
+      } else {
+        if(wasLocked){
+          const remaining = LOCK_DURATION_MS - (Date.now() - state.startTime);
+          toast('Security lockout active. Retry in ' + formatCountdown(remaining) + '.');
+        } else {
+          showError();
+        }
+      }
+    });
+  }
+
+  function finishSuccess(){
+    const elapsed = Math.round((Date.now() - state.startTime)/1000);
+    $('statAttempts').textContent = state.attempts;
+    $('statTime').textContent = elapsed + 's';
+    const patience = state.attempts >= 5 ? 'Legendary' : state.attempts >= 3 ? 'Remarkable' : 'Respectable';
+    $('statPatience').textContent = patience;
+    $('loginView').style.display = 'none';
+    $('successView').style.display = 'block';
+  }
+
+  $('enterDashBtn').addEventListener('click', ()=>{
+    $('successView').style.display = 'none';
+    $('dashView').style.display = 'block';
+    const elapsed = Math.round((Date.now() - state.startTime)/1000);
+    $('dashAttemptsNum').textContent = state.attempts;
+    $('dashTimeNum').textContent = elapsed + 's';
+    $('dashCaptchas').textContent = state.captchasSolved;
+    $('dashConfirms').textContent = state.confirmsClicked;
+    const bars = $('dashBars');
+    bars.innerHTML = '';
+    const points = Math.max(6, Math.min(state.attempts + 4, 12));
+    for(let i=0;i<points;i++){
+      const bar = document.createElement('i');
+      const h = 10 + Math.round(Math.random()*40) + (i/points)*20;
+      bar.style.height = Math.min(h, 50) + 'px';
+      bars.appendChild(bar);
+    }
+  });
+
+  /* ============ Forgot password paradox ============ */
+  $('forgotLink').addEventListener('click', ()=>{
+    $('forgotTitle').textContent = 'Do not worry. We remember your password.';
+    $('forgotSub').textContent = 'Unfortunately, we cannot tell you what it is.';
+    $('forgotInputWrap').style.display = 'none';
+    $('forgotAction').textContent = 'Recover Password';
+    openModal('forgotOverlay');
+  });
+  $('forgotClose').addEventListener('click', ()=> closeModal('forgotOverlay'));
+  $('forgotAction').addEventListener('click', ()=>{
+    if($('forgotInputWrap').style.display === 'none'){
+      $('forgotTitle').textContent = 'Please enter your current password to continue.';
+      $('forgotSub').textContent = 'This confirms your identity so we can remember it more accurately.';
+      $('forgotInputWrap').style.display = 'block';
+      $('forgotAction').textContent = 'Submit';
+    } else {
+      $('forgotTitle').textContent = 'Thank you.';
+      $('forgotSub').textContent = 'Your password has been remembered.';
+      $('forgotInputWrap').style.display = 'none';
+      setTimeout(()=> closeModal('forgotOverlay'), 1100);
+    }
+  });
+
+  /* ============ Terms & conditions trap ============ */
+  const termsMessages = ['Terms have been updated.','Privacy policy updated.','Security policy updated.'];
+  $('termsCheck').addEventListener('change', function(){
+    if(this.checked){
+      if(state.termsClicks < termsMessages.length){
+        toast(termsMessages[state.termsClicks]);
+        state.termsClicks++;
+        if(state.termsClicks < termsMessages.length){
+          setTimeout(()=>{ this.checked = false; }, 500);
+        }
+      }
+    }
+  });
+
+  /* ============ Social login chaos ============ */
+  document.querySelectorAll('.social-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const provider = btn.dataset.provider;
+      $('socialTitle').textContent = 'Redirecting...';
+      $('socialSub').textContent = 'Connecting to ' + provider + '.';
+      openModal('socialOverlay');
+      setTimeout(()=>{ $('socialTitle').textContent = 'Checking provider...'; }, 800);
+      setTimeout(()=>{ $('socialTitle').textContent = 'Provider unavailable.'; $('socialSub').textContent = provider + ' could not verify this request.'; }, 1700);
+      setTimeout(()=>{ $('socialTitle').textContent = 'Returning to secure authentication.'; }, 2600);
+      setTimeout(()=>{ closeModal('socialOverlay'); }, 3400);
+    });
+  });
+
+  /* ============ Keyboard betrayal ============ */
+  let enterCount = 0;
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      const active = document.activeElement;
+      if(active && (active.id === 'email' || active.id === 'password')){
+        enterCount++;
+        if(active.id === 'email'){
+          e.preventDefault();
+          pwInput.focus();
+          return;
+        }
+        if(enterCount % 3 === 0){
+          e.preventDefault();
+          toast('Confirming input...');
+          return;
+        }
+        e.preventDefault();
+        loginBtn.click();
+      }
+    }
+    if(e.key === 'Escape'){
+      const openOverlays = Array.from(document.querySelectorAll('.modal-overlay.show'));
+      if(openOverlays.length){ openOverlays[0].classList.remove('show'); }
+    }
+  });
+
+  /* ============ init ============ */
+  updateAttemptCounter();
+  $('browserName').textContent = (navigator.userAgent.match(/Chrome|Firefox|Safari|Edge/) || ['this browser'])[0];
+  setTimeout(function(){
+    toast('Nothing on this page works until Step 1 is complete.');
+  }, 900);
+
+})();
+</script>
+</body>
+</html>

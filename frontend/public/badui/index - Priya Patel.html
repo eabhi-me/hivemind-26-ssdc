@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My CAPTCHA</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f2eaff;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            height: 100vh;
+        }
+
+        .box {
+            width: 400px;
+            background-color: white;
+            padding: 25px;
+
+            border: 3px solid purple;
+            border-radius: 10px;
+
+            box-shadow: 7px 7px 0 pink;
+        }
+
+        h1 {
+            text-align: center;
+            color: purple;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        .captcha-code {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+
+            background-color: yellow;
+            padding: 15px;
+            margin: 15px 0;
+
+            border: 2px dashed red;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+
+            font-size: 17px;
+
+            border: 2px solid pink;
+            border-radius: 6px;
+
+            margin-bottom: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+
+            background-color: purple;
+            color: white;
+
+            border: none;
+            border-radius: 6px;
+
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: red;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+
+        <h1>🤖 CAPTCHA</h1>
+
+        <p>
+            Are you a human? Enter the code shown below.
+        </p>
+
+        <div class="captcha-code">
+            7B4K9
+        </div>
+
+        <input
+            type="text"
+            id="captchaInput"
+            placeholder="Enter code here"
+        >
+
+        <button onclick="checkCaptcha()">
+            Verify
+        </button>
+
+        <div id="message"></div>
+
+    </div>
+
+    <script>
+        function checkCaptcha() {
+
+            let input = document.getElementById("captchaInput").value;
+            let message = document.getElementById("message");
+
+            if (input.toUpperCase() == "7B4K9") {
+                message.innerHTML = "Wrong! Try again 😅";
+                message.style.color = "red";
+            } else {
+                message.innerHTML = "CAPTCHA failed!";
+                message.style.color = "red";
+            }
+        }
+    </script>
+
+</body>
+</html>

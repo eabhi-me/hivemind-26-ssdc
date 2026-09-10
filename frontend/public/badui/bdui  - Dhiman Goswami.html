@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAD UI Championship</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Comic Sans MS, Papyrus, Arial, cursive;
+        background: linear-gradient(
+            45deg,
+            red,
+            yellow,
+            lime,
+            cyan,
+            blue,
+            magenta
+        );
+        background-size: 500% 500%;
+        animation: rainbow 4s infinite alternate;
+        overflow-x: hidden;
+    }
+
+    @keyframes rainbow {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+    }
+
+    header {
+        background: yellow;
+        border: 8px dotted red;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transform: rotate(-0.5deg);
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 60px;
+        color: red;
+        text-shadow:
+            4px 4px black,
+            8px 8px lime;
+        animation: shake 0.4s infinite;
+    }
+
+    @keyframes shake {
+        0% { transform: translate(0); }
+        25% { transform: translate(2px,-2px); }
+        50% { transform: translate(-2px,2px); }
+        75% { transform: translate(3px,1px); }
+        100% { transform: translate(0); }
+    }
+
+    .clock {
+        background: white;
+        border: 5px ridge purple;
+        padding: 15px;
+        font-size: 22px;
+    }
+
+    .layout {
+        display: grid;
+        grid-template-columns: 230px 1fr 260px;
+        gap: 7px;
+        padding: 7px;
+    }
+
+    .sidebar {
+        background: hotpink;
+        border: 7px groove cyan;
+        padding: 10px;
+    }
+
+    .sidebar button {
+        width: 100%;
+        margin: 7px 0;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        border: 5px outset white;
+        cursor: pointer;
+    }
+
+    .sidebar button:nth-child(odd) {
+        background: lime;
+    }
+
+    .sidebar button:nth-child(even) {
+        background: orange;
+    }
+
+    .sidebar button:hover {
+        transform: scale(0.7) rotate(8deg);
+    }
+
+    .main {
+        background: rgba(255,255,255,0.4);
+        padding: 8px;
+    }
+
+    .hero {
+        background: red;
+        color: black;
+        text-align: center;
+        border: 8px dashed yellow;
+        padding: 25px;
+        position: relative;
+    }
+
+    .hero h2 {
+        font-size: 55px;
+        margin: 0;
+        text-decoration: underline overline;
+    }
+
+    .hero button {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        background: yellow;
+        border-radius: 50%;
+        border: 4px solid black;
+        padding: 20px;
+        font-weight: bold;
+        transform: rotate(30deg);
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        margin-top: 7px;
+    }
+
+    .card {
+        background: #fff67a;
+        border: 8px ridge purple;
+        padding: 15px;
+        min-height: 220px;
+    }
+
+    .card h3 {
+        font-size: 26px;
+        margin-top: 0;
+        text-decoration: underline;
+    }
+
+    input, select, textarea {
+        font-size: 18px;
+        padding: 10px;
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .bad-button {
+        padding: 13px 30px;
+        font-size: 19px;
+        margin: 5px;
+        cursor: pointer;
+        border: 6px outset;
+    }
+
+    .progress {
+        height: 30px;
+        background: gray;
+        border: 3px solid black;
+    }
+
+    .progress div {
+        height: 100%;
+        width: 4%;
+        background: lime;
+    }
+
+    .rightbar {
+        background: cyan;
+        border: 8px double red;
+        padding: 10px;
+    }
+
+    .rightbar button {
+        width: 100%;
+        padding: 15px;
+        margin: 7px 0;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .fake-ad {
+        background: orange;
+        border: 8px dotted blue;
+        padding: 20px;
+        text-align: center;
+        animation: blink 0.6s infinite alternate;
+    }
+
+    @keyframes blink {
+        from { opacity: 1; }
+        to { opacity: 0.4; }
+    }
+
+    .popup {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 420px;
+        background: yellow;
+        border: 15px ridge red;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 0 100px black;
+    }
+
+    .popup button {
+        padding: 15px;
+        margin: 10px;
+        font-size: 18px;
+    }
+
+    #runaway {
+        position: relative;
+    }
+
+    .marquee {
+        background: black;
+        color: lime;
+        font-size: 22px;
+        padding: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .marquee span {
+        display: inline-block;
+        animation: move 8s linear infinite;
+    }
+
+    @keyframes move {
+        from { transform: translateX(100vw); }
+        to { transform: translateX(-100%); }
+    }
+
+    footer {
+        background: black;
+        color: white;
+        text-align: center;
+        padding: 25px;
+        border-top: 10px dotted lime;
+    }
+
+    .captcha {
+        padding: 12px;
+        background: pink;
+        border: 5px dashed black;
+        margin-top: 10px;
+    }
+
+    #mouseFollower {
+        position: fixed;
+        pointer-events: none;
+        z-index: 10000;
+        font-size: 30px;
+    }
+
+    .tiny {
+        font-size: 8px;
+    }
+
+    @media(max-width:900px) {
+        .layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div id="mouseFollower">👉</div>
+
+<header>
+    <h1>BAD UI</h1>
+    <div>
+        Making bad design great again 😎
+    </div>
+
+    <div class="clock" id="clock">
+        Time loading...
+    </div>
+</header>
+
+<div class="marquee">
+    <span>
+        ⚠ Welcome to BAD UI v0.0.1 — Everything works. Probably. Click responsibly. ⚠
+    </span>
+</div>
+
+<div class="layout">
+
+    <!-- LEFT -->
+    <aside class="sidebar">
+
+        <h2>User123</h2>
+        <p>Level: Confused</p>
+
+        <button onclick="fakeNavigate()">Home</button>
+        <button onclick="fakeNavigate()">Dashboard</button>
+        <button onclick="fakeNavigate()">My Stuff</button>
+        <button onclick="doSomething()">Do Something</button>
+        <button onclick="openPopup()">Settings</button>
+        <button onclick="alert('Help is currently unavailable because help needs help.')">
+            Help???
+        </button>
+
+        <button
+            style="background:black;color:white"
+            onclick="logout()"
+        >
+            Log Out
+        </button>
+
+        <hr>
+
+        <h3>Why are you still here?</h3>
+        <p style="font-size:50px;text-align:center">😐</p>
+
+    </aside>
+
+    <!-- CENTER -->
+    <main class="main">
+
+        <section class="hero">
+            <button onclick="alert('WOW! Nothing happened.')">
+                WOW!
+            </button>
+
+            <h2>CLICK EVERYTHING!</h2>
+
+            <p>
+                You might find something... or not.
+            </p>
+        </section>
+
+        <div class="grid">
+
+            <div class="card">
+                <h3>Your Tasks (maybe)</h3>
+
+                <label>
+                    <input type="checkbox" checked>
+                    Do something
+                </label><br>
+
+                <label>
+                    <input type="checkbox">
+                    Do something else
+                </label><br>
+
+                <label>
+                    <input type="checkbox">
+                    Maybe finish this
+                </label><br>
+
+                <label>
+                    <input type="checkbox">
+                    Ignore this task
+                </label><br>
+
+                <label>
+                    <input type="checkbox">
+                    Why are you reading this?
+                </label><br><br>
+
+                <button class="bad-button" onclick="addTask()">Add</button>
+
+                <button
+                    class="bad-button"
+                    onclick="alert('Deleted everything except the task you wanted.')"
+                >
+                    Delete
+                </button>
+
+                <button
+                    id="runaway"
+                    class="bad-button"
+                >
+                    Save
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>Your Progress</h3>
+
+                <h1>5%</h1>
+
+                <div class="progress">
+                    <div></div>
+                </div>
+
+                <p>
+                    Almost there!
+                </p>
+
+                <button onclick="changeProgress()">
+                    Increase Progress
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>Motivational Quote</h3>
+
+                <blockquote id="quote">
+                    “Procrastination is a feature, not a bug.”
+                </blockquote>
+
+                <button onclick="newQuote()">
+                    Next Quote
+                </button>
+
+                <br><br>
+
+                <label>
+                    <input type="checkbox">
+                    Never show this again
+                </label>
+
+                <p class="tiny">
+                    By checking this box you agree to see this quote forever.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Settings (or something)</h3>
+
+                <label>
+                    <input type="checkbox" checked>
+                    Enable confusion
+                </label>
+
+                <br><br>
+
+                <label>
+                    Make it worse:
+                </label>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="80"
+                    oninput="makeWorse(this.value)"
+                >
+
+                <select onchange="themeChanged(this.value)">
+                    <option>Choose Theme</option>
+                    <option>Rainbow</option>
+                    <option>More Rainbow</option>
+                    <option>Too Much Rainbow</option>
+                </select>
+
+                <button onclick="reverseWebsite()">
+                    Improve UI
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>Login Again</h3>
+
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Username"
+                >
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password"
+                >
+
+                <button onclick="login()">
+                    Login
+                </button>
+
+                <div class="captcha">
+                    Prove you're human:
+                    <br><br>
+                    What is
+                    <b>17 × 3 + 2 ÷ banana?</b>
+
+                    <input type="text">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Volume</h3>
+
+                <p>
+                    Adjust screen brightness:
+                </p>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="50"
+                    oninput="changeBrightness(this.value)"
+                >
+
+                <p>
+                    Volume: 627%
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="rightbar">
+
+        <h2>Search</h2>
+
+        <input
+            id="search"
+            placeholder="Type anything..."
+        >
+
+        <button onclick="badSearch()">
+            Search
+        </button>
+
+        <hr>
+
+        <h2>Quick Actions</h2>
+
+        <button onclick="alert('Doing the thing... maybe.')">
+            Do the Thing
+        </button>
+
+        <button onclick="openPopup()">
+            Another Thing
+        </button>
+
+        <button onclick="doSomething()">
+            Something Else
+        </button>
+
+        <button disabled>
+            Nothing
+        </button>
+
+        <hr>
+
+        <div class="fake-ad">
+            <h2>Sponsored Ad</h2>
+            <p style="font-size:60px">😎🐱</p>
+            <h1>BUY MORE STUFF!</h1>
+
+            <button
+                onclick="alert('Purchase failed successfully.')"
+            >
+                SHOP NOW!!!
+            </button>
+        </div>
+
+        <hr>
+
+        <h3>Contact Us</h3>
+
+        <input placeholder="Name">
+
+        <input
+            placeholder="Email"
+            value="no-reply@nowhere.com"
+        >
+
+        <textarea placeholder="Message"></textarea>
+
+        <button onclick="sendMessage()">
+            Send
+        </button>
+
+    </aside>
+
+</div>
+
+<footer>
+
+    Privacy |
+    Terms |
+    Cookies |
+    Who Knows?
+
+    <br><br>
+
+    <button onclick="alert('Bug reported as a feature.')">
+        Report a Bug
+    </button>
+
+    <p>
+        Page loaded in
+        <span id="loadTime">
+            18.4
+        </span>
+        seconds.
+    </p>
+
+</footer>
+
+<div class="popup" id="popup">
+
+    <h1>⚠ IMPORTANT ⚠</h1>
+
+    <p>
+        Would you like to close this popup?
+    </p>
+
+    <button onclick="popupWrongButton()">
+        YES
+    </button>
+
+    <button onclick="closePopup()">
+        NO
+    </button>
+
+</div>
+
+
+<script>
+
+    // CLOCK THAT IS INTENTIONALLY WRONG
+    function updateClock() {
+
+        let date = new Date();
+
+        date.setHours(date.getHours() + 3);
+
+        document.getElementById("clock").innerHTML =
+            date.toLocaleTimeString() +
+            "<br><small>Definitely your local time</small>";
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+
+    // MOUSE FOLLOWER
+
+    document.addEventListener("mousemove", function(e) {
+
+        const follower =
+            document.getElementById("mouseFollower");
+
+        follower.style.left =
+            (e.clientX + 25) + "px";
+
+        follower.style.top =
+            (e.clientY + 20) + "px";
+
+    });
+
+
+    // RUNAWAY SAVE BUTTON
+
+    const runaway =
+        document.getElementById("runaway");
+
+    runaway.addEventListener(
+        "mouseenter",
+        function() {
+
+            runaway.style.position = "fixed";
+
+            runaway.style.left =
+                Math.random() *
+                (window.innerWidth - 150)
+                + "px";
+
+            runaway.style.top =
+                Math.random() *
+                (window.innerHeight - 70)
+                + "px";
+
+        }
+    );
+
+
+    // POPUP
+
+    function openPopup() {
+
+        document.getElementById("popup")
+            .style.display = "block";
+
+    }
+
+    function closePopup() {
+
+        document.getElementById("popup")
+            .style.display = "none";
+
+    }
+
+    function popupWrongButton() {
+
+        alert(
+            "You clicked YES, so obviously the popup will stay open."
+        );
+
+    }
+
+
+    // SEARCH
+
+    function badSearch() {
+
+        let text =
+            document.getElementById("search").value;
+
+        if (text.trim() === "") {
+
+            alert(
+                "0 results found for absolutely nothing."
+            );
+
+        } else {
+
+            alert(
+                "Searching for \"" +
+                text +
+                "\"...\n\nResult: Banana."
+            );
+
+        }
+
+    }
+
+
+    // LOGIN
+
+    function login() {
+
+        let username =
+            document.getElementById("username").value;
+
+        let password =
+            document.getElementById("password").value;
+
+        if (username && password) {
+
+            alert(
+                "Wrong password.\n\nWe won't tell you which password."
+            );
+
+        } else {
+
+            alert(
+                "Login successful!\n\nActually, please enter your login details."
+            );
+
+        }
+
+    }
+
+
+    // QUOTES
+
+    const quotes = [
+
+        "You miss 100% of buttons that move away from you.",
+
+        "Good design is temporary. Bad UI is forever.",
+
+        "If users understand the website, we have failed.",
+
+        "Why use one button when seventeen will do?",
+
+        "Accessibility is currently loading...",
+
+        "Consistency is overrated."
+
+    ];
+
+    function newQuote() {
+
+        const index =
+            Math.floor(
+                Math.random() *
+                quotes.length
+            );
+
+        document.getElementById("quote")
+            .innerText =
+            "\"" +
+            quotes[index] +
+            "\"";
+
+    }
+
+
+    // FAKE NAVIGATION
+
+    function fakeNavigate() {
+
+        alert(
+            "404: This page exists but refuses to open."
+        );
+
+    }
+
+
+    // ADD TASK
+
+    function addTask() {
+
+        let task =
+            prompt(
+                "Enter your task. We may ignore it."
+            );
+
+        if (task) {
+
+            alert(
+                "Task added successfully somewhere."
+            );
+
+        }
+
+    }
+
+
+    // FAKE PROGRESS
+
+    let progress = 5;
+
+    function changeProgress() {
+
+        progress -= 1;
+
+        if (progress < 0) {
+            progress = 99;
+        }
+
+        document.querySelector(".progress div")
+            .style.width =
+            progress + "%";
+
+        alert(
+            "Congratulations! Progress is now "
+            + progress +
+            "%."
+        );
+
+    }
+
+
+    // MAKE WEBSITE WORSE
+
+    function makeWorse(value) {
+
+        document.body.style.filter =
+            "hue-rotate(" +
+            value * 4 +
+            "deg) contrast(" +
+            (1 + value / 70) +
+            ")";
+
+    }
+
+
+    function themeChanged(theme) {
+
+        alert(
+            theme +
+            " theme selected.\n\nNothing changed."
+        );
+
+    }
+
+
+    // REVERSE WEBSITE
+
+    function reverseWebsite() {
+
+        document.body.style.transform =
+            "rotate(180deg)";
+
+        document.body.style.transition =
+            "1s";
+
+        alert(
+            "UI successfully improved."
+        );
+
+    }
+
+
+    function doSomething() {
+
+        const options = [
+
+            "Something happened.",
+
+            "Nothing happened.",
+
+            "Loading forever...",
+
+            "Task failed successfully.",
+
+            "Unexpected success occurred."
+
+        ];
+
+        alert(
+            options[
+                Math.floor(
+                    Math.random() *
+                    options.length
+                )
+            ]
+        );
+
+    }
+
+
+    // FAKE BRIGHTNESS
+
+    function changeBrightness(value) {
+
+        document.body.style.opacity =
+            0.5 +
+            value / 200;
+
+    }
+
+
+    function logout() {
+
+        let answer =
+            confirm(
+                "Are you sure you DON'T want to logout?"
+            );
+
+        if (answer) {
+
+            alert(
+                "Logout cancelled successfully."
+            );
+
+        } else {
+
+            alert(
+                "You have been logged in again."
+            );
+
+        }
+
+    }
+
+
+    function sendMessage() {
+
+        alert(
+            "Message not sent.\n\nThank you for contacting us!"
+        );
+
+    }
+
+
+    // RANDOM POPUP ATTACK
+
+    setTimeout(function() {
+
+        openPopup();
+
+    }, 7000);
+
+
+    // FAKE PAGE LOAD NUMBER
+
+    setInterval(function() {
+
+        document.getElementById("loadTime")
+            .innerText =
+            (
+                Math.random() *
+                99
+            ).toFixed(1);
+
+    }, 1000);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Duniya Ka Sabse Ghatiya UI™</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    background: repeating-linear-gradient(45deg, #ff00ff, #ff00ff 10px, #00ff00 10px, #00ff00 20px);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: wait;
+  }
+
+  #topbar {
+    background: yellow;
+    color: red;
+    text-align: center;
+    font-weight: bold;
+    font-size: 22px;
+    padding: 10px;
+    animation: blink 0.4s infinite, shake 0.15s infinite;
+    border-bottom: 6px dashed purple;
+  }
+
+  @keyframes blink { 50% { opacity: 0.1; } }
+  @keyframes shake {
+    0% { transform: translateX(0px); }
+    25% { transform: translateX(-3px) rotate(-1deg); }
+    75% { transform: translateX(3px) rotate(1deg); }
+    100% { transform: translateX(0px); }
+  }
+
+  .marquee-wrap { background: black; padding: 6px 0; }
+  marquee { color: lime; font-size: 20px; font-weight: bold; }
+
+  #container {
+    padding: 40px;
+    text-align: center;
+    color: white;
+    text-shadow: 2px 2px black;
+  }
+
+  h1 {
+    font-size: 40px;
+    color: cyan;
+    animation: rainbow 1s infinite;
+  }
+  @keyframes rainbow {
+    0%{color:red;} 20%{color:orange;} 40%{color:yellow;}
+    60%{color:lime;} 80%{color:blue;} 100%{color:violet;}
+  }
+
+  #fakeClose {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: red;
+    color: white;
+    border: 3px outset white;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 999;
+  }
+
+  .runner {
+    position: relative;
+    display: inline-block;
+    margin: 30px;
+    padding: 15px 30px;
+    background: linear-gradient(90deg, orange, red);
+    color: white;
+    border: 4px ridge yellow;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.05s;
+  }
+
+  #captchaBox {
+    background: white;
+    color: black;
+    padding: 20px;
+    margin: 30px auto;
+    max-width: 400px;
+    border: 5px double black;
+    font-size: 14px;
+  }
+
+  #tinytext {
+    font-size: 6px;
+    color: #333;
+    background: #222;
+    padding: 10px;
+    line-height: 1.8;
+    margin-top: 40px;
+  }
+
+  #popupAd {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: black;
+    color: lime;
+    padding: 15px;
+    font-size: 18px;
+    text-align: center;
+    display: none;
+    border-top: 5px solid red;
+  }
+
+  input {
+    padding: 8px;
+    font-size: 16px;
+    width: 60%;
+  }
+
+  #scrollbarChaos {
+    height: 200px;
+    overflow: scroll;
+    background: repeating-linear-gradient(90deg, pink, pink 5px, white 5px, white 10px);
+    margin: 30px auto;
+    max-width: 300px;
+    padding: 10px;
+    color: black;
+  }
+
+  ::-webkit-scrollbar { width: 40px; background: red; }
+  ::-webkit-scrollbar-thumb { background: lime; border-radius: 0; }
+
+  #consentModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  #consentModal .box {
+    background: white;
+    color: black;
+    padding: 30px;
+    max-width: 90%;
+    text-align: center;
+    border: 6px solid magenta;
+  }
+  #consentModal button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+
+  body { cursor: none !important; user-select: none; }
+
+  #fakeCursor {
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, red, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+  }
+
+  #loadingBarWrap {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    background: black;
+    z-index: 9998;
+    padding: 4px 0;
+  }
+  #loadingBarFill {
+    height: 10px;
+    background: repeating-linear-gradient(45deg, lime, lime 5px, yellow 5px, yellow 10px);
+    width: 0%;
+  }
+  #loadingLabel {
+    color: white;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  #virusWarning {
+    position: fixed;
+    inset: 0;
+    background: blue;
+    color: white;
+    z-index: 99998;
+    display: none;
+    padding: 60px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 22px;
+  }
+
+  .rogueBtn {
+    position: fixed;
+    background: purple;
+    color: yellow;
+    border: 3px dashed white;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 500;
+    font-weight: bold;
+  }
+
+  @keyframes spin360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spinny { display:inline-block; animation: spin360 1s linear infinite; }
+
+  @keyframes screenShake {
+    0% { transform: translate(0,0); }
+    20% { transform: translate(-15px, 10px) rotate(-1deg); }
+    40% { transform: translate(12px, -8px) rotate(1deg); }
+    60% { transform: translate(-8px, -12px) rotate(-1deg); }
+    80% { transform: translate(10px, 8px) rotate(1deg); }
+    100% { transform: translate(0,0); }
+  }
+  .shaking { animation: screenShake 0.4s ease-in-out; }
+
+  #prizePopup {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: gold;
+    color: red;
+    border: 8px ridge orange;
+    padding: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 99997;
+    box-shadow: 0 0 40px yellow;
+  }
+  #prizePopup button {
+    display:block;
+    margin: 15px auto 0;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .jumble-hover:hover { letter-spacing: 3px; }
+
+  body { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><text y="50" font-size="50">🤡</text></svg>') 32 32, auto !important; }
+
+  #hackOverlay {
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: lime;
+    font-family: monospace;
+    font-size: 16px;
+    z-index: 999999;
+    padding: 20px;
+    overflow: hidden;
+    white-space: pre-wrap;
+    line-height: 1.4;
+  }
+
+  #installOverlay {
+    position: fixed;
+    inset: 0;
+    background: #012;
+    color: white;
+    font-family: monospace;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    text-align: center;
+  }
+  #installBarWrap {
+    width: 300px;
+    height: 20px;
+    background: #333;
+    margin-top: 20px;
+    border: 2px solid white;
+  }
+  #installBarFill {
+    height: 100%;
+    width: 1%;
+    background: orange;
+  }
+
+  #loginOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: monospace;
+  }
+  #loginBox {
+    background: #111;
+    border: 4px solid lime;
+    padding: 30px;
+    width: 320px;
+    text-align: center;
+    position: relative;
+  }
+  #loginBox h2 { color: lime; margin-top: 0; }
+  #loginBox input {
+    display: block;
+    width: 90%;
+    margin: 12px auto;
+    padding: 10px;
+    font-size: 14px;
+    border: 2px solid lime;
+    background: black;
+    color: lime;
+  }
+  #loginBox .runner { font-size: 14px; padding: 8px 16px; margin: 10px; }
+  #loginError { color: red; font-size: 12px; min-height: 16px; }
+  #loginCaptcha {
+    background: white;
+    color: black;
+    padding: 10px;
+    font-size: 12px;
+    margin: 10px 0;
+  }
+  #loginCloseX {
+    position: absolute;
+    top: 5px; right: 8px;
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  #waitGate {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.97);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: monospace;
+    text-align: center;
+  }
+  #waitBox {
+    border: 4px dashed orange;
+    padding: 40px;
+    max-width: 400px;
+  }
+  #waitTimer {
+    font-size: 48px;
+    color: orange;
+    margin: 20px 0;
+  }
+  #waitTaunt {
+    font-size: 14px;
+    color: #aaa;
+    min-height: 40px;
+  }
+</style>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="installOverlay">
+  <div><span class="spinny">⚙️</span> Zaroori Update Install Ho Raha Hai <span class="spinny">⚙️</span></div>
+  <div id="installBarWrap"><div id="installBarFill"></div></div>
+  <div id="installPct" style="font-size:14px; margin-top:10px;">1% — Anumanit samay: hamesha</div>
+  <div style="font-size:12px; margin-top:20px; opacity:0.7;">(Laptop band mat karo, sab data uda jaayega — jhooth hai, lekin band mat karo)</div>
+</div>
+
+<div id="hackOverlay" style="display:none;"></div>
+
+<div id="waitGate">
+  <div id="waitBox">
+    <h2 style="color:orange;">⏳ Matha-Pachi Zone ⏳</h2>
+    <p>Login page sirf poore <b>5 minute</b> intezaar ke baad khulega.</p>
+    <div id="waitTimer">05:00</div>
+    <div id="waitTaunt">Bas dekhte raho. Kuch nahi kar sakte.</div>
+    <button class="runner" style="font-size:13px; padding:6px 14px;" onmouseover="moveAway(event)" onclick="alert('Skip karne ka koi button nahi hai. Yeh mazaak nahi hai... ya hai?')">Skip Karo</button>
+  </div>
+</div>
+
+<div id="loginOverlay">
+  <div id="loginBox">
+    <span id="loginCloseX" onmouseover="moveAway(event)" onclick="alert('Yeh bhi close nahi hoga.')">X</span>
+    <h2>🔐 SUPER SECRET LOGIN</h2>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <div id="loginCaptcha">
+      CAPTCHA: <b id="captchaQ">7 + 3 = ?</b>
+      <input type="text" id="captchaAns" style="width:50px; display:inline-block; margin:0 0 0 8px;">
+    </div>
+    <div id="loginError"></div>
+    <button class="runner" onmouseover="moveAway(event)" onclick="tryLogin()">Login Karo</button>
+  </div>
+</div>
+
+<div id="fakeCursor"></div>
+
+<div id="loadingBarWrap">
+  <div id="loadingBarFill"></div>
+  <div id="loadingLabel">Loading... please wait (hamesha ke liye)</div>
+</div>
+
+<div id="virusWarning">
+  <span class="spinny">⚠️</span> SYSTEM WARNING <span class="spinny">⚠️</span><br><br>
+  Aapke computer mein 999 VIRUSES mil gaye hain (jhooth hai, koi nahi mila).<br><br>
+  Isse band karne ke liye neeche wale button ko 5 baar dabao.
+  <br><br>
+  <button onclick="virusCount++; if(virusCount>=5){document.getElementById('virusWarning').style.display='none';} else {alert('Nahi! Phir se try karo. ('+virusCount+'/5)')}">Theek Karo</button>
+</div>
+
+<div id="consentModal">
+  <div class="box">
+    <h2>⚠️ Zaroori Suchna ⚠️</h2>
+    <p>Kya aap is duniya ke sabse GHATIYA UI mein enter karna chahte hain?</p>
+    <p style="font-size:10px;">(Is button ko dabane se pehle 3 baar sochiye. Fir bhi kuch nahi hoga.)</p>
+    <button onclick="startTorture()">Haan, Bhugatna Hai</button>
+    <button onclick="moveAway(event)" onmouseover="moveAway(event)">Nahi, Bahar Jaana Hai</button>
+  </div>
+</div>
+
+<div id="topbar">🚨 YEH WEBSITE AAPKO PASAND NAHI AAYEGI — GUARANTEED 🚨</div>
+
+<div class="marquee-wrap">
+  <marquee behavior="alternate" scrollamount="15">🔥 WELCOME TO GHATIYA UI 🔥 SCROLL KARO, CLICK KARO, PACHTAOGE 🔥 LOADING KABHI KHATAM NAHI HOGA 🔥</marquee>
+</div>
+
+<button id="fakeClose" onmouseover="moveAway(event)" onclick="alert('Yeh close button kaam nahi karta. Kabhi nahi karega.')">X</button>
+
+<div id="container">
+  <h1>Aapka Swagat Hai Is Bekaar Jagah Mein</h1>
+  <p class="jumble-hover">Neeche diya gaya button dabao... agar pakad sako to.</p>
+
+  <button class="runner" onmouseover="moveAway(event)" onclick="fakeSubmit()">Submit Karo</button>
+
+  <div>
+    <input type="text" id="nameInput" placeholder="Apna naam likho (fayda nahi hoga)">
+  </div>
+  <p id="inputEcho" style="font-size:12px; opacity:0.7;"></p>
+
+  <div id="captchaBox">
+    <b>CAPTCHA:</b> Neeche wale saare cloud-shaped buttons mein se sirf uss button ko dabao jo asal mein bicycle jaisa dikhta ho.
+    <br><br>
+    <button onclick="captchaFail()">☁️</button>
+    <button onclick="captchaFail()">☁️</button>
+    <button onclick="captchaFail()">☁️</button>
+    <br><br>
+    <small>(Hint: koi bhi bicycle jaisa nahi dikhta)</small>
+  </div>
+
+  <div id="scrollbarChaos">
+    <p>Yeh box scroll karne ke liye hai.</p>
+    <p>Lekin scroll karte hi</p>
+    <p>yeh box thoda upar-neeche</p>
+    <p>hilta rahega.</p>
+    <p>Bas isi tarah.</p>
+    <p>Aur isi tarah.</p>
+    <p>Ant nahi hai.</p>
+    <p>Chalte raho.</p>
+    <p>Bahut accha.</p>
+  </div>
+
+  <div style="margin-top:50px; border-top: 4px dotted red; padding-top:30px;">
+    <p style="color:yellow; font-size:20px;">💀 Himmat hai to Login Page tak pahuncho 💀</p>
+    <button class="runner" onmouseover="moveAway(event)" onclick="revealLogin()">Login Page Kholo (Agar Himmat Hai)</button>
+  </div>
+
+  <p id="tinytext">
+    Niyam aur shartein: is website ka koi bhi button expected kaam nahi karega. Scroll karne se page thoda hilega.
+    Zoom karke padhne ki koshish mat kijiye, hum jaante hain aap yeh nahi kar paayenge. Yeh text jaanbujh kar
+    itna chhota rakha gaya hai ki koi na padh sake, phir bhi hum ise likhte hain kyunki asli ghatiya websites
+    aisa hi karti hain. Agar aap yeh padh rahe hain to aap sach mein bahut dhairyavaan (patient) vyakti hain,
+    lekin isse aapko koi fayda nahi milega.
+  </p>
+</div>
+
+<div id="popupAd">🎉 BADHAI HO! Aap 1,000,000th visitor hain! (Nahi hain.) <button onclick="this.parentElement.style.display='none'; spawnClone()">Band Karo</button></div>
+
+<script>
+var virusCount = 0;
+
+// Fake cursor: lags behind real cursor and occasionally jumps away
+var fc = document.getElementById('fakeCursor');
+var realX = 0, realY = 0;
+document.addEventListener('mousemove', function(e) {
+  realX = e.clientX; realY = e.clientY;
+});
+setInterval(function() {
+  if (Math.random() < 0.15) {
+    // random rebellious jump
+    fc.style.left = (Math.random() * window.innerWidth) + 'px';
+    fc.style.top = (Math.random() * window.innerHeight) + 'px';
+  } else {
+    fc.style.left = (realX + (Math.random()*60-30)) + 'px';
+    fc.style.top = (realY + (Math.random()*60-30)) + 'px';
+  }
+}, 120);
+
+// Infinite loading bar that never actually finishes
+var pct = 0;
+var bar = document.getElementById('loadingBarFill');
+var label = document.getElementById('loadingLabel');
+setInterval(function() {
+  pct += Math.random() * 8;
+  if (pct >= 99) { pct = Math.random() * 40; label.innerText = 'Loading... phir se shuru (0% se)'; }
+  bar.style.width = pct + '%';
+  label.innerText = label.innerText.indexOf('phir') === -1 ? ('Loading... ' + Math.floor(pct) + '% (kabhi 100% nahi hoga)') : label.innerText;
+}, 400);
+
+// Fake virus warning pops up randomly
+setTimeout(function() {
+  document.getElementById('virusWarning').style.display = 'block';
+}, 6000);
+
+// Rogue buttons that spawn and wander around, doing nothing useful
+function spawnRogueButton() {
+  var b = document.createElement('button');
+  b.className = 'rogueBtn';
+  var labels = ['OK', 'Band Karo', 'Continue', 'Skip Ad', 'Accept', '×'];
+  b.innerText = labels[Math.floor(Math.random()*labels.length)];
+  b.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+  b.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+  b.onmouseover = function(e){ moveAway(e); };
+  b.onclick = function() {
+    alert('Kuch nahi hua. Bas ek aur button aa gaya.');
+    spawnRogueButton();
+  };
+  document.body.appendChild(b);
+}
+setInterval(spawnRogueButton, 9000);
+
+// Block right click and text selection attempts
+document.addEventListener('selectstart', function(e){ e.preventDefault(); });
+document.addEventListener('keydown', function(e) {
+  // Randomly hijack keys just to be extra annoying
+  if (Math.random() < 0.05) {
+    e.preventDefault();
+    alert('Keyboard temporarily disabled. Wajah: koi nahi.');
+  }
+});
+
+// Fake "leave site" trap - the most hated real dark pattern
+window.addEventListener('beforeunload', function(e) {
+  e.preventDefault();
+  e.returnValue = 'Kya aap sach mein is ghatiya website ko chhodna chahte hain?';
+  return e.returnValue;
+});
+
+// Fake stuck installer at 1% that "progresses" absurdly slowly then jumps back
+(function() {
+  var fill = document.getElementById('installBarFill');
+  var pctLabel = document.getElementById('installPct');
+  var p = 1;
+  var stuckMsgs = ['1% — Anumanit samay: hamesha', '1% — Kripya intezaar karein', '2% — Bas thoda aur', '1% — Phir se ganna shuru'];
+  var interval = setInterval(function() {
+    p += Math.random() * 3;
+    if (p > 15) p = 1;
+    fill.style.width = p + '%';
+    pctLabel.innerText = stuckMsgs[Math.floor(Math.random()*stuckMsgs.length)];
+  }, 600);
+  setTimeout(function() {
+    clearInterval(interval);
+    document.getElementById('installOverlay').style.display = 'none';
+    runHackSequence();
+  }, 8000);
+})();
+
+// Fake "hacking" matrix-style text dump, purely decorative theatre
+function runHackSequence() {
+  var overlay = document.getElementById('hackOverlay');
+  overlay.style.display = 'block';
+  var lines = [
+    'INITIALIZING GHATIYA_UI.EXE...',
+    'Locating patience.dll... NOT FOUND',
+    'Deleting sabr (patience) from memory...',
+    'Injecting extra bugs into UI thread...',
+    'Bypassing user sanity checks...',
+    'Rerouting close-button logic to nowhere...',
+    'Compiling frustration.pkg [########--] 82%',
+    'WARNING: chill-pill.exe stopped responding',
+    'Access granted to maximum irritation mode.',
+    'Have a wonderful (ghatiya) day.'
+  ];
+  var i = 0;
+  var buf = '';
+  var typer = setInterval(function() {
+    if (i < lines.length) {
+      buf += lines[i] + '\n';
+      overlay.innerText = buf;
+      i++;
+    } else {
+      clearInterval(typer);
+      setTimeout(function() { overlay.style.display = 'none'; }, 1200);
+    }
+  }, 450);
+}
+
+// Occasionally invert scroll direction just to mess with you
+var scrollInverted = false;
+setInterval(function() {
+  scrollInverted = Math.random() < 0.5;
+}, 10000);
+window.addEventListener('wheel', function(e) {
+  if (scrollInverted) {
+    e.preventDefault();
+    window.scrollBy(0, -e.deltaY);
+  }
+}, { passive: false });
+
+// The "impossible login page" challenge
+var loginAttempts = 0;
+var captchaNums = [3, 7];
+
+function newCaptcha() {
+  captchaNums = [Math.floor(Math.random()*9)+1, Math.floor(Math.random()*9)+1];
+  document.getElementById('captchaQ').innerText = captchaNums[0] + ' + ' + captchaNums[1] + ' = ?';
+  document.getElementById('captchaAns').value = '';
+}
+
+// The 5-minute "matha-pachi" wait gate before login even appears
+var WAIT_SECONDS = 300; // 5 minutes
+var waitRemaining = WAIT_SECONDS;
+var waitTimerHandle = null;
+
+var taunts = [
+  'Bas dekhte raho. Kuch nahi kar sakte.',
+  'Refresh karne se timer reset ho jaayega. Try mat karo.',
+  'Coffee le aao, abhi bahut time hai.',
+  'Yeh progress bar nahi hai, sirf ginti hai.',
+  'Haan haan, hum jaante hain yeh bekaar hai.',
+  'Tab change kiya na? Ab thoda aur wait karo.',
+  'Almost... nahi, actually bahut baaki hai.'
+];
+
+function formatTime(s) {
+  var m = Math.floor(s / 60);
+  var sec = s % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function revealLogin() {
+  document.getElementById('waitGate').style.display = 'flex';
+  waitRemaining = WAIT_SECONDS;
+  document.getElementById('waitTimer').innerText = formatTime(waitRemaining);
+  document.getElementById('waitTaunt').innerText = taunts[0];
+
+  if (waitTimerHandle) clearInterval(waitTimerHandle);
+  waitTimerHandle = setInterval(function() {
+    waitRemaining--;
+    document.getElementById('waitTimer').innerText = formatTime(waitRemaining);
+    if (waitRemaining % 20 === 0) {
+      document.getElementById('waitTaunt').innerText = taunts[Math.floor(Math.random() * taunts.length)];
+    }
+    if (waitRemaining <= 0) {
+      clearInterval(waitTimerHandle);
+      document.getElementById('waitGate').style.display = 'none';
+      document.getElementById('loginOverlay').style.display = 'flex';
+      newCaptcha();
+      var passField = document.getElementById('loginPass');
+      passField.addEventListener('input', function() {
+        if (Math.random() < 0.3) {
+          setTimeout(function() { passField.value = ''; }, 300);
+        }
+      });
+    }
+  }, 1000);
+}
+
+// Extra cruelty: switching tabs / minimizing adds time back
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden && waitTimerHandle && waitRemaining > 0 && waitRemaining < WAIT_SECONDS) {
+    waitRemaining = Math.min(WAIT_SECONDS, waitRemaining + 15);
+    document.getElementById('waitTaunt').innerText = 'Kahin gaye the? +15 second milla tohfe mein.';
+  }
+});
+
+function tryLogin() {
+  loginAttempts++;
+  var err = document.getElementById('loginError');
+  var ansGiven = parseInt(document.getElementById('captchaAns').value, 10);
+  var correctAns = captchaNums[0] + captchaNums[1];
+
+  var excuses = [
+    'Galat username. (Koi bhi sahi nahi hai)',
+    'Password ki lambai kaafi nahi. (Kitni bhi ho, kaafi nahi hai)',
+    'Server abhi so raha hai. Baad mein try karo.',
+    'CAPTCHA expire ho gaya, dubara bharo.',
+    'Login button ne apna mann badal liya.',
+    'Aapka IP address humein pasand nahi aaya.',
+    'Login safal... nahi hua. Phir se try karo.'
+  ];
+
+  if (isNaN(ansGiven) || ansGiven !== correctAns) {
+    err.innerText = 'CAPTCHA galat! (' + captchaNums[0] + ' + ' + captchaNums[1] + ' itna mushkil hai kya?)';
+    newCaptcha();
+    return;
+  }
+
+  err.innerText = excuses[Math.floor(Math.random() * excuses.length)];
+  newCaptcha();
+
+  if (loginAttempts >= 3) {
+    err.innerText = 'Bahut zyada koshish ki. 30 second ke liye login band.';
+    var btn = document.querySelector('#loginBox .runner');
+    btn.disabled = true;
+    var secs = 5; // symbolic "30 seconds" that is mercifully shorter, still annoying
+    var cd = setInterval(function() {
+      btn.innerText = 'Ruko... (' + secs + ')';
+      secs--;
+      if (secs < 0) {
+        clearInterval(cd);
+        btn.innerText = 'Login Karo';
+        btn.disabled = false;
+        loginAttempts = 0;
+      }
+    }, 1000);
+  }
+}
+
+function moveAway(e) {
+  const btn = e.target;
+  const x = Math.random() * (window.innerWidth - 150);
+  const y = Math.random() * (window.innerHeight - 80);
+  btn.style.position = 'fixed';
+  btn.style.left = x + 'px';
+  btn.style.top = y + 'px';
+  btn.style.transition = 'left 0.1s, top 0.1s';
+}
+
+// Flashing browser tab title
+var titles = ['🔴 LIVE', '⚠️ ALERT', '(1) New Message', '🎉 AAP JEETE!', 'GHATIYA UI™'];
+var tIdx = 0;
+setInterval(function() {
+  document.title = titles[tIdx % titles.length];
+  tIdx++;
+}, 800);
+
+// Random screen shake
+setInterval(function() {
+  document.body.classList.add('shaking');
+  setTimeout(function() { document.body.classList.remove('shaking'); }, 400);
+}, 5000);
+
+// Short annoying beep using Web Audio API (no external files needed)
+function playBeep() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 880;
+    gain.gain.value = 0.04;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    setTimeout(function(){ osc.stop(); ctx.close(); }, 150);
+  } catch(e) {}
+}
+setInterval(playBeep, 7000);
+
+// Multiplying "you won a prize" popups
+function spawnPrizePopup() {
+  var p = document.createElement('div');
+  p.id = 'prizePopup';
+  p.style.top = (10 + Math.random()*50) + '%';
+  p.style.left = (20 + Math.random()*40) + '%';
+  p.innerHTML = '🎉 BADHAI HO! AAP JEET GAYE! 🎉<br><small>(Kuch nahi jeete, band karo yeh)</small><button>Claim Karo</button>';
+  p.querySelector('button').onclick = function() {
+    p.remove();
+    spawnPrizePopup();
+    spawnPrizePopup();
+  };
+  document.body.appendChild(p);
+}
+setTimeout(spawnPrizePopup, 4000);
+
+function startTorture() {
+  document.getElementById('consentModal').style.display = 'none';
+  setTimeout(() => {
+    document.getElementById('popupAd').style.display = 'block';
+  }, 3000);
+}
+
+function fakeSubmit() {
+  alert('Loading... 1%');
+  setTimeout(() => alert('Loading... 2%'), 500);
+  setTimeout(() => alert('Error: Kuch bhi submit nahi hua. Dubara koshish karo.'), 1200);
+}
+
+function captchaFail() {
+  alert('Galat! Phir se koshish karo. (Sahi jawab tha hi nahi)');
+}
+
+document.getElementById('nameInput').addEventListener('input', function(e) {
+  document.getElementById('inputEcho').innerText =
+    'Aapne likha: "' + e.target.value + '" — lekin hum ise save nahi karenge.';
+});
+
+function spawnClone() {
+  const ad = document.getElementById('popupAd').cloneNode(true);
+  ad.style.display = 'block';
+  ad.style.top = Math.random() * 50 + '%';
+  document.body.appendChild(ad);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SLIET Student Login</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            #263238,
+            #101418 45%,
+            #050608
+        );
+
+    color: white;
+
+    overflow-x: hidden;
+
+    transition: background 0.5s;
+}
+
+
+/* =========================
+   WARNING
+========================= */
+
+.warning {
+
+    width: 100%;
+
+    background: #ffb300;
+
+    color: #111;
+
+    padding: 10px;
+
+    text-align: center;
+
+    font-weight: bold;
+
+    font-size: 14px;
+
+    letter-spacing: 1px;
+
+    box-shadow:
+        0 0 20px rgba(255,179,0,0.4);
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+
+    width: 100%;
+
+    padding: 20px 30px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.1);
+
+    background:
+        rgba(0,0,0,0.25);
+
+    transition:
+        transform 1.5s cubic-bezier(.2,.8,.2,1),
+        opacity 1s;
+}
+
+
+.logo {
+
+    width: 50px;
+
+    height: 50px;
+
+    border-radius: 50%;
+
+    border:
+        2px solid #ffb300;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 24px;
+
+    color: #ffb300;
+
+    font-weight: bold;
+}
+
+
+.server {
+
+    font-size: 13px;
+
+    color: #7cff7c;
+}
+
+
+.server span {
+
+    display: inline-block;
+
+    width: 9px;
+
+    height: 9px;
+
+    background: #4caf50;
+
+    border-radius: 50%;
+
+    margin-right: 6px;
+
+    box-shadow:
+        0 0 10px #4caf50;
+
+    transition: background 0.3s;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+
+    min-height:
+        calc(100vh - 110px);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 40px 20px;
+
+    transition:
+        transform 1.7s cubic-bezier(.2,.8,.2,1),
+        opacity 1s;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+
+    width: 1100px;
+
+    max-width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 430px 1fr;
+
+    gap: 25px;
+
+    align-items: center;
+}
+
+
+/* =========================
+   SIDE
+========================= */
+
+.side {
+
+    background:
+        rgba(255,255,255,0.04);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-radius: 15px;
+
+    padding: 25px;
+
+    min-height: 300px;
+
+    backdrop-filter: blur(10px);
+
+    transition:
+        transform 1.7s cubic-bezier(.2,.8,.2,1),
+        opacity 1s;
+}
+
+
+.side h3 {
+
+    color: #ffb300;
+
+    margin-bottom: 15px;
+}
+
+
+.side p {
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    color: #aaa;
+}
+
+
+.fake-list {
+
+    margin-top: 20px;
+}
+
+
+.fake-list div {
+
+    padding: 10px;
+
+    margin: 7px 0;
+
+    background:
+        rgba(255,255,255,0.04);
+
+    border-radius: 8px;
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   LOGIN CARD
+========================= */
+
+.login-card {
+
+    position: relative;
+
+    background:
+        rgba(15,18,22,0.95);
+
+    border:
+        1px solid rgba(255,179,0,0.3);
+
+    border-radius: 20px;
+
+    padding: 35px;
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,0.6),
+        0 0 40px rgba(255,179,0,0.05);
+
+    transition:
+        transform 1.7s cubic-bezier(.2,.8,.2,1),
+        opacity 1s;
+}
+
+
+.login-card h1 {
+
+    text-align: center;
+
+    font-size: 28px;
+
+    margin-bottom: 8px;
+}
+
+
+.subtitle {
+
+    text-align: center;
+
+    color: #888;
+
+    font-size: 13px;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================
+   FIELDS
+========================= */
+
+.field {
+
+    margin-bottom: 18px;
+}
+
+
+.field label {
+
+    display: block;
+
+    font-size: 12px;
+
+    color: #aaa;
+
+    margin-bottom: 7px;
+}
+
+
+.field input {
+
+    width: 100%;
+
+    padding: 13px;
+
+    background: #090b0e;
+
+    border:
+        1px solid #30353b;
+
+    border-radius: 8px;
+
+    color: white;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+
+.field input:focus {
+
+    border-color: #ffb300;
+
+    box-shadow:
+        0 0 12px rgba(255,179,0,0.15);
+}
+
+
+/* =========================
+   CAPTCHA
+========================= */
+
+.captcha-row {
+
+    display: flex;
+
+    gap: 8px;
+
+    align-items: center;
+}
+
+
+#captchaText {
+
+    flex: 1;
+
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        repeating-linear-gradient(
+            45deg,
+            #222,
+            #222 5px,
+            #333 5px,
+            #333 10px
+        );
+
+    border:
+        1px solid #555;
+
+    border-radius: 8px;
+
+    color: #ffb300;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    letter-spacing: 7px;
+
+    user-select: none;
+
+    text-decoration:
+        line-through;
+}
+
+
+.refresh {
+
+    width: 48px;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #24282d;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 20px;
+}
+
+
+.refresh:hover {
+
+    background: #333;
+}
+
+
+/* =========================
+   LOGIN AREA
+========================= */
+
+.login-area {
+
+    position: relative;
+
+    height: 100px;
+
+    margin-top: 20px;
+}
+
+
+/* =========================
+   LOGIN BUTTON
+========================= */
+
+#loginButton {
+
+    position: absolute;
+
+    left: 0;
+
+    top: 20px;
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #ffb300;
+
+    color: #111;
+
+    font-weight: bold;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition:
+        left 0.15s ease,
+        top 0.15s ease,
+        transform 0.15s ease;
+
+    box-shadow:
+        0 8px 20px rgba(255,179,0,0.25);
+
+    z-index: 9999;
+}
+
+
+#loginButton:hover {
+
+    transform: scale(1.02);
+}
+
+
+/* =========================
+   SMALL TEXT
+========================= */
+
+.small-text {
+
+    margin-top: 15px;
+
+    text-align: center;
+
+    color: #666;
+
+    font-size: 11px;
+}
+
+
+/* =========================
+   POPUP
+========================= */
+
+.popup-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,0.75);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 10000;
+}
+
+
+.popup {
+
+    width: 400px;
+
+    max-width: 90%;
+
+    background: #15191d;
+
+    border:
+        1px solid #ffb300;
+
+    border-radius: 15px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,0.8);
+
+    animation:
+        popup 0.25s ease;
+}
+
+
+@keyframes popup {
+
+    from {
+
+        transform: scale(0.7);
+
+        opacity: 0;
+    }
+
+    to {
+
+        transform: scale(1);
+
+        opacity: 1;
+    }
+}
+
+
+.popup h2 {
+
+    color: #ffb300;
+
+    margin-bottom: 12px;
+}
+
+
+.popup p {
+
+    color: #bbb;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    margin-bottom: 20px;
+}
+
+
+.popup button {
+
+    padding: 10px 25px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #ffb300;
+
+    color: #111;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   CONNECTION LOST SCREEN
+========================= */
+
+.connection-lost {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 20000;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    background:
+        #050608;
+
+    opacity: 0;
+
+    transition:
+        opacity 1s ease;
+}
+
+
+.connection-box {
+
+    width: 420px;
+
+    max-width: 90%;
+
+    padding: 35px;
+
+    border-radius: 18px;
+
+    border:
+        1px solid #ffb300;
+
+    background:
+        rgba(20,22,25,0.95);
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,0.8);
+}
+
+
+.connection-icon {
+
+    font-size: 55px;
+
+    margin-bottom: 15px;
+}
+
+
+.connection-box h1 {
+
+    color: #ffb300;
+
+    margin-bottom: 12px;
+}
+
+
+.connection-box p {
+
+    color: #999;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    margin-bottom: 25px;
+}
+
+
+.retry-button {
+
+    padding: 13px 30px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #ffb300;
+
+    color: #111;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+
+.retry-button:hover {
+
+    transform: scale(1.03);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width: 900px) {
+
+    .container {
+
+        grid-template-columns: 1fr;
+
+        max-width: 500px;
+    }
+
+
+    .side {
+
+        display: none;
+    }
+
+}
+
+
+@media(max-width: 500px) {
+
+    .login-card {
+
+        padding: 25px 20px;
+    }
+
+
+    header {
+
+        padding: 15px;
+    }
+
+
+    .login-card h1 {
+
+        font-size: 24px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     WARNING
+========================= -->
+
+<div class="warning">
+
+⚠ SYSTEM NOTICE:
+Login server is experiencing unusual levels of user frustration.
+
+</div>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header id="pageHeader">
+
+    <div class="logo">
+        ☸
+    </div>
+
+    <div class="server">
+
+        <span id="serverDot"></span>
+
+        SERVER ONLINE
+
+    </div>
+
+</header>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main" id="mainContent">
+
+
+<div class="container" id="mainContainer">
+
+
+    <!-- LEFT -->
+
+    <div class="side">
+
+        <h3>
+            📢 Important Notice
+        </h3>
+
+
+        <p>
+
+            Please enter your registration number
+            and password carefully.
+
+        </p>
+
+
+        <div class="fake-list">
+
+            <div>
+                ✓ Registration required
+            </div>
+
+            <div>
+                ✓ Password required
+            </div>
+
+            <div>
+                ✓ CAPTCHA required
+            </div>
+
+            <div>
+                ✓ Patience required
+            </div>
+
+            <div>
+                ✕ Happiness not guaranteed
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- LOGIN CARD -->
+
+    <div class="login-card" id="loginCard">
+
+
+        <h1>
+            Student Login
+        </h1>
+
+
+        <div class="subtitle">
+
+            Secure Student Portal
+
+        </div>
+
+
+        <!-- REGISTRATION -->
+
+        <div class="field">
+
+            <label>
+                Registration No.
+            </label>
+
+
+            <input
+                type="text"
+                id="registration"
+                placeholder="Enter Registration No."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="field">
+
+            <label>
+                Password
+            </label>
+
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter Password"
+            >
+
+        </div>
+
+
+        <!-- CAPTCHA -->
+
+        <div class="field">
+
+            <label>
+                Security Verification
+            </label>
+
+
+            <div class="captcha-row">
+
+
+                <div id="captchaText">
+                    ABC12
+                </div>
+
+
+                <button
+                    class="refresh"
+                    onclick="generateCaptcha()"
+                >
+
+                    ↻
+
+                </button>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <input
+                type="text"
+                id="captchaInput"
+                placeholder="Enter CAPTCHA"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- LOGIN BUTTON -->
+
+        <div class="login-area">
+
+            <button id="loginButton">
+
+                Sign In
+
+            </button>
+
+        </div>
+
+
+        <div class="small-text">
+
+            🔒 Your information is totally probably secure.
+
+        </div>
+
+
+    </div>
+
+
+    <!-- RIGHT -->
+
+    <div class="side">
+
+        <h3>
+            🖥 Server Information
+        </h3>
+
+
+        <p>
+
+            Current system status:
+
+        </p>
+
+
+        <div class="fake-list">
+
+            <div>
+                Server: ONLINE 🟢
+            </div>
+
+            <div>
+                Security: VERY SERIOUS
+            </div>
+
+            <div>
+                CAPTCHA: ANNOYING
+            </div>
+
+            <div>
+                Login Button: UNSTABLE
+            </div>
+
+            <div>
+                User Patience: UNKNOWN
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+</main>
+
+
+<!-- =========================
+     POPUP
+========================= -->
+
+<div
+    class="popup-overlay"
+    id="popupOverlay"
+>
+
+    <div class="popup">
+
+
+        <h2 id="popupTitle">
+            Error
+        </h2>
+
+
+        <p id="popupMessage">
+            Something went wrong.
+        </p>
+
+
+        <button onclick="closePopup()">
+
+            OK, I understand 😐
+
+        </button>
+
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CONNECTION LOST
+========================= -->
+
+<div
+    class="connection-lost"
+    id="connectionLost"
+>
+
+    <div class="connection-box">
+
+        <div class="connection-icon">
+            📡❌
+        </div>
+
+
+        <h1>
+            Connection Lost
+        </h1>
+
+
+        <p>
+
+            Your login was almost successful...
+
+            <br><br>
+
+            Unfortunately, the connection to the
+            server was lost.
+
+            <br><br>
+
+            Please login again.
+
+        </p>
+
+
+        <button
+            class="retry-button"
+            onclick="restartLogin()"
+        >
+
+            🔄 LOGIN AGAIN
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+/* ==========================================
+   VARIABLES
+========================================== */
+
+let captchaValue = "";
+
+let captchaRound = 0;
+
+const maxCaptchaRounds = 4;
+
+let buttonEscapes = 0;
+
+let loginFinished = false;
+
+
+/* ==========================================
+   CAPTCHA
+========================================== */
+
+function generateCaptcha() {
+
+    const characters =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+
+    captchaValue = "";
+
+
+    for (let i = 0; i < 5; i++) {
+
+        captchaValue +=
+            characters[
+                Math.floor(
+                    Math.random() *
+                    characters.length
+                )
+            ];
+
+    }
+
+
+    document.getElementById(
+        "captchaText"
+    ).innerText = captchaValue;
+
+
+    document.getElementById(
+        "captchaInput"
+    ).value = "";
+
+}
+
+
+generateCaptcha();
+
+
+
+/* ==========================================
+   POPUP
+========================================== */
+
+function showPopup(title, message) {
+
+    document.getElementById(
+        "popupTitle"
+    ).innerText = title;
+
+
+    document.getElementById(
+        "popupMessage"
+    ).innerText = message;
+
+
+    document.getElementById(
+        "popupOverlay"
+    ).style.display = "flex";
+
+}
+
+
+function closePopup() {
+
+    document.getElementById(
+        "popupOverlay"
+    ).style.display = "none";
+
+}
+
+
+
+/* ==========================================
+   MOVE BUTTON ANYWHERE
+========================================== */
+
+function moveLoginButton() {
+
+
+    if (loginFinished) {
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "loginButton"
+        );
+
+
+    buttonEscapes++;
+
+
+    button.style.position =
+        "fixed";
+
+
+    const buttonWidth =
+        button.offsetWidth;
+
+
+    const buttonHeight =
+        button.offsetHeight;
+
+
+    const maxX =
+        window.innerWidth -
+        buttonWidth -
+        10;
+
+
+    const maxY =
+        window.innerHeight -
+        buttonHeight -
+        10;
+
+
+    const randomX =
+        Math.floor(
+            Math.random() *
+            Math.max(10, maxX)
+        );
+
+
+    const randomY =
+        Math.floor(
+            Math.random() *
+            Math.max(10, maxY)
+        );
+
+
+    button.style.left =
+        randomX + "px";
+
+
+    button.style.top =
+        randomY + "px";
+
+
+    const messages = [
+
+        "Nice try 😏",
+
+        "Too slow!",
+
+        "Catch me! 😂",
+
+        "Almost!",
+
+        "Nope! 😭",
+
+        "You thought! 💀",
+
+        "STOP CHASING ME!",
+
+        "Not today 😈",
+
+        "Try again 😂",
+
+        "I'm over here 👉",
+
+        "Wrong place 😭",
+
+        "HAHA NOPE 💀"
+
+    ];
+
+
+    button.innerText =
+        messages[
+            Math.floor(
+                Math.random() *
+                messages.length
+            )
+        ];
+
+}
+
+
+
+/* ==========================================
+   HOVER
+========================================== */
+
+document
+    .getElementById("loginButton")
+    .addEventListener(
+        "mouseenter",
+        function() {
+
+            if (!loginFinished) {
+
+                moveLoginButton();
+
+            }
+
+        }
+    );
+
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+document
+    .getElementById("loginButton")
+    .addEventListener(
+        "touchstart",
+        function(event) {
+
+            if (!loginFinished) {
+
+                event.preventDefault();
+
+                moveLoginButton();
+
+            }
+
+        }
+    );
+
+
+
+/* ==========================================
+   LOGIN
+========================================== */
+
+document
+    .getElementById("loginButton")
+    .addEventListener(
+        "click",
+        function() {
+
+
+            if (loginFinished) {
+
+                return;
+
+            }
+
+
+            const registration =
+                document
+                    .getElementById(
+                        "registration"
+                    )
+                    .value
+                    .trim();
+
+
+            const password =
+                document
+                    .getElementById(
+                        "password"
+                    )
+                    .value
+                    .trim();
+
+
+            const enteredCaptcha =
+                document
+                    .getElementById(
+                        "captchaInput"
+                    )
+                    .value
+                    .trim()
+                    .toUpperCase();
+
+
+
+            /* =========================
+               REGISTRATION
+            ========================= */
+
+            if (registration === "") {
+
+                showPopup(
+                    "Registration No. Missing 😐",
+                    "You can enter anything here. Just don't leave it empty."
+                );
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               PASSWORD
+            ========================= */
+
+            if (password === "") {
+
+                showPopup(
+                    "Password Missing 🔐",
+                    "Any password is accepted. Just type something."
+                );
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               CAPTCHA
+            ========================= */
+
+            if (
+                enteredCaptcha !==
+                captchaValue
+            ) {
+
+                showPopup(
+                    "Wrong CAPTCHA 🤖",
+                    "That CAPTCHA was not correct. Here's another one."
+                );
+
+                generateCaptcha();
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               CAPTCHA ROUND
+            ========================= */
+
+            if (
+                captchaRound <
+                maxCaptchaRounds
+            ) {
+
+
+                captchaRound++;
+
+
+                const messages = [
+
+                    [
+                        "CAPTCHA EXPIRED! 😭",
+
+                        "You entered it correctly. Unfortunately, the CAPTCHA has expired. Please enter the new one."
+                    ],
+
+                    [
+                        "SECURITY CHECK FAILED! 💀",
+
+                        "Nothing is wrong with your details. We just need you to verify again."
+                    ],
+
+                    [
+                        "CAPTCHA TIMEOUT! ⏰",
+
+                        "Congratulations! You solved it. Unfortunately, you have to solve another one."
+                    ],
+
+                    [
+                        "ONE MORE VERIFICATION! 🤡",
+
+                        "The system has decided that you are still suspicious. Enter the new CAPTCHA."
+                    ]
+
+                ];
+
+
+                showPopup(
+
+                    messages[
+                        captchaRound - 1
+                    ][0],
+
+                    messages[
+                        captchaRound - 1
+                    ][1]
+
+                );
+
+
+                generateCaptcha();
+
+
+                setTimeout(
+                    function() {
+
+                        moveLoginButton();
+
+                    },
+                    300
+                );
+
+
+                return;
+
+            }
+
+
+
+            /* ==================================
+               ALMOST CONNECTED
+            ================================== */
+
+            startConnectionFailure();
+
+        }
+    );
+
+
+
+/* ==========================================
+   CONNECTION FAILURE ANIMATION
+========================================== */
+
+function startConnectionFailure() {
+
+
+    loginFinished = true;
+
+
+    const button =
+        document.getElementById(
+            "loginButton"
+        );
+
+
+    button.style.position =
+        "fixed";
+
+
+    button.style.left =
+        "50%";
+
+
+    button.style.top =
+        "50%";
+
+
+    button.style.transform =
+        "translate(-50%, -50%)";
+
+
+    button.innerText =
+        "Connecting...";
+
+
+    button.style.background =
+        "#4caf50";
+
+
+    button.style.color =
+        "white";
+
+
+    /*
+       Step 1:
+       Pretend to connect
+    */
+
+    setTimeout(
+        function() {
+
+            button.innerText =
+                "Almost connected...";
+
+        },
+        900
+    );
+
+
+    /*
+       Step 2:
+       Server starts failing
+    */
+
+    setTimeout(
+        function() {
+
+            document.getElementById(
+                "serverDot"
+            ).style.background =
+                "#ff3333";
+
+
+            document.querySelector(
+                ".server"
+            ).innerHTML =
+                '<span style="background:#ff3333;box-shadow:0 0 10px #ff3333;"></span> SERVER ERROR';
+
+        },
+        1600
+    );
+
+
+    /*
+       Step 3:
+       Shake the entire page
+    */
+
+    setTimeout(
+        function() {
+
+            document.body.style.animation =
+                "shake 0.12s infinite";
+
+        },
+        2000
+    );
+
+
+    /*
+       Step 4:
+       EVERYTHING FALLS
+    */
+
+    setTimeout(
+        function() {
+
+            document.body.style.animation =
+                "none";
+
+
+            /*
+                Header falls
+            */
+
+            document.getElementById(
+                "pageHeader"
+            ).style.transform =
+                "translateY(120vh) rotate(8deg)";
+
+
+            document.getElementById(
+                "pageHeader"
+            ).style.opacity =
+                "0";
+
+
+            /*
+                Main falls
+            */
+
+            document.getElementById(
+                "mainContent"
+            ).style.transform =
+                "translateY(130vh) rotate(-3deg)";
+
+
+            document.getElementById(
+                "mainContent"
+            ).style.opacity =
+                "0";
+
+
+            /*
+                Warning falls too
+            */
+
+            document.querySelector(
+                ".warning"
+            ).style.transform =
+                "translateY(120vh)";
+
+
+            document.querySelector(
+                ".warning"
+            ).style.transition =
+                "transform 1.4s cubic-bezier(.2,.8,.2,1)";
+
+
+        },
+        2300
+    );
+
+
+    /*
+       Step 5:
+       Show connection lost
+    */
+
+    setTimeout(
+        function() {
+
+            const lost =
+                document.getElementById(
+                    "connectionLost"
+                );
+
+
+            lost.style.display =
+                "flex";
+
+
+            setTimeout(
+                function() {
+
+                    lost.style.opacity =
+                        "1";
+
+                },
+                100
+            );
+
+
+        },
+        3600
+    );
+
+}
+
+
+
+/* ==========================================
+   SHAKE ANIMATION
+========================================== */
+
+const shakeStyle =
+document.createElement("style");
+
+
+shakeStyle.innerHTML = `
+
+@keyframes shake {
+
+    0% {
+        transform: translate(0,0);
+    }
+
+    20% {
+        transform: translate(-5px,3px);
+    }
+
+    40% {
+        transform: translate(5px,-3px);
+    }
+
+    60% {
+        transform: translate(-4px,-2px);
+    }
+
+    80% {
+        transform: translate(4px,2px);
+    }
+
+    100% {
+        transform: translate(0,0);
+    }
+
+}
+
+`;
+
+
+document.head.appendChild(
+    shakeStyle
+);
+
+
+
+/* ==========================================
+   LOGIN AGAIN
+========================================== */
+
+function restartLogin() {
+
+
+    location.reload();
+
+}
+
+</script>
+
+</body>
+
+</html>

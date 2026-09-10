@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Museum of Unwanted Attention</title>
+  <style>
+    :root {
+      --ink: #12152d;
+      --cream: #fffaf0;
+      --coral: #ff5f72;
+      --acid: #dfff57;
+      --sky: #65c9ff;
+      --purple: #7957ff;
+      --line: 3px solid var(--ink);
+      --shadow: 7px 7px 0 var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+
+    /* 2018 ERA: laggy fake cursor — the "Consent Factory" gets to watch you hesitate */
+    body[data-era="2018"], body[data-era="2018"] * { cursor: none !important; }
+    #evil-cursor {
+      position: fixed;
+      z-index: 99999;
+      width: 22px;
+      height: 22px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23222" stroke="white" stroke-width="1.5" d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2.9-3.2-7.4-4.4 4.7z"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      display: none;
+      transition: left .16s cubic-bezier(.2,.8,.3,1), top .16s cubic-bezier(.2,.8,.3,1);
+    }
+    body[data-era="2018"] #evil-cursor { display: block; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 17%, rgba(223, 255, 87, .82) 0 4px, transparent 5px) 0 0 / 35px 35px,
+        linear-gradient(130deg, #fed0d7, #a5d9ff 49%, #f7efbd);
+      font-family: Arial, Helvetica, sans-serif;
+      transition: background .65s ease, color .45s ease;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+      opacity: .34;
+      pointer-events: none;
+      background-image: linear-gradient(90deg, rgba(18, 21, 45, .08) 1px, transparent 1px), linear-gradient(rgba(18, 21, 45, .08) 1px, transparent 1px);
+      background-size: 26px 26px;
+    }
+    body[data-era="1999"] { background-color: #a3b5ff; background-image: radial-gradient(circle, #ffff00 0 2px, transparent 3px), linear-gradient(135deg, #0b25ad, #ec68a6); }
+    body[data-era="2008"] { background-color: #c6e1ff; background-image: linear-gradient(180deg, #e8f6ff, #a6c9ec 42%, #d5e5f0); }
+    body[data-era="2018"] { background-color: #eeeeee; background-image: linear-gradient(90deg, rgba(0,0,0,.027) 1px, transparent 1px), linear-gradient(rgba(0,0,0,.027) 1px, transparent 1px); }
+    body[data-era="2036"] { color: #e9f1ff; background-color: #10142e; background-image: radial-gradient(circle at 18% 14%, rgba(125, 87, 255, .68), transparent 24%), radial-gradient(circle at 87% 72%, rgba(47, 255, 190, .45), transparent 27%), linear-gradient(130deg, #10142e, #1d1645 55%, #062f42); }
+
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible { outline: 4px solid var(--acid); outline-offset: 4px; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 12px clamp(14px, 4vw, 48px);
+      border-bottom: var(--line);
+      background: var(--cream);
+      box-shadow: 0 4px 0 rgba(18, 21, 45, .12);
+      color: var(--ink);
+    }
+    body[data-era="1999"] .topbar { background: #ffff00; font-family: "Courier New", monospace; }
+    body[data-era="2008"] .topbar { background: linear-gradient(#fff, #c5e1fb); border-color: #3a679c; }
+    body[data-era="2018"] .topbar { border-color: #313131; background: #fff; }
+    body[data-era="2036"] .topbar { color: #e9f1ff; border-color: #9a89ff; background: rgba(8, 11, 32, .88); backdrop-filter: blur(13px); }
+    .brand { display: flex; align-items: center; min-width: 0; gap: 10px; font-weight: 950; letter-spacing: -1px; }
+    .brand-mark { display: grid; width: 31px; height: 31px; place-items: center; flex: 0 0 auto; border: var(--line); background: var(--coral); box-shadow: 3px 3px 0 var(--ink); transform: rotate(-6deg); }
+    .brand small { display: block; font-size: 10px; letter-spacing: .6px; text-transform: uppercase; }
+    .forecast { flex: 0 0 auto; padding: 7px 9px; border: var(--line); background: var(--acid); color: var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 11px; font-weight: 900; text-align: center; }
+    .forecast b { display: block; font-size: 13px; }
+
+    main { max-width: 1190px; margin: 0 auto; padding: clamp(34px, 6vw, 70px) 20px 115px; }
+    .museum-kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-bottom: 17px; font-size: 12px; font-weight: 900; letter-spacing: .75px; text-transform: uppercase; }
+    .museum-kicker span { padding: 4px 7px; border: 2px solid currentColor; background: var(--acid); color: var(--ink); }
+    .museum-kicker em { font-style: normal; }
+    .stage-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: 27px; align-items: start; }
+
+    .reading-room, .engine { border: var(--line); background: rgba(255, 250, 240, .94); box-shadow: var(--shadow); color: var(--ink); }
+    .reading-room { padding: clamp(23px, 4vw, 48px); min-height: 480px; }
+    body[data-era="1999"] .reading-room { border-width: 5px; box-shadow: 11px 11px 0 #ffed00; background: #f4f1c7; font-family: "Courier New", monospace; }
+    body[data-era="2008"] .reading-room { border-color: #38669b; border-radius: 8px; box-shadow: 7px 7px 0 #7d99ae; background: linear-gradient(#fff, #eaf6ff); }
+    body[data-era="2018"] .reading-room { border-color: #303030; box-shadow: 7px 7px 0 #979797; background: #fff; }
+    body[data-era="2036"] .reading-room { color: #e9f1ff; border-color: #8778ff; box-shadow: 9px 9px 0 #3d3283; background: rgba(12, 18, 52, .86); }
+
+    .note-label { margin: 0 0 15px; color: var(--coral); font-size: 12px; font-weight: 950; letter-spacing: 1.2px; text-transform: uppercase; }
+    h1 { max-width: 710px; margin: 0; font-size: clamp(42px, 6.3vw, 79px); line-height: .87; letter-spacing: -4px; }
+    h1 .highlight { color: var(--purple); text-decoration: underline wavy 4px var(--coral); }
+    body[data-era="2036"] h1 .highlight { color: var(--acid); }
+    .intro { max-width: 600px; margin: 24px 0; font-size: clamp(17px, 2.1vw, 20px); font-weight: 650; line-height: 1.46; }
+    .note-preview { position: relative; display: grid; gap: 11px; max-width: 590px; padding: 21px; border: var(--line); background: #fffdf5; }
+    .note-preview::after { content: "COURSEWARE"; position: absolute; right: -15px; top: -15px; padding: 7px; border: var(--line); background: var(--sky); font-size: 10px; font-weight: 900; transform: rotate(8deg); }
+    .note-preview i { display: block; width: 100%; height: 9px; background: #bfc6d1; }
+    .note-preview i:nth-child(2) { width: 82%; }
+    .note-preview i:nth-child(4) { width: 67%; }
+    .note-preview i:nth-child(5) { width: 89%; }
+    .download { margin-top: 25px; padding: 14px 17px; border: var(--line); background: var(--acid); box-shadow: 5px 5px 0 var(--ink); color: var(--ink); font-weight: 950; transition: transform .12s, box-shadow .12s, filter .12s; }
+    .download:not([disabled]):hover { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+    .download[disabled] { cursor: not-allowed; filter: grayscale(.9); opacity: .68; }
+    .lock-copy { display: block; max-width: 510px; margin-top: 13px; font-size: 12px; font-weight: 800; }
+
+    .engine { overflow: hidden; }
+    .engine-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; border-bottom: var(--line); background: var(--ink); color: #fff; font-family: "Courier New", monospace; font-size: 12px; font-weight: 900; letter-spacing: .4px; }
+    .live-dot { width: 9px; height: 9px; border-radius: 999px; background: var(--acid); box-shadow: 0 0 0 4px rgba(223,255,87,.18); animation: blink 1.2s steps(2, start) infinite; }
+    .exhibit { padding: 17px; border-bottom: var(--line); background: var(--sky); }
+    .exhibit-label { margin: 0 0 6px; font-size: 11px; font-weight: 950; letter-spacing: 1px; text-transform: uppercase; }
+    .exhibit h2 { margin: 0 0 8px; font-size: 27px; line-height: .96; letter-spacing: -1.4px; }
+    .exhibit p { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.36; }
+    .profile { padding: 16px; }
+    .profile h3, .log-title { margin: 0 0 10px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+    .traits { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+    .traits li { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 8px; border: 2px solid var(--ink); background: #f8f6f0; font-size: 11px; font-weight: 800; }
+    .traits b { max-width: 135px; color: #c21e58; text-align: right; }
+    .activity { padding: 0 16px 16px; }
+    .log { max-height: 150px; overflow: hidden; border: 2px solid var(--ink); background: #10152d; color: #dfff57; font-family: "Courier New", monospace; font-size: 10px; line-height: 1.35; }
+    .log p { margin: 0; padding: 7px 8px; border-bottom: 1px dashed rgba(223,255,87,.35); }
+    .fake-privacy { padding: 0 16px 16px; color: #4e4e58; font-size: 9px; font-weight: 700; line-height: 1.35; }
+    body[data-era="2036"] .engine { color: #e9f1ff; border-color: #8778ff; background: rgba(12, 18, 52, .95); box-shadow: 7px 7px 0 #3d3283; }
+    body[data-era="2036"] .exhibit { color: var(--ink); background: #b7aaff; }
+    body[data-era="2036"] .traits li { color: var(--ink); background: #e9f1ff; }
+
+    .eras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 31px; }
+    .era { padding: 10px; border: var(--line); background: rgba(255,255,255,.78); font-size: 11px; font-weight: 900; text-align: center; opacity: .48; transition: opacity .2s, transform .2s, background .2s; }
+    .era.active { opacity: 1; background: var(--acid); transform: translateY(-5px); box-shadow: 3px 3px 0 var(--ink); }
+    body[data-era="2036"] .era { color: var(--ink); }
+
+    #ad-layer { position: fixed; z-index: 20; inset: 0; pointer-events: none; }
+    .popup { position: absolute; width: min(365px, calc(100vw - 24px)); border: 4px solid var(--ink); background: #fffef8; color: var(--ink); box-shadow: 9px 9px 0 var(--ink); pointer-events: auto; animation: arrive .28s cubic-bezier(.1, 1.36, .5, 1) both; transition: left .2s ease-out, top .2s ease-out, transform .2s ease-out; }
+    .popup.satellite { width: min(260px, calc(100vw - 24px)); box-shadow: 5px 5px 0 var(--ink); }
+    .popup.wide { width: min(450px, calc(100vw - 24px)); }
+    .windowbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 38px; padding: 6px 7px 6px 10px; border-bottom: 3px solid var(--ink); background: var(--purple); color: #fff; font-size: 12px; font-weight: 950; }
+    .windowbar .window-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .close, .close-pair button { display: grid; width: 25px; height: 25px; place-items: center; padding: 0; border: 2px solid var(--ink); background: #fff; color: var(--ink); font-size: 18px; font-weight: 900; line-height: 1; }
+    .popup-body { padding: 16px; }
+    .popup-body h3 { margin: 0 0 8px; font-size: 23px; line-height: .95; letter-spacing: -1px; }
+    .popup-body p { margin: 0 0 12px; font-size: 13px; font-weight: 700; line-height: 1.34; }
+    .ad-art { display: grid; height: 86px; place-items: center; margin-bottom: 13px; overflow: hidden; border: 3px solid var(--ink); background: repeating-linear-gradient(-45deg, var(--acid) 0 10px, #fff 10px 20px); font-size: 41px; }
+    .ad-art .blink { animation: blink .7s steps(2, start) infinite; font-size: 14px; font-weight: 950; letter-spacing: 1px; }
+    .popup-action { width: 100%; padding: 10px; border: 3px solid var(--ink); background: var(--acid); color: var(--ink); font-size: 12px; font-weight: 950; text-align: center; }
+    .popup-action:hover { background: var(--coral); }
+    .legal { display: block; margin-top: 9px; color: #63636a; font-size: 9px; font-weight: 700; line-height: 1.3; }
+    .progress-line { height: 12px; overflow: hidden; border: 2px solid var(--ink); background: #fff; }
+    .progress-line span { display: block; height: 100%; width: 56%; background: var(--coral); transition: width .35s ease; }
+    .close-pair { display: flex; align-items: center; gap: 5px; }
+
+    .popup.era-1999 { border-width: 5px; font-family: "Courier New", monospace; background: #f9f8d0; }
+    .popup.era-1999 .windowbar { background: #001f9e; }
+    .popup.era-1999 .ad-art { background: #ff00b7; color: #ffff00; text-shadow: 2px 2px #001f9e; }
+    .popup.era-1999 .popup-action { border-radius: 0; background: #00eaff; }
+    .popup.era-2008 { border-color: #416d9d; border-radius: 7px; box-shadow: 8px 8px 0 rgba(37,73,111,.57); background: linear-gradient(#fff, #e6f3ff); }
+    .popup.era-2008 .windowbar { border-color: #416d9d; background: linear-gradient(#8cc9ff, #316da8); }
+    .popup.era-2008 .ad-art { border-color: #416d9d; background: linear-gradient(135deg, #d8efff, #83bff5); }
+    .popup.era-2018 { border-color: #222; box-shadow: 8px 8px 0 #8f8f8f; background: #fafafa; }
+    .popup.era-2018 .windowbar { background: #262626; }
+    .popup.era-2018 .popup-action { background: #272727; color: white; }
+    .popup.era-2036 { color: #edf4ff; border-color: #9f92ff; box-shadow: 0 0 0 3px rgba(154,137,255,.21), 9px 9px 0 #3b3188; background: linear-gradient(150deg, #111a45, #211b58); }
+    .popup.era-2036 .windowbar { border-color: #9f92ff; background: linear-gradient(90deg, #4839ae, #ed4c9d); }
+    .popup.era-2036 .ad-art { border-color: #9f92ff; background: radial-gradient(circle, rgba(223,255,87,.8) 0 3px, transparent 4px) 0 0 / 19px 19px, #0a1537; }
+    .popup.era-2036 .popup-action { background: var(--acid); }
+    .popup.shake { animation: shake .27s linear 2; }
+    .popup.watching .windowbar::before { content: "◉ watching"; color: var(--acid); font-size: 9px; letter-spacing: .5px; }
+    .moving-x { transition: transform .17s ease; }
+
+    .consent-list { display: grid; gap: 6px; margin: 10px 0 13px; }
+    .consent-row { display: flex; justify-content: space-between; gap: 8px; padding: 7px; border: 2px solid var(--ink); background: #fff; font-size: 10px; font-weight: 800; }
+    .consent-row b { color: #db1e5a; }
+    .toggle { width: 34px; height: 17px; border: 2px solid var(--ink); background: var(--acid); }
+    .auction { display: grid; gap: 7px; margin: 8px 0 13px; }
+    .bid { display: grid; grid-template-columns: auto 1fr auto; gap: 7px; align-items: center; padding: 6px; border: 2px solid #9f92ff; background: rgba(255,255,255,.07); font-size: 10px; font-weight: 800; }
+    .bid i { display: block; height: 7px; background: linear-gradient(90deg, var(--acid) 0 68%, rgba(255,255,255,.15) 68%); }
+    .bid b { color: var(--acid); }
+    .hold-button { position: relative; overflow: hidden; }
+    .hold-fill { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 0; background: var(--coral); }
+    .hold-button span { position: relative; z-index: 1; }
+    .popup.bouncing-boss { transition: none; }
+
+    /* HELPBOT: a self-aware fake AI assistant, because "Use of AI Tools: Allowed" */
+    #helpbot {
+      position: fixed;
+      z-index: 60;
+      left: 16px;
+      bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px 9px 9px;
+      border: var(--line);
+      background: var(--purple);
+      color: #fff;
+      box-shadow: var(--shadow);
+      font-weight: 900;
+      font-size: 13px;
+      cursor: pointer;
+      animation: helpbotIn .3s cubic-bezier(.12,1.3,.5,1) both;
+    }
+    #helpbot.visible { display: flex; }
+    #helpbot .bot-face { display: grid; place-items: center; width: 30px; height: 30px; border: 2px solid #fff; border-radius: 999px; background: #211b58; font-size: 16px; flex: 0 0 auto; }
+    #helpbot .bot-dot { position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 999px; background: var(--acid); animation: blink 1s steps(2,start) infinite; }
+    #helpbot:hover { transform: translate(2px, 2px); box-shadow: 4px 4px 0 var(--ink); }
+    @keyframes helpbotIn { from { opacity: 0; transform: translateY(14px) scale(.85); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    #toast-lane { position: fixed; z-index: 50; top: 76px; left: 50%; width: min(490px, calc(100vw - 30px)); transform: translateX(-50%); pointer-events: none; }
+    .toast { margin: 7px 0; padding: 10px 12px; border: var(--line); background: var(--acid); box-shadow: 4px 4px 0 var(--ink); color: var(--ink); font-size: 12px; font-weight: 900; animation: toastIn .2s ease-out both; }
+    .toast.alert { background: var(--coral); }
+
+    .completion { position: fixed; z-index: 70; top: 50%; left: 50%; width: min(540px, calc(100vw - 28px)); transform: translate(-50%, -50%); padding: 27px; border: 5px solid var(--ink); background: var(--acid); box-shadow: 12px 12px 0 var(--ink); color: var(--ink); text-align: center; }
+    .completion h2 { margin: 0 0 13px; font-size: clamp(34px, 5vw, 51px); line-height: .86; letter-spacing: -2.5px; }
+    .completion p { margin: 0 0 16px; font-size: 14px; font-weight: 800; line-height: 1.4; }
+    .completion .receipt { margin: 0 0 17px; padding: 11px; border: 3px dashed var(--ink); background: #fff; font-family: "Courier New", monospace; font-size: 11px; font-weight: 800; text-align: left; }
+    .completion-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; }
+    .completion button { padding: 10px 13px; border: 3px solid var(--ink); background: #fff; color: var(--ink); font-weight: 950; }
+    .completion button:last-child { background: var(--coral); }
+
+    @keyframes arrive { from { opacity: 0; transform: scale(.78) rotate(-2deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+    @keyframes shake { 25%, 75% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }
+    @keyframes blink { 50% { opacity: .22; } }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 780px) { .stage-grid { grid-template-columns: 1fr; } .engine { order: -1; } .reading-room { min-height: 0; } .eras { font-size: 9px; } h1 { letter-spacing: -3px; } .popup { width: min(340px, calc(100vw - 22px)); } }
+    @media (max-width: 430px) { .topbar { align-items: flex-start; } .forecast { font-size: 9px; } .forecast b { font-size: 11px; } .eras { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body data-era="1999">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">M</span><span>The Museum of <strong>Unwanted Attention</strong><small>NoteSpace archival wing</small></span></div>
+    <div class="forecast" id="forecast"><span>Escape forecast†</span><b>0 / 6</b></div>
+  </header>
+
+  <main>
+    <div class="museum-kicker"><span>Free student notes</span><em>Enter the archive. Leave with one PDF, if the ads approve.</em></div>
+    <div class="stage-grid">
+      <section class="reading-room">
+        <p class="note-label">HCI 101 / Courseware recovery</p>
+        <h1>Your notes are trapped in the <span class="highlight">history of advertising.</span></h1>
+        <p class="intro">To reach a single, perfectly ordinary study note, you must excavate four eras of internet advertising. Each era learned something terrible from the last.</p>
+        <div class="note-preview" aria-label="Blurred note preview"><i></i><i></i><i></i><i></i><i></i></div>
+        <button class="download" id="download" disabled>Retrieve my very important notes ↓</button>
+        <span class="lock-copy" id="lock-copy">Archive access is locked while the exhibit makes you more valuable than the notes.</span>
+      </section>
+
+      <aside class="engine" aria-label="Advertising engine profile">
+        <div class="engine-title"><span>ENGAGEMENT OPTIMISATION ENGINE</span><span class="live-dot" aria-hidden="true"></span></div>
+        <section class="exhibit">
+          <p class="exhibit-label" id="exhibit-label">Exhibit 1 / 4 · 1999</p>
+          <h2 id="exhibit-title">The Wild Web</h2>
+          <p id="exhibit-copy">Pop-ups had no natural predators. The visitor counter had no known purpose.</p>
+        </section>
+        <section class="profile">
+          <h3>Profile being invented about you</h3>
+          <ul class="traits" id="traits"></ul>
+        </section>
+        <section class="activity">
+          <p class="log-title">Live auction notes</p>
+          <div class="log" id="log" aria-live="polite"></div>
+        </section>
+        <p class="fake-privacy">†Forecasts are intentionally unhelpful. All “behavioural analysis” is simulated inside this one HTML file. No real tracking, no network, no escape.</p>
+      </aside>
+    </div>
+    <section class="eras" aria-label="Exhibit progress">
+      <div class="era active" data-era-card="1999">1999<br>Wild Web</div>
+      <div class="era" data-era-card="2008">2008<br>Toolbar Age</div>
+      <div class="era" data-era-card="2018">2018<br>Consent Factory</div>
+      <div class="era" data-era-card="2036">2036<br>Ad Exchange</div>
+    </section>
+  </main>
+
+  <div id="ad-layer" aria-live="polite"></div>
+  <div id="toast-lane" aria-live="polite"></div>
+  <div id="evil-cursor"></div>
+  <button id="helpbot" type="button" aria-label="Ask the AI assistant for help">
+    <span class="bot-face" style="position:relative">🤖<span class="bot-dot"></span></span>
+    <span>Ask AI for help</span>
+  </button>
+
+  <script>
+    (() => {
+      const layer = document.querySelector('#ad-layer');
+      const forecast = document.querySelector('#forecast');
+      const label = document.querySelector('#exhibit-label');
+      const exhibitTitle = document.querySelector('#exhibit-title');
+      const exhibitCopy = document.querySelector('#exhibit-copy');
+      const traits = document.querySelector('#traits');
+      const log = document.querySelector('#log');
+      const download = document.querySelector('#download');
+      const lockCopy = document.querySelector('#lock-copy');
+      const toastLane = document.querySelector('#toast-lane');
+      const helpbot = document.querySelector('#helpbot');
+
+      const eraInfo = {
+        1999: { number: 1, title: 'The Wild Web', copy: 'Pop-ups had no natural predators. The visitor counter had no known purpose.' },
+        2008: { number: 2, title: 'The Toolbar Age', copy: 'Every download had three buttons and at least one opinion about your browser.' },
+        2018: { number: 3, title: 'The Consent Factory', copy: 'Choice was reinvented as a long legal document with one neon button.' },
+        2036: { number: 4, title: 'The Attention Auction', copy: 'Your urge to leave is now a premium signal sold in real time.' }
+      };
+
+      const state = {
+        stage: 0,
+        credits: 0,
+        completed: false,
+        transitioning: false,
+        run: 0,
+        xClicks: 0,
+        actionClicks: 0,
+        hovers: 0,
+        escapePresses: 0,
+        cookieMood: 'unclassified',
+        firstExit: 'unobserved',
+        lastMoveAt: 0,
+        lastPointer: 'not yet marketable',
+        logs: [],
+        required: 6,
+        falseProgress: 0,
+        punishments: 0,
+        suspicious: 0,
+        helpbotClicks: 0,
+        stillnessResets: 0
+      };
+
+      function toast(message, alert = false) {
+        const item = document.createElement('div');
+        item.className = `toast${alert ? ' alert' : ''}`;
+        item.textContent = message;
+        toastLane.append(item);
+        setTimeout(() => item.remove(), 2700);
+      }
+
+      // --- Sound design: sparing, used only at key friction moments, never spammed ---
+      let audioCtx = null;
+      function initAudio() {
+        if (!audioCtx) {
+          try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+          catch (e) { audioCtx = null; }
+        }
+      }
+      function playAnnoyingBeep(freq = 440, type = 'sawtooth', duration = 0.15, vol = 0.09) {
+        if (!audioCtx) return;
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.value = freq;
+          gain.gain.value = vol;
+          osc.connect(gain).connect(audioCtx.destination);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) { /* audio is a bonus, never block the UI on it */ }
+      }
+
+      // --- 2018 era: laggy fake cursor. Real cursor is hidden; this one trails behind. ---
+      const evilCursor = document.querySelector('#evil-cursor');
+      document.addEventListener('pointermove', event => {
+        if (document.body.dataset.era === '2018') {
+          evilCursor.style.left = `${event.clientX - 11}px`;
+          evilCursor.style.top = `${event.clientY - 4}px`;
+        }
+      });
+      document.addEventListener('pointerdown', initAudio, { once: true });
+      document.addEventListener('keydown', initAudio, { once: true });
+
+      // --- HELPBOT: appears after the first exhibit, offers "help" that never helps ---
+      const helpbotLines = [
+        { log: 'HELPBOT: analysed 3 pixels of cursor movement. Recommends more ads.', toast: 'AI ANALYSIS COMPLETE: you are 73% likely to enjoy another popup.' },
+        { log: 'HELPBOT: since AI tools are allowed here, one has been generated on your behalf.', toast: 'Good news — I made you a brand new advertisement. You are welcome.' },
+        { log: 'HELPBOT: consulted another AI about skippable ads. Answer withheld for legal reasons.', toast: 'I asked a second AI if ads should be skippable. It said "depends on quarterly targets."' },
+        { log: 'HELPBOT: optimised annoyance by 12% using machine learning. No notes were harmed.', toast: 'Your experience has been personalised. Ads were harmed. Notes were not.' },
+        { log: 'HELPBOT: confirms closing this bot will not close anything else.', toast: 'Helpful tip: closing me will not close the actual ad. That would be too helpful.' },
+        { log: 'HELPBOT: the only unbiased model here is the one that keeps choosing more ads.', toast: 'Fun fact: the fairest algorithm on this page is the one deciding you need another popup.' }
+      ];
+      function revealHelpbot() {
+        if (helpbot.classList.contains('visible')) return;
+        helpbot.classList.add('visible');
+      }
+      helpbot.addEventListener('click', () => {
+        state.helpbotClicks++;
+        const line = helpbotLines[(state.helpbotClicks - 1) % helpbotLines.length];
+        toast(line.toast, state.helpbotClicks % 2 === 0);
+        addLog(line.log);
+        playAnnoyingBeep(520, 'sine', 0.08, 0.05);
+        // The "help" spawns exactly what it claims to prevent: one more ad.
+        satellite(eraForStage(state.stage), 'AI Suggestion', 'Personalised by HELPBOT:|Here is a completely unrelated offer, chosen just for you.', position(.06, .74));
+        renderDashboard();
+      });
+
+      function addLog(message) {
+        state.logs.unshift(message);
+        state.logs = state.logs.slice(0, 5);
+        log.innerHTML = state.logs.map(line => `<p>› ${line}</p>`).join('');
+      }
+
+      function position(x, y) { return { x, y }; }
+
+      function place(node, spot) {
+        const padding = 12;
+        const width = node.offsetWidth || 365;
+        const height = node.offsetHeight || 280;
+        const left = Math.max(padding, Math.min(window.innerWidth - width - padding, Math.round((window.innerWidth - width) * spot.x)));
+        const top = Math.max(70, Math.min(window.innerHeight - height - padding, Math.round(70 + (window.innerHeight - height - 82) * spot.y)));
+        node.style.left = `${left}px`;
+        node.style.top = `${top}px`;
+        node.dataset.spotX = spot.x;
+        node.dataset.spotY = spot.y;
+      }
+
+      function reflowPopups() {
+        document.querySelectorAll('.popup').forEach(node => place(node, position(Number(node.dataset.spotX || .5), Number(node.dataset.spotY || .2))));
+      }
+      function clearPopups() { layer.replaceChildren(); }
+
+      function makePopup({ era, title, body, spot = position(.5, .16), satellite = false, wide = false, watching = false, closable = false, onClose }) {
+        const card = document.createElement('section');
+        card.className = `popup era-${era}${satellite ? ' satellite' : ''}${wide ? ' wide' : ''}${watching ? ' watching' : ''}`;
+        card.innerHTML = `<div class="windowbar"><span class="window-name">${title}</span>${closable ? '<button class="close" data-close aria-label="Close this pop-up">×</button>' : ''}</div><div class="popup-body">${body}</div>`;
+        layer.append(card);
+        place(card, spot);
+        if (closable) {
+          card.querySelector('[data-close]').addEventListener('click', () => {
+            state.xClicks++;
+            playAnnoyingBeep(620, 'square', 0.09, 0.06);
+            if (state.firstExit === 'unobserved') state.firstExit = 'conventional top-right exit';
+            onClose?.(card);
+          });
+        }
+        return card;
+      }
+
+      function satellite(era, title, text, spot) {
+        if (layer.querySelectorAll('.popup').length >= 3) return null;
+        const [heading, copy = ''] = text.split('|');
+        const card = makePopup({ era, title, satellite: true, spot, body: `<h3>${heading}</h3><p>${copy}</p><button class="popup-action" data-dismiss>Fine, noted</button>`, closable: true, onClose: node => node.remove() });
+        card.querySelector('[data-dismiss]').addEventListener('click', () => card.remove());
+        return card;
+      }
+
+      function eraForStage(stage) {
+        if (stage < 2) return '1999';
+        if (stage < 4) return '2008';
+        if (stage < 6) return '2018';
+        return '2036';
+      }
+
+      function currentRequirement() { return state.required; }
+
+      function forecastText() {
+        if (state.credits >= state.required) return ['Archive verdict', `${state.credits} / ${state.required}`];
+        if (state.falseProgress) return ['Forecast recalibrating', `${state.credits} / ${state.required}`];
+        return ['Escape forecast†', `${state.credits} / ${state.required}`];
+      }
+
+      function renderDashboard() {
+        const era = eraForStage(state.stage);
+        const info = eraInfo[era];
+        document.body.dataset.era = era;
+        label.textContent = `Exhibit ${info.number} / 4 · ${era}`;
+        exhibitTitle.textContent = info.title;
+        exhibitCopy.textContent = info.copy;
+        const [caption, value] = forecastText();
+        forecast.innerHTML = `<span>${caption}</span><b>${value}</b>`;
+        document.querySelectorAll('[data-era-card]').forEach(card => card.classList.toggle('active', card.dataset.eraCard === era));
+        traits.innerHTML = [
+          ['exit style', state.firstExit],
+          ['brand hostility', state.xClicks > 2 ? 'concerningly persistent' : state.xClicks ? 'early signs detected' : 'unmonetised'],
+          ['ad curiosity', state.actionClicks ? 'purchase intent, allegedly' : 'tragically low'],
+          ['cookie personality', state.cookieMood],
+          ['cursor mood', state.lastPointer],
+          ['requirements', `${currentRequirement()} exits`],
+          ['corrective actions', state.punishments],
+          ['profile risk', state.suspicious ? 'unpleasantly specific' : 'still forming']
+        ].map(([key, value]) => `<li><span>${key}</span><b>${value}</b></li>`).join('');
+      }
+
+      function surpriseRequirement() {
+        if (state.credits === 3 && state.required === 6) {
+          state.required = 8;
+          state.falseProgress++;
+          state.punishments++;
+          addLog('SYSTEM: success threshold silently recalibrated after the user approached it.');
+          toast('Great news: you were nearly done. The archive revised “nearly”.', true);
+          return;
+        }
+        if (state.credits === 5 && state.required === 8) {
+          state.required = 10;
+          state.falseProgress++;
+          state.punishments++;
+          addLog('MARKET: strong escape behaviour increased required attention inventory.');
+          toast('Forecast update: your attempt to leave increased advertising demand.', true);
+        }
+      }
+
+      function adaptiveCommentary() {
+        if (state.xClicks === 2) { toast('Pattern detected: user strongly prefers the tiny ×.'); addLog('PROFILE: repeated exit behaviour classified as a premium preference.'); }
+        if (state.xClicks === 4) { toast('The system has learned that you are willing to fight UI.'); addLog('MODEL: resistance to ads now considered marketable intent.'); }
+        if (state.actionClicks === 3) { toast('Three ad actions clicked. You are now “high intent”.'); addLog('AUCTION: participant classified as commercially promising.'); }
+        if (state.escapePresses === 2) { toast('Escape key usage added to your advertising biography.'); addLog('MODEL: keyboard resistance packaged into behavioural data.'); }
+      }
+
+      function advance(note) {
+        if (state.completed || state.transitioning) return;
+        state.transitioning = true;
+        state.credits++;
+        state.stage++;
+        addLog(note);
+        surpriseRequirement();
+        renderDashboard();
+        clearPopups();
+        const token = ++state.run;
+        setTimeout(() => {
+          if (token !== state.run) return;
+          state.transitioning = false;
+          if (state.credits >= currentRequirement()) unlock(); else renderStage();
+        }, 440);
+        setTimeout(adaptiveCommentary, 70);
+      }
+
+      function moveCard(card, spot) {
+        place(card, spot);
+        card.style.transform = 'rotate(-2deg)';
+        setTimeout(() => { if (card.isConnected) card.style.transform = ''; }, 220);
+      }
+
+      function make1999Welcome() {
+        const card = makePopup({
+          era: '1999', title: 'Netscape Bonus Window', spot: position(.47, .15), closable: true,
+          body: `<div class="ad-art"><span class="blink">★ YOU ARE VISITOR #009999 ★</span></div><h3>Congratulations, scholar!</h3><p>You have been selected to receive one completely unrelated animated banner before your notes.</p><button class="popup-action" data-claim>Claim free floppy disk</button><span class="legal">This window contains 100% of the internet.</span>`,
+          onClose: () => advance('1999: user used a conventional top-right exit. alarming normalcy detected.')
+        });
+        card.querySelector('[data-claim]').addEventListener('click', () => {
+          state.actionClicks++;
+          satellite('1999', 'Free Floppy Delivery', 'Floppy is on its way!|It may take 3–5 business decades.', position(.08, .56));
+          toast('Purchase intent detected. Free floppy assigned to your academic profile.');
+          renderDashboard();
+        });
+      }
+
+      function make1999Remover() {
+        const card = makePopup({
+          era: '1999', title: 'POPUP REMOVER.EXE — Sponsored', spot: position(.57, .17),
+          body: `<div class="ad-art">🪟<span class="blink">POP-UP REMOVER</span></div><h3>Would you like to remove this pop-up?</h3><p>Our paid solution removes every window except this one, which is emotionally attached to you.</p><button class="popup-action" data-leave>No thanks, show notes anyway</button><span class="legal">The highlighted “YES” button has been placed somewhere else for your safety.</span>`
+        });
+        card.querySelector('[data-leave]').addEventListener('click', () => {
+          state.actionClicks++;
+          state.firstExit = 'politely declined a popup remover';
+          toast('1999 product design update: “No thanks” has been interpreted as engagement.');
+          advance('1999: user refused paid protection from the thing currently happening.');
+        });
+      }
+
+      function make2008Toolbar() {
+        const card = makePopup({
+          era: '2008', title: 'ToolbarPlus™ wants to make studying easier', spot: position(.39, .15), closable: true,
+          body: `<div class="ad-art">⬇️ <b>DOWNLOAD</b> ⬇️</div><h3>One free toolbar with every note</h3><p>It will add a search box, a weather box, and a box explaining the other boxes.</p><button class="popup-action" data-toolbar>Install all recommended boxes</button><span class="legal">Uncheck the tiny agreement checkbox that we did not provide.</span>`,
+          onClose: () => advance('2008: exit target moved once, then grudgingly respected the user’s click.')
+        });
+        const x = card.querySelector('[data-close]');
+        let dodge = 0;
+        x.addEventListener('pointerenter', event => {
+          if (event.pointerType === 'touch' || dodge) return;
+          dodge = 1;
+          state.hovers++;
+          state.lastPointer = 'suspiciously exit-seeking';
+          x.classList.add('moving-x');
+          moveCard(card, position(.12, .53));
+          playAnnoyingBeep(880, 'triangle', 0.09, 0.06);
+          toast('ToolbarPlus predicted your browser would prefer a different place.');
+          addLog('2008: pointer approached ×. Toolbar relocated itself for relevance.');
+          renderDashboard();
+        });
+        card.querySelector('[data-toolbar]').addEventListener('click', () => {
+          state.actionClicks++;
+          satellite('2008', 'Toolbar Installation', 'Installing 47 helpful boxes.|One is labelled “notes” but opens a horoscope.', position(.65, .6));
+          toast('High tolerance for buttons detected. Bid value increased by ₹0.03.');
+          renderDashboard();
+        });
+      }
+
+      function make2008DualExit() {
+        const card = makePopup({ era: '2008', title: 'Download Confidence Centre', spot: position(.56, .25), body: `<div class="ad-art">🧭</div><h3>Choose your exit.</h3><p>For your convenience, we have supplied two visually identical close buttons. One is an exit. The other is an advertiser-approved exit.</p><div class="progress-line"><span></span></div><span class="legal">The truthful exit is the one that feels least like an improvement.</span>` });
+        const bar = card.querySelector('.windowbar');
+        const pair = document.createElement('div');
+        pair.className = 'close-pair';
+        pair.innerHTML = '<button data-wrong aria-label="Close option one">×</button><button data-right aria-label="Close option two">×</button>';
+        bar.append(pair);
+        let misdirected = false;
+        pair.querySelector('[data-wrong]').addEventListener('click', () => {
+          state.xClicks++;
+          card.classList.add('shake');
+          if (!misdirected) {
+            misdirected = true;
+            satellite('2008', 'Premium Exit Activated', 'You chose our recommended exit.|It has opened a loyalty window instead.', position(.06, .55));
+            toast('That × was sponsored. The honest × is now glowing with disappointment.', true);
+          } else {
+            toast('The sponsored × remains sponsored. Its feelings are valid, your exit is not.');
+          }
+          pair.querySelector('[data-right]').style.background = 'var(--acid)';
+          state.punishments++;
+          addLog('2008: user selected advertiser-approved exit. corrective hint deployed.');
+          renderDashboard();
+        });
+        pair.querySelector('[data-right]').addEventListener('click', () => {
+          state.xClicks++;
+          state.firstExit = 'learned to distrust duplicate exits';
+          advance('2008: user defeated the decoy × after receiving a completely unnecessary loyalty popup.')
+        });
+      }
+
+      function make2018Consent() {
+        const card = makePopup({
+          era: '2018', title: 'Your privacy matters to our partners', spot: position(.38, .16), wide: true,
+          body: `<div class="ad-art">🍪</div><h3>We respect your choices*</h3><p>*Your choice is whether our 312 partners learn about your choice.</p><div class="consent-list"><div class="consent-row"><span>Essential cookies</span><b>essential-ish</b></div><div class="consent-row"><span>Academic horoscope</span><span class="toggle"></span></div><div class="consent-row"><span>Legitimate interest in your cursor</span><span class="toggle"></span></div></div><button class="popup-action" data-essential>Use only necessary cookies</button><span class="legal">Necessary cookies include ads, analytics, astrology, and the person who wrote this sentence.</span>`
+        });
+        card.querySelector('[data-essential]').addEventListener('click', () => {
+          state.actionClicks++;
+          state.cookieMood = 'politely overwhelmed';
+          satellite('2018', 'Necessary Cookie Receipt', 'Only essentials were enabled.|We classified 311 partners as “emotional infrastructure.”', position(.07, .6));
+          toast('Consent recorded: user trusts labels despite all available evidence.');
+          advance('2018: “necessary” now includes every ad with a pulse.')
+        });
+      }
+
+      function make2018LegitimateInterest() {
+        const card = makePopup({
+          era: '2018', title: 'Legitimate Interest Centre', spot: position(.57, .18),
+          body: `<div class="ad-art">⚖️</div><h3>Your objection needs consent.</h3><p>You may object to personalised ads once you agree that your objection is personally meaningful to our ad partners.</p><button class="popup-action" data-object>I object to this sentence</button><span class="legal" id="interest-legal">Clicking this does not imply agreement. It implies a stronger kind of agreement.</span>`
+        });
+        const object = card.querySelector('[data-object]');
+        let objections = 0;
+        object.addEventListener('click', () => {
+          objections++;
+          state.actionClicks++;
+          if (objections === 1) {
+            object.textContent = 'Consent to object to this sentence';
+            card.querySelector('#interest-legal').textContent = 'Your objection is being carefully monetised. Please object once more for accuracy.';
+            card.classList.add('shake');
+            toast('Objection detected. Generating a consent layer for the objection.');
+            addLog('2018: objection was classified as highly targeted engagement.');
+            renderDashboard();
+          } else {
+            state.cookieMood = 'legally expressive';
+            advance('2018: user completed a two-click objection ritual. Consent factory satisfied.')
+          }
+        });
+      }
+
+      function make2036Prediction() {
+        const card = makePopup({
+          era: '2036', title: 'ADaptive Exchange — live prediction', spot: position(.42, .13), watching: true, closable: true,
+          body: `<div class="ad-art">◉ <span class="blink">YOUR EXIT INTENT IS TRADEABLE</span></div><h3>We knew you would come for the ×.</h3><p>Three bidders are competing to be the last thing you see before your notes.</p><div class="auction"><div class="bid"><span>🐕 DogMajor</span><i></i><b>₹0.08</b></div><div class="bid"><span>🍕 SnackScholar</span><i></i><b>₹0.06</b></div><div class="bid"><span>🛡️ AdAdBlocker</span><i></i><b>₹0.05</b></div></div><button class="popup-action" data-bid>Increase relevance</button><span class="legal">Prediction generated from one mouse movement and extreme confidence.</span>`,
+          onClose: () => advance('2036: bidder lost the exit auction. User demonstrated expensive anti-ad behaviour.')
+        });
+        const x = card.querySelector('[data-close]');
+        let dodges = 0;
+        x.addEventListener('pointerenter', event => {
+          if (event.pointerType === 'touch' || dodges >= 1) return;
+          dodges++;
+          state.hovers++;
+          state.lastPointer = 'predictably rebellious';
+          moveCard(card, position(.11, .51));
+          playAnnoyingBeep(950, 'sawtooth', 0.09, 0.06);
+          toast('Prediction accuracy: 100%. Exit moved because you wanted it.', true);
+          addLog('2036: predicted exit intent became a premium auction signal.');
+          renderDashboard();
+        });
+        card.querySelector('[data-bid]').addEventListener('click', () => {
+          state.actionClicks++;
+          toast('Bid accepted. The dog has bought 0.7 seconds of your attention.');
+          satellite('2036', 'DogMajor Bid Won', 'The dog selects your major:|“Advertising Psychology.” It feels seen.', position(.7, .56));
+          renderDashboard();
+        });
+      }
+
+      function make2036PremiumExit() {
+        const card = makePopup({
+          era: '2036', title: 'Premium Escape Offer', spot: position(.56, .2), watching: true,
+          body: `<div class="ad-art">↗️</div><h3>Escape is now a paid feature.</h3><p>Good news: based on your brand hostility, we have generated one personalised exit. It is somehow still an advertisement.</p><button class="popup-action" data-premium>Close (unprofitable for advertisers)</button><span class="legal">First click is used to verify that you have not clicked this by accident. Obviously.</span>`
+        });
+        const premium = card.querySelector('[data-premium]');
+        let verified = false;
+        premium.addEventListener('click', () => {
+          state.actionClicks++;
+          if (!verified) {
+            verified = true;
+            premium.textContent = 'Verify my anti-ad intent →';
+            satellite('2036', 'Intent Verification', 'Are you sure you dislike ads?|Our model calls this a niche preference.', position(.06, .57));
+            toast('Anti-ad intent received. We need one more click to sell it responsibly.');
+            addLog('2036: escape preference packaged as a demographic.');
+            renderDashboard();
+          } else {
+            state.firstExit = 'commercially inconvenient';
+            advance('2036: user chose the one action that made their attention less profitable.')
+          }
+        });
+      }
+
+      // The final twist: after training the visitor to click, hold and act for ten stages,
+      // the archive reveals its real rule — the only unsellable visitor is a still one.
+      function beginStillnessClause(onDone) {
+        clearPopups();
+        helpbot.classList.remove('visible');
+        const stillDuration = 3000;
+        const card = makePopup({
+          era: '2036', title: 'Final clause: the attention tax', spot: position(.32, .34), wide: true, watching: true,
+          body: `<div class="ad-art">🫥</div><h3>To be released, first stop being interesting.</h3><p>The archive only lets go of visitors who give it nothing left to sell. Do not move the mouse. Do not press a key. Hold still for three uninterrupted seconds.</p><div class="progress-line" style="margin-top:10px"><span data-stillbar style="width:0"></span></div><span class="legal" id="still-legal">Any motion, click, or key resets the silence.</span>`
+        });
+        const bar = card.querySelector('[data-stillbar]');
+        const legalEl = card.querySelector('#still-legal');
+        let stillStart = performance.now();
+        let raf = null;
+        let finished = false;
+
+        function resetStillness(reason) {
+          if (finished) return;
+          stillStart = performance.now();
+          state.stillnessResets++;
+          if (reason) {
+            legalEl.textContent = reason;
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 270);
+          }
+        }
+
+        function tick(now) {
+          if (finished) return;
+          const elapsed = now - stillStart;
+          const progress = Math.min(1, elapsed / stillDuration);
+          bar.style.width = `${Math.round(progress * 100)}%`;
+          if (progress >= 1) {
+            finished = true;
+            cleanup();
+            playAnnoyingBeep(1300, 'sine', 0.5, 0.08);
+            onDone();
+            return;
+          }
+          raf = requestAnimationFrame(tick);
+        }
+
+        function onMove() { resetStillness('Movement detected. The archive got interested again.'); }
+        function onKey(event) { resetStillness(event.key === 'Escape' ? 'Escape detected. That still counts as attention.' : 'Key press detected. That counts as attention.'); }
+        function onClickAnywhere() { resetStillness('Click registered. The archive noticed you.'); }
+
+        function cleanup() {
+          document.removeEventListener('pointermove', onMove);
+          document.removeEventListener('keydown', onKey, true);
+          document.removeEventListener('pointerdown', onClickAnywhere, true);
+          if (raf) cancelAnimationFrame(raf);
+          if (card.isConnected) card.remove();
+        }
+
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('keydown', onKey, true);
+        document.addEventListener('pointerdown', onClickAnywhere, true);
+        raf = requestAnimationFrame(tick);
+      }
+
+      function make2036BehaviourAudit() {
+        const card = makePopup({
+          era:'2036', title:'Personalisation Audit — final notice', spot:position(.26,.42), watching:true, wide:true,
+          body:`<div class="ad-art">🧠 <span class="blink">WE KNOW YOU'RE TRYING TO LEAVE</span></div><h3>Your behaviour has been upgraded to a product.</h3><p>We generated this interface from your previous decisions. None of these labels are flattering.</p><div class="consent-grid"><div class="tiny-box">X-click frequency<br><b>${state.xClicks}</b></div><div class="tiny-box">Ad action clicks<br><b>${state.actionClicks}</b></div><div class="tiny-box">Escape key presses<br><b>${state.escapePresses}</b></div><div class="tiny-box">Resistance score<br><b>${Math.max(1,state.xClicks*2+state.escapePresses)}</b></div></div><button class="popup-action" data-audit>Accept my completely unnecessary profile</button><span class="legal">Rejecting this profile would require another profile about how you rejected it.</span>`
+        });
+        card.querySelector('[data-audit]').addEventListener('click', () => {
+          state.actionClicks++;
+          state.suspicious++;
+          toast('Perfect. You approved the profile created from your approval of the profile.');
+          addLog('2036: recursive consent converted into premium engagement.');
+          satellite('2036','Profile Accepted','Your anti-ad personality is now available to advertisers.|Estimated market value: ₹0.03',position(.7,.6));
+          advance('2036: user accepted a profile that existed only because the user wanted to escape it.');
+        });
+      }
+
+      function make2036Release() {
+        const card = makePopup({
+          era: '2036', title: 'Final listing: your attention', spot: position(.39, .16), wide: true, watching: true,
+          body: `<div class="ad-art">⟡</div><h3>Your attention is listed for sale.</h3><p>Catch this window and hold the button long enough to prove you truly mean to leave. This is our most humane era.</p><button class="popup-action hold-button" data-hold><span class="hold-fill"></span><span>Hold to delist my attention</span></button><div class="progress-line" style="margin-top:10px"><span data-holdbar style="width:0"></span></div><span class="legal">Release after 1.8 seconds of sustained, dignified frustration.</span>`
+        });
+        card.classList.add('bouncing-boss');
+
+        // The final window runs a DVD-screensaver bounce until the user starts holding.
+        let xPos = card.offsetLeft;
+        let yPos = card.offsetTop;
+        let xSpeed = 3.2;
+        let ySpeed = 2.6;
+        let animFrame = null;
+        let holding = false;
+
+        function bounceStep() {
+          const rect = card.getBoundingClientRect();
+          if (xPos + rect.width >= window.innerWidth - 10 || xPos <= 10) { xSpeed = -xSpeed; playAnnoyingBeep(500, 'triangle', 0.05, 0.04); }
+          if (yPos + rect.height >= window.innerHeight - 10 || yPos <= 70) { ySpeed = -ySpeed; playAnnoyingBeep(500, 'triangle', 0.05, 0.04); }
+          xPos += xSpeed;
+          yPos += ySpeed;
+          card.style.left = `${xPos}px`;
+          card.style.top = `${yPos}px`;
+          animFrame = requestAnimationFrame(bounceStep);
+        }
+        animFrame = requestAnimationFrame(bounceStep);
+
+        const hold = card.querySelector('[data-hold]');
+        const fill = card.querySelector('.hold-fill');
+        const bar = card.querySelector('[data-holdbar]');
+        let timer = null;
+        let started = 0;
+        const duration = 1800;
+        function resetHold() {
+          if (timer) cancelAnimationFrame(timer);
+          timer = null; holding = false;
+          fill.style.width = '0'; bar.style.width = '0';
+          // letting go speeds the window back up — mercy is temporary
+          xSpeed = 3.2 * Math.sign(xSpeed || 1);
+          ySpeed = 2.6 * Math.sign(ySpeed || 1);
+        }
+        function tick(now) {
+          const progress = Math.min(1, (now - started) / duration);
+          const percent = `${Math.round(progress * 100)}%`;
+          fill.style.width = percent;
+          bar.style.width = percent;
+          if (progress >= 1) {
+            timer = null;
+            cancelAnimationFrame(animFrame);
+            playAnnoyingBeep(1100, 'sine', 0.35, 0.08);
+            toast('Hold complete. One final clause remains before release.', true);
+            addLog('2036: moving target held still. A final clause has activated.');
+            beginStillnessClause(() => {
+              advance('2036: total stillness achieved. The archive found nothing left worth selling.');
+            });
+            return;
+          }
+          timer = requestAnimationFrame(tick);
+        }
+        hold.addEventListener('pointerdown', event => {
+          event.preventDefault();
+          if (timer || state.transitioning) return;
+          holding = true;
+          // holding slows the bounce to a near-stop, giving a fair (if tense) chance
+          xSpeed = 0.4 * Math.sign(xSpeed || 1);
+          ySpeed = 0.4 * Math.sign(ySpeed || 1);
+          started = performance.now();
+          timer = requestAnimationFrame(tick);
+        });
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(type => hold.addEventListener(type, resetHold));
+        hold.addEventListener('keydown', event => {
+          if (event.code === 'Space' || event.code === 'Enter') {
+            event.preventDefault();
+            if (!timer) { holding = true; xSpeed = 0.4 * Math.sign(xSpeed || 1); ySpeed = 0.4 * Math.sign(ySpeed || 1); started = performance.now(); timer = requestAnimationFrame(tick); }
+          }
+        });
+        hold.addEventListener('keyup', resetHold);
+      }
+
+      function maybeSpawnMemoryPopup() {
+        if (state.credits < 2 || state.completed) return;
+        if (state.xClicks >= 3 && !layer.querySelector('[data-memory-ad]')) {
+          const memory = makePopup({
+            era: eraForStage(state.stage), title:'We Remember You', spot:position(.72,.18), satellite:true,
+            body:`<div class="ad-art">👁️</div><h3>You came for the × again.</h3><p>We noticed. We also noticed that you keep ignoring the product buttons.</p><button class="popup-action" data-memory>Fine, show me something relevant</button><span class="legal">This ad was generated from your previous attempts to leave.</span>`
+          });
+          memory.dataset.memoryAd='true';
+          memory.querySelector('[data-memory]').addEventListener('click',()=>{
+            state.actionClicks++;
+            toast('Relevant result: another advertisement.');
+            addLog('MEMORY: historical resistance successfully converted into retargeting.');
+            renderDashboard();
+          });
+        }
+      }
+
+      function renderStage() {
+        if (state.completed) return;
+        renderDashboard();
+        [make1999Welcome, make1999Remover, make2008Toolbar, make2008DualExit, make2018Consent, make2018LegitimateInterest, make2036Prediction, make2036PremiumExit, make2036BehaviourAudit, make2036Release][state.stage]?.();
+        setTimeout(()=>{ maybeSpawnMemoryPopup(); if(state.credits > 0 && state.credits % 2 === 0) addLog(`MODEL: visitor profile refreshed after ${state.credits} exits.`); }, 230);
+        if (state.stage >= 1) revealHelpbot();
+      }
+
+      function unlock() {
+        if (state.completed) return;
+        state.completed = true;
+        clearPopups();
+        document.body.dataset.era = '2036';
+        renderDashboard();
+        download.disabled = false;
+        lockCopy.textContent = 'Archive unlocked. Your attention was declared unprofitable, so the notes have been reluctantly released.';
+        toast('EXHIBIT COMPLETE: you excavated the history of being treated as inventory.');
+        addLog('2036: release authorised only because user attention ceased to be profitable.');
+        playAnnoyingBeep(700, 'sine', 0.6, 0.07);
+      }
+
+      function showCompletion() {
+        if (document.querySelector('.completion')) return;
+        const modal = document.createElement('section');
+        modal.className = 'completion';
+        modal.innerHTML = `<h2>YOU HAVE BEEN RELEASED.</h2><p>Congratulations. You survived four eras of advertising, one AI assistant, and a final clause that rewarded you for doing nothing at all.</p><div class="receipt">MUSEUM RECEIPT<br>attention extracted: ${(1.25 + state.credits*.14).toFixed(2)} simulated minutes<br>ads dismissed: ${state.credits}<br>false progress events: ${state.falseProgress}<br>escape attempts classified: ${state.xClicks + state.escapePresses}<br>HELPBOT consultations: ${state.helpbotClicks}<br>stillness attempts before success: ${state.stillnessResets}<br>final attention market value: ₹${(0.03 + state.actionClicks*.01 + state.xClicks*.002).toFixed(2)}<br>customer status: inventory, archived</div><div class="completion-actions"><button data-download>Download the “notes”</button><button data-replay>Replay the exhibit</button></div>`;
+        modal.querySelector('[data-download]').addEventListener('click', () => {
+          const content = `THE IMPORTANT NOTES\n\nYou spent time closing advertisements to receive this sentence:\n\nA working interface is not necessarily a human interface. Sometimes the most humane feature is knowing when to stop asking for attention.\n\n— The Museum of Unwanted Attention\n\nArchive metrics:\nAds dismissed: ${state.credits}\nFalse progress events: ${state.falseProgress}\nEscape attempts classified: ${state.xClicks + state.escapePresses}\nHELPBOT consultations: ${state.helpbotClicks}\nStillness attempts before success: ${state.stillnessResets}`;
+          const blob = new Blob([content], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'important_notes.txt';
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1200);
+          modal.querySelector('p').textContent = 'Downloaded: one completely real, extremely short, ad-free note. You earned it the hard way.';
+        });
+        modal.querySelector('[data-replay]').addEventListener('click', () => { modal.remove(); replay(); });
+        document.body.append(modal);
+      }
+
+      function replay() {
+        Object.assign(state, { stage:0, credits:0, required:6, completed:false, transitioning:false, xClicks:0, actionClicks:0, hovers:0, escapePresses:0, cookieMood:'unclassified', firstExit:'unobserved', lastPointer:'not yet marketable', logs:[], punishments:0, falseProgress:0, suspicious:0, helpbotClicks:0, stillnessResets:0 });
+        state.run++;
+        clearPopups();
+        download.disabled = true;
+        helpbot.classList.remove('visible');
+        lockCopy.textContent = 'Archive access is locked while the exhibit makes you more valuable than the notes.';
+        addLog('1999: new visitor loaded. Historic mistakes restored.');
+        renderStage();
+      }
+
+      document.addEventListener('pointermove', event => {
+        const now = performance.now();
+        if (now - state.lastMoveAt < 450) return;
+        state.lastMoveAt = now;
+        if (state.stage >= 6 && !state.completed) {
+          state.lastPointer = event.clientX > window.innerWidth * .6 ? 'heading right, emotionally' : 'exploring exit territory';
+          renderDashboard();
+        }
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          state.escapePresses++;
+          state.lastPointer = 'pressed Escape with hope';
+          playAnnoyingBeep(180, 'square', 0.12, 0.05);
+          toast('Escape registered as a mood, not an instruction.', true);
+          addLog('System: Escape key classified as emotional resistance.');
+          if (state.escapePresses === 3) {
+            state.punishments++;
+            document.body.style.filter = 'saturate(1.35)';
+            toast('Three Escape presses detected. Adding confidence to your profile.', true);
+            setTimeout(()=>document.body.style.filter='',800);
+          }
+          renderDashboard();
+        }
+      });
+      let resizeTimer;
+      window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(reflowPopups, 80); });
+      download.addEventListener('click', () => { if (!download.disabled) showCompletion(); });
+
+      addLog('1999: visitor loaded. Attention is now an archival material.');
+      console.log('%c🕳️ You opened devtools. That is 100% valid research.', 'font-size:14px;font-weight:900;color:#7957ff;');
+      console.log('%cIf you are judging this: every mechanic here is one real dark pattern, just made honest — decoy exits, moving buttons, recursive consent, and a "hold to leave" button that runs away from you. Thanks for reading the source, not just clicking through it.', 'font-size:12px;color:#12152d;');
+      renderStage();
+    })();
+  </script>
+</body>
+</html>

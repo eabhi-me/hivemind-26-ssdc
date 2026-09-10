@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LOG IN OR ELSE</title>
+<style>
+  @keyframes blink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+  @keyframes rainbow {
+    0% { color: red; } 16% { color: orange; } 32% { color: yellow; }
+    48% { color: green; } 64% { color: blue; } 80% { color: indigo; } 100% { color: violet; }
+  }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-10deg) scale(0.95) translateX(-15px); }
+    25% { transform: rotate(8deg) scale(1.1) translateX(15px); }
+    50% { transform: rotate(-6deg) scale(1.15) translateX(-10px); }
+    75% { transform: rotate(10deg) scale(0.9) translateX(10px); }
+  }
+  @keyframes bgshift {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 200%; }
+  }
+  body {
+    margin: 0;
+    height: 100vh;
+    background: repeating-linear-gradient(135deg, lime 0, lime 20px, magenta 20px, magenta 40px, cyan 40px, cyan 60px);
+    background-size: 300% 300%;
+    animation: bgshift 6s linear infinite;
+    font-family: "Comic Sans MS", cursive;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: crosshair;
+  }
+  .login-box {
+    background: yellow;
+    border: 10px double red;
+    padding: 40px 60px;
+    text-align: center;
+    box-shadow: 0 0 0 6px black, 20px 20px 0 purple;
+    animation: wobble 0.4s infinite;
+    max-width: 340px;
+  }
+  h1 {
+    animation: rainbow 0.8s infinite;
+    font-size: 34px;
+    text-shadow: 2px 2px black;
+    margin-bottom: 5px;
+  }
+  .subtitle {
+    font-size: 10px;
+    color: darkred;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    text-align: left;
+    font-size: 20px;
+    color: blue;
+    text-shadow: 1px 1px white;
+    margin-top: 15px;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    border: 4px inset gray;
+    background: repeating-linear-gradient(90deg, white 0, white 4px, #ccc 4px, #ccc 8px);
+    color: white;
+    text-shadow: 0 0 1px black;
+  }
+  input:focus {
+    outline: 5px dashed red;
+    background: black;
+    color: black;
+  }
+  .captcha {
+    background: black;
+    color: #111;
+    font-size: 9px;
+    padding: 15px;
+    margin-top: 15px;
+    letter-spacing: -1px;
+    line-height: 0.7;
+    transform: skew(-8deg, 3deg);
+  }
+  .capslock-warning {
+    font-size: 22px;
+    color: red;
+    animation: blink 0.4s infinite;
+    margin-top: 10px;
+  }
+  button {
+    margin-top: 25px;
+    background: radial-gradient(circle, red, darkred);
+    color: yellow;
+    font-size: 26px;
+    padding: 14px 30px;
+    border: 6px ridge silver;
+    font-family: "Comic Sans MS", cursive;
+    cursor: not-allowed;
+  }
+  .forgot {
+    display: block;
+    margin-top: 20px;
+    font-size: 7px;
+    color: #b8b800;
+  }
+  .terms {
+    font-size: 5px;
+    color: #555;
+    margin-top: 15px;
+    line-height: 0.8;
+    text-align: justify;
+  }
+  .popup-ad {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: lime;
+    border: 4px dashed red;
+    padding: 10px;
+    font-size: 11px;
+    animation: wobble 0.3s infinite;
+  }
+</style>
+</head>
+<body>
+
+<div id="leave-marquee" style="position:fixed; top:0; left:0; width:100%; overflow:hidden; z-index:1; pointer-events:none;">
+  <div style="white-space:nowrap; font-size:120px; font-weight:bold; color:rgba(255,0,0,0.25); font-family:Impact; animation:scrollLeave 6s linear infinite;">
+    PLEASE LEAVE &nbsp; PLEASE LEAVE &nbsp; PLEASE LEAVE &nbsp; PLEASE LEAVE &nbsp; PLEASE LEAVE
+  </div>
+</div>
+
+<div id="virus-warning" style="position:fixed; top:10px; right:10px; background:#000080; color:#00ff00; font-family:monospace; font-size:12px; padding:10px; border:3px outset silver; z-index:1000;">
+  🛡️ Virus Scan Complete<br>Viruses found: <b>0</b><br>Threat level: <b>0</b><br><span style="color:red;">⚠ SCAN RESULT UNTRUSTED ⚠</span>
+</div>
+
+<div class="login-box" id="login-box">
+  <h1>CLICK ON LOG IN OR APNE GUPT ROG KI JAANKARI PAA</h1>
+  <div class="subtitle">(session expires in 4 seconds, re-enter password each time)</div>
+
+  <label id="label-username" onclick="showMonkey()" style="cursor:pointer;">AAPKA GANDA NAAM (case, font, and mood sensitive):</label>
+  <div id="username-taunt" style="color:red; font-size:14px; font-weight:bold; min-height:18px; text-shadow:1px 1px white; overflow:hidden;"></div>
+  <input type="text" id="username-field" autocomplete="off" spellcheck="false" oninput="tauntUsername()">
+
+  <label id="label-password">PASSWORD (min 40 characters, must include a haiku):</label>
+  <input type="text" id="password-field" placeholder="hunter2" oninput="reverseInput(this)">
+
+  <div class="capslock-warning">⚠ CAPS LOCK MIGHT BE ON ⚠</div>
+
+  <div class="captcha" id="captcha-text">
+    prove you are human: what is the 14th digit of pi, backwards, in base 7, expressed as a limerick, click the boxes with traffic lights except there are no boxes and no traffic lights, this text is intentionally illegible so good luck, we believe in you, probably not though, humans usually fail this one, I mean look at it, why would anyone design it this way, and yet here we are, still not done, almost though, ok now you're done, wait no there's more
+  </div>
+
+  <label style="font-size:11px; margin-top:12px;">
+    <input type="checkbox" style="width:auto;" checked disabled> I agree to the Terms (grayed out, already checked, cannot be unchecked)
+  </label>
+
+  <button id="login-btn" onclick="playFailSound(); playVoiceLine(); showFailMeme();">EK BAAR ANDAR TO AAO, MAZA AAYEGA</button>
+
+  <a href="#" class="forgot" id="forgot-link" onclick="flipPage(); return false;">forgot password? (link goes nowhere)</a>
+
+  <div class="terms">
+    By attempting to log in you agree to receive 400 emails per day, forfeit your firstborn rubber duck, and acknowledge that this button has never once worked for anybody in the history of the internet, we are aware, it is a feature not a bug, please stop trying, but also please keep trying, we need the engagement metrics.
+  </div>
+</div>
+
+<div class="popup-ad" onclick="alert('IIT Longowal')" style="cursor:pointer;">🔥 YOU WON!!! CLICK NOW!!! 🔥</div>
+
+<style>
+  @keyframes scrollLeave {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  body.flipped {
+    transform: rotate(180deg);
+    transition: transform 1s;
+  }
+  @keyframes popDown {
+    0% { transform: translateY(-40px); opacity: 0; }
+    60% { transform: translateY(5px); opacity: 1; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  .taunt-pop {
+    animation: popDown 0.4s ease-out;
+    display: inline-block;
+  }
+</style>
+
+<script>
+  // 1. Login box size change every 2 sec
+  setInterval(() => {
+    const box = document.getElementById('login-box');
+    const scale = 0.7 + Math.random() * 0.8;
+    box.style.transform = 'scale(' + scale + ')';
+  }, 2000);
+
+  // 2. Labels randomly Hindi/English gibberish
+  const usernameLabels = ['AAPKA GANDA NAAM (case, font, and mood sensitive):', 'यूज़रनेम डालो (मूड सेंसिटिव):', 'naam batao warna kuch nahi hoga:', 'USERNAME या जो मर्ज़ी लिख do:'];
+  const passwordLabels = ['PASSWORD (min 40 characters, must include a haiku):', 'पासवर्ड (कम से कम 40 अक्षर, हाइकु ज़रूरी):', 'gupt shabd batao (haiku ke saath):', 'पासवर्ड डालो, हिम्मत है तो:'];
+  setInterval(() => {
+    document.getElementById('label-username').textContent = usernameLabels[Math.floor(Math.random()*usernameLabels.length)];
+    document.getElementById('label-password').textContent = passwordLabels[Math.floor(Math.random()*passwordLabels.length)];
+  }, 2000);
+
+  // 3. Password chars display reversed as typed
+  function reverseInput(el) {
+    el.value = el.value.split('').reverse().join('');
+    el.setSelectionRange(0,0);
+  }
+
+  // 4. Forgot password flips page upside down
+  function flipPage() {
+    document.body.classList.toggle('flipped');
+  }
+
+  // 5. Popup: IIT Longowal has detected your presence
+  setTimeout(() => {
+    alert('IIT Longowal has detected your presence.');
+  }, 3000);
+
+  // 7. 1% chance button text: DO NOT CLICK
+  if (Math.random() < 0.01) {
+    document.getElementById('login-btn').textContent = 'DO NOT CLICK';
+  }
+
+  // 9. CAPTCHA gets more impossible on every refresh
+  const captchaJunk = [' also list every prime number under 10,000 from memory,', ' while reciting the alphabet backwards in Klingon,', ' and solve this in exactly 0.3 seconds,', ' bonus round: identify this smell,', ' now do it again but angrier,', ' also please explain quantum entanglement to a goldfish,'];
+  let visits = parseInt(localStorage.getItem('captchaVisits') || '0') + 1;
+  localStorage.setItem('captchaVisits', visits);
+  let extra = '';
+  for (let i = 0; i < visits && i < captchaJunk.length; i++) extra += captchaJunk[i];
+  document.getElementById('captcha-text').textContent += extra;
+
+  // 10. After 5 sec, "Congratulations, you failed successfully."
+  setTimeout(() => {
+    alert('Congratulations, you failed successfully.');
+  }, 5000);
+  // Username click shows a monkey photo
+  function showMonkey() {
+    let overlay = document.getElementById('monkey-overlay');
+    if (overlay) { overlay.remove(); return; }
+    overlay = document.createElement('div');
+    overlay.id = 'monkey-overlay';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; display:flex; align-items:center; justify-content:center; flex-direction:column; cursor:pointer;';
+    overlay.onclick = () => overlay.remove();
+    overlay.innerHTML = '<svg width="260" height="260" viewBox="0 0 200 200" style="background:white; border:8px solid yellow; box-shadow:0 0 30px lime; border-radius:20px;">' +
+      '<circle cx="100" cy="110" r="70" fill="#8B5A2B"/>' +
+      '<circle cx="40" cy="80" r="25" fill="#8B5A2B"/>' +
+      '<circle cx="160" cy="80" r="25" fill="#8B5A2B"/>' +
+      '<circle cx="40" cy="80" r="14" fill="#D2A679"/>' +
+      '<circle cx="160" cy="80" r="14" fill="#D2A679"/>' +
+      '<ellipse cx="100" cy="125" rx="45" ry="40" fill="#D2A679"/>' +
+      '<path d="M 65 92 Q 78 82 92 92" stroke="black" stroke-width="3" fill="none"/>' +
+      '<path d="M 108 92 Q 122 82 135 92" stroke="black" stroke-width="3" fill="none"/>' +
+      '<ellipse cx="80" cy="108" rx="9" ry="10" fill="white"/>' +
+      '<ellipse cx="120" cy="106" rx="9" ry="10" fill="white"/>' +
+      '<circle cx="83" cy="110" r="4.5" fill="black"/>' +
+      '<circle cx="123" cy="108" r="4.5" fill="black"/>' +
+      '<ellipse cx="100" cy="125" rx="12" ry="9" fill="#4A2E14"/>' +
+      '<path d="M 68 140 Q 100 168 132 140 Q 122 155 100 158 Q 78 155 68 140 Z" fill="#3a1f0d"/>' +
+      '<path d="M 78 143 L 82 150 L 86 143 Z" fill="white"/>' +
+      '<path d="M 114 143 L 118 150 L 122 143 Z" fill="white"/>' +
+      '<path d="M 70 141 Q 100 160 130 141" stroke="black" stroke-width="2" fill="none"/>' +
+      '</svg>' +
+      '<div style="color:yellow; font-size:28px; font-family:\'Comic Sans MS\',cursive; margin-top:15px; text-shadow:2px 2px black;">kyu abhi apni shakal dekh raha hai kya (click anywhere to close)</div>';
+    document.body.appendChild(overlay);
+  }
+  // Funny "wrong answer" buzzer sound on login click
+  function playFailSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.6);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.6);
+    } catch (e) {}
+  }
+  // Meme popup on login fail
+  function showFailMeme() {
+    let overlay = document.getElementById('meme-overlay');
+    if (overlay) overlay.remove();
+    playBoomSound();
+    overlay = document.createElement('div');
+    overlay.id = 'meme-overlay';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; display:flex; align-items:center; justify-content:center; cursor:pointer;';
+    overlay.onclick = () => overlay.remove();
+    overlay.innerHTML = `
+      <div style="position:relative; width:300px; background:black; border:6px solid white; box-shadow:0 0 30px red;">
+        <div style="font-family:Impact,'Arial Black',sans-serif; color:white; -webkit-text-stroke:1.5px black; font-size:24px; text-align:center; text-transform:uppercase; padding:10px 5px 0;">
+          kundi laga lo saiyaan, tumhaare ko jannat dikhati
+        </div>
+        <svg width="300" height="220" viewBox="0 0 200 200" style="display:block; margin:0 auto; background:white;">
+          <circle cx="100" cy="110" r="70" fill="#8B5A2B"/>
+          <circle cx="40" cy="80" r="25" fill="#8B5A2B"/>
+          <circle cx="160" cy="80" r="25" fill="#8B5A2B"/>
+          <circle cx="40" cy="80" r="14" fill="#D2A679"/>
+          <circle cx="160" cy="80" r="14" fill="#D2A679"/>
+          <ellipse cx="100" cy="125" rx="45" ry="40" fill="#D2A679"/>
+          <path d="M 65 92 Q 78 82 92 92" stroke="black" stroke-width="3" fill="none"/>
+          <path d="M 108 92 Q 122 82 135 92" stroke="black" stroke-width="3" fill="none"/>
+          <ellipse cx="80" cy="108" rx="9" ry="10" fill="white"/>
+          <ellipse cx="120" cy="106" rx="9" ry="10" fill="white"/>
+          <circle cx="83" cy="110" r="4.5" fill="black"/>
+          <circle cx="123" cy="108" r="4.5" fill="black"/>
+          <ellipse cx="100" cy="125" rx="12" ry="9" fill="#4A2E14"/>
+          <path d="M 68 140 Q 100 168 132 140 Q 122 155 100 158 Q 78 155 68 140 Z" fill="#3a1f0d"/>
+          <path d="M 78 143 L 82 150 L 86 143 Z" fill="white"/>
+          <path d="M 114 143 L 118 150 L 122 143 Z" fill="white"/>
+          <path d="M 70 141 Q 100 160 130 141" stroke="black" stroke-width="2" fill="none"/>
+        </svg>
+        <div style="font-family:Impact,'Arial Black',sans-serif; color:white; -webkit-text-stroke:1.5px black; font-size:24px; text-align:center; text-transform:uppercase; padding:0 5px 12px;">
+          you are successfully failed 😂
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+  // "Vine boom" style dramatic bass hit sound (generated, not copyrighted audio)
+  function playBoomSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.35);
+      gain.gain.setValueAtTime(1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } catch (e) {}
+  }
+  // Taunt message on every letter typed in username
+  const usernameTaunts = [
+    'bada hi ganda naam hai, sharam nahi aati iss naam par',
+    'yeh naam rakha kisne, sochne ki himmat kaise hui',
+    'itna ganda naam maine aaj tak nahi dekha',
+    'iss naam ke saath bahar nikalte ho kya',
+    'naam dekh ke hi mann kharab ho gaya',
+    'parents ko bata dena chahiye tha yeh naam'
+  ];
+  function tauntUsername() {
+    const box = document.getElementById('username-taunt');
+    box.textContent = usernameTaunts[Math.floor(Math.random() * usernameTaunts.length)];
+    box.classList.remove('taunt-pop');
+    void box.offsetWidth; // restart animation
+    box.classList.add('taunt-pop');
+  }
+  // Cute AI-assistant style Bhojpuri voice, triggers repeatedly on mouse movement
+  const voiceLines = [
+    'Ka haal ba rauwa sab ke',
+    'Ka kar rahal baani rauwa',
+    'Hamra ke ignore mat karihi',
+    'Hello hello, ham yahin baani',
+    'Itna mouse ghumaib toh ham bolte rahab',
+    'Arre ruk jaa, kahan bhaag rahal baani',
+    'Login kar ke dekha, kuchh na hoi',
+    'Rauwa ke mann bahut ghuma rahal ba aaj',
+    'Ee website chhod ke jaib toh ham udas ho jaib',
+    'Kaahe itna click kar rahal baani, thak jaib'
+  ];
+  function playVoiceLine(text) {
+    try {
+      const utterance = new SpeechSynthesisUtterance(text || voiceLines[Math.floor(Math.random()*voiceLines.length)]);
+      utterance.pitch = 1.9;   // higher pitch = cuter
+      utterance.rate = 1.15;   // slightly faster = perky
+      const voices = speechSynthesis.getVoices();
+      // Browsers don't ship dedicated Bhojpuri voices, so try 'bho' then fall back to closest Hindi voice
+      const bhojpuriVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('bho'));
+      const hindiFemale = voices.find(v => v.lang === 'hi-IN' && /female|woman/i.test(v.name)) ||
+                           voices.find(v => v.lang === 'hi-IN') ||
+                           voices.find(v => v.lang.startsWith('hi'));
+      const chosen = bhojpuriVoice || hindiFemale;
+      utterance.lang = chosen ? chosen.lang : 'hi-IN';
+      if (chosen) utterance.voice = chosen;
+      speechSynthesis.speak(utterance);
+    } catch (e) {}
+  }
+
+  // Irritatingly repeats on mouse movement, throttled so it's not literally nonstop
+  let lastVoiceTime = 0;
+  document.addEventListener('mousemove', () => {
+    const now = Date.now();
+    if (now - lastVoiceTime > 4000 && !speechSynthesis.speaking) {
+      lastVoiceTime = now;
+      playVoiceLine();
+    }
+  });
+</script>
+
+</body>
+</html>
+</body>
+</html>

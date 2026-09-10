@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NORMΛL.NET — Absolute Peace, No Distractions</title>
+<style>
+  :root {
+    --bg-void: #020306;
+    --card-surface: #07090f;
+    --card-border: #ff0033;
+    --toxic-green: #00ff66;
+    --hazard-yellow: #ffe600;
+    --blood-red: #ff0033;
+    --text-white: #f8fafc;
+    --text-dim: #64748b;
+    --font-terminal: "Courier New", monospace;
+    --font-impact: Impact, "Arial Black", sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body {
+    background-color: var(--bg-void);
+    color: var(--text-white);
+    font-family: var(--font-terminal);
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* CRT Scanlines */
+  .crt-lines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.5) 3px,
+      rgba(0, 0, 0, 0.5) 4px
+    ), radial-gradient(circle at 50% 50%, rgba(255, 0, 51, 0.08) 0%, rgba(0, 0, 0, 0.8) 100%);
+    pointer-events: none !important;
+    z-index: 99999;
+  }
+
+  #strobe-layer {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 0, 51, 0.6) 0%, rgba(0,0,0,0.95) 100%);
+    pointer-events: none !important;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.05s ease;
+  }
+
+  .fake-notif {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #0f121d;
+    border: 2px solid var(--blood-red);
+    box-shadow: 0 0 25px rgba(255,0,51,0.6);
+    padding: 12px 18px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 800;
+    z-index: 100000;
+    display: none;
+    pointer-events: none;
+    animation: popNotif 0.18s ease-out;
+  }
+
+  @keyframes popNotif {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+  }
+
+  .meme-sidebar {
+    position: fixed;
+    top: 100px;
+    width: 200px;
+    display: none;
+    flex-direction: column;
+    gap: 1.2rem;
+    z-index: 400;
+    pointer-events: none !important;
+  }
+  .meme-sidebar.left { left: 15px; }
+
+  .floating-sticker {
+    background: #0d1017;
+    border: 2px dashed var(--hazard-yellow);
+    box-shadow: 6px 6px 0px #000;
+    padding: 10px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--hazard-yellow);
+    text-align: center;
+    animation: twitch 0.3s infinite;
+  }
+  .floating-sticker.red {
+    border-color: var(--blood-red);
+    color: var(--blood-red);
+    animation-delay: 0.1s;
+  }
+  .floating-sticker.green {
+    border-color: var(--toxic-green);
+    color: var(--toxic-green);
+    animation-delay: 0.2s;
+  }
+
+  @keyframes twitch {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-2deg) scale(1.02); }
+    75% { transform: rotate(2deg) scale(0.98); }
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.4rem 3rem;
+    border-bottom: 2px solid #1a1e29;
+    background: rgba(6, 8, 12, 0.95);
+    z-index: 10;
+  }
+
+  .logo {
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-tag {
+    background: var(--toxic-green);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    margin-left: 2.2rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  main.hero-wrapper {
+    position: relative;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    flex: 1;
+    pointer-events: auto !important;
+  }
+
+  .hero-wrapper h1 {
+    font-size: 4.2rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(180deg, #ffffff 40%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+  }
+
+  .hero-wrapper p {
+    font-size: 1.25rem;
+    color: var(--text-dim);
+    max-width: 650px;
+    margin-bottom: 2.8rem;
+    line-height: 1.6;
+    font-family: sans-serif;
+  }
+
+  .btn-enter-vault {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #000;
+    border: none;
+    padding: 1.3rem 4rem;
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    cursor: pointer !important;
+    box-shadow: 0 0 35px rgba(16, 185, 129, 0.4);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 60;
+  }
+  .btn-enter-vault:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 50px rgba(16, 185, 129, 0.7);
+  }
+
+  /* Vertical Scoreboard Docked to the Right */
+  #hud-board {
+    position: fixed;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(9, 11, 16, 0.96);
+    border: 2px solid var(--blood-red);
+    padding: 1.2rem 1rem;
+    box-shadow: -5px 0 35px rgba(255, 0, 51, 0.35);
+    display: none;
+    flex-direction: column;
+    gap: 1.1rem;
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: #cbd5e1;
+    z-index: 10000;
+    backdrop-filter: blur(10px);
+    border-radius: 4px;
+    pointer-events: none;
+    width: 170px;
+    text-align: left;
+  }
+  #hud-board div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+  }
+  #hud-board div:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  #hud-board span { color: #fff; font-size: 1.15rem; font-weight: 900; }
+  #hud-board .alert-stat { color: var(--blood-red); text-shadow: 0 0 10px var(--blood-red); }
+
+  #arena {
+    position: fixed;
+    inset: 0;
+    pointer-events: none !important;
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dark-window {
+    pointer-events: auto !important;
+    background: var(--card-surface);
+    color: var(--text-white);
+    border: 5px solid var(--card-border);
+    box-shadow: 25px 25px 0px #000, 0 0 90px rgba(255, 0, 51, 0.45);
+    width: 760px;
+    max-width: 88vw;
+    position: relative;
+    animation: slamEntrance 0.14s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .dark-titlebar {
+    background: #0f121a;
+    border-bottom: 3px solid var(--card-border);
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--hazard-yellow);
+    font-weight: 900;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    position: relative;
+    min-height: 56px;
+  }
+
+  .dark-x-btn {
+    background: #191e28;
+    color: var(--blood-red);
+    border: 2px solid var(--blood-red);
+    font-weight: 900;
+    padding: 6px 14px;
+    cursor: pointer !important;
+    font-size: 1rem;
+    line-height: 1;
+    transition: background 0.1s;
+    white-space: nowrap;
+  }
+  .dark-x-btn:hover { background: var(--blood-red); color: #000; }
+
+  .dark-body {
+    padding: 2.4rem 2.2rem;
+    text-align: center;
+  }
+
+  .hazard-banner {
+    background: repeating-linear-gradient(
+      -45deg,
+      #000,
+      #000 14px,
+      #ffe600 14px,
+      #ffe600 28px
+    );
+    color: #000;
+    font-family: var(--font-impact);
+    font-weight: 900;
+    font-size: 1.25rem;
+    padding: 10px 14px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-shadow: 1px 1px 0px #fff;
+  }
+
+  .dark-h1 {
+    font-size: 2.7rem;
+    font-weight: 900;
+    margin-bottom: 0.6rem;
+    color: var(--blood-red);
+    font-family: var(--font-impact);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .dark-p {
+    font-size: 1.2rem;
+    color: #cbd5e1;
+    margin-bottom: 1.8rem;
+    line-height: 1.5;
+    font-family: sans-serif;
+  }
+
+  .interactive-rack {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-bottom: 1.3rem;
+    min-height: 55px;
+    position: relative;
+  }
+
+  .brutal-btn {
+    background: #121620;
+    color: var(--hazard-yellow);
+    border: 2px solid var(--hazard-yellow);
+    padding: 0.95rem 1.8rem;
+    font-size: 1.05rem;
+    font-weight: 900;
+    font-family: var(--font-terminal);
+    cursor: pointer !important;
+    box-shadow: 6px 6px 0px #000;
+    transition: transform 0.05s, background 0.1s;
+  }
+  .brutal-btn:hover { background: var(--hazard-yellow); color: #000; }
+  .brutal-btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0px #000; }
+
+  .rage-terminal {
+    font-size: 1rem;
+    font-family: var(--font-terminal);
+    color: var(--toxic-green);
+    background: #000;
+    padding: 14px;
+    border: 2px solid #222;
+    min-height: 3.5rem;
+    margin-top: 1.4rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.12);
+  }
+
+  #flee-target-screen {
+    position: fixed;
+    z-index: 99999;
+    background: var(--hazard-yellow);
+    color: #000;
+    border: 3px solid #000;
+    font-size: 1.15rem;
+    font-weight: 900;
+    padding: 1rem 2.2rem;
+    cursor: pointer !important;
+    box-shadow: 0 0 35px var(--hazard-yellow), 8px 8px 0px #000;
+    pointer-events: auto !important;
+  }
+
+  .pitch-hud {
+    width: 100%;
+    height: 60px;
+    background: #000;
+    border: 3px solid #222;
+    position: relative;
+    margin: 1.8rem 0;
+    overflow: hidden;
+  }
+  .pitch-safe-zone {
+    position: absolute;
+    left: 45%;
+    width: 35%;
+    height: 100%;
+    background: rgba(0, 255, 102, 0.35);
+    border-left: 3px dashed var(--toxic-green);
+    border-right: 3px dashed var(--toxic-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: var(--toxic-green);
+    font-family: var(--font-impact);
+  }
+  .pitch-wire {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    background: var(--blood-red);
+    left: 0%;
+    transition: left 0.07s linear;
+    box-shadow: 0 0 18px var(--blood-red);
+  }
+
+  .optical-viewport {
+    position: relative;
+    width: 400px;
+    height: 280px;
+    margin: 0 auto 1.6rem;
+    border: 4px solid var(--blood-red);
+    background: #000;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(255, 0, 51, 0.4);
+  }
+  .target-quadrant {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    border-bottom: 3px dashed var(--hazard-yellow);
+    background: rgba(255, 230, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #fff;
+    pointer-events: none;
+    font-family: var(--font-impact);
+    letter-spacing: 0.05em;
+  }
+
+  .chaos-card {
+    position: absolute;
+    width: 330px;
+    background: #090c12;
+    color: #fff;
+    border: 3px solid var(--blood-red);
+    box-shadow: 14px 14px 0px #000;
+    padding: 1rem;
+    pointer-events: auto !important;
+    z-index: 600;
+    font-family: var(--font-terminal);
+    animation: slamEntrance 0.12s ease-out;
+  }
+
+  .alarm-input {
+    background: #000;
+    border: 3px solid var(--blood-red);
+    color: var(--hazard-yellow);
+    font-family: monospace;
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-align: center;
+    padding: 10px;
+    width: 280px;
+    margin: 1.2rem auto;
+    outline: none;
+    box-shadow: 0 0 20px rgba(255, 0, 51, 0.4);
+  }
+
+  .laughing-cat-box {
+    margin: 1.2rem auto;
+    width: 140px;
+    height: 140px;
+    animation: catBounce 0.25s infinite alternate ease-in-out;
+  }
+  @keyframes catBounce {
+    0% { transform: translateY(0) rotate(-3deg) scale(1); }
+    100% { transform: translateY(-8px) rotate(3deg) scale(1.05); }
+  }
+
+  @keyframes slamEntrance {
+    0% { transform: scale(0.65) rotate(-4deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  @keyframes violentRageShake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    15% { transform: translate(-26px, 20px) rotate(-3.5deg); }
+    30% { transform: translate(28px, -22px) rotate(4deg); }
+    45% { transform: translate(-22px, -18px) rotate(-2.5deg); }
+    60% { transform: translate(24px, 22px) rotate(3.5deg); }
+    75% { transform: translate(-18px, 16px) rotate(-1.5deg); }
+    90% { transform: translate(20px, -14px) rotate(2.5deg); }
+  }
+  .shake-violent { animation: violentRageShake 0.35s ease infinite; }
+</style>
+</head>
+<body>
+
+<div class="crt-lines"></div>
+<div id="strobe-layer"></div>
+<div class="fake-notif" id="notif-bar">🚨 WARNING: 99 UNRESOLVED PROBLEMS INJECTED</div>
+
+<div class="meme-sidebar left" id="meme-left">
+  <div class="floating-sticker red">🔥 TASK FAILED SUCCESSFULLY 💀</div>
+  <div class="floating-sticker">⚠️ 404 LOGIC NOT FOUND</div>
+  <div class="floating-sticker green">📈 ATTENTION STONKS ONLY GO UP 🤑</div>
+</div>
+
+<header>
+  <div class="logo">
+    NORMΛL.NET 
+    <span class="logo-tag">100% PEACEFUL</span>
+  </div>
+  <nav>
+    <a href="#" onclick="return false;">PORTAL</a>
+    <a href="#" onclick="return false;">SAFETY</a>
+    <a href="#" onclick="return false;">SAFE EXIT</a>
+  </nav>
+</header>
+
+<main class="hero-wrapper" id="clean-screen">
+  <h1>A completely normal<br>browsing experience.</h1>
+  <p>No popups. No mic tricks. No digital surveillance bloatware.<br>Click below to enter the verified distraction-free vault.</p>
+  <button class="btn-enter-vault" id="enter-vault-btn">ENTER WEBSITE</button>
+</main>
+
+<div id="hud-board">
+  <div>STAGE: <span id="hud-stage">0/8</span></div>
+  <div>ATTENTION: <span id="hud-attention" class="alert-stat">0%</span></div>
+  <div>FAILED TRAPS: <span id="hud-traps">0</span></div>
+  <div>ADS SPAWNED: <span id="hud-ads">0</span></div>
+  <div>ELAPSED: <span id="hud-timer">00:00</span></div>
+</div>
+
+<div id="arena"></div>
+
+<script>
+class Synthesizer {
+  constructor() {
+    this.ctx = null;
+    this.alarmInterval = null;
+  }
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+  playTone(freq, type = 'square', duration = 0.12, vol = 0.25) {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch(e) {}
+  }
+  bonkBuzz() {
+    this.playTone(75, 'sawtooth', 0.28, 0.4);
+    setTimeout(() => this.playTone(45, 'sawtooth', 0.3, 0.4), 60);
+  }
+  popBeep() {
+    this.playTone(950, 'square', 0.08, 0.2);
+    setTimeout(() => this.playTone(1400, 'square', 0.1, 0.2), 50);
+  }
+  fleeBoing() {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.18);
+      gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.18);
+    } catch(e) {}
+  }
+  startUnbearableAlarm() {
+    if (!this.ctx) return;
+    this.stopAlarm();
+    let toggle = false;
+    this.alarmInterval = setInterval(() => {
+      toggle = !toggle;
+      this.playTone(toggle ? 980 : 650, 'sawtooth', 0.18, 0.35);
+    }, 200);
+  }
+  stopAlarm() {
+    if (this.alarmInterval) {
+      clearInterval(this.alarmInterval);
+      this.alarmInterval = null;
+    }
+  }
+  fanfareVictory() {
+    this.stopAlarm();
+    const notes = [261.6, 329.6, 392.0, 523.2, 659.2, 784.0];
+    notes.forEach((note, idx) => {
+      setTimeout(() => this.playTone(note, 'triangle', 0.35, 0.25), idx * 110);
+    });
+  }
+}
+
+const audio = new Synthesizer();
+const arena = document.getElementById('arena');
+const hud = document.getElementById('hud-board');
+const hudStage = document.getElementById('hud-stage');
+const hudAttention = document.getElementById('hud-attention');
+const hudTraps = document.getElementById('hud-traps');
+const hudAds = document.getElementById('hud-ads');
+const hudTimer = document.getElementById('hud-timer');
+const strobe = document.getElementById('strobe-layer');
+const notif = document.getElementById('notif-bar');
+const memeLeft = document.getElementById('meme-left');
+
+const state = {
+  stage: 0,
+  attention: 15,
+  maxAttention: 15,
+  trapsTriggered: 0,
+  adsSpawned: 0,
+  startTime: null,
+  activeIntervals: [],
+  activeStreams: [],
+  activeListeners: []
+};
+
+setInterval(() => {
+  if (!state.startTime) return;
+  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const s = String(elapsed % 60).padStart(2, '0');
+  hudTimer.innerText = `${m}:${s}`;
+}, 1000);
+
+function registerListener(target, event, handler, options = false) {
+  target.addEventListener(event, handler, options);
+  state.activeListeners.push({ target, event, handler, options });
+}
+
+function flashStrobe() {
+  strobe.style.opacity = '1';
+  setTimeout(() => { strobe.style.opacity = '0'; }, 70);
+  
+  document.title = "(99+) SYSTEM OVERLOAD — STOP ENGAGING 💀";
+  notif.style.display = 'block';
+  setTimeout(() => {
+    document.title = "NORMΛL.NET — Absolute Peace, No Distractions";
+    notif.style.display = 'none';
+  }, 1200);
+}
+
+function updateHUD() {
+  hudStage.innerText = `${state.stage}/8`;
+  hudAttention.innerText = `${Math.max(0, Math.round(state.attention))}%`;
+  hudTraps.innerText = state.trapsTriggered;
+  hudAds.innerText = state.adsSpawned;
+  if (state.attention > state.maxAttention) state.maxAttention = state.attention;
+}
+
+function penalizeUser(addAtt = 10) {
+  state.trapsTriggered++;
+  state.attention = Math.min(250, state.attention + addAtt);
+  audio.bonkBuzz();
+  flashStrobe();
+  updateHUD();
+}
+
+function resetArena() {
+  audio.stopAlarm();
+  state.activeIntervals.forEach(clearInterval);
+  state.activeIntervals = [];
+  state.activeStreams.forEach(stream => {
+    try { stream.getTracks().forEach(t => t.stop()); } catch(e) {}
+  });
+  state.activeStreams = [];
+  state.activeListeners.forEach(({ target, event, handler, options }) => {
+    try { target.removeEventListener(event, handler, options); } catch(e) {}
+  });
+  state.activeListeners = [];
+  
+  const lingeringScreenBtn = document.getElementById('flee-target-screen');
+  if (lingeringScreenBtn) lingeringScreenBtn.remove();
+
+  arena.innerHTML = '';
+}
+
+document.getElementById('enter-vault-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  audio.init();
+  state.startTime = Date.now();
+  
+  document.getElementById('clean-screen').style.display = 'none';
+  arena.style.display = 'flex';
+  hud.style.display = 'flex';
+  memeLeft.style.display = 'flex';
+  
+  startAct1();
+});
+
+/**
+ * ACT 1: THE LYING CLOSE BUTTON
+ */
+function startAct1() {
+  resetArena();
+  state.stage = 1;
+  state.attention = 18;
+  state.adsSpawned++;
+  updateHUD();
+  audio.popBeep();
+
+  let strikes = 0;
+  const win = document.createElement('div');
+  win.className = 'dark-window';
+  win.innerHTML = `
+    <div class="dark-titlebar" id="act1-titlebar">
+      <span>WINNER_PRIZE_VERIFICATION.EXE</span>
+      <button class="dark-x-btn" id="act1-x">✕ CLOSE</button>
+    </div>
+    <div class="dark-body">
+      <div class="hazard-banner">🔥 SPECIAL ENGAGEMENT PROTOCOL INITIALIZED 🔥</div>
+      <div class="dark-h1">CONGRATULATIONS!</div>
+      <div class="dark-p">You have won absolutely nothing. Click below to confirm non-interest.</div>
+      <div class="interactive-rack">
+        <button class="brutal-btn" id="act1-trap" style="background:#ff0055; color:#fff; border-color:#ff0055;">CLAIM VOID</button>
+      </div>
+      <div class="rage-terminal" id="act1-log">Awaiting user exit intent...</div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const closeX = win.querySelector('#act1-x');
+  const trapBtn = win.querySelector('#act1-trap');
+  const log = win.querySelector('#act1-log');
+
+  trapBtn.addEventListener('click', () => {
+    penalizeUser(12);
+    log.innerText = "Bro thought clicking an ad button would help 💀";
+  });
+
+  const quotes = [
+    "bro clicked it AGAIN 💀",
+    "Button relocated to another dimension!",
+    "Attention rising! Nice reflex though.",
+    "At this point, we're basically besties.",
+    "Fine. Click me one more time. No games."
+  ];
+
+  const jumpSpots = [
+    { top: "8px", right: "220px", left: "auto", text: "✕ REALLY?" },
+    { top: "8px", right: "auto", left: "15px", text: "✕ BRO WHY" },
+    { top: "8px", right: "350px", left: "auto", text: "✕ STOP IT" },
+    { top: "8px", right: "25px", left: "auto", text: "✕ ACTUALLY DONE" }
+  ];
+
+  closeX.addEventListener('click', () => {
+    strikes++;
+    penalizeUser(8);
+    win.classList.remove('shake-violent');
+    void win.offsetWidth;
+    win.classList.add('shake-violent');
+
+    if (strikes <= quotes.length) {
+      log.innerText = quotes[strikes - 1];
+      closeX.style.position = "absolute";
+      const spot = jumpSpots[(strikes - 1) % jumpSpots.length];
+      closeX.style.top = spot.top;
+      closeX.style.right = spot.right;
+      closeX.style.left = spot.left;
+      closeX.innerText = spot.text;
+      closeX.style.transform = `scale(${1 - strikes * 0.12})`;
+    } else {
+      log.innerText = "Error: User stubbornness exceeded. Proceeding to Survey...";
+      setTimeout(() => startAct2(), 600);
+    }
+  });
+}
+
+/**
+ * ACT 2: BUTTON TRUST ISSUES
+ */
+function startAct2() {
+  resetArena();
+  state.stage = 2;
+  state.attention = 40;
+  state.adsSpawned++;
+  updateHUD();
+  audio.popBeep();
+
+  const win = document.createElement('div');
+  win.className = 'dark-window';
+  win.innerHTML = `
+    <div class="dark-titlebar">
+      <span>CANCELLATION_CONFIRMATION_PORTAL_V4</span>
+    </div>
+    <div class="dark-body">
+      <div class="hazard-banner">⚠️ EMOTIONAL DAMAGE PROTOCOL ACTIVATED ⚠️</div>
+      <div class="dark-h1">HOW WOULD YOU LIKE TO CLOSE THIS AD?</div>
+      <div class="dark-p">Select official exit gateway below to safely terminate visual tracking.</div>
+      <div class="interactive-rack" id="act2-grid">
+        <button class="brutal-btn">CLOSE</button>
+        <button class="brutal-btn">EXIT</button>
+        <button class="brutal-btn">DISMISS</button>
+        <button class="brutal-btn">REMOVE</button>
+        <button class="brutal-btn">LEAVE</button>
+        <button class="brutal-btn">PLEASE STOP</button>
+        <button class="brutal-btn">I AM DONE</button>
+      </div>
+      <div class="rage-terminal" id="act2-log">Trusting UI labels was your first mistake.</div>
+      <div style="margin-top: 1.4rem;">
+        <span id="act2-secret" style="font-size: 0.9rem; color: #475569; cursor: pointer; font-family: monospace;">Advertisement ID: 404-AD-NOTFOUND</span>
+      </div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const grid = win.querySelector('#act2-grid');
+  const log = win.querySelector('#act2-log');
+  const secret = win.querySelector('#act2-secret');
+  let tries = 0;
+
+  const quips = [
+    "POV: you trusted UI labels 🤡",
+    "Task failed successfully.",
+    "Buttons scrambled for maximum interaction convenience.",
+    "Congratulations! You unlocked MORE PROBLEMS."
+  ];
+
+  grid.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('brutal-btn')) return;
+    tries++;
+    penalizeUser(10);
+    win.classList.remove('shake-violent');
+    void win.offsetWidth;
+    win.classList.add('shake-violent');
+
+    const btns = Array.from(grid.children);
+    btns.sort(() => Math.random() - 0.5);
+    btns.forEach(b => grid.appendChild(b));
+
+    log.innerText = quips[tries % quips.length];
+    if (tries >= 3) {
+      log.innerText = "Maybe the solution isn't a button. Look lower.";
+      secret.style.color = "var(--toxic-green)";
+      secret.style.textDecoration = "underline";
+    }
+  });
+
+  secret.addEventListener('click', () => {
+    audio.playTone(720, 'sine', 0.25, 0.2);
+    log.innerText = "De-registering asset ID...";
+    setTimeout(() => startAct3(), 600);
+  });
+}
+
+/**
+ * ACT 3: PREDICTIVE CURSOR RADAR (FULL VIEWPORT)
+ */
+function startAct3() {
+  resetArena();
+  state.stage = 3;
+  state.attention = 60;
+  state.adsSpawned++;
+  updateHUD();
+  audio.popBeep();
+
+  const win = document.createElement('div');
+  win.className = 'dark-window';
+  win.innerHTML = `
+    <div class="dark-titlebar">
+      <span>AI_CURSOR_VELOCITY_PREDICTOR.SYS</span>
+    </div>
+    <div class="dark-body">
+      <div class="hazard-banner">💀 BRO THINKS HE'S FASTER THAN CSS 💀</div>
+      <div class="dark-h1">HYPERSPACE REFLEXES</div>
+      <div class="dark-p">The close button escaped into the open page! Chase it down across the entire screen.</div>
+      <div class="rage-terminal" id="act3-log">Tracking high-velocity cursor dynamics...</div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const log = win.querySelector('#act3-log');
+
+  const screenBtn = document.createElement('button');
+  screenBtn.id = 'flee-target-screen';
+  screenBtn.innerText = "✕ CLOSE ME IF YOU CAN";
+  document.body.appendChild(screenBtn);
+
+  let curX = window.innerWidth / 2 - 120;
+  let curY = window.innerHeight / 2 + 180;
+  screenBtn.style.left = `${curX}px`;
+  screenBtn.style.top = `${curY}px`;
+
+  let freezeTimeout = null;
+
+  const onPointerMove = (e) => {
+    const rect = screenBtn.getBoundingClientRect();
+    const btnCenterX = rect.left + rect.width / 2;
+    const btnCenterY = rect.top + rect.height / 2;
+
+    const dx = e.clientX - btnCenterX;
+    const dy = e.clientY - btnCenterY;
+    const dist = Math.hypot(dx, dy);
+
+    clearTimeout(freezeTimeout);
+
+    if (dist < 180) {
+      const angle = Math.atan2(dy, dx);
+      curX -= Math.cos(angle) * 240;
+      curY -= Math.sin(angle) * 240;
+
+      if (curX < 40) curX = window.innerWidth - rect.width - 60;
+      if (curX > window.innerWidth - rect.width - 200) curX = 60;
+      if (curY < 40) curY = window.innerHeight - rect.height - 60;
+      if (curY > window.innerHeight - rect.height - 40) curY = 60;
+
+      screenBtn.style.left = `${curX}px`;
+      screenBtn.style.top = `${curY}px`;
+
+      state.attention += 2.5;
+      updateHUD();
+      audio.fleeBoing();
+      log.innerText = "Way too predictable! Bro is fighting CSS physics across the screen 💀";
+    }
+
+    freezeTimeout = setTimeout(() => {
+      log.innerText = "Target stationary... Button disoriented. Approach calmly and slowly!";
+      curX = window.innerWidth / 2 - 120;
+      curY = window.innerHeight / 2 + 160;
+      screenBtn.style.transition = "all 1s cubic-bezier(0.16, 1, 0.3, 1)";
+      screenBtn.style.left = `${curX}px`;
+      screenBtn.style.top = `${curY}px`;
+      setTimeout(() => { screenBtn.style.transition = "none"; }, 1000);
+    }, 2000);
+  };
+
+  registerListener(window, 'pointermove', onPointerMove);
+
+  screenBtn.addEventListener('click', () => {
+    screenBtn.remove();
+    audio.playTone(760, 'sine', 0.25, 0.2);
+    startAct4();
+  });
+}
+
+/**
+ * ACT 4: THE ATTENTION SLIDER
+ */
+function startAct4() {
+  resetArena();
+  state.stage = 4;
+  state.attention = 100;
+  state.adsSpawned++;
+  updateHUD();
+  audio.popBeep();
+
+  const win = document.createElement('div');
+  win.className = 'dark-window';
+  win.innerHTML = `
+    <div class="dark-titlebar">
+      <span>DISENGAGEMENT_PROTOCOL.EXE</span>
+    </div>
+    <div class="dark-body">
+      <div class="hazard-banner">📉 MANUAL OVERRIDE PROTOCOL ACTIVATED 📉</div>
+      <div class="dark-h1">DISENGAGEMENT PROTOCOL</div>
+      <div class="dark-p">Calibrate Attention Level to 0% to safely unlock page access.</div>
+      <div style="margin: 1.8rem 0;">
+        <input type="range" id="act4-slider" min="0" max="180" value="100" style="width: 85%; height: 18px; cursor: pointer; accent-color: var(--blood-red);" />
+        <div style="font-size: 1.8rem; font-weight: 900; margin-top: 0.8rem; font-family: monospace; color: var(--hazard-yellow);" id="act4-val">ATTENTION: 100%</div>
+      </div>
+      <div class="rage-terminal" id="act4-log">Dragging left attempts manual willpower...</div>
+      <div id="act4-optout" style="margin-top: 1.4rem; display: none; font-size: 1rem; background: rgba(255, 0, 51, 0.15); border: 2px dashed var(--blood-red); padding: 12px; cursor: pointer; color: #fca5a5; font-weight: 900; font-family: monospace;">
+        [AD PERSONALIZATION: ON ➔ CLICK TO SWITCH OFF]
+      </div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const slider = win.querySelector('#act4-slider');
+  const valDisplay = win.querySelector('#act4-val');
+  const log = win.querySelector('#act4-log');
+  const optOutBtn = win.querySelector('#act4-optout');
+
+  let naturalLevel = 100;
+  let userHolding = false;
+
+  slider.addEventListener('mousedown', () => { userHolding = true; });
+  slider.addEventListener('mouseup', () => {
+    userHolding = false;
+    if (parseInt(slider.value, 10) < 50) {
+      slider.value = 100;
+      naturalLevel = 100;
+      penalizeUser(14);
+      log.innerText = "Nice try. You can't manually decide to stop caring.";
+      valDisplay.innerText = "ATTENTION: 100%";
+    }
+  });
+
+  slider.addEventListener('input', () => {
+    const val = parseInt(slider.value, 10);
+    valDisplay.innerText = `ATTENTION: ${val}%`;
+    if (val > 100) {
+      state.attention = val;
+      updateHUD();
+      audio.playTone(200 + val * 3, 'sawtooth', 0.05, 0.1);
+      log.innerText = "Bro is literally feeding it.";
+    }
+  });
+
+  const decay = setInterval(() => {
+    if (!userHolding && naturalLevel > 13) {
+      naturalLevel -= 2;
+      slider.value = naturalLevel;
+      valDisplay.innerText = `ATTENTION: ${naturalLevel}%`;
+      state.attention = naturalLevel;
+      updateHUD();
+      if (naturalLevel <= 14) {
+        log.innerText = "Close... but you're still here.";
+        optOutBtn.style.display = 'block';
+      }
+    }
+  }, 250);
+  state.activeIntervals.push(decay);
+
+  optOutBtn.addEventListener('click', () => {
+    slider.value = 0;
+    valDisplay.innerText = "ATTENTION: 0%";
+    state.attention = 0;
+    updateHUD();
+    audio.playTone(850, 'sine', 0.35, 0.25);
+    log.innerText = "Personalization disabled. Congratulations. You successfully opted out.";
+    setTimeout(() => startAct5(), 1000);
+  });
+}
+
+/**
+ * ACT 5: ROBUST AUDIO PITCH TRACKER (HARDWARE COMPATIBLE)
+ */
+function startAct5() {
+  resetArena();
+  state.stage = 5;
+  state.attention = 75;
+  state.adsSpawned++;
+  updateHUD();
+  audio.popBeep();
+
+  const win = document.createElement('div');
+  win.className = 'dark-window';
+  win.innerHTML = `
+    <div class="dark-titlebar">
+      <span>ACOUSTIC_FREQUENCY_CALIBRATOR.SYS</span>
+    </div>
+    <div class="dark-body">
+      <div class="hazard-banner">🎤 “THE AD HAS EARS” (MIC REQUIRED) 🎤</div>
+      <div class="dark-h1">MATCH THE FREQUENCY</div>
+      <div class="dark-p">Hum continuously into your microphone to hold the frequency needle in the TARGET ZONE for 2.5s!</div>
+      
+      <div class="interactive-rack">
+        <button class="brutal-btn" id="act5-mic-btn" style="background: var(--toxic-green); color: #000; border-color: var(--toxic-green); font-size: 1.15rem;">ENABLE LIVE MIC</button>
+      </div>
+
+      <div class="pitch-hud">
+        <div class="pitch-safe-zone">TARGET ZONE (200Hz - 380Hz)</div>
+        <div class="pitch-wire" id="pitch-needle"></div>
+      </div>
+
+      <div style="font-family: monospace; font-size: 1.25rem; font-weight: 900; color: var(--hazard-yellow);" id="pitch-readout">CURRENT PITCH: WAITING...</div>
+      <div style="background: #151922; height: 20px; border: 2px solid #333; margin-top: 1.4rem; overflow: hidden;">
+        <div id="hold-progress" style="background: var(--toxic-green); height: 100%; width: 0%; transition: width 0.1s;"></div>
+      </div>
+      <div class="rage-terminal" id="act5-log">Click green button and hum into your microphone.</div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const micBtn = win.querySelector('#act5-mic-btn');
+  const needle = win.querySelector('#pitch-needle');
+  const readout = win.querySelector('#pitch-readout');
+  const holdBar = win.querySelector('#hold-progress');
+  const log = win.querySelector('#act5-log');
+
+  let holdScore = 0;
+
+  function passAct5() {
+    audio.playTone(880, 'triangle', 0.4, 0.25);
+    log.innerText = "If you have nothing to say, neither do I. Stage Passed.";
+    setTimeout(() => startAct6(), 1000);
+  }
+
+  function detectPitch(buf, sampleRate) {
+    const SIZE = buf.length;
+    let rms = 0;
+    for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / SIZE);
+    
+    // Low RMS threshold (0.006) for quiet/laptop mics
+    if (rms < 0.006) return -1;
+
+    let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+    for (let i = 0; i < SIZE / 2; i++) {
+      if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+    }
+    for (let i = 1; i < SIZE / 2; i++) {
+      if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+    }
+
+    const trimmed = buf.slice(r1, r2);
+    const c = new Array(trimmed.length).fill(0);
+    for (let i = 0; i < trimmed.length; i++) {
+      for (let j = 0; j < trimmed.length - i; j++) {
+        c[i] = c[i] + trimmed[j] * trimmed[j + i];
+      }
+    }
+
+    let d = 0;
+    while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < trimmed.length; i++) {
+      if (c[i] > maxval) {
+        maxval = c[i];
+        maxpos = i;
+      }
+    }
+    return sampleRate / maxpos;
+  }
+
+  micBtn.addEventListener('click', async () => {
+    try {
+      // Raw stream access bypassing aggressive browser audio processing
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
+        }
+      });
+      state.activeStreams.push(stream);
+      micBtn.style.display = 'none';
+      log.innerText = "Mic active! Hum into your mic to keep needle in TARGET ZONE.";
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+      const analyser = audioCtx.createAnalyser();
+      const src = audioCtx.createMediaStreamSource(stream);
+      analyser.fftSize = 2048;
+      src.connect(analyser);
+
+      const buf = new Float32Array(analyser.fftSize);
+      const poll = setInterval(() => {
+        analyser.getFloatTimeDomainData(buf);
+        const pitch = detectPitch(buf, audioCtx.sampleRate);
+
+        if (pitch > 60 && pitch < 800) {
+          readout.innerText = `CURRENT PITCH: ${Math.round(pitch)} Hz`;
+          const pct = Math.min(100, Math.max(0, ((pitch - 80) / 420) * 100));
+          needle.style.left = `${pct}%`;
+
+          // Generous target zone bounds
+          if (pct >= 40 && pct <= 82) {
+            holdScore += 4;
+            needle.style.background = "var(--toxic-green)";
+            log.innerText = "HOLD IT! Target frequency matched!";
+          } else {
+            holdScore = Math.max(0, holdScore - 2);
+            needle.style.background = "var(--blood-red)";
+          }
+        } else {
+          holdScore = Math.max(0, holdScore - 1);
+        }
+
+        holdBar.style.width = `${Math.min(100, holdScore)}%`;
+        if (holdScore >= 100) {
+          clearInterval(poll);
+          passAct5();
+        }
+      }, 70);
+      state.activeIntervals.push(poll);
+    } catch(err) {
+      log.innerText = "Microphone access denied! Allow browser permissions.";
+    }
+  });
+}
+
+/**
+ * ACT 6: OPTICAL GESTURE SCANNER (WEBCAM MANDATORY)
+ */
+function startAct6() {
+  resetArena();
+  state.stage = 6;
+  state.attention = 85;
+  state.adsSpawned++;
+  updateHUD();
+  audio.popBeep();
+
+  const win = document.createElement('div');
+  win.className = 'dark-window';
+  win.innerHTML = `
+    <div class="dark-titlebar">
+      <span>OPTICAL_GESTURE_SCANNER.EXE</span>
+    </div>
+    <div class="dark-body">
+      <div class="hazard-banner">👁️ “THE AD HAS EYES” (WEBCAM MANDATORY) 👁️</div>
+      <div class="dark-h1">VISUAL ATTENTION DETECTOR</div>
+      <div class="dark-p">Turn on webcam, raise your hand into the top box, and hold for 3 seconds!</div>
+      
+      <div class="interactive-rack">
+        <button class="brutal-btn" id="act6-cam-btn" style="background: #3b82f6; color: #fff; border-color: #3b82f6; font-size: 1.15rem;">START WEBCAM FEED</button>
+      </div>
+
+      <div class="optical-viewport" id="cam-box" style="display: none;">
+        <canvas id="cam-canvas" width="400" height="280"></canvas>
+        <div class="target-quadrant">✋ RAISE HAND HERE TO DISSOLVE AD</div>
+      </div>
+
+      <div style="font-family: monospace; font-size: 1.25rem; font-weight: 900; margin-bottom: 0.8rem; color: var(--hazard-yellow);" id="cam-readout">GESTURE: WAITING FOR CAMERA</div>
+      <div style="background: #151922; height: 20px; border: 2px solid #333; overflow: hidden;">
+        <div id="cam-progress" style="background: linear-gradient(90deg, #3b82f6, var(--toxic-green)); height: 100%; width: 0%;"></div>
+      </div>
+      <div class="rage-terminal" id="act6-log">Optical recognition stays strictly local inside browser.</div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const camBtn = win.querySelector('#act6-cam-btn');
+  const camBox = win.querySelector('#cam-box');
+  const canvas = win.querySelector('#cam-canvas');
+  const readout = win.querySelector('#cam-readout');
+  const progressBar = win.querySelector('#cam-progress');
+  const log = win.querySelector('#act6-log');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+  let gestureScore = 0;
+
+  function passAct6() {
+    audio.playTone(850, 'triangle', 0.4, 0.25);
+    log.innerText = "Wait... you're actually ignoring me.";
+    setTimeout(() => startAct7(), 1000);
+  }
+
+  camBtn.addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 400, height: 280 } });
+      state.activeStreams.push(stream);
+      camBtn.style.display = 'none';
+      camBox.style.display = 'block';
+
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.playsInline = true;
+      video.srcObject = stream;
+      await video.play();
+
+      let lastFrame = null;
+      const pollCam = setInterval(() => {
+        ctx.drawImage(video, 0, 0, 400, 280);
+        const currentFrame = ctx.getImageData(0, 0, 400, 280);
+
+        if (lastFrame) {
+          let topDiff = 0;
+          const halfLen = currentFrame.data.length / 2;
+          for (let i = 0; i < halfLen; i += 16) {
+            topDiff += Math.abs(currentFrame.data[i] - lastFrame.data[i]);
+          }
+          const topMotion = topDiff / (halfLen / 16);
+
+          if (topMotion > 16) {
+            gestureScore += 4;
+            readout.innerText = "GESTURE: ✋ HAND DETECTED! KEEP HOLDING!";
+            readout.style.color = "var(--toxic-green)";
+          } else {
+            gestureScore = Math.max(0, gestureScore - 2);
+            readout.innerText = "GESTURE: MOVE HAND HIGHER INTO TARGET BOX";
+            readout.style.color = "var(--blood-red)";
+          }
+
+          progressBar.style.width = `${Math.min(100, gestureScore)}%`;
+          if (gestureScore >= 100) {
+            clearInterval(pollCam);
+            passAct6();
+          }
+        }
+        lastFrame = currentFrame;
+      }, 100);
+      state.activeIntervals.push(pollCam);
+    } catch(e) {
+      log.innerText = "Camera access denied! Allow browser permissions.";
+    }
+  });
+}
+
+/**
+ * ACT 7: ADPOCALYPSE (HARDENED CIPHER PUZZLE)
+ */
+function startAct7() {
+  resetArena();
+  state.stage = 7;
+  state.attention = 130;
+  updateHUD();
+  audio.bonkBuzz();
+
+  const adConfigs = [
+    { title: "FREE RAM!", body: "Your device now has -4 GB RAM.", x: "6vw", y: "12vh" },
+    { title: "LIMITED OFFER", body: "Expired before you read this.", x: "50vw", y: "14vh" },
+    { title: "URGENT!", body: "We detected peace.", x: "10vw", y: "58vh" },
+    { title: "HOT DEAL 🔥", body: "Absolutely not hot.", x: "48vw", y: "58vh" },
+    { title: "NOTIFICATION", body: "You have 99 pending problems.", x: "28vw", y: "35vh" }
+  ];
+
+  const cards = [];
+  adConfigs.forEach(cfg => {
+    state.adsSpawned++;
+    const box = document.createElement('div');
+    box.className = 'chaos-card';
+    box.style.left = cfg.x;
+    box.style.top = cfg.y;
+    box.innerHTML = `
+      <div style="background: #11141d; border-bottom: 2px solid var(--blood-red); padding: 4px 8px; font-weight: 900; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+        <span style="color:var(--hazard-yellow);">${cfg.title}</span>
+        <button class="chaos-x-btn" style="cursor: pointer; background: #222; color: var(--blood-red); font-weight: 900; padding: 2px 8px; border: 1px solid var(--blood-red);">✕</button>
+      </div>
+      <div style="font-weight: 700; margin: 0.8rem 0; font-size: 0.95rem; color:#fff;">${cfg.body}</div>
+      <div style="font-size: 0.75rem; color: #64748b;">ADS REMAINING: ∞</div>
+    `;
+    arena.appendChild(box);
+    cards.push(box);
+  });
+  updateHUD();
+
+  // Cryptic High-IQ Riddle
+  const banner = document.createElement('div');
+  banner.style.position = 'fixed';
+  banner.style.top = '1.4rem';
+  banner.style.left = '50%';
+  banner.style.transform = 'translateX(-50%)';
+  banner.style.background = 'var(--blood-red)';
+  banner.style.color = '#fff';
+  banner.style.padding = '0.9rem 2.2rem';
+  banner.style.fontFamily = 'var(--font-terminal)';
+  banner.style.fontWeight = '900';
+  banner.style.fontSize = '0.95rem';
+  banner.style.boxShadow = '0 0 45px rgba(255, 0, 51, 0.8)';
+  banner.style.zIndex = '10000';
+  banner.style.borderRadius = '4px';
+  banner.style.textAlign = 'center';
+  banner.innerHTML = "CIPHER: I modify the state, yet left alone I leave no mark. Hold me while cutting the knot [✕] to purge the hive.";
+  arena.appendChild(banner);
+
+  const hiddenToken = document.createElement('div');
+  hiddenToken.style.position = 'fixed';
+  hiddenToken.style.bottom = '16px';
+  hiddenToken.style.left = '20px';
+  hiddenToken.style.fontSize = '0.85rem';
+  hiddenToken.style.color = '#334155';
+  hiddenToken.style.cursor = 'pointer';
+  hiddenToken.style.fontFamily = 'monospace';
+  hiddenToken.style.zIndex = '10000';
+  hiddenToken.style.pointerEvents = 'auto';
+  hiddenToken.innerText = "[DEBUG: AD_STREAM_OVERFLOW - CLICK TO TERMINATE]";
+  arena.appendChild(hiddenToken);
+
+  hiddenToken.addEventListener('mouseenter', () => {
+    hiddenToken.style.color = 'var(--blood-red)';
+    hiddenToken.style.textDecoration = 'underline';
+  });
+  hiddenToken.addEventListener('mouseleave', () => {
+    hiddenToken.style.color = '#334155';
+    hiddenToken.style.textDecoration = 'none';
+  });
+
+  const panicNukeBtn = document.createElement('button');
+  panicNukeBtn.style.position = 'fixed';
+  panicNukeBtn.style.top = '5.8rem';
+  panicNukeBtn.style.left = '50%';
+  panicNukeBtn.style.transform = 'translateX(-50%)';
+  panicNukeBtn.style.background = 'var(--toxic-green)';
+  panicNukeBtn.style.color = '#000';
+  panicNukeBtn.style.border = '2px solid #000';
+  panicNukeBtn.style.padding = '0.7rem 2rem';
+  panicNukeBtn.style.fontFamily = 'var(--font-terminal)';
+  panicNukeBtn.style.fontWeight = '900';
+  panicNukeBtn.style.fontSize = '1rem';
+  panicNukeBtn.style.cursor = 'pointer';
+  panicNukeBtn.style.zIndex = '10000';
+  panicNukeBtn.style.display = 'none';
+  panicNukeBtn.innerText = "🚨 [SYSTEM OVERLOAD: EMERGENCY PURGE]";
+  arena.appendChild(panicNukeBtn);
+
+  let shiftHeld = false;
+  registerListener(window, 'keydown', (e) => {
+    if (e.key === 'Shift') {
+      shiftHeld = true;
+      banner.style.background = 'var(--toxic-green)';
+      banner.style.color = '#000';
+      banner.innerHTML = "STATUS: MODIFIER ENGAGED [0x10] — CLICK ANY [✕] NOW!";
+    }
+  });
+  registerListener(window, 'keyup', (e) => {
+    if (e.key === 'Shift') {
+      shiftHeld = false;
+      banner.style.background = 'var(--blood-red)';
+      banner.style.color = '#fff';
+      banner.innerHTML = "CIPHER: I modify the state, yet left alone I leave no mark. Hold me while cutting the knot [✕] to purge the hive.";
+    }
+  });
+
+  let failedCount = 0;
+
+  function executePurge(reason = "Finally. A power user.") {
+    audio.playTone(450, 'triangle', 0.5, 0.3);
+    banner.style.background = 'var(--toxic-green)';
+    banner.style.color = '#000';
+    banner.innerText = reason;
+    cards.forEach((c, idx) => {
+      setTimeout(() => {
+        c.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
+        c.style.transform = 'scale(0) rotate(45deg)';
+        c.style.opacity = '0';
+      }, idx * 60);
+    });
+    setTimeout(() => startFinalAct(), 900);
+  }
+
+  hiddenToken.addEventListener('click', () => {
+    executePurge("Emergency debug killswitch activated!");
+  });
+
+  panicNukeBtn.addEventListener('click', () => {
+    executePurge("Manual override executed.");
+  });
+
+  cards.forEach(card => {
+    const btn = card.querySelector('.chaos-x-btn');
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (shiftHeld || e.shiftKey) {
+        executePurge("Protocol decoded. Collective swarm eliminated.");
+      } else {
+        failedCount++;
+        penalizeUser(10);
+        state.adsSpawned++;
+        updateHUD();
+        card.classList.remove('shake-violent');
+        void card.offsetWidth;
+        card.classList.add('shake-violent');
+
+        // Progressive cryptic clues
+        if (failedCount === 2) {
+          banner.innerText = "ATTEMPT FAILED: You cannot pick off the swarm one by one. Find the modifier.";
+        } else if (failedCount === 4) {
+          banner.innerText = "HINT: It sits above Ctrl, below Caps Lock. Hold it while clicking ✕.";
+          panicNukeBtn.style.display = 'block';
+        } else if (failedCount > 4) {
+          banner.innerText = `HOLD 'SHIFT' ON KEYBOARD! Attempts failed: ${failedCount}`;
+        }
+      }
+    });
+  });
+}
+
+/**
+ * FINAL ACT: UNBEARABLE ALARM & CODE INPUT (LOCKED TARGET PIN BUGFIX)
+ */
+function startFinalAct() {
+  resetArena();
+  state.stage = 8;
+  state.attention = 100;
+  state.adsSpawned++;
+  updateHUD();
+
+  audio.startUnbearableAlarm();
+
+  // Immutable target numbers frozen upon stage initialization
+  const frozenTraps = state.trapsTriggered;
+  const frozenAds = state.adsSpawned;
+  const correctPassword = String((frozenTraps * 2) + (frozenAds * 3));
+
+  const win = document.createElement('div');
+  win.className = 'dark-window shake-violent';
+  win.style.width = '760px';
+  win.innerHTML = `
+    <div class="dark-titlebar">
+      <span>FINAL_ATTENTION_MELTDOWN.SYS</span>
+    </div>
+    <div class="dark-body">
+      <div class="hazard-banner">🚨 UNBEARABLE MELTDOWN ALARM ACTIVE 🚨</div>
+      <div class="dark-h1">CRACK THE SECURITY CODE</div>
+      <div class="dark-p">The siren will NOT stop until you calculate and enter the shutdown PIN!</div>
+      
+      <div style="background: #000; border: 2px dashed var(--hazard-yellow); padding: 14px; margin: 1.2rem 0; font-family: monospace; font-size: 1.1rem; color: var(--hazard-yellow);">
+        TERMINAL FORMULA: [FAILED TRAPS (${frozenTraps}) * 2] + [ADS CREATED (${frozenAds}) * 3]
+      </div>
+
+      <input type="text" id="final-code" class="alarm-input" placeholder="ENTER PIN" maxlength="10" autofocus />
+      <div>
+        <button class="brutal-btn" id="submit-code" style="background: var(--toxic-green); color: #000; font-size: 1.2rem;">TERMINATE SIREN</button>
+      </div>
+
+      <div class="rage-terminal" id="final-log">Wrong code will spike attention and re-trigger alarm!</div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const input = win.querySelector('#final-code');
+  const submitBtn = win.querySelector('#submit-code');
+  const log = win.querySelector('#final-log');
+
+  function checkPassword() {
+    const entered = input.value.trim();
+    if (entered === correctPassword) {
+      audio.stopAlarm();
+      win.classList.remove('shake-violent');
+      log.innerText = "PASSWORD CORRECT! Neutralizing final advertisement...";
+      log.style.color = "var(--toxic-green)";
+      setTimeout(() => {
+        win.style.transition = "transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease";
+        win.style.transform = "scale(0.5) translateY(-80px) rotate(15deg)";
+        win.style.opacity = "0";
+        setTimeout(() => renderVictory(), 1000);
+      }, 1200);
+    } else {
+      state.attention = Math.min(250, state.attention + 15);
+      audio.bonkBuzz();
+      flashStrobe();
+      updateHUD();
+
+      log.innerText = `WRONG PIN! Expected Formula: (${frozenTraps}*2) + (${frozenAds}*3) = ${correctPassword}. Try again!`;
+      log.style.color = "var(--blood-red)";
+      input.value = "";
+      input.focus();
+    }
+  }
+
+  submitBtn.addEventListener('click', checkPassword);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkPassword();
+  });
+}
+
+/**
+ * VICTORY SCREEN WITH ANIMATED LAUGHING CAT
+ */
+function renderVictory() {
+  resetArena();
+  state.stage = 9;
+  hud.style.display = 'none';
+  audio.fanfareVictory();
+
+  const win = document.createElement('div');
+  win.className = 'dark-window';
+  win.style.width = '760px';
+  win.innerHTML = `
+    <div class="dark-body" style="padding: 3rem 2.6rem;">
+      <div style="background: var(--toxic-green); color: #000; font-weight: 900; font-size: 1rem; padding: 6px 16px; display: inline-block; margin-bottom: 1.2rem; font-family: var(--font-impact);">
+        CERTIFIED INTERNET SURVIVOR 🏆
+      </div>
+      <div style="font-size: 2.8rem; font-weight: 900; margin-bottom: 0.6rem; color: #fff; font-family: var(--font-impact);">
+        YOU SURVIVED.
+      </div>
+      <div style="color: #94a3b8; font-size: 1.2rem; margin-bottom: 0.4rem; font-family: sans-serif;">
+        You didn't close the ad.
+      </div>
+      <div style="color: var(--toxic-green); font-weight: 900; font-size: 1.5rem; margin-bottom: 1.4rem; font-family: var(--font-terminal);">
+        YOU STOPPED FEEDING IT.
+      </div>
+
+      <div class="laughing-cat-box" title="The Ad Laughing At Your Struggle">
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <polygon points="20,40 10,10 45,25" fill="#f59e0b" stroke="#000" stroke-width="3" />
+          <polygon points="80,40 90,10 55,25" fill="#f59e0b" stroke="#000" stroke-width="3" />
+          <circle cx="50" cy="55" r="38" fill="#fbbf24" stroke="#000" stroke-width="3" />
+          <path d="M 28 48 Q 36 38 44 48" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" />
+          <path d="M 56 48 Q 64 38 72 48" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" />
+          <ellipse cx="24" cy="56" rx="4" ry="7" fill="#38bdf8" />
+          <ellipse cx="76" cy="56" rx="4" ry="7" fill="#38bdf8" />
+          <path d="M 32 60 Q 50 90 68 60 Z" fill="#b91c1c" stroke="#000" stroke-width="3" />
+          <path d="M 42 74 Q 50 65 58 74 Q 50 85 42 74 Z" fill="#f43f5e" />
+          <line x1="12" y1="58" x2="28" y2="60" stroke="#000" stroke-width="2" />
+          <line x1="10" y1="68" x2="28" y2="65" stroke="#000" stroke-width="2" />
+          <line x1="88" y1="58" x2="72" y2="60" stroke="#000" stroke-width="2" />
+          <line x1="90" y1="68" x2="72" y2="65" stroke="#000" stroke-width="2" />
+        </svg>
+      </div>
+
+      <table style="width: 100%; font-family: monospace; font-size: 1.05rem; margin-bottom: 2rem; border-top: 2px solid #222; border-bottom: 2px solid #222; text-align: left;">
+        <tr style="height: 38px;"><td>FAILED CLICKS</td><td style="text-align: right; color:var(--blood-red); font-weight:900;">${state.trapsTriggered}</td></tr>
+        <tr style="height: 38px;"><td>ADS CREATED</td><td style="text-align: right; color:var(--hazard-yellow); font-weight:900;">${state.adsSpawned}</td></tr>
+        <tr style="height: 38px;"><td>MAXIMUM ATTENTION LEVEL</td><td style="text-align: right; color:var(--blood-red); font-weight:900;">${state.maxAttention}%</td></tr>
+        <tr style="height: 38px;"><td>TIME WASTED</td><td style="text-align: right; color:var(--toxic-green); font-weight:900;">${hudTimer.innerText}</td></tr>
+        <tr style="height: 38px;"><td>PATIENCE</td><td style="text-align: right; color:#38bdf8; font-weight:900;">0%</td></tr>
+      </table>
+
+      <div>
+        <div style="font-size: 1rem; color: #94a3b8; margin-bottom: 0.6rem; font-family: sans-serif;">How was your psychological damage?</div>
+        <div id="star-box" style="font-size: 2.6rem; cursor: pointer; display: inline-block; position: relative;">
+          <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+        </div>
+        <div class="rage-terminal" id="star-log" style="background: transparent; border: none; font-size: 1.15rem; color: var(--hazard-yellow);"></div>
+      </div>
+    </div>
+  `;
+  arena.appendChild(win);
+
+  const starBox = win.querySelector('#star-box');
+  const starLog = win.querySelector('#star-log');
+  let jumped = false;
+
+  starBox.addEventListener('mouseenter', () => {
+    if (!jumped) {
+      starBox.style.transform = "translateX(100px)";
+      starLog.innerText = "Relax bro. We're actually done.";
+      jumped = true;
+    }
+  });
+
+  starBox.addEventListener('click', () => {
+    starBox.style.transform = "none";
+    starBox.innerHTML = `<span style="color: var(--hazard-yellow); font-size: 1.4rem; font-weight: 900;">⭐⭐⭐⭐⭐ 5.0 (OFFLINE CHAD)</span>`;
+    starLog.innerText = "THE END. Now safely close your browser tab for real.";
+  });
+}
+</script>
+</body>
+</html>

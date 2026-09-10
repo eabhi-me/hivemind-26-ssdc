@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>THE WORLD'S WORST ONLINE CHECKOUT</title>
+<style>
+    /* * INTENTIONALLY TERRIBLE CSS
+     * Violates every principle of good design:
+     * Bad contrast, excessive gradients, inconsistent spacing, multiple fonts.
+     */
+    body {
+        background: repeating-linear-gradient(45deg, #ff00ff, #00ffff 10%, #ffff00 20%);
+        font-family: "Comic Sans MS", "Times New Roman", Papyrus, sans-serif;
+        color: #000080;
+        margin: 0;
+        overflow-x: scroll; /* Mobile overflow requirement */
+        cursor: help;
+        animation: subtle-shake 10s infinite;
+    }
+
+    @keyframes subtle-shake {
+        0%, 98% { transform: translate(0, 0); }
+        99% { transform: translate(-10px, 15px) rotate(2deg); }
+        100% { transform: translate(10px, -15px) rotate(-2deg); }
+    }
+
+    .container {
+        width: 130%; /* Intentionally overflowing */
+        max-width: 1200px;
+        margin: -10px auto;
+        padding: 50px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 15px ridge #ff0000;
+    }
+
+    header {
+        text-align: center;
+        background: #000;
+        color: #0f0;
+        padding: 20px;
+        border-bottom: 5px dashed yellow;
+    }
+
+    h1 {
+        font-size: 4rem;
+        text-transform: uppercase;
+        animation: blinker 0.1s linear infinite;
+        text-shadow: 5px 5px #f0f;
+    }
+
+    @keyframes blinker {
+        50% { opacity: 0.8; }
+    }
+
+    .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        justify-content: center;
+    }
+
+    .nav-links a {
+        background: blue;
+        color: white;
+        padding: 5px;
+        text-decoration: underline overline;
+        font-size: 10px;
+    }
+
+    .nav-links a:hover {
+        background: red;
+        font-size: 24px; /* Unnecessary jump */
+    }
+
+    .marquee-container {
+        background: yellow;
+        color: red;
+        font-weight: bold;
+        font-size: 24px;
+        border: 2px solid blue;
+    }
+
+    .product-box {
+        border: 10px groove #00ff00;
+        background: #fff;
+        padding: 10px;
+        margin-top: 20px;
+        text-align: right; /* Bad alignment */
+    }
+
+    .banana {
+        font-size: 100px;
+        filter: drop-shadow(10px 10px 5px red);
+    }
+
+    .price-details {
+        font-family: monospace;
+        font-size: 18px;
+    }
+
+    .price-strike {
+        text-decoration: line-through;
+        color: gray;
+    }
+
+    .qty-controls button {
+        font-size: 30px;
+        background: pink;
+        border: 3px solid #000;
+        cursor: wait;
+    }
+
+    .form-grid {
+        display: flex;
+        flex-direction: column;
+        gap: -5px; /* Inconsistent spacing */
+        margin-top: 30px;
+    }
+
+    .form-group {
+        border: 1px dotted #ccc;
+        padding: 15px;
+        background: #e0ffff;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    input[type="text"], input[type="email"] {
+        background: #ffffcc;
+        border: 4px inset red;
+        font-family: "Impact";
+        color: green;
+        width: 150px;
+    }
+
+    .checkbox-hell {
+        background: #000;
+        color: #fff;
+        padding: 20px;
+        margin-top: 20px;
+        font-family: serif;
+    }
+
+    .captcha-container {
+        margin-top: 20px;
+        padding: 10px;
+        background: #f0f8ff;
+        border: 5px solid blue;
+    }
+
+    .captcha-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        width: 200px;
+        margin: auto;
+    }
+
+    .captcha-cell {
+        font-size: 30px;
+        cursor: pointer;
+        text-align: center;
+        background: #ddd;
+        border: 1px solid #999;
+        user-select: none;
+    }
+
+    .captcha-cell.selected {
+        background: red;
+    }
+
+    .coupon-box {
+        margin: 20px 0;
+        padding: 20px;
+        background: orange;
+    }
+
+    #apply-btn {
+        position: relative;
+        transition: top 0.1s, left 0.1s;
+    }
+
+    .btn-doom {
+        font-size: 36px;
+        padding: 20px;
+        background: red;
+        color: yellow;
+        font-weight: bold;
+        border: 10px outset darkred;
+        margin: 50px auto;
+        display: block;
+        position: relative;
+    }
+
+    .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: #000;
+        color: lime;
+        font-family: monospace;
+        z-index: 9999;
+        text-align: left;
+    }
+
+    .progress-fill {
+        height: 10px;
+        background: red;
+        width: 10%;
+        transition: width 0.5s;
+    }
+
+    .popup {
+        position: fixed;
+        background: silver;
+        border: 3px outset white;
+        padding: 10px;
+        z-index: 1000;
+        box-shadow: 5px 5px 0 #000;
+        font-family: 'MS Sans Serif', sans-serif;
+        display: none;
+    }
+
+    .popup-title {
+        background: darkblue;
+        color: white;
+        padding: 2px;
+        font-weight: bold;
+    }
+
+    .payment-options {
+        border: 2px dashed purple;
+        padding: 10px;
+        margin: 20px 0;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .tiny-hint {
+        font-size: 2px;
+        color: transparent; /* Almost invisible */
+    }
+    .tiny-hint:hover { color: black; }
+
+    /* Modal Hell */
+    #hell-modal {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hell-modal-content {
+        background: magenta;
+        padding: 50px;
+        text-align: center;
+        border: 10px dotted lime;
+    }
+
+    .btn-yes { font-size: 8px; padding: 2px; background: red; color: white; border:none; margin: 5px; }
+    .btn-no { font-size: 40px; padding: 20px; background: green; color: white; margin: 5px; border: 5px solid black; }
+
+    /* Final Loading */
+    #final-loader {
+        position: fixed;
+        top:0; left:0; width:100%; height:100%;
+        background: #000; color: #0f0;
+        z-index: 20000;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: monospace;
+        font-size: 24px;
+    }
+
+    #secret-btn {
+        background: none;
+        border: none;
+        color: rgba(0,0,0,0.1);
+        font-size: 10px;
+        cursor: default;
+    }
+
+    /* Mobile Nightmare */
+    @media (max-width: 768px) {
+        .container {
+            width: 180vw;
+            margin-left: -20vw;
+        }
+        .btn-doom {
+            font-size: 50px;
+            margin-left: -50px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress-bar">
+    CHECKOUT PROGRESS: <span id="progress-text">Step 1/7</span>
+    <div class="progress-fill" id="progress-fill"></div>
+</div>
+
+<div class="marquee-container">
+    <marquee scrollamount="20" direction="right">⚠️ VERY IMPORTANT BUY AREA ⚠️ DO NOT LEAVE THIS PAGE ⚠️</marquee>
+</div>
+
+<header>
+    <h1>🛒 SUPER ULTRA MEGA SHOP 9000™</h1>
+    <p>Trusted by approximately 7.3 people worldwide.</p>
+    <div class="nav-links">
+        <a href="#" onclick="return false;">Home</a>
+        <a href="#" onclick="return false;">Home 2</a>
+        <a href="#" onclick="return false;">Not Home</a>
+        <a href="#" onclick="return false;">Maybe Home</a>
+        <a href="#" onclick="return false;">Account</a>
+        <a href="#" onclick="return false;">Account (Old)</a>
+        <a href="#" onclick="return false;">Account (New)</a>
+        <a href="#" onclick="return false;">Settings</a>
+        <a href="#" onclick="return false;">Advanced Settings</a>
+        <a href="#" onclick="return false;">Settings 2</a>
+    </div>
+</header>
+
+<div class="container">
+    
+    <div class="product-box">
+        <h2>Premium Invisible Banana — ₹99</h2>
+        <div class="banana">🍌</div>
+        <div class="price-details">
+            Original Price: <span class="price-strike">₹9,999</span><br>
+            Discount: 99%<br>
+            Current Price: <strong style="font-size: 30px; color: red;" id="dynamic-price">₹99</strong><br>
+            Today's Special Price: ₹999<br>
+            <strong style="font-size: 10px;">Final Final Price: ₹99</strong>
+        </div>
+        
+        <div class="qty-controls">
+            <label>Quantity behavior is optimized for your convenience:</label><br>
+            <button id="btn-minus">-</button>
+            <span id="qty-display" style="font-size: 24px;">1</span>
+            <button id="btn-plus">+</button>
+        </div>
+    </div>
+
+    <div id="fake-popup" class="popup">
+        <div class="popup-title">System Alert</div>
+        <p id="popup-msg">Congratulations! You won nothing.</p>
+        <button onclick="closePopup()">YES</button>
+        <button onclick="closePopup()">YES</button>
+        <button onclick="closePopup()">YES</button>
+        <button onclick="closePopup()">Maybe</button>
+    </div>
+
+    <div class="form-grid" id="shipping-form">
+        <div class="form-group" style="order: 1;">
+            <label>Full Name (No numbers probably)</label>
+            <input type="text" id="fname" placeholder="John Doe">
+        </div>
+        <div class="form-group" style="order: 2;">
+            <label>Email (probably)</label>
+            <input type="email" id="email" placeholder="a@b.c">
+        </div>
+        <div class="form-group" style="order: 3;">
+            <label>Phone number, unless you prefer something else</label>
+            <input type="text" id="phone" placeholder="9876543210">
+        </div>
+        <div class="form-group" style="order: 4;">
+            <label>Address-ish location</label>
+            <input type="text" id="address" placeholder="123 Street">
+        </div>
+        <div class="form-group" style="order: 5;">
+            <label>City</label>
+            <input type="text" id="city" placeholder="Townsville">
+        </div>
+        <div class="form-group" style="order: 6;">
+            <label>State</label>
+            <input type="text" id="state" placeholder="State">
+        </div>
+        <div class="form-group" style="order: 7;">
+            <label>PIN Code</label>
+            <input type="text" id="pin" placeholder="110001">
+        </div>
+    </div>
+
+    <div class="checkbox-hell">
+        <h3>To continue, select exactly 3.5 checkboxes.</h3>
+        <label><input type="checkbox" class="hell-check" data-val="1"> I agree to the Terms</label><br>
+        <label><input type="checkbox" class="hell-check" data-val="1"> I agree to the Terms of the Terms</label><br>
+        <label><input type="checkbox" class="hell-check" data-val="1"> I disagree with my agreement</label><br>
+        <label><input type="checkbox" class="hell-check" data-val="1"> I confirm that I have confirmed</label><br>
+        <label><input type="checkbox" class="hell-check" data-val="1"> I understand that I don't understand</label><br>
+        <label><input type="checkbox" class="hell-check" data-val="1"> I would like to receive emails</label><br>
+        <label><input type="checkbox" class="hell-check" data-val="0.5"> I would like to receive emails about receiving emails</label><br>
+        <label><input type="checkbox" class="hell-check" data-val="0"> I am NOT a robot</label><br>
+        <p id="cb-status" style="color:red;"></p>
+    </div>
+
+    <div class="captcha-container">
+        <h3 style="margin:0;">SECURITY VERIFICATION: PROVE YOU ARE HUMAN</h3>
+        <p>Select all squares containing squares.</p>
+        <div class="captcha-grid" id="captcha-grid">
+            </div>
+        <p id="captcha-msg" style="color:red; font-weight:bold;"></p>
+        <button id="verify-captcha">VERIFY HUMANITY</button>
+    </div>
+
+    <div class="coupon-box">
+        <label>Coupon Code: </label>
+        <input type="text" id="coupon-code">
+        <button id="apply-btn">APPLY</button>
+        <p id="coupon-msg"></p>
+    </div>
+
+    <div class="payment-options">
+        <h3>Select Payment</h3>
+        <label><input type="radio" name="pay" value="cc"> Credit Card</label><br>
+        <label><input type="radio" name="pay" value="dc"> Debit Card</label><br>
+        <label><input type="radio" name="pay" value="upi" id="pay-upi"> UPI</label><br>
+        <label><input type="radio" name="pay" value="cash"> Cash</label><br>
+        <label><input type="radio" name="pay" value="crypto"> Cryptocurrency</label><br>
+        <label><input type="radio" name="pay" value="vibes"> Pay with vibes</label><br>
+        
+        <div id="upi-hell" class="hidden" style="margin-left:20px; border-left:3px solid red; padding-left:10px;">
+            <p>Enter UPI ID:</p>
+            <input type="text" id="upi-1">
+            <div id="upi-step-2" class="hidden">
+                <p>Confirm UPI ID:</p>
+                <input type="text" id="upi-2">
+            </div>
+            <div id="upi-step-3" class="hidden">
+                <p>Confirm confirmation of UPI ID:</p>
+                <input type="text" id="upi-3">
+            </div>
+            <div id="upi-step-4" class="hidden">
+                <label><input type="checkbox" id="upi-final-check"> Are you absolutely certain this is your UPI ID?</label>
+            </div>
+        </div>
+    </div>
+
+    <button id="btn-doom" class="btn-doom">CONTINUE →</button>
+
+    <br><br>
+    <div style="text-align:center;">
+        <p class="tiny-hint">Hint: The coupon is SAVE99</p>
+        <button id="secret-btn">© 1998 Advanced Settings</button>
+    </div>
+
+</div>
+
+<div id="hell-modal">
+    <div class="hell-modal-content">
+        <h2 id="hm-text">Are you sure?</h2>
+        <button class="btn-yes" id="hm-yes">YES</button>
+        <button class="btn-no" id="hm-no">NO</button>
+    </div>
+</div>
+
+<div id="final-loader">
+    <div id="fl-content">
+        <h1 style="color:red;">COMPLETE PURCHASE</h1>
+        <button id="btn-dont-click" style="font-size:40px; padding:20px; background:yellow; border:10px dashed red;">DON'T CLICK</button>
+    </div>
+    <div id="fl-progress" class="hidden" style="width: 80%; background:#333; height:50px; border:5px solid white; margin-top:20px;">
+        <div id="fl-bar" style="width: 0%; background:lime; height:100%; transition: width 0.2s;"></div>
+    </div>
+    <p id="fl-text" class="hidden" style="margin-top:20px;"></p>
+    
+    <div id="fl-success" class="hidden" style="text-align:center; background:#fff; color:#000; padding:50px; border:20px ridge gold;">
+        <h1>🎉 ORDER SUCCESSFULLY PLACED 🎉</h1>
+        <p>Order number: <strong>ORDER-0000-ERROR-404</strong></p>
+        <p>Price: <strong>₹99</strong></p>
+        <button id="btn-undo" style="background:red; color:white; font-size:50px; padding:30px; font-weight:bold; border:10px outset darkred; cursor:not-allowed;">UNDO PURCHASE</button>
+    </div>
+</div>
+
+<div id="judge-panel" class="popup" style="width: 300px; left:50%; top:50%; transform:translate(-50%,-50%); border:5px solid black;">
+    <div class="popup-title" style="background:red;">WHY THIS UI IS TERRIBLE</div>
+    <ol style="font-size:12px; font-family:sans-serif;">
+        <li>Misleading labels</li>
+        <li>Poor visual hierarchy</li>
+        <li>Inconsistent interaction</li>
+        <li>Excessive confirmations</li>
+        <li>Moving buttons</li>
+        <li>Confusing navigation</li>
+        <li>Bad contrast</li>
+        <li>Random state changes</li>
+        <li>Unnecessary cognitive load</li>
+        <li>Dark-pattern-like interactions</li>
+    </ol>
+    <button onclick="document.getElementById('judge-panel').style.display='none'">Close</button>
+</div>
+
+
+<script>
+    /* * THE JAVASCRIPT OF DOOM
+     * Contains intentionally bad UX mechanisms.
+     */
+
+    // --- 1. RANDOM PRICE CHANGER ---
+    // Displays random fake prices to stress the user out, while maintaining 99 internally.
+    const prices = ["₹99", "₹999", "₹9.99", "₹9,999", "₹0", "₹99 + GST", "₹99*"];
+    setInterval(() => {
+        document.getElementById('dynamic-price').innerText = prices[Math.floor(Math.random() * prices.length)];
+    }, 2500);
+
+
+    // --- 2. BROKEN QUANTITY SELECTOR ---
+    // +/- buttons randomly reverse their mathematical logic.
+    let qty = 1;
+    let qtyBehavior = 1; // 1 means normal, -1 means reversed
+    let qtyClicks = 0;
+
+    document.getElementById('btn-plus').addEventListener('click', () => {
+        qty += qtyBehavior;
+        updateQty();
+    });
+    document.getElementById('btn-minus').addEventListener('click', () => {
+        qty -= qtyBehavior;
+        updateQty();
+    });
+
+    function updateQty() {
+        qtyClicks++;
+        if (qty < 1) qty = 1;
+        document.getElementById('qty-display').innerText = qty;
+        
+        // Reverse behavior every 4 clicks
+        if (qtyClicks % 4 === 0) {
+            qtyBehavior *= -1;
+        }
+    }
+
+
+    // --- 3. SHIPPING FORM CHAOS ---
+    
+    // Rearrange fields randomly on any input click
+    const formGrid = document.getElementById('shipping-form');
+    formGrid.addEventListener('click', () => {
+        if(Math.random() > 0.7) { // 30% chance to shuffle order on click
+            const groups = document.querySelectorAll('.form-group');
+            groups.forEach(g => {
+                g.style.order = Math.floor(Math.random() * 10);
+            });
+        }
+    });
+
+    // Random uppercase/lowercase logic for email
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', (e) => {
+        let chars = e.target.value.split('');
+        for(let i=0; i<chars.length; i++) {
+            if(Math.random() > 0.8) {
+                chars[i] = chars[i] === chars[i].toUpperCase() ? chars[i].toLowerCase() : chars[i].toUpperCase();
+            }
+        }
+        e.target.value = chars.join('');
+    });
+
+    // Phone number digit reversing 
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', (e) => {
+        if(Math.random() > 0.6 && e.target.value.length > 2) {
+            // Reverses the string randomly during typing
+            e.target.value = e.target.value.split('').reverse().join('');
+        }
+    });
+
+
+    // --- 4. CHECKBOX HELL ---
+    // Requires exactly 3.5 sum. Values are hidden in data-val attribute.
+    const checkboxes = document.querySelectorAll('.hell-check');
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            // Randomly uncheck another checkbox
+            if(cb.checked && Math.random() > 0.5) {
+                let others = Array.from(checkboxes).filter(c => c !== cb && c.checked);
+                if(others.length > 0) {
+                    others[Math.floor(Math.random()*others.length)].checked = false;
+                }
+            }
+        });
+    });
+
+    function isCheckboxHellSolved() {
+        let sum = 0;
+        checkboxes.forEach(cb => {
+            if(cb.checked) sum += parseFloat(cb.getAttribute('data-val'));
+        });
+        if(sum === 3.5) {
+            document.getElementById('cb-status').innerText = "Requirement met (3.5 selected).";
+            document.getElementById('cb-status').style.color = "lime";
+            return true;
+        } else {
+            document.getElementById('cb-status').innerText = `Current selection value: ${sum}. Need exactly 3.5.`;
+            document.getElementById('cb-status').style.color = "red";
+            return false;
+        }
+    }
+
+
+    // --- 5. CAPTCHA FROM HELL ---
+    // Emojis: 🔲 is correct (square with square). Others are wrong.
+    const captchaGrid = document.getElementById('captcha-grid');
+    const shapes = ['🔵', '🔺', '🟦', '🔲', '🟦', '🔲', '🔵', '🔺', '🔲', '🟦', '🔵', '🔺', '🟦', '🔵', '🔺', '🟦'];
+    let captchaSolved = false;
+
+    function renderCaptcha() {
+        captchaGrid.innerHTML = '';
+        // Shuffle
+        shapes.sort(() => Math.random() - 0.5);
+        shapes.forEach((shape, idx) => {
+            let div = document.createElement('div');
+            div.className = 'captcha-cell';
+            div.innerText = shape;
+            div.dataset.val = shape;
+            div.onclick = () => div.classList.toggle('selected');
+            captchaGrid.appendChild(div);
+        });
+    }
+    renderCaptcha();
+
+    // Rearrange every few seconds if not solved
+    setInterval(() => {
+        if(!captchaSolved) renderCaptcha();
+    }, 4000);
+
+    document.getElementById('verify-captcha').addEventListener('click', () => {
+        const selected = document.querySelectorAll('.captcha-cell.selected');
+        let valid = true;
+        let count = 0;
+        selected.forEach(el => {
+            if(el.dataset.val !== '🔲') valid = false;
+            count++;
+        });
+        
+        // Count must equal 3 since there are 3 '🔲' generated
+        let totalCorrect = shapes.filter(s => s === '🔲').length;
+
+        if(valid && count === totalCorrect) {
+            document.getElementById('captcha-msg').innerText = "Verification successful. We still don't trust you.";
+            document.getElementById('captcha-msg').style.color = "green";
+            captchaSolved = true;
+        } else {
+            document.getElementById('captcha-msg').innerText = "Incorrect. Humanity disappointed us.";
+            document.getElementById('captcha-msg').style.color = "red";
+            renderCaptcha(); // Reset only CAPTCHA
+        }
+    });
+
+
+    // --- 6. COUPON ---
+    const applyBtn = document.getElementById('apply-btn');
+    let couponDodges = 0;
+
+    applyBtn.addEventListener('mousemove', () => {
+        if(couponDodges < 5) {
+            applyBtn.style.top = (Math.random() * 40 - 20) + "px";
+            applyBtn.style.left = (Math.random() * 60 - 30) + "px";
+            couponDodges++;
+        }
+    });
+
+    applyBtn.addEventListener('click', () => {
+        const val = document.getElementById('coupon-code').value;
+        if(val === "SAVE99") {
+            document.getElementById('coupon-msg').innerText = "Coupon accepted, but price remains ₹99.";
+        } else {
+            document.getElementById('coupon-msg').innerText = "Coupon rejected because your coupon was too correct.";
+        }
+    });
+
+
+    // --- 7. BUTTON OF DOOM ---
+    const btnDoom = document.getElementById('btn-doom');
+    let doomClicks = 0;
+    let doomDodges = 0;
+    const doomTexts = ["CONTINUE →", "NO, GO BACK", "CONTINUE DEFINITELY", "ARE YOU SURE?"];
+
+    btnDoom.addEventListener('mousemove', () => {
+        if(doomDodges < 7) {
+            btnDoom.style.transform = `translate(${Math.random() * 150 - 75}px, ${Math.random() * 100 - 50}px)`;
+            doomDodges++;
+        } else {
+            btnDoom.style.transform = 'translate(0, 0)'; // Stays still eventually
+        }
+    });
+
+    btnDoom.addEventListener('click', (e) => {
+        doomClicks++;
+        btnDoom.innerText = doomTexts[doomClicks % doomTexts.length];
+        
+        // If clicking while not dodging and it's the "correct" state
+        if(doomClicks > 3) {
+            if(!isCheckboxHellSolved() || !captchaSolved) {
+                alert("Fix your form! 3.5 checkboxes and humanity verification required.");
+                return;
+            }
+            startConfirmationHell();
+        }
+    });
+
+
+    // --- 8. FAKE POPUPS ---
+    const popups = [
+        "Congratulations! You won nothing.",
+        "Your session has been successfully unsuccessful.",
+        "Important update: No update.",
+        "Your mouse movement has been recorded for absolutely no reason.",
+        "Would you like to enable Ultra Security?"
+    ];
+    let popupInterval = setInterval(() => {
+        if(Math.random() > 0.5) {
+            const popup = document.getElementById('fake-popup');
+            popup.style.display = 'block';
+            popup.style.top = (Math.random() * 60 + 10) + "%";
+            popup.style.left = (Math.random() * 60 + 10) + "%";
+            document.getElementById('popup-msg').innerText = popups[Math.floor(Math.random() * popups.length)];
+        }
+    }, 15000);
+
+    window.closePopup = function() {
+        document.getElementById('fake-popup').style.display = 'none';
+    }
+
+
+    // --- 9. CONFUSING PROGRESS BAR ---
+    const progressTexts = ["Step 1/7", "Step 3/9", "Step 2/8", "Step 4/11", "Step 1/1", "Step 7/7"];
+    document.body.addEventListener('click', () => {
+        if(Math.random() > 0.7) {
+            let txt = progressTexts[Math.floor(Math.random() * progressTexts.length)];
+            document.getElementById('progress-text').innerText = txt;
+            document.getElementById('progress-fill').style.width = (Math.random() * 100) + "%";
+        }
+    });
+
+
+    // --- 10. PAYMENT UPI HELL ---
+    document.getElementById('pay-upi').addEventListener('change', (e) => {
+        if(e.target.checked) {
+            document.getElementById('upi-hell').classList.remove('hidden');
+        }
+    });
+    
+    document.getElementById('upi-1').addEventListener('input', () => {
+        document.getElementById('upi-step-2').classList.remove('hidden');
+    });
+    document.getElementById('upi-2').addEventListener('input', () => {
+        document.getElementById('upi-step-3').classList.remove('hidden');
+    });
+    document.getElementById('upi-3').addEventListener('input', () => {
+        document.getElementById('upi-step-4').classList.remove('hidden');
+    });
+
+
+    // --- 11. FINAL CONFIRMATION HELL ---
+    const confirmQuestions = [
+        "Are you sure?",
+        "Are you REALLY sure?",
+        "Are you sure you're sure?",
+        "Last chance.",
+        "Final last chance.",
+        "Actually, one more thing.",
+        "Do you understand what you're doing?",
+        "Would you like to reconsider your life choices?"
+    ];
+    let confirmIndex = 0;
+
+    function startConfirmationHell() {
+        confirmIndex = 0;
+        showNextConfirm();
+    }
+
+    function showNextConfirm() {
+        if(confirmIndex >= confirmQuestions.length) {
+            document.getElementById('hell-modal').style.display = 'none';
+            startFinalLoading();
+            return;
+        }
+        document.getElementById('hell-modal').style.display = 'flex';
+        document.getElementById('hm-text').innerText = confirmQuestions[confirmIndex];
+        
+        // Randomly swap YES/NO button functionality slightly for extra pain? No, just visual swap.
+        // NO is visually huge, YES is tiny. User must click YES to proceed.
+    }
+
+    document.getElementById('hm-yes').addEventListener('click', () => {
+        confirmIndex++;
+        showNextConfirm();
+    });
+
+    document.getElementById('hm-no').addEventListener('click', () => {
+        // Clicking NO resets the flow and closes modal
+        document.getElementById('hell-modal').style.display = 'none';
+        alert("Coward.");
+    });
+
+
+    // --- 12. FINAL LOADING & SUCCESS ---
+    function startFinalLoading() {
+        document.getElementById('final-loader').style.display = 'flex';
+    }
+
+    document.getElementById('btn-dont-click').addEventListener('click', () => {
+        document.getElementById('fl-content').classList.add('hidden');
+        document.getElementById('fl-progress').classList.remove('hidden');
+        document.getElementById('fl-text').classList.remove('hidden');
+        
+        const sequence = [0, 17, 31, 58, 91, 99];
+        let i = 0;
+        
+        function nextPercent() {
+            if(i < sequence.length) {
+                let p = sequence[i];
+                document.getElementById('fl-bar').style.width = p + "%";
+                document.getElementById('fl-text').innerText = "Processing: " + p + "%";
+                i++;
+                
+                let delay = (p === 99) ? 2000 : 800; // Pause at 99%
+                setTimeout(nextPercent, delay);
+            } else {
+                // Done with 99
+                document.getElementById('fl-text').innerText = "Something went successfully wrong.";
+                setTimeout(() => {
+                    document.getElementById('fl-text').innerText = "Just kidding.";
+                    setTimeout(() => {
+                        document.getElementById('fl-progress').classList.add('hidden');
+                        document.getElementById('fl-text').classList.add('hidden');
+                        document.getElementById('fl-success').classList.remove('hidden');
+                    }, 1000);
+                }, 1500);
+            }
+        }
+        nextPercent();
+    });
+
+    document.getElementById('btn-undo').addEventListener('click', () => {
+        // Does absolutely nothing except move slightly
+        document.getElementById('btn-undo').style.transform = "rotate(5deg)";
+        setTimeout(() => document.getElementById('btn-undo').style.transform = "none", 100);
+    });
+
+    // --- 13. SECRET JUDGE MODE ---
+    document.getElementById('secret-btn').addEventListener('click', () => {
+        document.getElementById('judge-panel').style.display = 'block';
+    });
+
+</script>
+</body>
+</html>

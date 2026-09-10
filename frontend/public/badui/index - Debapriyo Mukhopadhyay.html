@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ultimate Login Portal</title>
+<style>
+    /* Reset and basic setup */
+    body, html { margin: 0; padding: 0; height: 100%; overflow-x: hidden; overflow-y: auto; font-family: 'Comic Sans MS', cursive, sans-serif; background-color: #f0f0f0; }
+
+    .container { display: flex; flex-direction: column; align-items: center; padding: 20px; z-index: 10; position: relative; pointer-events: none; }
+    
+    /* Sliders */
+    .sliders-container { background: rgba(255,255,255,0.9); padding: 20px; border: 2px solid #ccc; pointer-events: auto; width: 350px; text-align: left; }
+    .sliders-container h3 { margin-top: 0; text-align: center; }
+    .slider-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .slider-row span.label { width: 30px; font-weight: bold; }
+    .slider-row input[type=range] { width: 200px; }
+    .slider-row span.val { width: 30px; text-align: center; font-weight: bold; background: #eee; border: 1px solid #aaa; }
+
+    /* Password Box */
+    .password-box { margin-top: 20px; font-size: 24px; background: white; padding: 10px; border: 2px solid #000; pointer-events: auto; min-width: 300px; text-align: center; min-height: 35px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); user-select: none; -webkit-user-select: none; }
+
+    /* Password Spawns */
+    .char-btn { position: absolute; font-size: 16px; font-family: monospace; padding: 8px; cursor: pointer; background: #fff; border: 2px solid #000; box-shadow: 2px 2px 0px #000; pointer-events: auto; user-select: none; z-index: 5;}
+    .char-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
+
+    /* Backspace */
+    #backspace-btn { margin-top: 15px; padding: 10px 20px; font-size: 16px; font-weight: bold; background: #ff4c4c; color: white; border: 2px solid #990000; cursor: pointer; pointer-events: auto; }
+
+    /* ToS Box */
+    .tos-container { margin-top: 20px; width: 300px; height: 120px; overflow-y: scroll; border: 2px solid #000; background: white; padding: 10px; font-size: 12px; pointer-events: auto; }
+    .tos-container::-webkit-scrollbar { width: 12px; }
+    .tos-container::-webkit-scrollbar-track { background: #f1f1f1; border-left: 1px solid #ccc;}
+    .tos-container::-webkit-scrollbar-thumb { background: #888; }
+    .tos-container::-webkit-scrollbar-thumb:hover { background: #555; }
+
+    /* Robot Checkbox */
+    #robot-container { position: fixed; pointer-events: auto; padding: 40px; z-index: 20; transition: top 0.15s ease-out, left 0.15s ease-out;}
+    #robot-label { display: flex; align-items: center; background: white; border: 2px solid #000; padding: 10px; cursor: pointer; user-select: none; font-size: 16px; box-shadow: 3px 3px 0px #000;}
+    #robot-checkbox { pointer-events: none; }
+
+    /* Submit Button */
+    #submit-btn { margin-top: 30px; padding: 15px 40px; font-size: 22px; font-weight: bold; pointer-events: auto; cursor: default; background: #4CAF50; color: white; border: 3px solid #2E7D32; box-shadow: 3px 3px 0px #2E7D32; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; pointer-events: auto; color: white; text-align: center; }
+    .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center;}
+
+    #dino-canvas { background: white; border: 4px solid #555; border-radius: 5px; }
+
+    /* Bouncing Captcha Elements */
+    #captcha-box { width: 400px; height: 300px; background: #222; border: 4px solid #fff; position: relative; overflow: hidden; margin-top: 20px; user-select: none; }
+    .bounce-btn { position: absolute; width: 40px; height: 40px; border-radius: 50%; background: #ff4c4c; color: white; font-weight: bold; font-size: 20px; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; }
+    
+    /* Result Overlay */
+    #result-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: none; z-index: 999999; justify-content: center; align-items: center; font-size: 4rem; font-weight: bold; color: white; text-align: center; pointer-events: none; text-shadow: 3px 3px 6px rgba(0,0,0,0.8); }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1 style="background: white; border: 2px solid black; padding: 10px; pointer-events: auto;">Welcome. Please Login.</h1>
+    
+    <div class="sliders-container" id="sliders-container">
+        <h3>Username</h3>
+        </div>
+
+    <div class="password-box" id="password-display">Password...</div>
+    <button id="backspace-btn">Backspace</button>
+
+    <div class="tos-container" id="tos-box">
+        <h4 style="margin-top:0;">Terms of Service</h4>
+        <p>By proceeding, you agree to our intentionally frustrating terms.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.</p>
+        <p>Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
+        <div id="tos-checkbox-wrapper" style="margin: 250px 0 50px 0; background:#eee; padding:10px; border:1px solid #ccc;">
+            <label style="cursor:pointer; display:block;"><input type="checkbox" id="tos-checkbox" tabindex="-1"> I actually agree to these terms.</label>
+        </div>
+        <p style="margin-bottom: 600px;">Keep dragging the scrollbar down... slowly...</p>
+        <p>End of terms. You made it.</p>
+    </div>
+
+    <button id="submit-btn" tabindex="-1" title="Left click does nothing!">Login</button>
+</div>
+
+<div id="robot-container">
+    <label id="robot-label" for="robot-checkbox">
+        <input type="checkbox" id="robot-checkbox" tabindex="-1" style="margin-right: 10px;"> I am not a robot
+    </label>
+</div>
+
+<div id="char-layer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></div>
+
+<div id="captcha-modal" class="modal">
+    <div class="modal-content">
+        <h1 style="font-size: 36px; margin-bottom: 5px;">Anti-Bot Check</h1>
+        <p style="font-size: 20px; color: #ffcc00;">Click the numbers in exact order (1 to 5) to continue typing.</p>
+        <p style="font-size: 16px; color: #ff5555; margin-top: 0;">Make a mistake and it resets (and speeds up).</p>
+        <div id="captcha-box"></div>
+    </div>
+</div>
+
+<div id="dino-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="font-size: 36px; color: #ffcc00;">Dino Backspace Challenge</h2>
+        <p style="font-size: 20px;">Score <b>300 points</b> to earn a <b>50% chance</b> to delete your last character.<br>Press <b>SPACE</b> to jump.</p>
+        <p style="font-size: 20px; color: #ff5555; font-weight: bold;">Fail before 300, and a random character is ADDED to your password.</p>
+        <div style="position: relative; margin-top: 20px;">
+            <canvas id="dino-canvas" width="800" height="250"></canvas>
+            <p id="dino-score" style="color: black; margin:0; position:absolute; top: 10px; right: 20px; font-size: 24px; font-weight:bold;">Score: 0</p>
+        </div>
+    </div>
+</div>
+
+<div id="result-overlay"></div>
+
+<script>
+// --- 1. GLOBAL DESTRUCTION & PROTECTIONS ---
+window.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    if (document.getElementById('dino-modal').style.display === 'block') return;
+    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%; font-family:sans-serif;'>You touched the scroll wheel.<br>Page Reset.</h1>";
+    setTimeout(() => location.reload(), 1500); // Reloads instantly, no confirmation prompt
+}, {passive: false});
+
+document.addEventListener('mousedown', function(e) { if(e.button === 1) e.preventDefault(); });
+
+window.addEventListener('keydown', function(e) {
+    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.code)) e.preventDefault();
+    if (e.code === 'F5' || (e.ctrlKey && e.code === 'KeyR')) e.preventDefault();
+    if (e.ctrlKey && (e.code === 'KeyW' || e.code === 'KeyU')) e.preventDefault();
+}, {passive: false});
+
+// (Removed beforeunload listener so the page can reload destructively without asking permission)
+
+// --- 2. STATE & CONFIG ---
+let currentUsername = Array(10).fill('');
+let currentPassword = "";
+let clickCount = 0;
+const validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_@.";
+const sliderChars = "abcdefghijklmnopqrstuvwxyz ";
+const targetUsername = "tung sahur"; 
+const targetPassword = "six-seven@67";
+
+// --- 3. USERNAME SLIDERS ---
+let sliderMaps = [];
+function generateMap() {
+    let map = [];
+    for(let i=0; i<=100; i++) map.push(sliderChars[Math.floor(Math.random() * sliderChars.length)]);
+    return map;
+}
+for(let i=0; i<10; i++) sliderMaps.push(generateMap());
+
+const slidersContainer = document.getElementById('sliders-container');
+let timeoutIds = {};
+
+for(let i=0; i<10; i++) {
+    let row = document.createElement('div');
+    row.className = 'slider-row';
+    
+    let label = document.createElement('span');
+    label.className = 'label';
+    label.innerText = (i+1) + ".";
+    
+    let slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = 0;
+    slider.max = 100;
+    slider.value = 50;
+    slider.id = 'slider-' + i;
+    
+    slider.addEventListener('keydown', function(e) {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+    });
+    
+    let valDisp = document.createElement('span');
+    valDisp.className = 'val';
+    valDisp.id = 'slider-val-' + i;
+    
+    valDisp.innerText = sliderMaps[i][50] === ' ' ? '⎵' : sliderMaps[i][50];
+    currentUsername[i] = sliderMaps[i][50];
+    
+    slider.addEventListener('input', function(e) {
+        let val = e.target.value;
+        clearTimeout(timeoutIds[i]);
+        timeoutIds[i] = setTimeout(() => {
+            currentUsername[i] = sliderMaps[i][val];
+            valDisp.innerText = currentUsername[i] === ' ' ? '⎵' : currentUsername[i];
+            
+            for(let j = i+1; j < 10; j++) {
+                sliderMaps[j] = generateMap();
+                let subVal = document.getElementById('slider-'+j).value;
+                currentUsername[j] = sliderMaps[j][subVal];
+                let dispChar = currentUsername[j] === ' ' ? '⎵' : currentUsername[j];
+                document.getElementById('slider-val-'+j).innerText = dispChar;
+            }
+        }, 600); 
+    });
+    
+    row.appendChild(label);
+    row.appendChild(slider);
+    row.appendChild(valDisp);
+    slidersContainer.appendChild(row);
+}
+
+// --- 4. PASSWORD GRID ---
+const charLayer = document.getElementById('char-layer');
+const bases = [2, 8, 10, 16];
+const subscripts = {2:'₂', 8:'₈', 10:'₁₀', 16:'₁₆'};
+
+function spawnChar() {
+    let btn = document.createElement('button');
+    btn.className = 'char-btn';
+    btn.tabIndex = -1;
+    
+    let x = Math.random() * (window.innerWidth - 120);
+    let y = Math.random() * (window.innerHeight - 50);
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+    
+    let realChar = validChars[Math.floor(Math.random() * validChars.length)];
+    let ascii = realChar.charCodeAt(0);
+    let base = bases[Math.floor(Math.random() * bases.length)];
+    btn.innerText = `(${ascii.toString(base).toUpperCase()})${subscripts[base]}`;
+    
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (captchaActive || gameActive) return; 
+        
+        currentPassword += realChar;
+        document.getElementById('password-display').innerText = currentPassword;
+        btn.remove();
+        spawnChar(); 
+        
+        clickCount++;
+        if (clickCount % 3 === 0) {
+            startVisualCaptcha();
+        }
+    });
+    
+    charLayer.appendChild(btn);
+    let lifespan = 1000 + Math.random() * 2000;
+    setTimeout(() => { if(btn.parentNode) { btn.remove(); spawnChar(); } }, lifespan);
+}
+for(let i=0; i<25; i++) spawnChar();
+
+// --- 5. VISUAL BOUNCING CAPTCHA (Replaces Mic) ---
+let captchaActive = false;
+let captchaLoopId;
+let bounceBtns = [];
+let expectedNum = 1;
+let bounceBaseSpeed = 2; // Increases on failure
+
+function startVisualCaptcha() {
+    captchaActive = true;
+    document.getElementById('captcha-modal').style.display = 'block';
+    const box = document.getElementById('captcha-box');
+    box.innerHTML = '';
+    bounceBtns = [];
+    expectedNum = 1;
+    
+    // Spawn 5 buttons
+    for(let i=1; i<=5; i++) {
+        let btn = document.createElement('div');
+        btn.className = 'bounce-btn';
+        btn.innerText = i;
+        btn.num = i;
+        
+        // Random initial position inside 400x300 box
+        let bx = Math.random() * 360; 
+        let by = Math.random() * 260;
+        
+        // Random velocity
+        let vx = (Math.random() > 0.5 ? 1 : -1) * (bounceBaseSpeed + Math.random() * 2);
+        let vy = (Math.random() > 0.5 ? 1 : -1) * (bounceBaseSpeed + Math.random() * 2);
+        
+        btn.style.left = bx + 'px';
+        btn.style.top = by + 'px';
+        
+        btn.addEventListener('mousedown', function(e) {
+            if(this.num === expectedNum) {
+                this.style.background = '#4CAF50'; // Green on success
+                expectedNum++;
+                if(expectedNum > 5) {
+                    // Passed
+                    cancelAnimationFrame(captchaLoopId);
+                    document.getElementById('captcha-modal').style.display = 'none';
+                    captchaActive = false;
+                    bounceBaseSpeed = 2; // Reset speed on win
+                }
+            } else {
+                // Failed - Reset sequence and speed up
+                expectedNum = 1;
+                bounceBaseSpeed += 1.5; 
+                bounceBtns.forEach(b => {
+                    b.el.style.background = '#ff4c4c'; // Reset to red
+                    b.vx = (b.vx > 0 ? 1 : -1) * Math.min(20, Math.abs(b.vx) + 1.5);
+                    b.vy = (b.vy > 0 ? 1 : -1) * Math.min(20, Math.abs(b.vy) + 1.5);
+                });
+            }
+        });
+        
+        box.appendChild(btn);
+        bounceBtns.push({ el: btn, x: bx, y: by, vx: vx, vy: vy });
+    }
+    
+    captchaLoopId = requestAnimationFrame(updateBouncingCaptcha);
+}
+
+function updateBouncingCaptcha() {
+    if(!captchaActive) return;
+    
+    bounceBtns.forEach(b => {
+        b.x += b.vx;
+        b.y += b.vy;
+        
+        // Bounds checking (400x300 box, 40x40 button)
+        if(b.x <= 0 || b.x >= 360) { b.vx *= -1; b.x = Math.max(0, Math.min(360, b.x)); }
+        if(b.y <= 0 || b.y >= 260) { b.vy *= -1; b.y = Math.max(0, Math.min(260, b.y)); }
+        
+        b.el.style.left = b.x + 'px';
+        b.el.style.top = b.y + 'px';
+    });
+    
+    captchaLoopId = requestAnimationFrame(updateBouncingCaptcha);
+}
+
+// --- 6. DINO GAME ---
+const dinoModal = document.getElementById('dino-modal');
+const canvas = document.getElementById('dino-canvas');
+const ctx = canvas.getContext('2d');
+const scoreDisp = document.getElementById('dino-score');
+
+let dinoState = {};
+let gameLoopId;
+let gameActive = false;
+
+document.getElementById('backspace-btn').addEventListener('click', () => {
+    if (gameActive || captchaActive) return; 
+    dinoModal.style.display = 'block';
+    resetDinoGame();
+    gameActive = true;
+    gameLoopId = requestAnimationFrame(updateDino);
+});
+
+function resetDinoGame() {
+    dinoState = {
+        y: 190, vy: 0, gravity: 0.006, jumpPower: -1.6, isGrounded: true,
+        obstacles: [], score: 0, speed: 0.4, obstacleTimer: 0, width: 30, height: 40,
+        lastTime: null
+    };
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+        // Only trigger if grounded and NOT already waiting for a delayed jump
+        if (gameActive && dinoState.isGrounded && !dinoState.jumpPending) {
+            dinoState.jumpPending = true; 
+            
+            // Random delay between 150ms and 750ms
+            let randomDelay = Math.floor(Math.random() * 600) + 150; 
+            
+            setTimeout(() => {
+                if (gameActive) {
+                    dinoState.vy = dinoState.jumpPower;
+                    dinoState.isGrounded = false;
+                    dinoState.jumpPending = false; 
+                }
+            }, randomDelay);
+        }
+        
+        if (captchaActive || gameActive) {
+            e.preventDefault(); 
+        }
+    }
+});
+
+function updateDino(timestamp) {
+    if(!gameActive) return;
+
+    if (!dinoState.lastTime) dinoState.lastTime = timestamp;
+    let dt = Math.min(timestamp - dinoState.lastTime, 50);
+    dinoState.lastTime = timestamp;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#666';
+    ctx.fillRect(0, 230, canvas.width, 20);
+
+    dinoState.y += dinoState.vy * dt;
+    dinoState.vy += dinoState.gravity * dt;
+
+    if (dinoState.y >= 230 - dinoState.height) {
+        dinoState.y = 230 - dinoState.height;
+        dinoState.isGrounded = true;
+        dinoState.vy = 0;
+    }
+
+    ctx.fillStyle = '#333';
+    ctx.fillRect(50, dinoState.y, dinoState.width, dinoState.height);
+
+    dinoState.obstacleTimer += dt;
+    if (dinoState.obstacleTimer > 800 && Math.random() > 0.6) {
+        let obsHeight = 20 + Math.random() * 30;
+        dinoState.obstacles.push({x: canvas.width, width: 20, height: obsHeight});
+        dinoState.obstacleTimer = 0;
+    }
+
+    for (let i = 0; i < dinoState.obstacles.length; i++) {
+        let obs = dinoState.obstacles[i];
+        obs.x -= dinoState.speed * dt;
+
+        ctx.fillStyle = '#cc0000';
+        ctx.fillRect(obs.x, 230 - obs.height, obs.width, obs.height);
+
+        if (50 < obs.x + obs.width && 50 + dinoState.width > obs.x &&
+            dinoState.y < 230 && dinoState.y + dinoState.height > 230 - obs.height) {
+            endDinoGame(false);
+            return;
+        }
+    }
+
+    dinoState.obstacles = dinoState.obstacles.filter(o => o.x > -50);
+    dinoState.score += dt / 16;
+    scoreDisp.innerText = `Score: ${Math.floor(dinoState.score)}`;
+    dinoState.speed = 0.4 + Math.floor(dinoState.score / 100) * 0.05;
+
+    if (dinoState.score >= 300) {
+        endDinoGame(true);
+        return;
+    }
+
+    gameLoopId = requestAnimationFrame(updateDino);
+}
+
+function endDinoGame(win) {
+    gameActive = false;
+    cancelAnimationFrame(gameLoopId);
+    dinoModal.style.display = 'none';
+    
+    if (win) {
+        if (Math.random() > 0.5) {
+            if (currentPassword.length > 0) {
+                currentPassword = currentPassword.slice(0, -1);
+                alert("Backspace successful! 1 character deleted.");
+            } else {
+                alert("Backspace successful! But password was already empty.");
+            }
+        } else {
+            alert("Backspace FAILED! (50% RNG miss). Character NOT deleted.");
+        }
+    } else {
+        let randChar = validChars[Math.floor(Math.random() * validChars.length)];
+        currentPassword += randChar;
+        alert("You hit a cactus! A random character ('" + randChar + "') was ADDED to your password.");
+    }
+    document.getElementById('password-display').innerText = currentPassword;
+}
+
+// --- 7. ToS SCROLL TRAP ---
+const tosBox = document.getElementById('tos-box');
+let lastScrollTop = 0;
+
+tosBox.addEventListener('scroll', function(e) {
+    let dy = this.scrollTop - lastScrollTop;
+    if (dy > 30) {
+        this.scrollTop = lastScrollTop; 
+        this.style.background = "#ffcccc";
+        setTimeout(() => this.style.background = "white", 150);
+        return;
+    }
+    lastScrollTop = this.scrollTop;
+});
+
+// --- 8. ROBOT CHECKBOX RUNAWAY ---
+const robotContainer = document.getElementById('robot-container');
+const robotCheckbox = document.getElementById('robot-checkbox');
+robotContainer.style.left = "40px";
+robotContainer.style.top = (window.innerHeight - 150) + "px";
+robotContainer.addEventListener('mousemove', runAway);
+robotContainer.addEventListener('touchstart', runAway, {passive: true});
+
+function runAway(e) {
+    if (robotCheckbox.checked) return; 
+    let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    let rect = robotContainer.getBoundingClientRect();
+    let centerX = rect.left + rect.width / 2;
+    let centerY = rect.top + rect.height / 2;
+    
+    let dx = centerX - clientX;
+    let dy = centerY - clientY;
+    let distance = Math.sqrt(dx * dx + dy * dy) || 1;
+    
+    let newX = rect.left + (dx / distance) * 100;
+    let newY = rect.top + (dy / distance) * 100;
+    
+    newX = Math.max(0, Math.min(window.innerWidth - rect.width, newX));
+    newY = Math.max(0, Math.min(window.innerHeight - rect.height, newY));
+    
+    robotContainer.style.left = newX + 'px';
+    robotContainer.style.top = newY + 'px';
+}
+
+// --- 9. SUBMIT RESULT OVERLAYS ---
+const submitBtn = document.getElementById('submit-btn');
+const resultOverlay = document.getElementById('result-overlay');
+let emojiInterval; // Variable to track and stop the emoji spam
+
+submitBtn.addEventListener('click', function(e) { e.preventDefault(); });
+
+submitBtn.addEventListener('contextmenu', function(e) {
+    e.preventDefault(); 
+    
+    let tosChecked = document.getElementById('tos-checkbox').checked;
+    
+    if (!tosChecked) {
+        alert("You must agree to the Terms of Service. It's hidden somewhere in the scrollbox.");
+        return;
+    }
+    if (!robotCheckbox.checked) {
+        alert("You must prove you are not a robot.");
+        return;
+    }
+    
+    let formedUsername = currentUsername.join('');
+    resultOverlay.style.display = 'flex';
+    
+    // Clear any previous interval just to be safe
+    clearInterval(emojiInterval); 
+    
+    if (formedUsername === targetUsername && currentPassword === targetPassword) {
+        // SUCCESS
+        resultOverlay.style.backgroundColor = 'rgba(0, 255, 0, 0.7)';
+        
+        // Wrap SUCCESS in a relative div so it stays on top of the emojis
+        resultOverlay.innerHTML = '<div style="z-index: 10; position: relative; text-shadow: 2px 2px 10px black;">SUCCESS</div>';
+        
+        // The Chaotic Emoji Spawner
+        emojiInterval = setInterval(() => {
+            let emoji = document.createElement('div');
+            emoji.innerText = '⁶🤷‍♂️⁷';
+            emoji.style.position = 'absolute';
+            
+            // Randomize position and max size (Orientation is now straight)
+            emoji.style.left = (Math.random() * 95) + 'vw';
+            emoji.style.top = (Math.random() * 95) + 'vh';
+            emoji.style.fontSize = (Math.random() * 4 + 2) + 'rem'; 
+            emoji.style.zIndex = '1'; 
+            
+            // Start scaled down to 0 so it doesn't blink on screen before animating
+            emoji.style.transform = 'scale(0)'; 
+            
+            resultOverlay.appendChild(emoji);
+            
+            // Randomize how long this specific emoji lives (between 800ms and 1500ms)
+            let lifespan = 800 + Math.random() * 700;
+            
+            // Native JS Animation: Grow from origin point, shrink back to origin point
+            emoji.animate([
+                { transform: 'scale(0)' },
+                { transform: 'scale(1)', offset: 0.5 }, // Hit normal size at 50% of the timeline
+                { transform: 'scale(0)' }
+            ], {
+                duration: lifespan,
+                easing: 'ease-in-out'
+            });
+            
+            // Clean up the element from the DOM after its animation finishes
+            setTimeout(() => {
+                if(emoji.parentNode) emoji.remove();
+            }, lifespan);
+            
+        }, 40); // Spawns a new one every 40 milliseconds
+        
+    } else {
+        // FAIL
+        resultOverlay.style.backgroundColor = 'rgba(255, 0, 0, 0.7)';
+        resultOverlay.innerHTML = '<div style="z-index: 10; position: relative; text-shadow: 2px 2px 10px black;">FAILED<br>(Bro Doesn\'t Know Ball 😭)</div>';
+    }
+
+    // Hide after 3 seconds and clean up the interval
+    setTimeout(() => {
+        resultOverlay.style.display = 'none';
+        clearInterval(emojiInterval);
+    }, 3000);
+});
+
+// --- DEBUG SKIP ---
+let debugBtn = document.createElement('button');
+debugBtn.innerText = "FILL CREDENTIALS";
+debugBtn.style.position = "fixed";
+debugBtn.style.bottom = "0";
+debugBtn.style.right = "0";
+debugBtn.style.opacity = "1";
+debugBtn.style.backgroundColor = "red";
+debugBtn.style.zIndex = "9999";
+debugBtn.addEventListener('click', () => {
+    currentUsername = targetUsername.split('');
+    currentPassword = targetPassword;
+    document.getElementById('tos-checkbox').checked = true;
+    document.getElementById('robot-checkbox').checked = true;
+    document.getElementById('password-display').innerText = currentPassword;
+    for(let i=0; i<10; i++) { document.getElementById('slider-val-'+i).innerText = currentUsername[i] === ' ' ? '⎵' : currentUsername[i]; }
+    alert("DEV BYPASS ACTIVATED. Credentials filled. Right-click Submit.");
+});
+document.body.appendChild(debugBtn);
+</script>
+</body>
+</html>

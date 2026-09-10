@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worst College Portal 💀</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:"Comic Sans MS",Arial,sans-serif;
+    background:#00ffff;
+    color:#ff00ff;
+    overflow-x:hidden;
+}
+
+header{
+    background:red;
+    color:yellow;
+    padding:12px;
+    text-align:center;
+    border:8px ridge yellow;
+    font-weight:bold;
+}
+
+h1{
+    text-align:center;
+    font-size:40px;
+    color:blue;
+    text-shadow:4px 4px yellow;
+}
+
+.box{
+    width:90%;
+    max-width:650px;
+    margin:30px auto;
+    padding:25px;
+    background:#ff9900;
+    border:12px double blue;
+    text-align:center;
+}
+
+input[type="text"],
+input[type="password"]{
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    font-size:18px;
+    border:5px inset gray;
+}
+
+button{
+    padding:16px 30px;
+    margin:12px;
+    font-size:20px;
+    font-weight:bold;
+    font-family:"Comic Sans MS";
+    background:lime;
+    color:red;
+    border:7px outset purple;
+}
+
+#loading,
+#piScreen,
+#finalScreen{
+    display:none;
+}
+
+.loadingbar{
+    width:100%;
+    height:35px;
+    background:black;
+    border:4px solid white;
+}
+
+.progress{
+    width:0%;
+    height:100%;
+    background:lime;
+}
+
+#percent{
+    font-size:28px;
+    font-weight:bold;
+}
+
+#scream{
+    font-size:32px;
+    color:red;
+    animation:shake .08s infinite;
+}
+
+@keyframes shake{
+    0%{transform:translateX(-8px) rotate(-2deg)}
+    50%{transform:translateX(8px) rotate(2deg)}
+    100%{transform:translateX(-8px) rotate(-2deg)}
+}
+
+.warning{
+    background:black;
+    color:red;
+    padding:18px;
+    border:6px dashed yellow;
+}
+
+#wrong{
+    color:red;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.maa{
+    background:yellow;
+    color:red;
+    padding:20px;
+    border:8px dashed red;
+}
+
+#catVideo{
+    display:none;
+    position:fixed;
+    z-index:9999;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:90%;
+    max-width:500px;
+    border:12px solid red;
+    box-shadow:0 0 40px yellow;
+    background:black;
+}
+
+#videoText{
+    display:none;
+    position:fixed;
+    z-index:10000;
+    top:10px;
+    left:0;
+    width:100%;
+    text-align:center;
+    color:yellow;
+    font-size:25px;
+    font-weight:bold;
+}
+
+#exitBtn{
+    display:none;
+}
+
+#escape{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:black;
+    color:red;
+    z-index:20000;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+⚠️ COLLEGE ADVANCED STUDENT MANAGEMENT SYSTEM™ ⚠️
+</header>
+
+<h1>WELCOME STUDENT 💀</h1>
+
+<!-- LOGIN -->
+<div class="box" id="login">
+
+<h2>🔐 STUDENT LOGIN</h2>
+
+<input type="text" placeholder="Username">
+<input type="password" placeholder="Password">
+
+<button onclick="startLoading()">LOGIN</button>
+
+<p>Best viewed on Internet Explorer 6.</p>
+
+</div>
+
+
+<!-- LOADING -->
+<div class="box" id="loading">
+
+<h2>🚀 AUTHENTICATING...</h2>
+
+<p id="status">Connecting to college server...</p>
+
+<div class="loadingbar">
+    <div class="progress" id="progress"></div>
+</div>
+
+<p id="percent">0%</p>
+
+<div id="scream"></div>
+
+</div>
+
+
+<!-- PI -->
+<div class="box" id="piScreen">
+
+<h2>🚨 SYSTEM EMERGENCY 🚨</h2>
+
+<div class="warning">
+
+🐓 A ROOSTER HAS TAKEN CONTROL OF THE SERVER.
+
+<br><br>
+
+The only way to stop it is to enter π.
+
+</div>
+
+<h3>Enter π — minimum 10 digits</h3>
+
+<input
+    type="text"
+    id="pi"
+    placeholder="Enter π value..."
+    autocomplete="off"
+>
+
+<button onclick="checkPi()">
+🐓 STOP THE ROOSTER
+</button>
+
+<p id="wrong"></p>
+
+</div>
+
+
+<!-- FINAL -->
+<div class="box" id="finalScreen">
+
+<h2>🐓 ROOSTER DEFEATED</h2>
+
+<p>You survived the loading screen.</p>
+
+<div class="maa">
+
+<h2>⚠️ FINAL CONFIRMATION ⚠️</h2>
+
+<p>
+Are you REALLY sure you want to leave?
+</p>
+
+<label style="font-size:18px">
+
+<input
+    type="checkbox"
+    id="maaCheck"
+    onchange="maaClicked()"
+>
+
+<b>MAA KI KASAM, I WANT TO LEAVE.</b>
+
+</label>
+
+<br>
+
+<button
+    id="exitBtn"
+    onclick="finalExit()"
+>
+EXIT PORTAL
+</button>
+
+</div>
+
+</div>
+
+
+<!-- CAT MEME VIDEO -->
+
+<div id="videoText">
+😂 YOU REALLY TICKED IT 💀
+</div>
+
+<video
+    id="catVideo"
+    playsinline
+    preload="auto"
+>
+    <source
+        src="Cat_Laughing_Meme_Download.mp4"
+        type="video/mp4"
+    >
+</video>
+
+
+<!-- ESCAPE SCREEN -->
+
+<div id="escape">
+
+<div>
+
+<h1 style="color:red">
+🚨 ACCESS DENIED 🚨
+</h1>
+
+<h2>YOU CANNOT ESCAPE.</h2>
+
+</div>
+
+</div>
+
+
+<!-- ROOSTER AUDIO -->
+
+<audio
+    id="rooster"
+    loop
+    preload="auto"
+>
+    <source
+        src="rooster_scream.mp3"
+        type="audio/mpeg"
+    >
+</audio>
+
+
+<script>
+
+let progress = 0;
+
+const rooster = document.getElementById("rooster");
+const cat = document.getElementById("catVideo");
+
+
+/* =========================
+   LOADING
+========================= */
+
+function startLoading(){
+
+    document.getElementById("login").style.display = "none";
+    document.getElementById("loading").style.display = "block";
+
+    /*
+       IMPORTANT:
+       Start audio DIRECTLY from the LOGIN click.
+       This gives the browser a valid user gesture.
+    */
+
+    rooster.volume = 0;
+    rooster.muted = true;
+
+    rooster.play().catch((error)=>{
+        console.log("Rooster preload blocked:", error);
+    });
+
+
+    let timer = setInterval(()=>{
+
+        progress++;
+
+        document.getElementById("progress").style.width =
+            progress + "%";
+
+        document.getElementById("percent").innerText =
+            progress + "%";
+
+
+        if(progress < 30){
+
+            document.getElementById("status").innerText =
+                "Finding college server...";
+
+        }
+
+        else if(progress < 60){
+
+            document.getElementById("status").innerText =
+                "Server found. Losing server...";
+
+        }
+
+        else if(progress < 90){
+
+            document.getElementById("status").innerText =
+                "Reconnecting...";
+
+        }
+
+        else{
+
+            document.getElementById("status").innerText =
+                "PLEASE DO NOT REFRESH.";
+
+        }
+
+
+        if(progress >= 99){
+
+            clearInterval(timer);
+
+            document.getElementById("status").innerText =
+                "99% — FINALIZING...";
+
+            setTimeout(startRooster,1000);
+        }
+
+    },80);
+}
+
+
+/* =========================
+   ROOSTER
+========================= */
+
+function startRooster(){
+
+    document.getElementById("scream").innerHTML =
+        "🐓 COCK-A-DOOOOOOOOOOOO! 🐓";
+
+    document.getElementById("piScreen").style.display =
+        "block";
+
+
+    /*
+       Audio was already started during LOGIN.
+       Now make it audible.
+    */
+
+    rooster.muted = false;
+    rooster.volume = 1.0;
+
+    rooster.play().catch((error)=>{
+
+        console.log("Audio playback error:", error);
+
+        /*
+           Fallback:
+           If browser still blocks it, user can tap.
+        */
+
+        document.body.addEventListener(
+            "click",
+            unlockRooster,
+            {once:true}
+        );
+
+    });
+}
+
+
+function unlockRooster(){
+
+    rooster.muted = false;
+    rooster.volume = 1.0;
+
+    rooster.play().catch((error)=>{
+        console.log(error);
+    });
+}
+
+
+/* =========================
+   PI CHECK
+========================= */
+
+function checkPi(){
+
+    let value =
+        document.getElementById("pi").value
+        .replace(/\s/g,"");
+
+    let correct = "3.1415926535";
+
+
+    if(value === correct){
+
+        rooster.pause();
+        rooster.currentTime = 0;
+
+        document.getElementById("piScreen").style.display =
+            "none";
+
+        document.getElementById("finalScreen").style.display =
+            "block";
+
+    }
+
+    else{
+
+        document.getElementById("wrong").innerText =
+            "❌ WRONG! THE ROOSTER GETS ANGRIER.";
+
+        document.getElementById("pi").value = "";
+
+        rooster.currentTime = 0;
+
+        rooster.muted = false;
+        rooster.volume = 1.0;
+
+        rooster.play().catch((error)=>{
+            console.log(error);
+        });
+    }
+}
+
+
+/* =========================
+   MAA KI KASAM
+========================= */
+
+function maaClicked(){
+
+    let check =
+        document.getElementById("maaCheck");
+
+
+    if(check.checked){
+
+        /*
+           Checkbox onchange itself is a user gesture.
+           Therefore video + its audio can normally play.
+        */
+
+        cat.style.display = "block";
+
+        document.getElementById("videoText").style.display =
+            "block";
+
+        cat.currentTime = 0;
+        cat.muted = false;
+        cat.volume = 1.0;
+
+
+        cat.play().then(()=>{
+
+            console.log("Cat meme playing!");
+
+        }).catch((error)=>{
+
+            console.log("Video playback blocked:", error);
+
+            /*
+               Fallback if browser blocks autoplay.
+            */
+
+            cat.controls = true;
+
+        });
+
+
+        document.getElementById("exitBtn").style.display =
+            "inline-block";
+    }
+}
+
+
+/* =========================
+   EXIT
+========================= */
+
+function finalExit(){
+
+    if(!document.getElementById("maaCheck").checked){
+
+        alert(
+            "❌ EXIT DENIED.\n\n" +
+            "MAA KI KASAM checkbox tick karo."
+        );
+
+        return;
+    }
+
+
+    cat.pause();
+
+    document.getElementById("catVideo").style.display =
+        "none";
+
+    document.getElementById("videoText").style.display =
+        "none";
+
+
+    document.body.innerHTML = `
+
+    <div style="
+        background:black;
+        color:lime;
+        min-height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        font-family:monospace;
+    ">
+
+        <div>
+
+            <h1>GAME OVER 💀</h1>
+
+            <h2>🐓 ROOSTER: DEAD</h2>
+
+            <h2>😂 CAT: VICTORIOUS</h2>
+
+            <p>
+                You survived the world's worst college portal.
+            </p>
+
+        </div>
+
+    </div>
+
+    `;
+}
+
+
+/* =========================
+   ESC KEY
+========================= */
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.key === "Escape"){
+
+            e.preventDefault();
+
+            document.getElementById("escape").style.display =
+                "flex";
+
+
+            setTimeout(()=>{
+
+                document.getElementById("escape").style.display =
+                    "none";
+
+            },2000);
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

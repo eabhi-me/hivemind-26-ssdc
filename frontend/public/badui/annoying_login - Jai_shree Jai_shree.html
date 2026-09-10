@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Comic Sans MS', 'Papyrus', cursive; }
+  body {
+    margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: repeating-linear-gradient(45deg, #ff00ff, #ff00ff 20px, #00ff00 20px, #00ff00 40px, #ffff00 40px, #ffff00 60px);
+    animation: bgshift 1.5s steps(4) infinite;
+    transition: transform 1s ease;
+  }
+  @keyframes bgshift {
+    0%{filter: hue-rotate(0deg)} 100%{filter: hue-rotate(360deg)}
+  }
+  body.flipped {
+    transform: rotate(180deg);
+  }
+  .card {
+    background: #c0c0c0; padding: 25px 40px 45px 15px; border: 8px double #ff0000;
+    box-shadow: 12px 12px 0px #000, -4px -4px 0px #0000ff;
+    width: 340px; text-align: center; position: relative; transform: rotate(-1.5deg);
+  }
+  h2 { margin-top: 0; color: #ff00ff; text-shadow: 2px 2px 0 #000, -2px -2px 0 #00ffff; font-size: 26px; }
+  input {
+    width: 105%; padding: 10px; margin: 8px 0 8px -6px; border-radius: 0;
+    border: 3px inset #808080; font-size: 15px; background: #ffffcc;
+    transform: rotate(0.5deg);
+  }
+  #captchaBox { display:flex; align-items:center; justify-content:space-between; margin: 8px 0; }
+  #captchaCanvas {
+    border: 2px dashed #ff0000; background: repeating-linear-gradient(-45deg, #fff, #fff 5px, #eee 5px, #eee 10px);
+    transform: rotate(-8deg);
+    animation: captchaWobble 2s ease-in-out infinite;
+  }
+  @keyframes captchaWobble {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(6deg); }
+  }
+  #refreshCaptcha { cursor:pointer; background: #ff6600; border: 3px outset #ffcc00; padding:6px 10px; font-weight:bold; }
+  button.submit {
+    position: relative; margin-top: 14px; padding: 12px 24px; border: 4px outset #00ff00;
+    background: #ff0066; color: yellow; border-radius: 0; font-size: 17px; cursor: pointer;
+    font-weight: bold; text-shadow: 1px 1px 0 #000;
+  }
+  #progressWrap { height: 14px; background: repeating-linear-gradient(90deg,#000,#000 4px,#fff 4px,#fff 8px); margin-top: 12px; overflow: hidden; display:none; border: 2px solid #ff00ff; }
+  #progressBar { height: 100%; width: 0%; background: repeating-linear-gradient(45deg,#ff0,#ff0 5px,#f0f 5px,#f0f 10px); transition: width 0.3s; }
+  #msg { color: #ff0000; font-size: 14px; min-height: 18px; font-weight: bold; text-shadow: 1px 1px 0 #fff; }
+  .adOverlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.85); z-index: 2000;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .adBox {
+    background: repeating-linear-gradient(45deg,#ff0,#ff0 8px,#000 8px,#000 16px);
+    color: red; border: 6px ridge #ff00ff; padding: 40px 60px;
+    font-weight: bold; font-size: 28px; text-align: center;
+    box-shadow: 0 0 60px #ff0; transform: rotate(-2deg);
+    max-width: 80%; position: relative;
+  }
+  .adBox span.closeBtn {
+    position: absolute; top: -18px; right: -18px; background: lime; color: red;
+    border: 3px solid black; width: 34px; height: 34px; display: flex;
+    align-items: center; justify-content: center; font-size: 20px; font-weight: bold;
+    cursor: pointer;
+  }
+  @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  .blink { animation: blink 0.6s steps(1) infinite; }
+  #marquee {
+    position: fixed; top: 0; left: 0; width: 100%; overflow: hidden;
+    background: black; color: #0f0; font-weight: bold; font-size: 20px;
+    padding: 6px 0; white-space: nowrap; z-index: 500; border-bottom: 4px ridge magenta;
+  }
+  #marqueeText {
+    display: inline-block; padding-left: 100%;
+    animation: scrollLeft 8s linear infinite;
+  }
+  @keyframes scrollLeft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+  .floatEmoji {
+    position: fixed; font-size: 28px; z-index: 1; pointer-events: none;
+    animation: floatMove linear infinite;
+  }
+  @keyframes floatMove {
+    0% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(40px,-60px) rotate(90deg); }
+    50% { transform: translate(-30px,-20px) rotate(180deg); }
+    75% { transform: translate(-60px,50px) rotate(270deg); }
+    100% { transform: translate(0,0) rotate(360deg); }
+  }
+  #visitorCounter {
+    position: fixed; bottom: 10px; right: 10px; background: black; color: #0f0;
+    font-family: 'Courier New', monospace; font-size: 18px; padding: 6px 12px;
+    border: 3px outset #0f0; z-index: 500; letter-spacing: 2px;
+  }
+  #underConstruction {
+    position: fixed; bottom: 10px; left: 10px; background: yellow; color: black;
+    font-weight: bold; padding: 6px 10px; border: 3px dashed black; z-index: 500;
+    font-size: 14px; transform: rotate(-2deg);
+  }
+  .failOverlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px;
+    background: repeating-linear-gradient(45deg, red, red 15px, yellow 15px, yellow 30px, lime 30px, lime 45px, cyan 45px, cyan 60px);
+    animation: failFlash 0.15s steps(2) infinite;
+    cursor: pointer;
+  }
+  @keyframes failFlash {
+    0% { filter: invert(0) hue-rotate(0deg); }
+    100% { filter: invert(1) hue-rotate(180deg); }
+  }
+  .failEmoji {
+    font-size: 100px;
+    animation: failSpin 0.5s linear infinite;
+  }
+  @keyframes failSpin {
+    from { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.4); }
+    to { transform: rotate(360deg) scale(1); }
+  }
+  .failText {
+    font-family: 'Comic Sans MS', cursive; font-size: 44px; font-weight: bold;
+    color: red; text-shadow: 3px 3px 0 yellow, -3px -3px 0 blue;
+    animation: failShake 0.1s linear infinite;
+    text-align: center;
+  }
+  @keyframes failShake {
+    0% { transform: translate(0,0); } 25% { transform: translate(6px,-6px); }
+    50% { transform: translate(-6px,6px); } 75% { transform: translate(6px,6px); }
+    100% { transform: translate(-6px,-6px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="marquee"><span id="marqueeText">🌟✨ WELCOME TO THE WORST LOGIN PAGE EVER MADE ✨🌟 &nbsp;&nbsp;&nbsp; 🖱️ CLICK EVERYTHING FOR FREE PRIZES 🖱️ &nbsp;&nbsp;&nbsp; 💾 BEST VIEWED AT 800x600 💾</span></div>
+<div id="visitorCounter" class="blink">VISITORS: <span id="visitorNum"></span></div>
+<div id="underConstruction">🚧 SITE UNDER CONSTRUCTION 🚧</div>
+
+<div class="card" id="loginCard">
+  <h2>🔐 Login Portal</h2>
+  <div id="loginForm">
+    <input type="text" id="username" placeholder="Username" onfocus="maybeSpawnAd()">
+    <input type="password" id="password" placeholder="Password" onfocus="maybeSpawnAd()">
+
+    <div id="captchaBox">
+      <canvas id="captchaCanvas" width="220" height="70"></canvas>
+      <button id="refreshCaptcha" onclick="newCaptcha()">🔄</button>
+    </div>
+    <input type="text" id="captchaInput" placeholder="Solve the CAPTCHA above" onfocus="maybeSpawnAd()" oninput="instantCardRotate()">
+
+    <div style="display:flex; align-items:center; gap:8px; margin: 10px 0; user-select:none;">
+      <input type="checkbox" id="robotCheck" style="width:auto; margin:0;" onclick="dodgeCheckbox(event)">
+      <label for="robotCheck" id="robotLabel">I'm not a robot 🤖</label>
+    </div>
+
+    <button class="submit" id="submitBtn">Login</button>
+    <div id="progressWrap"><div id="progressBar"></div></div>
+    <p id="msg"></p>
+  </div>
+
+  <div id="welcome">
+    <h2>✅ Welcome, <span id="welcomeName"></span>!</h2>
+  </div>
+</div>
+
+<script>
+// ---------- CONFIG (demo credentials) ----------
+const VALID_USER = "admin";
+const VALID_PASS = "1234";
+
+let wrongAttempts = 0;
+let captchaAnswer = 0;
+
+function newCaptcha() {
+  const a = Math.floor(Math.random() * 20) + 5;
+  const b = Math.floor(Math.random() * 15) + 1;
+  const ops = ['+', '-', '*'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let result;
+  if (op === '+') result = a + b;
+  else if (op === '-') result = a - b;
+  else result = a * b;
+  captchaAnswer = result;
+
+  const text = `${a}${op}${b}=?`;
+  const canvas = document.getElementById('captchaCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // noisy background dots
+  for (let i = 0; i < 60; i++) {
+    ctx.fillStyle = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
+    ctx.beginPath();
+    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // random squiggly lines
+  for (let i = 0; i < 5; i++) {
+    ctx.strokeStyle = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+    ctx.bezierCurveTo(
+      Math.random() * canvas.width, Math.random() * canvas.height,
+      Math.random() * canvas.width, Math.random() * canvas.height,
+      Math.random() * canvas.width, Math.random() * canvas.height
+    );
+    ctx.stroke();
+  }
+
+  // distorted characters, each rotated/offset/colored differently
+  const startX = 15;
+  let x = startX;
+  for (const ch of text) {
+    ctx.save();
+    const y = 30 + (Math.random() * 12 - 6);
+    ctx.translate(x, y);
+    ctx.rotate((Math.random() * 50 - 25) * Math.PI / 180);
+    ctx.font = `bold ${22 + Math.floor(Math.random() * 8)}px 'Comic Sans MS', cursive`;
+    ctx.fillStyle = `rgb(${Math.random()*180|0},${Math.random()*180|0},${Math.random()*180|0})`;
+    ctx.fillText(ch, 0, 0);
+    ctx.restore();
+    x += 22;
+  }
+}
+newCaptcha();
+
+// Button stays still normally, only dodges when the user actually tries to press it
+const btn = document.getElementById('submitBtn');
+let justDodged = false;
+btn.addEventListener('mousedown', (e) => {
+  const captchaOk = parseInt(document.getElementById('captchaInput').value) === captchaAnswer;
+  if (!captchaOk) {
+    e.preventDefault();
+    justDodged = true;
+    const card = document.getElementById('loginCard').getBoundingClientRect();
+    const maxX = card.width - 100;
+    const maxY = 60;
+    btn.style.position = 'relative';
+    btn.style.left = Math.floor(Math.random() * maxX - maxX/2) + 'px';
+    btn.style.top = Math.floor(Math.random() * maxY - maxY/2) + 'px';
+  }
+});
+btn.addEventListener('click', (e) => {
+  if (justDodged) {
+    e.preventDefault();
+    e.stopPropagation();
+    justDodged = false;
+    return;
+  }
+  confirmLogin();
+});
+
+function beep(freq = 300, duration = 120) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    osc.frequency.value = freq;
+    osc.connect(ctx.destination);
+    osc.start();
+    setTimeout(() => { osc.stop(); ctx.close(); }, duration);
+  } catch (e) {}
+}
+
+function shakeCard() {
+  const card = document.getElementById('loginCard');
+  card.style.transition = 'transform 0.1s';
+  let n = 0;
+  const interval = setInterval(() => {
+    card.style.transform = `translateX(${n % 2 === 0 ? 8 : -8}px)`;
+    n++;
+    if (n > 6) { clearInterval(interval); card.style.transform = 'translateX(0)'; }
+  }, 50);
+}
+
+function maybeSpawnAd() {
+  if (Math.random() < 0.6) spawnAd();
+}
+
+function spawnAd() {
+  const messages = [
+    "🎉 You won a FREE prize! Click NO to claim!",
+    "⚠️ Your PC has 1 virus. Click to fix now!",
+    "💰 Congratulations! You're the 1,000,000th visitor!",
+    "🔥 Hot singles are typing your password right now!"
+  ];
+  const overlay = document.createElement('div');
+  overlay.className = 'adOverlay';
+
+  const box = document.createElement('div');
+  box.className = 'adBox';
+  box.innerText = messages[Math.floor(Math.random() * messages.length)];
+
+  const closeBtn = document.createElement('span');
+  closeBtn.className = 'closeBtn';
+  closeBtn.innerText = 'X';
+  closeBtn.onclick = (e) => { e.stopPropagation(); overlay.remove(); };
+  // Dodge the first couple of tries, then let it go on its own
+  let dodgeCount = 0;
+  const maxDodges = 2;
+  closeBtn.onmouseover = () => {
+    if (dodgeCount < maxDodges) {
+      closeBtn.style.position = 'absolute';
+      closeBtn.style.top = Math.floor(Math.random() * 50 - 25) + 'px';
+      closeBtn.style.left = Math.floor(Math.random() * 200 - 100) + 'px';
+      dodgeCount++;
+      if (dodgeCount === maxDodges) {
+        // After the last dodge, auto-remove shortly by itself, no click needed
+        setTimeout(() => overlay.remove(), 1200);
+      }
+    }
+  };
+
+  box.appendChild(closeBtn);
+  overlay.appendChild(box);
+  // Clicking anywhere on the dark overlay outside the box also dodges instead of closing
+  overlay.onclick = () => { beep(400, 80); };
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 6000);
+}
+
+function fakeProgress(onDone) {
+  const wrap = document.getElementById('progressWrap');
+  const bar = document.getElementById('progressBar');
+  wrap.style.display = 'block';
+  let pct = 0;
+  let resets = 0;
+  const interval = setInterval(() => {
+    pct += Math.random() * 15;
+    if (pct >= 99 && resets < 2) {
+      pct = 0;
+      resets++;
+    }
+    if (pct >= 100) {
+      pct = 100;
+      bar.style.width = '100%';
+      clearInterval(interval);
+      setTimeout(onDone, 400);
+      return;
+    }
+    bar.style.width = pct + '%';
+  }, 200);
+}
+
+// ---------- Random visitor counter ----------
+document.getElementById('visitorNum').innerText = String(Math.floor(Math.random() * 900000) + 100000);
+
+// ---------- Floating background emoji chaos ----------
+const emojiList = ['⭐','🔥','💥','👽','💀','🎉','🌀','⚡','🎃','👀'];
+function spawnFloatingEmoji() {
+  const el = document.createElement('div');
+  el.className = 'floatEmoji';
+  el.innerText = emojiList[Math.floor(Math.random() * emojiList.length)];
+  el.style.left = Math.floor(Math.random() * (window.innerWidth - 40)) + 'px';
+  el.style.top = Math.floor(Math.random() * (window.innerHeight - 40)) + 'px';
+  el.style.animationDuration = (2 + Math.random() * 3) + 's';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+setInterval(spawnFloatingEmoji, 700);
+for (let i = 0; i < 8; i++) spawnFloatingEmoji();
+function distortTyping(inputEl) {
+  inputEl.addEventListener('input', () => {
+    if (Math.random() < 0.4) {
+      let val = inputEl.value;
+      let chars = val.split('');
+      let i = chars.length - 1;
+      if (i >= 0) {
+        chars[i] = Math.random() < 0.5 ? chars[i].toUpperCase() : chars[i].toLowerCase();
+        const pos = inputEl.selectionStart;
+        inputEl.value = chars.join('');
+        inputEl.setSelectionRange(pos, pos);
+      }
+    }
+  });
+}
+distortTyping(document.getElementById('username'));
+
+// ---------- Fields randomly swap positions while typing ----------
+function maybeSwapFields() {
+  if (Math.random() < 0.12) {
+    const parent = userField.parentElement;
+    parent.insertBefore(passField, userField);
+    setTimeout(() => {
+      parent.insertBefore(userField, passField);
+    }, 1200);
+  }
+}
+
+// ---------- Fields randomly freeze/lag for a moment while typing ----------
+function maybeFreezeField(field) {
+  if (Math.random() < 0.15) {
+    field.disabled = true;
+    const oldPlaceholder = field.placeholder;
+    field.placeholder = "⏳ Loading...";
+    setTimeout(() => {
+      field.disabled = false;
+      field.placeholder = oldPlaceholder;
+      field.focus();
+    }, 500);
+  }
+}
+const userField = document.getElementById('username');
+
+// ---------- Auto-clear the field twice after typing, third attempt sticks ----------
+const fieldAttempts = { username: 0, password: 0 };
+const fieldTimers = {};
+function setupAutoDeleteRetry(field, key) {
+  field.addEventListener('input', () => {
+    clearTimeout(fieldTimers[key]);
+    if (field.value.length === 0) return;
+    fieldTimers[key] = setTimeout(() => {
+      if (fieldAttempts[key] < 2) {
+        fieldAttempts[key]++;
+        field.value = '';
+        field.placeholder = `Deleted! Try again (attempt ${fieldAttempts[key] + 1}/3)`;
+        field.focus();
+        beep(220, 150);
+      }
+    }, 900);
+  });
+}
+
+// ---------- Rotate the whole login card a full 360 degrees the moment anything is typed ----------
+const ROTATE_MS = 600;
+let cardRotation = -1.5; // running total angle, always lands back visually at the base tilt after each full spin
+function instantCardRotate() {
+  const card = document.getElementById('loginCard');
+  cardRotation += 360;
+  card.style.transition = `transform ${ROTATE_MS}ms ease-in-out`;
+  card.style.transform = `rotate(${cardRotation}deg)`;
+}
+
+userField.addEventListener('input', () => {
+  instantCardRotate();
+  if (Math.random() < 0.2) {
+    const randomEmoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+    userField.value += randomEmoji;
+  }
+  // Wobble font size for chaos
+  userField.style.fontSize = (14 + Math.random() * 6) + 'px';
+  maybeSwapFields();
+  maybeFreezeField(userField);
+});
+
+// ---------- Placeholder that keeps changing on password field ----------
+const passPlaceholders = ["Password", "Password (for real this time)", "Try again lol", "P4ssw0rd?", "Are you sure this is right?"];
+let placeholderIndex = 0;
+setInterval(() => {
+  placeholderIndex = (placeholderIndex + 1) % passPlaceholders.length;
+  document.getElementById('password').placeholder = passPlaceholders[placeholderIndex];
+}, 2000);
+
+// ---------- Field dodges cursor occasionally on focus ----------
+[userField].forEach(el => {
+  el.addEventListener('focus', () => {
+    if (Math.random() < 0.3) {
+      el.style.transform = `translateX(${Math.floor(Math.random()*60-30)}px) rotate(${Math.floor(Math.random()*6-3)}deg)`;
+      setTimeout(() => { el.style.transform = 'rotate(0.5deg)'; }, 400);
+    }
+  });
+});
+
+// ---------- Randomly delete typed characters (password field) ----------
+const passField = document.getElementById('password');
+setupAutoDeleteRetry(userField, 'username');
+setupAutoDeleteRetry(passField, 'password');
+passField.addEventListener('input', () => {
+  instantCardRotate();
+  if (passField.value.length > 0 && Math.random() < 0.25) {
+    setTimeout(() => {
+      const val = passField.value;
+      const cutIndex = Math.floor(Math.random() * val.length);
+      passField.value = val.slice(0, cutIndex) + val.slice(cutIndex + 1);
+    }, 150);
+  }
+  // Occasionally insert a random junk character
+  if (Math.random() < 0.15) {
+    const junkChars = "!@#$%^&*?";
+    const randChar = junkChars[Math.floor(Math.random() * junkChars.length)];
+    const pos = Math.floor(Math.random() * (passField.value.length + 1));
+    passField.value = passField.value.slice(0, pos) + randChar + passField.value.slice(pos);
+  }
+  maybeFreezeField(passField);
+});
+
+// ---------- Random screen flip ----------
+function flipScreen() {
+  document.body.classList.add('flipped');
+  beep(180, 200);
+  setTimeout(() => {
+    document.body.classList.remove('flipped');
+  }, 2500);
+}
+
+// Flip the screen randomly while typing in username or password
+[document.getElementById('username'), passField].forEach(el => {
+  el.addEventListener('input', () => {
+    if (Math.random() < 0.08) flipScreen();
+  });
+});
+
+// ---------- Dodging "I'm not a robot" checkbox ----------
+const robotBox = document.getElementById('robotCheck');
+let robotVerified = false;
+function dodgeCheckbox(e) {
+  if (!robotVerified && Math.random() < 0.7) {
+    e.preventDefault();
+    robotBox.checked = false;
+    const wrapper = robotBox.parentElement;
+    wrapper.style.position = 'relative';
+    wrapper.style.left = Math.floor(Math.random() * 160 - 80) + 'px';
+    wrapper.style.top = Math.floor(Math.random() * 40 - 20) + 'px';
+    document.getElementById('robotLabel').innerText = "Nice try, robot. Click again.";
+    beep(220);
+  } else {
+    robotVerified = true;
+    document.getElementById('robotLabel').innerText = "OK fine, you're human 🙄";
+  }
+}
+
+// ---------- Multi-step "Are you sure?" confirmation chain ----------
+const confirmSteps = [
+  "Are you sure you want to log in?",
+  "Really sure?",
+  "100% sure?",
+  "Last chance to back out...",
+  "Ok, actually logging in now."
+];
+let confirmIndex = 0;
+
+function confirmLogin() {
+  const msg = document.getElementById('msg');
+  if (confirmIndex < confirmSteps.length - 1) {
+    msg.style.color = '#6c5ce7';
+    msg.innerText = confirmSteps[confirmIndex];
+    btn.innerText = confirmIndex === 0 ? "Yes, I'm sure" : "Yes, really";
+    confirmIndex++;
+    beep(300, 60);
+    return;
+  }
+  msg.style.color = 'red';
+  confirmIndex = 0;
+  btn.innerText = "Login";
+  tryLogin();
+}
+
+// ---------- Extremely annoying fail overlay shown on failed login ----------
+const failMessages = [
+  "😤 TUMSE NA HO PAYEGA 😤",
+  "🚪💨 PEHLI FURSAT ME NIKAL 🚪💨",
+  "🤡 CONGRATS, YOU FAILED 🤡",
+  "💔📶 Connection toh tha... kismat nahi thi. 💔📶"
+];
+function sirenBeep() {
+  let toggle = false;
+  const interval = setInterval(() => {
+    beep(toggle ? 900 : 400, 150);
+    toggle = !toggle;
+  }, 150);
+  setTimeout(() => clearInterval(interval), 2500);
+}
+function showFailMeme() {
+  const overlay = document.createElement('div');
+  overlay.className = 'failOverlay';
+
+  const emoji = document.createElement('div');
+  emoji.className = 'failEmoji';
+  emoji.innerText = '🤣';
+
+  const text = document.createElement('div');
+  text.className = 'failText';
+  text.innerText = failMessages[Math.floor(Math.random() * failMessages.length)];
+
+  overlay.appendChild(emoji);
+  overlay.appendChild(text);
+  overlay.onclick = () => overlay.remove();
+  document.body.appendChild(overlay);
+
+  sirenBeep();
+  setTimeout(() => overlay.remove(), 2500);
+}
+
+// ---------- Spin the whole login page 360 degrees on failed login ----------
+function spinPageThenMeme(callback) {
+  beep(300, 400);
+  instantCardRotate();
+  setTimeout(() => {
+    if (callback) callback();
+  }, ROTATE_MS);
+}
+
+function tryLogin() {
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const captchaVal = parseInt(document.getElementById('captchaInput').value);
+  const msg = document.getElementById('msg');
+
+  if (!user || !pass) {
+    msg.innerText = "Fields can't be empty, obviously.";
+    shakeCard(); beep(200);
+    return;
+  }
+
+  if (captchaVal !== captchaAnswer) {
+    msg.innerText = "Wrong CAPTCHA. Try again. (It got harder.)";
+    newCaptcha();
+    shakeCard(); beep(150);
+    spawnAd();
+    if (Math.random() < 0.3) flipScreen();
+    return;
+  }
+
+  if (user !== VALID_USER || pass !== VALID_PASS) {
+    wrongAttempts++;
+    // annoyingly reject correct-looking attempts once, for fun
+    if (wrongAttempts === 1 && user === VALID_USER && pass === VALID_PASS) {
+      msg.innerText = "Wrong Password. (Just kidding, try once more.)";
+      shakeCard(); beep(250);
+      spinPageThenMeme(showFailMeme);
+      return;
+    }
+    msg.innerText = `Invalid credentials. Attempt ${wrongAttempts}. (hint: admin / 1234)`;
+    shakeCard(); beep(180);
+    spinPageThenMeme(showFailMeme);
+    return;
+  }
+
+  msg.innerText = "Verifying... please don't leave.";
+  btn.disabled = true;
+  fakeProgress(() => {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('welcome').style.display = 'block';
+    document.getElementById('welcomeName').innerText = user;
+  });
+}
+</script>
+
+</body>
+</html>

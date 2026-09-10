@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>BAD UI</title>
+        <style>
+            body{
+                margin: 0;
+                min-height: 100vh;
+                background: linear-gradient(135deg,#170545,#500582,#211d91);
+            }
+            h1, h3{text-align: center;color: white;}
+            h1{
+                font-family: Georgia, 'Times New Roman', Times, serif;
+            }
+            #worst{margin-top: 0px; margin-bottom: 0px;}
+            .login-card{
+                background-color:rgb(22, 21, 56) ;
+                margin: auto;
+                height: 520px;
+                width: 700px;
+                border: 2px solid rgb(71, 65, 65);
+                box-shadow: 3px 3px 10px black;
+                border-radius: 10px;
+            }
+            .extra{
+                background-color:rgb(22, 21, 56) ;
+                margin: auto;
+                margin-top: 20px;
+                color: white;
+                height: 110px;
+                width: 700px;
+                border: 2px solid rgb(100, 53, 53);
+                box-shadow: 3px 3px 10px black;
+                border-radius: 10px;
+
+            }
+            #info-card{
+                margin-left:220px ;
+            }
+            #loginbtn{
+                margin-left:210px ;
+                height: 40px;
+                width: 300px;
+                border-radius: 8px;
+                background-color: #6C63FF;
+                color: white;
+                font-size: 20px;
+            }
+            span{
+                color:rgb(189, 16, 189);
+            }
+            .input{
+                border-radius: 4px;
+                height:25px ;
+                width:250px ;
+                font-size: 17px;
+            }
+            label{
+                color: white;
+                font-size: 20px;
+            }
+            .grey{
+                color: grey;
+            }
+            a{
+                text-decoration: none;
+                color: rgb(203, 40, 203);
+            }
+            .help{
+                position:fixed;
+                right: 6px;
+                top: 6px;
+                border-radius: 8px;
+                background-color: rgb(52, 45, 45);
+                color: white;
+            } 
+            .login-user{
+                height: 53px;
+            }
+            marquee{
+                /* background-color: rgb(77, 25, 25); */
+                font-size: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: #e2ad0e;
+                height: 40px;
+            }  
+            #label-b{
+                display: inline-flex;
+                align-items: center;
+                height: 25px;
+            }
+        </style>
+    </head>
+    <body>
+        <marquee loop="1">Logging shouldn't be this difficult...</marquee>
+        <h1 id="worst"><u>Worst Login Page</u></h1>
+        <br><br><br>
+        <div class="login-card">
+            <h1>Welcome <span>Back!</span></h1>
+            <h3 class="grey">Sign in to continue to your account</h3>
+            <div id="info-card">
+                <div class="login-user">
+                    <label id="lname" for="name"><b>Username or Email</b></label><br> 
+                    <input type="text" id="name" placeholder="Username or Email" class="input">
+                </div>
+                <br>
+                <label for="password" id="lpass"><b>Password (min 8 char)</b></label><br>
+                <input type="password" id="password" placeholder="password" class="input">
+                <a href="" id="forget">Forget password?</a>
+                <br><br>
+                <input type="checkbox" id="a">
+                <label for="a" id="label-a">Remember me</label> <br>
+                <input type="checkbox" id="b">
+                <label for="b" id="label-b">I agree to the <a href="" id="term">Terms & Conditions</a></label> <br>
+                <input type="checkbox" id="c">
+                <label for="c" id="label-c">I want to receive updates and offers</label> <br>
+            </div>
+            <br><br><br>
+            <button id="loginbtn">Login</button>
+            <br><br><br>
+            <h3 class="grey">Don't have an account? <a href="" id="sign">Sign up</a></h3>
+        </div>
+    <script>
+        let a=document.querySelector('#a');
+        let b=document.querySelector('#b');
+        let c=document.querySelector('#c');
+        let labela=document.querySelector('#label-a');
+        let labelb=document.querySelector('#label-b');
+        let labelc=document.querySelector('#label-c');
+        let pass=document.querySelector('#password');
+        let forget=document.querySelector('#forget');
+        let term=document.querySelector('#term');
+        let sign=document.querySelector('#sign');
+        let btn=document.querySelector('#loginbtn');
+        let input1=document.querySelector('#name');
+        let card=document.querySelector('.login-card');
+        let comment=['Halwa hai kyaa 🤡','Nhi pakad payega 🤪','Zalim nazar hata le 😂',
+            'Dibba hai tu dibba 😜','Why are you touching me? 😡','Yeh fas gaya 😉',
+            'Aaj tera kissa khatam 🥶','Catch me! 🫡'
+        ];
+        a.addEventListener('change',function(){
+            console.log(a.checked);
+            if(a.checked){
+                labela.textContent='Nice try! But you have to click it again';
+            }else{labela.textContent='Remember me'}
+        });
+        b.addEventListener('change',function(){
+            if(b.checked){
+                labelb.textContent='Mujhe kya mai to second choice hun!😒';
+            }else{labelb.innerHTML='I agree to the <a href="">Terms & Conditions</a>'}
+        });
+        c.addEventListener('change',function(){
+            if(c.checked){
+                labelc.textContent='Are you sure you want to do this?';
+            }else{labelc.textContent='I want to receive updates and offers'}
+        });
+        function checkLength(){;
+            if(pass.value.length===8){
+            pass.value='';
+            setTimeout(()=>{
+                alert('Find the way, You can enter any length of password(Also more than 8).');
+            },300)
+            };
+        }
+        pass.addEventListener('input',checkLength);
+        pass.addEventListener('dblclick',function(){
+            pass.removeEventListener('input',checkLength);
+            pass.placeholder="You can set any length of password";
+        })
+        forget.addEventListener('click',function(){
+            alert("Want to reset password☠️. Click 'Ok'");
+            prompt('First, enter original password👽.');
+        });
+        term.addEventListener('click',function(){
+            alert("Terms accepted🥳...probably. We won't tell you what you agreed to😂.");
+        });
+        sign.addEventListener('click',function(){
+            alert('Sign-up failed because you clicked the button correctly. Please try again incorrectly.🤡');
+        });
+        input1.addEventListener('mouseover',function(){
+            input1.style.position='absolute';
+            input1.style.left=Math.random()*80 + "vw";
+            input1.style.top=Math.random()*80 + "vh";
+            let ranNum=Math.floor(Math.random()*8);
+            input1.placeholder=`${comment[ranNum]}`;
+        });
+        btn.addEventListener('click',function(){
+            alert('Access denied!👎. Click "Ok" to proceed.');
+            alert('Login nhi kar paya. Ja tera Placement nhi hoga.😈');
+            alert('Kya Itna bura hu mai, Maa.🥺');
+            alert("Nice argument, but sadly you're lower caste!😎.");
+            let feel=prompt('Enter what you feel?');
+            alert("Feel aa gyi!😜");
+            alert('Tera time ayega. Please try to login again.😁');
+            let div=document.createElement('div');
+            div.style.textAlign='center';
+            div.classList.add('extra');
+            div.innerHTML=`<h2>Feeling:${feel}</h2>
+            <h2>Solution:Take mud bath.😂</h2>`;
+            card.insertAdjacentElement('afterend',div);
+        });
+        setTimeout(()=>{
+            let helpbtn=document.createElement('button');
+            let body=document.querySelector('body');
+            helpbtn.classList.add('help');
+            helpbtn.textContent='Help Me?';
+            body.insertAdjacentElement('afterbegin',helpbtn);
+            helpbtn.addEventListener('click',function(){
+                alert("You have to figure out👍, you can fill all data easily.");
+                let yes=prompt('Ready to find ways?, Type "yes"');
+                if(yes==='yes'){
+                    alert("To fill username,click it's label.");
+                    alert('To fill the password, double click the password box.');
+                };
+                
+            })
+        },120000)
+    </script>    
+    </body>
+</html>

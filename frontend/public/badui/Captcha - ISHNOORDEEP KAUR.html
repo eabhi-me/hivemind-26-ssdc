@@ -1,0 +1,5160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Secure Human Verification</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+
+    background:
+        radial-gradient(circle at 20% 20%, #52248f, transparent 35%),
+        radial-gradient(circle at 80% 80%, #087b8a, transparent 35%),
+        #080811;
+
+    color: white;
+}
+
+
+/* ==================================================
+   MAIN VERIFICATION CONTAINER
+================================================== */
+
+.container {
+    width: 540px;
+    min-height: 580px;
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    background: rgba(18, 18, 32, 0.97);
+
+    border: 1px solid rgba(255,255,255,0.12);
+
+    border-radius: 22px;
+
+    padding: 28px;
+
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+}
+
+
+.securityHeader {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+
+.securityIcon {
+    width: 54px;
+    height: 54px;
+
+    margin: 0 auto 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #775bff,
+        #19c7cf
+    );
+
+    font-size: 26px;
+}
+
+
+h1 {
+    margin: 0;
+
+    text-align: center;
+
+    font-size: 29px;
+
+    letter-spacing: 0.5px;
+}
+
+
+.subtitle {
+    text-align: center;
+
+    color: #aaa;
+
+    margin: 8px 0 18px;
+
+    font-size: 14px;
+}
+
+
+.securityStatus {
+    width: fit-content;
+
+    margin: 0 auto 14px;
+
+    padding: 6px 12px;
+
+    border-radius: 30px;
+
+    background: rgba(255,255,255,0.07);
+
+    color: #bbb;
+
+    font-size: 12px;
+}
+
+
+#confidenceText {
+    text-align: center;
+
+    margin-bottom: 10px;
+
+    font-weight: bold;
+
+    color: #ffd767;
+}
+
+
+#progressOuter {
+    width: 100%;
+    height: 9px;
+
+    background: #29293c;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    margin-bottom: 20px;
+}
+
+
+#progressInner {
+    height: 100%;
+
+    width: 0%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #9168ff,
+            #1dd8dc
+        );
+
+    transition: 0.4s;
+}
+
+
+.stage {
+    display: none;
+}
+
+
+.stage.active {
+    display: block;
+}
+
+
+.stage h2 {
+    margin-bottom: 8px;
+
+    font-size: 21px;
+}
+
+
+.stage p {
+    color: #c9c9d2;
+
+    line-height: 1.45;
+}
+
+
+.message {
+    min-height: 24px;
+
+    margin-top: 13px;
+
+    text-align: center;
+
+    color: #ffd767;
+
+    font-size: 14px;
+}
+
+
+button {
+    font-family: inherit;
+
+    cursor: pointer;
+}
+
+
+
+/* ==================================================
+   LEVEL 1
+================================================== */
+
+#checkboxArena {
+    height: 280px;
+
+    border: 2px dashed #40405b;
+
+    border-radius: 14px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    margin-top: 14px;
+
+    background: rgba(255,255,255,0.015);
+}
+
+
+.humanButton {
+    position: absolute;
+
+    border: 1px solid #d7d7d7;
+
+    background: white;
+
+    color: #111;
+
+    padding: 13px 17px;
+
+    border-radius: 7px;
+
+    font-weight: bold;
+
+    transition:
+        left 0.08s,
+        top 0.08s,
+        transform 0.08s;
+}
+
+
+.fakeCheck {
+    position: absolute;
+
+    background: #ececec;
+
+    color: #111;
+
+    padding: 9px 12px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    opacity: 0.8;
+
+    cursor: pointer;
+}
+
+
+
+/* ==================================================
+   LEVEL 2
+================================================== */
+
+#emojiGrid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 9px;
+
+    margin-top: 14px;
+}
+
+
+.emoji {
+    border: 1px solid #454560;
+
+    background: #29293e;
+
+    border-radius: 10px;
+
+    padding: 12px;
+
+    font-size: 30px;
+
+    text-align: center;
+
+    user-select: none;
+
+    cursor: pointer;
+
+    min-height: 64px;
+}
+
+
+.emoji:hover {
+    background: #33334b;
+}
+
+
+.emoji.selected {
+    outline: 3px solid #42dcc7;
+
+    background: #314946;
+}
+
+
+#emojiControls {
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 15px;
+}
+
+
+#emojiSubmit,
+#emojiReset {
+    flex: 1;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    font-weight: bold;
+}
+
+
+#emojiSubmit {
+    background: #7c5cff;
+
+    color: white;
+}
+
+
+#emojiReset {
+    background: #ffcf3f;
+
+    color: #111;
+}
+
+
+
+/* ==================================================
+   POPUPS
+================================================== */
+
+#resetPopup,
+#surrenderPopup,
+#dotSurrenderPopup {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.78);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 500;
+}
+
+
+.popupBox {
+    background: white;
+
+    color: #111;
+
+    width: 330px;
+
+    padding: 26px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+
+.popupBox h2 {
+    margin-top: 0;
+}
+
+
+.popupBox button {
+    margin: 12px 6px 0;
+
+    padding: 10px 24px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #111;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+
+/* ==================================================
+   LEVEL 3
+================================================== */
+
+#holdArena {
+    height: 230px;
+
+    position: relative;
+
+    border: 2px dashed #3d3d57;
+
+    border-radius: 14px;
+
+    margin-top: 15px;
+}
+
+
+#holdButton {
+    position: absolute;
+
+    left: 150px;
+
+    top: 75px;
+
+    border: none;
+
+    padding: 16px 28px;
+
+    background: #ffca3a;
+
+    color: #111;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    border-radius: 10px;
+}
+
+
+#holdOuter {
+    height: 13px;
+
+    background: #29293d;
+
+    border-radius: 15px;
+
+    margin-top: 15px;
+
+    overflow: hidden;
+}
+
+
+#holdInner {
+    height: 100%;
+
+    width: 0%;
+
+    background: white;
+}
+
+
+
+/* ==================================================
+   LEVEL 4 CAPTCHA
+================================================== */
+
+#captchaBox {
+    margin-top: 18px;
+
+    padding: 16px;
+
+    border: 1px solid #40405b;
+
+    border-radius: 12px;
+
+    background:
+        repeating-linear-gradient(
+            -35deg,
+            rgba(255,255,255,0.015),
+            rgba(255,255,255,0.015) 10px,
+            rgba(255,255,255,0.03) 10px,
+            rgba(255,255,255,0.03) 20px
+        );
+}
+
+
+#captchaWord {
+    text-align: center;
+
+    font-size: 34px;
+
+    font-weight: bold;
+
+    letter-spacing: 5px;
+
+    min-height: 75px;
+
+    margin: 10px 0 16px;
+
+    word-break: break-all;
+
+    user-select: none;
+}
+
+
+#captchaInput {
+    width: 100%;
+
+    border: 1px solid #45455c;
+
+    background: white;
+
+    color: #111;
+
+    border-radius: 9px;
+
+    padding: 13px;
+
+    font-size: 18px;
+
+    outline: none;
+}
+
+
+#captchaInput:focus {
+    border-color: #835dff;
+}
+
+
+#finalVerify {
+    width: 100%;
+
+    margin-top: 12px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 13px;
+
+    background: #835dff;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+}
+
+
+
+/* ==================================================
+   LEVEL 5
+================================================== */
+
+#confirmArena {
+    height: 220px;
+
+    border: 2px dashed #40405b;
+
+    border-radius: 14px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    margin-top: 18px;
+}
+
+
+#confirmButton {
+    position: absolute;
+
+    left: 155px;
+
+    top: 80px;
+
+    padding: 15px 28px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #42dcc7;
+
+    color: #111;
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+    transition:
+        left 0.12s,
+        top 0.12s;
+}
+
+
+#confirmCounter {
+    text-align: center;
+
+    margin-top: 14px;
+
+    font-weight: bold;
+
+    color: #ffd767;
+}
+
+
+
+/* ==================================================
+   LEVEL 6 MEMORY
+================================================== */
+
+#memoryPanel {
+    border: 1px solid #40405b;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    margin-top: 15px;
+
+    background: rgba(255,255,255,0.025);
+
+    text-align: center;
+}
+
+
+#memoryStatus {
+    color: #aeb0bd;
+
+    font-size: 13px;
+
+    margin-bottom: 14px;
+}
+
+
+#memorySymbols {
+    min-height: 90px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 14px;
+
+    font-size: 36px;
+}
+
+
+.memorySymbol {
+    width: 50px;
+    height: 55px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #29293e;
+
+    border: 1px solid #484862;
+
+    border-radius: 9px;
+}
+
+
+#memoryCountdown {
+    margin-top: 14px;
+
+    color: #ffd767;
+
+    font-size: 13px;
+}
+
+
+#memoryQuestion {
+    display: none;
+
+    margin-top: 18px;
+}
+
+
+#memoryChoices {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 9px;
+
+    margin-top: 14px;
+}
+
+
+.memoryChoice {
+    min-height: 60px;
+
+    border: 1px solid #454560;
+
+    background: #29293e;
+
+    border-radius: 9px;
+
+    color: white;
+
+    font-size: 29px;
+}
+
+
+.memoryChoice:hover {
+    background: #393950;
+}
+
+
+
+/* ==================================================
+   LEVEL 7 ACCURACY
+================================================== */
+
+#accuracyPanel {
+    margin-top: 15px;
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    border: 1px solid #40405b;
+
+    background: rgba(255,255,255,0.025);
+}
+
+
+#accuracyStats {
+    display: flex;
+
+    justify-content: space-between;
+
+    color: #bbb;
+
+    font-size: 13px;
+
+    margin-bottom: 12px;
+}
+
+
+#accuracyArena {
+    height: 285px;
+
+    position: relative;
+
+    border: 1px solid #35354d;
+
+    border-radius: 12px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(255,255,255,0.025),
+            transparent
+        );
+
+    overflow: hidden;
+
+    cursor: crosshair;
+}
+
+
+#accuracyCircle {
+    position: absolute;
+
+    width: 110px;
+    height: 110px;
+
+    border: 2px solid #eeeeff;
+
+    border-radius: 50%;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    box-shadow:
+        0 0 20px rgba(255,255,255,0.12);
+}
+
+
+#accuracyCircle::before {
+    content: "";
+
+    position: absolute;
+
+    width: 22px;
+    height: 22px;
+
+    border: 1px solid rgba(255,255,255,0.45);
+
+    border-radius: 50%;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+#accuracyCircle::after {
+    content: "";
+
+    position: absolute;
+
+    width: 4px;
+    height: 4px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+
+/* ==================================================
+   LEVEL 8 CONFIRMATION LOOP
+================================================== */
+
+#loopBox {
+    margin-top: 18px;
+
+    padding: 22px;
+
+    border-radius: 14px;
+
+    border: 1px solid #414158;
+
+    background: rgba(255,255,255,0.025);
+
+    text-align: center;
+}
+
+
+#loopShield {
+    font-size: 45px;
+
+    margin-bottom: 10px;
+}
+
+
+#loopQuestion {
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin: 8px 0 16px;
+}
+
+
+#loopButton {
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #775bff;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+}
+
+
+#loopProgressText {
+    margin-top: 12px;
+
+    color: #aaa;
+
+    font-size: 12px;
+}
+
+
+
+/* ==================================================
+   FAKE SUCCESS
+================================================== */
+
+#fakeSuccess {
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    z-index: 900;
+
+    background: #080811;
+
+    text-align: center;
+}
+
+
+#fakeSuccessIcon {
+    width: 100px;
+    height: 100px;
+
+    border-radius: 50%;
+
+    background: #27d796;
+
+    color: #04140e;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 55px;
+
+    font-weight: bold;
+
+    margin-bottom: 20px;
+}
+
+
+#fakeSuccess h2 {
+    margin: 0;
+
+    font-size: 55px;
+}
+
+
+#fakeSuccess p {
+    color: #aaa;
+
+    font-size: 18px;
+}
+
+
+#fakeSuccessSecondary {
+    display: none;
+
+    color: #ffd767 !important;
+
+    font-size: 25px !important;
+
+    font-weight: bold;
+}
+
+
+
+/* ==================================================
+   FINAL DOT
+================================================== */
+
+#dotOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #10101d,
+            #04040a
+        );
+
+    display: none;
+
+    z-index: 1000;
+}
+
+
+#dotInstruction {
+    position: absolute;
+
+    top: 28px;
+
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 25px;
+
+    font-weight: bold;
+
+    z-index: 105;
+}
+
+
+#dotSecurityLabel {
+    position: absolute;
+
+    top: 68px;
+
+    width: 100%;
+
+    text-align: center;
+
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+#tinyDot,
+.decoyDot {
+    position: absolute;
+
+    width: 8px;
+    height: 8px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+}
+
+
+#tinyDot {
+    z-index: 106;
+}
+
+
+.decoyDot {
+    z-index: 104;
+}
+
+
+#arrow {
+    position: absolute;
+
+    display: none;
+
+    font-size: 40px;
+
+    color: #ffd767;
+
+    z-index: 110;
+
+    pointer-events: none;
+}
+
+
+#dotMessage {
+    position: absolute;
+
+    bottom: 40px;
+
+    width: 100%;
+
+    text-align: center;
+
+    color: #ffd767;
+
+    z-index: 120;
+}
+
+
+
+/* ==================================================
+   TRUE SUCCESS
+================================================== */
+
+#success {
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    z-index: 1200;
+
+    background: #080811;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    text-align: center;
+}
+
+
+#successIcon {
+    width: 100px;
+    height: 100px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #27d796;
+
+    font-size: 50px;
+
+    color: #07150f;
+
+    margin-bottom: 20px;
+}
+
+
+#success h2 {
+    font-size: 60px;
+
+    margin: 0;
+}
+
+
+#success p {
+    color: #aaa;
+
+    font-size: 18px;
+}
+
+
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+.securityFooter {
+    text-align: center;
+
+    margin-top: 18px;
+
+    color: #676777;
+
+    font-size: 11px;
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     MAIN CONTAINER
+================================================== -->
+
+<div class="container">
+
+
+    <div class="securityHeader">
+
+        <div class="securityIcon">
+            🛡
+        </div>
+
+        <h1>Security Verification</h1>
+
+        <div class="subtitle">
+            Complete the verification steps to continue.
+        </div>
+
+        <div class="securityStatus">
+            🔒 Secure human verification session
+        </div>
+
+    </div>
+
+
+    <div id="confidenceText">
+        Human confidence: 12%
+    </div>
+
+
+    <div id="progressOuter">
+        <div id="progressInner"></div>
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 1
+    ================================================== -->
+
+    <div class="stage active" id="stage1">
+
+        <h2>Human verification</h2>
+
+        <p>
+            Complete the checkbox challenge below.
+        </p>
+
+
+        <div id="checkboxArena">
+
+            <button
+                class="humanButton"
+                id="realHumanButton"
+                style="left:170px; top:110px;"
+            >
+                ☐ I am human
+            </button>
+
+        </div>
+
+
+        <div class="message" id="message1">
+            This should be easy.
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 2
+    ================================================== -->
+
+    <div class="stage" id="stage2">
+
+        <h2 id="emojiTitle">
+            Image verification
+        </h2>
+
+        <p id="emojiInstruction">
+            Select every living thing.
+        </p>
+
+
+        <div id="emojiGrid"></div>
+
+
+        <div id="emojiControls">
+
+            <button id="emojiSubmit">
+                Submit
+            </button>
+
+            <button id="emojiReset">
+                Reset
+            </button>
+
+        </div>
+
+
+        <div class="message" id="message2">
+            Images may be updated for security purposes.
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 3
+    ================================================== -->
+
+    <div class="stage" id="stage3">
+
+        <h2>Behavioural verification</h2>
+
+        <p>
+            Hold the verification control until the security check completes.
+        </p>
+
+
+        <div id="holdArena">
+
+            <button id="holdButton">
+                HOLD TO VERIFY
+            </button>
+
+        </div>
+
+
+        <div id="holdOuter">
+            <div id="holdInner"></div>
+        </div>
+
+
+        <div class="message" id="message3">
+            Approach carefully.
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 4
+    ================================================== -->
+
+    <div class="stage" id="stage4">
+
+        <h2>Text verification</h2>
+
+        <p>
+            Enter the security code exactly as displayed.
+            Codes are case-sensitive.
+        </p>
+
+
+        <div id="captchaBox">
+
+            <div id="captchaWord"></div>
+
+            <input
+                type="text"
+                id="captchaInput"
+                placeholder="Enter security code"
+                autocomplete="off"
+            >
+
+            <button id="finalVerify">
+                Verify
+            </button>
+
+        </div>
+
+
+        <div class="message" id="message4">
+            Please type carefully.
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 5
+    ================================================== -->
+
+    <div class="stage" id="stage5">
+
+        <h2>Confirmation check</h2>
+
+        <p>
+            Confirm your request three times to continue.
+        </p>
+
+
+        <div id="confirmArena">
+
+            <button id="confirmButton">
+                CONTINUE
+            </button>
+
+        </div>
+
+
+        <div id="confirmCounter">
+            Confirmations: 0 / 3
+        </div>
+
+
+        <div class="message" id="message5">
+            Just three simple confirmations.
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 6 MEMORY
+    ================================================== -->
+
+    <div class="stage" id="stage6">
+
+        <h2>Visual memory verification</h2>
+
+        <p>
+            Memorise the symbols below.
+            They will disappear automatically.
+        </p>
+
+
+        <div id="memoryPanel">
+
+            <div id="memoryStatus">
+                Security sequence generated
+            </div>
+
+
+            <div id="memorySymbols"></div>
+
+
+            <div id="memoryCountdown">
+                Memorise the sequence...
+            </div>
+
+
+            <div id="memoryQuestion">
+
+                <strong>
+                    Which symbol was THIRD?
+                </strong>
+
+                <div id="memoryChoices"></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="message" id="message6">
+            Do not look away.
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 7 ACCURACY
+    ================================================== -->
+
+    <div class="stage" id="stage7">
+
+        <h2>Pointer accuracy verification</h2>
+
+        <p>
+            Click as close to the exact centre of the target as possible.
+        </p>
+
+
+        <div id="accuracyPanel">
+
+            <div id="accuracyStats">
+
+                <span>
+                    Required accuracy:
+                    <strong>99.5%</strong>
+                </span>
+
+                <span id="accuracyAttemptText">
+                    Attempt 1
+                </span>
+
+            </div>
+
+
+            <div id="accuracyArena">
+
+                <div id="accuracyCircle"></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="message" id="message7">
+            Precision tracking enabled.
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         LEVEL 8 CONFIRMATION LOOP
+    ================================================== -->
+
+    <div class="stage" id="stage8">
+
+        <h2>Final security confirmation</h2>
+
+        <p>
+            Review and confirm the verification request.
+        </p>
+
+
+        <div id="loopBox">
+
+            <div id="loopShield">
+                🛡
+            </div>
+
+
+            <div id="loopQuestion">
+                Are you sure?
+            </div>
+
+
+            <button id="loopButton">
+                YES, CONTINUE
+            </button>
+
+
+            <div id="loopProgressText">
+                Confirmation 1 of 4
+            </div>
+
+        </div>
+
+
+        <div class="message" id="message8">
+            Final confirmation required.
+        </div>
+
+    </div>
+
+
+
+    <div class="securityFooter">
+        Protected by Advanced Human Verification™
+        · Session encrypted
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     RESET POPUP
+================================================== -->
+
+<div id="resetPopup">
+
+    <div class="popupBox">
+
+        <h2>Verification reset</h2>
+
+        <p>
+            Your previous selections have been cleared.
+        </p>
+
+        <button id="resetOkay">
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     LEVEL 2 SURRENDER
+================================================== -->
+
+<div id="surrenderPopup">
+
+    <div class="popupBox">
+
+        <h2>Verification assistance</h2>
+
+        <p>
+            You've been completing this challenge for a while.
+        </p>
+
+        <p>
+            Would you like to surrender?
+        </p>
+
+
+        <button id="surrenderYes">
+            Yes
+        </button>
+
+
+        <button id="surrenderNo">
+            No
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     DOT SURRENDER
+================================================== -->
+
+<div id="dotSurrenderPopup">
+
+    <div class="popupBox">
+
+        <h2>Verification assistance</h2>
+
+        <p>
+            The verification target has relocated 50 times.
+        </p>
+
+        <p>
+            Would you like to surrender?
+        </p>
+
+
+        <button id="dotSurrenderYes">
+            Yes
+        </button>
+
+
+        <button id="dotSurrenderNo">
+            No
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     FAKE SUCCESS
+================================================== -->
+
+<div id="fakeSuccess">
+
+    <div id="fakeSuccessIcon">
+        ✓
+    </div>
+
+    <h2 id="fakeSuccessTitle">
+        VERIFIED
+    </h2>
+
+    <p id="fakeSuccessNormal">
+        Human verification completed successfully.
+    </p>
+
+    <p id="fakeSuccessSecondary">
+        Just kidding. One final check.
+    </p>
+
+</div>
+
+
+
+<!-- ==================================================
+     FINAL DOT CHALLENGE
+================================================== -->
+
+<div id="dotOverlay">
+
+    <div id="dotInstruction">
+        FINAL VERIFICATION: Click the verification point.
+    </div>
+
+    <div id="dotSecurityLabel">
+        Advanced pointer-integrity analysis
+    </div>
+
+
+    <div id="tinyDot"></div>
+
+    <div id="decoyContainer"></div>
+
+    <div id="arrow">➜</div>
+
+
+    <div id="dotMessage">
+        Find it before it moves.
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     REAL SUCCESS
+================================================== -->
+
+<div id="success">
+
+    <div id="successIcon">
+        ✓
+    </div>
+
+    <h2>VERIFIED</h2>
+
+    <p>
+        Human verification complete.
+    </p>
+
+    <p>
+        Human confidence: 51%
+    </p>
+
+    <p>
+        Good enough.
+    </p>
+
+</div>
+
+
+
+<script>
+
+/* ==================================================
+   GENERAL
+================================================== */
+
+let humanConfidence = 12;
+
+const totalStages = 8;
+
+
+function confidenceChange(amount) {
+
+    humanConfidence += amount;
+
+
+    if(humanConfidence > 99) {
+        humanConfidence = 99;
+    }
+
+
+    if(humanConfidence < 1) {
+        humanConfidence = 1;
+    }
+
+
+    document.getElementById(
+        "confidenceText"
+    ).textContent =
+        "Human confidence: " +
+        humanConfidence +
+        "%";
+}
+
+
+
+function setStage(number) {
+
+    document.querySelectorAll(".stage")
+        .forEach(function(stage) {
+
+            stage.classList.remove("active");
+
+        });
+
+
+    if(number <= totalStages) {
+
+        document.getElementById(
+            "stage" + number
+        ).classList.add("active");
+
+    }
+
+
+    const progress =
+        ((number - 1) /
+        totalStages) *
+        100;
+
+
+    document.getElementById(
+        "progressInner"
+    ).style.width =
+        progress + "%";
+}
+
+
+
+/* ==================================================
+   STAGE 2 SURRENDER TIMER
+================================================== */
+
+let surrenderTimer = null;
+
+
+function startSurrenderTimer() {
+
+    clearTimeout(surrenderTimer);
+
+
+    surrenderTimer =
+        setTimeout(function() {
+
+
+            if(
+                document.getElementById("stage2")
+                .classList.contains("active")
+            ) {
+
+                document.getElementById(
+                    "surrenderPopup"
+                ).style.display =
+                    "flex";
+
+            }
+
+        }, 120000);
+
+}
+
+
+
+document.getElementById(
+    "surrenderNo"
+).onclick = function() {
+
+
+    document.getElementById(
+        "surrenderPopup"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "message2"
+    ).textContent =
+        "Verification assistance declined.";
+
+
+    surrenderTimer =
+        setTimeout(function() {
+
+
+            if(
+                document.getElementById("stage2")
+                .classList.contains("active")
+            ) {
+
+                document.getElementById(
+                    "surrenderPopup"
+                ).style.display =
+                    "flex";
+
+            }
+
+        }, 60000);
+
+};
+
+
+
+document.getElementById(
+    "surrenderYes"
+).onclick = function() {
+
+
+    clearTimeout(surrenderTimer);
+
+
+    document.getElementById(
+        "surrenderPopup"
+    ).style.display =
+        "none";
+
+
+    confidenceChange(-12);
+
+
+    setStage(3);
+
+
+    document.getElementById(
+        "message3"
+    ).textContent =
+        "Assistance accepted. Human confidence reduced.";
+
+};
+
+
+
+/* ==================================================
+   LEVEL 1
+================================================== */
+
+const realHumanButton =
+    document.getElementById(
+        "realHumanButton"
+    );
+
+
+const checkboxArena =
+    document.getElementById(
+        "checkboxArena"
+    );
+
+
+let checkboxRuns = 0;
+
+let fakeCount = 0;
+
+
+
+function moveCheckbox() {
+
+    const maxX =
+        checkboxArena.clientWidth -
+        realHumanButton.offsetWidth -
+        10;
+
+
+    const maxY =
+        checkboxArena.clientHeight -
+        realHumanButton.offsetHeight -
+        10;
+
+
+    realHumanButton.style.left =
+        Math.random() *
+        maxX +
+        "px";
+
+
+    realHumanButton.style.top =
+        Math.random() *
+        maxY +
+        "px";
+
+}
+
+
+
+function createFakeCheckbox() {
+
+    if(fakeCount >= 7) {
+        return;
+    }
+
+
+    fakeCount++;
+
+
+    const fake =
+        document.createElement(
+            "div"
+        );
+
+
+    fake.className =
+        "fakeCheck";
+
+
+    fake.textContent =
+        Math.random() > 0.5
+        ? "☐ I am human"
+        : "☑ I am human";
+
+
+    fake.style.left =
+        Math.random() *
+        330 +
+        "px";
+
+
+    fake.style.top =
+        Math.random() *
+        220 +
+        "px";
+
+
+    fake.onclick =
+        function() {
+
+
+            fake.textContent =
+                "Verification failed";
+
+
+            document.getElementById(
+                "message1"
+            ).textContent =
+                "That checkbox was suspiciously easy.";
+
+
+            confidenceChange(-5);
+
+        };
+
+
+    checkboxArena.appendChild(
+        fake
+    );
+
+}
+
+
+
+realHumanButton.addEventListener(
+    "mouseenter",
+    function() {
+
+
+        if(checkboxRuns < 8) {
+
+
+            checkboxRuns++;
+
+
+            moveCheckbox();
+
+
+            realHumanButton.style.transform =
+                "scale(" +
+                (
+                    0.55 +
+                    Math.random() *
+                    0.85
+                ) +
+                ")";
+
+
+            if(
+                checkboxRuns % 2 === 0
+            ) {
+
+                createFakeCheckbox();
+
+            }
+
+
+            document.getElementById(
+                "message1"
+            ).textContent =
+                "Pointer detected. Verification control relocated.";
+
+
+            confidenceChange(-2);
+
+        }
+
+
+        else {
+
+
+            realHumanButton.style.transform =
+                "scale(1)";
+
+
+            document.getElementById(
+                "message1"
+            ).textContent =
+                "Verification control stabilised.";
+
+        }
+
+    }
+);
+
+
+
+realHumanButton.onclick =
+    function() {
+
+
+        if(checkboxRuns < 8) {
+
+
+            moveCheckbox();
+
+
+            document.getElementById(
+                "message1"
+            ).textContent =
+                "Unexpected interaction detected.";
+
+
+            return;
+
+        }
+
+
+        realHumanButton.textContent =
+            "☑ Human response detected";
+
+
+        confidenceChange(18);
+
+
+        setTimeout(function() {
+
+
+            setupEmojiStage();
+
+
+            setStage(2);
+
+
+            startSurrenderTimer();
+
+
+        }, 700);
+
+};
+
+
+
+/* ==================================================
+   LEVEL 2
+================================================== */
+
+const emojiPool = [
+
+    {icon:"🐶", alive:true},
+    {icon:"🐟", alive:true},
+    {icon:"🐈", alive:true},
+    {icon:"🐝", alive:true},
+    {icon:"🌳", alive:true},
+    {icon:"🌵", alive:true},
+    {icon:"🍄", alive:true},
+    {icon:"🌻", alive:true},
+
+    {icon:"🚗", alive:false},
+    {icon:"📱", alive:false},
+    {icon:"🪑", alive:false},
+    {icon:"💡", alive:false},
+    {icon:"⌚", alive:false},
+    {icon:"🚲", alive:false},
+    {icon:"📷", alive:false},
+    {icon:"🔑", alive:false},
+    {icon:"🧸", alive:false},
+    {icon:"🎧", alive:false}
+
+];
+
+
+const fixedEmojiItems = [
+
+    {icon:"🐶", alive:true},
+    {icon:"🐟", alive:true},
+    {icon:"🌳", alive:true},
+
+    {icon:"🚗", alive:false},
+    {icon:"📱", alive:false},
+    {icon:"🪑", alive:false}
+
+];
+
+
+let selectionCount = 0;
+
+let targetType =
+    "living";
+
+let instructionChanged =
+    false;
+
+let instructionChangeAt =
+    3;
+
+
+
+function randomEmoji() {
+
+    return emojiPool[
+        Math.floor(
+            Math.random() *
+            emojiPool.length
+        )
+    ];
+
+}
+
+
+
+function createEmojiElement(
+    item,
+    fixed
+) {
+
+    const element =
+        document.createElement(
+            "div"
+        );
+
+
+    element.className =
+        "emoji";
+
+
+    element.textContent =
+        item.icon;
+
+
+    element.dataset.alive =
+        item.alive;
+
+
+    element.dataset.fixed =
+        fixed
+        ? "true"
+        : "false";
+
+
+    element.onclick =
+        function() {
+
+
+            element.classList.toggle(
+                "selected"
+            );
+
+
+            selectionCount++;
+
+
+            changeRandomEmojis();
+
+
+            if(
+                !instructionChanged &&
+                selectionCount >=
+                instructionChangeAt
+            ) {
+
+
+                instructionChanged =
+                    true;
+
+
+                targetType =
+                    "nonliving";
+
+
+                document.getElementById(
+                    "emojiTitle"
+                ).textContent =
+                    "Image verification";
+
+
+                document.getElementById(
+                    "emojiInstruction"
+                ).textContent =
+                    "Select every NON-LIVING object.";
+
+
+                document.getElementById(
+                    "message2"
+                ).textContent =
+                    "Security requirements updated.";
+
+            }
+
+        };
+
+
+    return element;
+
+}
+
+
+
+function setupEmojiStage() {
+
+    const grid =
+        document.getElementById(
+            "emojiGrid"
+        );
+
+
+    grid.innerHTML = "";
+
+
+    selectionCount = 0;
+
+
+    targetType =
+        "living";
+
+
+    instructionChanged =
+        false;
+
+
+    instructionChangeAt =
+        Math.random() < 0.5
+        ? 2
+        : 3;
+
+
+    document.getElementById(
+        "emojiTitle"
+    ).textContent =
+        "Image verification";
+
+
+    document.getElementById(
+        "emojiInstruction"
+    ).textContent =
+        "Select every living thing.";
+
+
+    document.getElementById(
+        "emojiSubmit"
+    ).textContent =
+        "Submit";
+
+
+    document.getElementById(
+        "emojiReset"
+    ).textContent =
+        "Reset";
+
+
+    fixedEmojiItems.forEach(
+        function(item) {
+
+
+            grid.appendChild(
+                createEmojiElement(
+                    item,
+                    true
+                )
+            );
+
+        }
+    );
+
+
+    for(
+        let i = 0;
+        i < 6;
+        i++
+    ) {
+
+
+        grid.appendChild(
+            createEmojiElement(
+                randomEmoji(),
+                false
+            )
+        );
+
+    }
+
+
+    shuffleEmojiPositions();
+
+}
+
+
+
+function shuffleEmojiPositions() {
+
+    const grid =
+        document.getElementById(
+            "emojiGrid"
+        );
+
+
+    const elements =
+        Array.from(
+            grid.children
+        );
+
+
+    elements.sort(
+        function() {
+
+            return (
+                Math.random() -
+                0.5
+            );
+
+        }
+    );
+
+
+    elements.forEach(
+        function(element) {
+
+            grid.appendChild(
+                element
+            );
+
+        }
+    );
+
+}
+
+
+
+function changeRandomEmojis() {
+
+    const dynamicElements =
+        Array.from(
+            document.querySelectorAll(
+                '.emoji[data-fixed="false"]'
+            )
+        );
+
+
+    dynamicElements.sort(
+        function() {
+
+            return (
+                Math.random() -
+                0.5
+            );
+
+        }
+    );
+
+
+    const amountToChange =
+        Math.random() < 0.5
+        ? 4
+        : 5;
+
+
+    for(
+        let i = 0;
+        i <
+        Math.min(
+            amountToChange,
+            dynamicElements.length
+        );
+        i++
+    ) {
+
+
+        const newItem =
+            randomEmoji();
+
+
+        dynamicElements[i]
+            .textContent =
+                newItem.icon;
+
+
+        dynamicElements[i]
+            .dataset.alive =
+                newItem.alive;
+
+
+        dynamicElements[i]
+            .classList.remove(
+                "selected"
+            );
+
+    }
+
+
+    shuffleEmojiPositions();
+
+
+    const submit =
+        document.getElementById(
+            "emojiSubmit"
+        );
+
+
+    const reset =
+        document.getElementById(
+            "emojiReset"
+        );
+
+
+    const submitWords = [
+
+        "Submit",
+        "Reset",
+        "Confirm",
+        "Definitely Reset",
+        "Submit?"
+
+    ];
+
+
+    const resetWords = [
+
+        "Reset",
+        "Submit",
+        "Start Over",
+        "Keep Selection",
+        "Definitely Submit"
+
+    ];
+
+
+    submit.textContent =
+        submitWords[
+            Math.floor(
+                Math.random() *
+                submitWords.length
+            )
+        ];
+
+
+    reset.textContent =
+        resetWords[
+            Math.floor(
+                Math.random() *
+                resetWords.length
+            )
+        ];
+
+}
+
+
+
+document.getElementById(
+    "emojiReset"
+).onclick =
+function() {
+
+
+    document.getElementById(
+        "resetPopup"
+    ).style.display =
+        "flex";
+
+};
+
+
+
+document.getElementById(
+    "resetOkay"
+).onclick =
+function() {
+
+
+    document.getElementById(
+        "resetPopup"
+    ).style.display =
+        "none";
+
+
+    setupEmojiStage();
+
+
+    document.getElementById(
+        "message2"
+    ).textContent =
+        "Verification grid regenerated.";
+
+
+    confidenceChange(-4);
+
+};
+
+
+
+document.getElementById(
+    "emojiSubmit"
+).onclick =
+function() {
+
+
+    const emojis =
+        document.querySelectorAll(
+            ".emoji"
+        );
+
+
+    let correct =
+        true;
+
+
+    emojis.forEach(
+        function(el) {
+
+
+            const alive =
+                el.dataset.alive ===
+                "true";
+
+
+            const selected =
+                el.classList.contains(
+                    "selected"
+                );
+
+
+            const shouldSelect =
+                targetType ===
+                "living"
+                ? alive
+                : !alive;
+
+
+            if(
+                selected !==
+                shouldSelect
+            ) {
+
+                correct =
+                    false;
+
+            }
+
+        }
+    );
+
+
+    if(correct) {
+
+
+        clearTimeout(
+            surrenderTimer
+        );
+
+
+        document.getElementById(
+            "message2"
+        ).textContent =
+            "Image verification accepted.";
+
+
+        confidenceChange(22);
+
+
+        setTimeout(
+            function() {
+
+                setStage(3);
+
+            },
+            800
+        );
+
+    }
+
+
+    else {
+
+
+        if(
+            targetType ===
+            "nonliving"
+        ) {
+
+
+            document.getElementById(
+                "message2"
+            ).textContent =
+                "You needed to select NON-LIVING objects. Security requirements changed.";
+
+        }
+
+
+        else {
+
+
+            document.getElementById(
+                "message2"
+            ).textContent =
+                "Incorrect image selection.";
+
+        }
+
+
+        confidenceChange(-7);
+
+
+        setTimeout(
+            function() {
+
+
+                setupEmojiStage();
+
+
+                document.getElementById(
+                    "message2"
+                ).textContent =
+                    "New verification grid generated.";
+
+
+            },
+            1400
+        );
+
+    }
+
+};
+
+
+
+/* ==================================================
+   LEVEL 3
+================================================== */
+
+const holdArena =
+    document.getElementById(
+        "holdArena"
+    );
+
+
+const holdButton =
+    document.getElementById(
+        "holdButton"
+    );
+
+
+const holdInner =
+    document.getElementById(
+        "holdInner"
+    );
+
+
+let holdEscapes = 0;
+
+let holding = false;
+
+let holdProgress = 0;
+
+let holdTimer;
+
+
+
+function moveHoldButton() {
+
+    const maxX =
+        holdArena.clientWidth -
+        holdButton.offsetWidth -
+        15;
+
+
+    const maxY =
+        holdArena.clientHeight -
+        holdButton.offsetHeight -
+        15;
+
+
+    holdButton.style.left =
+        Math.random() *
+        maxX +
+        "px";
+
+
+    holdButton.style.top =
+        Math.random() *
+        maxY +
+        "px";
+
+}
+
+
+
+holdButton.addEventListener(
+    "mouseenter",
+    function() {
+
+
+        if(
+            !holding &&
+            holdEscapes < 3
+        ) {
+
+
+            holdEscapes++;
+
+
+            moveHoldButton();
+
+
+            document.getElementById(
+                "message3"
+            ).textContent =
+                "Unexpected cursor trajectory detected.";
+
+        }
+
+
+        else if(!holding) {
+
+
+            document.getElementById(
+                "message3"
+            ).textContent =
+                "Hold the control until verification completes.";
+
+        }
+
+    }
+);
+
+
+
+holdButton.addEventListener(
+    "mousedown",
+    function() {
+
+
+        if(holdEscapes < 3) {
+            return;
+        }
+
+
+        holding =
+            true;
+
+
+        holdProgress =
+            0;
+
+
+        document.getElementById(
+            "message3"
+        ).textContent =
+            "Analysing behavioural response...";
+
+
+        holdTimer =
+            setInterval(
+                function() {
+
+
+                    if(
+                        Math.random() <
+                        0.18 &&
+                        holdProgress >
+                        18
+                    ) {
+
+
+                        holdProgress -=
+                            Math.floor(
+                                Math.random() *
+                                8
+                            ) +
+                            4;
+
+
+                        document.getElementById(
+                            "message3"
+                        ).textContent =
+                            "Verification confidence recalculating...";
+
+                    }
+
+
+                    else {
+
+
+                        holdProgress +=
+                            2;
+
+                    }
+
+
+                    if(
+                        holdProgress <
+                        0
+                    ) {
+
+                        holdProgress =
+                            0;
+
+                    }
+
+
+                    holdInner.style.width =
+                        holdProgress +
+                        "%";
+
+
+                    if(
+                        holdProgress >=
+                        100
+                    ) {
+
+
+                        clearInterval(
+                            holdTimer
+                        );
+
+
+                        holding =
+                            false;
+
+
+                        document.getElementById(
+                            "message3"
+                        ).textContent =
+                            "Processing behavioural profile...";
+
+
+                        let processing =
+                            3;
+
+
+                        const wait =
+                            setInterval(
+                                function() {
+
+
+                                    document.getElementById(
+                                        "message3"
+                                    ).textContent =
+                                        "Checking response integrity... " +
+                                        processing;
+
+
+                                    processing--;
+
+
+                                    if(
+                                        processing <
+                                        0
+                                    ) {
+
+
+                                        clearInterval(
+                                            wait
+                                        );
+
+
+                                        confidenceChange(
+                                            20
+                                        );
+
+
+                                        startCaptchaLevel();
+
+
+                                        setStage(4);
+
+                                    }
+
+
+                                },
+                                700
+                            );
+
+                    }
+
+
+                },
+                120
+            );
+
+    }
+);
+
+
+
+document.addEventListener(
+    "mouseup",
+    function() {
+
+
+        if(
+            holding &&
+            holdProgress <
+            100
+        ) {
+
+
+            clearInterval(
+                holdTimer
+            );
+
+
+            holding =
+                false;
+
+
+            holdProgress =
+                0;
+
+
+            holdInner.style.width =
+                "0%";
+
+
+            document.getElementById(
+                "message3"
+            ).textContent =
+                "Control released too early. Verification restarted.";
+
+
+            confidenceChange(-4);
+
+        }
+
+    }
+);
+
+
+
+/* ==================================================
+   LEVEL 4 CAPTCHA
+================================================== */
+
+const characters =
+    "ABCDEFGHJKLMNPQRSTUVWXYZ" +
+    "abcdefghijkmnopqrstuvwxyz" +
+    "23456789" +
+    "@#$%&!?";
+
+
+let currentCaptcha =
+    "";
+
+
+let captchaAttempt =
+    1;
+
+
+let captchaTimer;
+
+
+let secondAttemptStartTime =
+    0;
+
+
+let changedAtFourthCharacter =
+    false;
+
+
+
+function generateCaptcha() {
+
+    let result =
+        "";
+
+
+    for(
+        let i = 0;
+        i < 9;
+        i++
+    ) {
+
+
+        result +=
+            characters[
+                Math.floor(
+                    Math.random() *
+                    characters.length
+                )
+            ];
+
+    }
+
+
+    return result;
+
+}
+
+
+
+function displayCaptcha() {
+
+    const display =
+        document.getElementById(
+            "captchaWord"
+        );
+
+
+    display.innerHTML =
+        "";
+
+
+    for(
+        let i = 0;
+        i <
+        currentCaptcha.length;
+        i++
+    ) {
+
+
+        const span =
+            document.createElement(
+                "span"
+            );
+
+
+        span.textContent =
+            currentCaptcha[i];
+
+
+        span.style.display =
+            "inline-block";
+
+
+        span.style.transform =
+            "rotate(" +
+            (
+                Math.random() *
+                20 -
+                10
+            ) +
+            "deg)";
+
+
+        span.style.fontSize =
+            (
+                27 +
+                Math.random() *
+                12
+            ) +
+            "px";
+
+
+        span.style.margin =
+            "0 2px";
+
+
+        display.appendChild(
+            span
+        );
+
+    }
+
+}
+
+
+
+function startCaptchaLevel() {
+
+    clearInterval(
+        captchaTimer
+    );
+
+
+    currentCaptcha =
+        generateCaptcha();
+
+
+    captchaAttempt =
+        1;
+
+
+    changedAtFourthCharacter =
+        false;
+
+
+    document.getElementById(
+        "captchaInput"
+    ).value =
+        "";
+
+
+    displayCaptcha();
+
+
+    document.getElementById(
+        "message4"
+    ).textContent =
+        "Enter the security code exactly.";
+
+}
+
+
+
+function restartCaptchaBecauseSlow() {
+
+    currentCaptcha =
+        generateCaptcha();
+
+
+    captchaAttempt++;
+
+
+    document.getElementById(
+        "captchaInput"
+    ).value =
+        "";
+
+
+    displayCaptcha();
+
+
+    document.getElementById(
+        "message4"
+    ).textContent =
+        "Session timeout. Security code changed. Enter the new code.";
+
+
+    secondAttemptStartTime =
+        Date.now();
+
+
+    clearInterval(
+        captchaTimer
+    );
+
+
+    captchaTimer =
+        setInterval(
+            function() {
+
+
+                const elapsed =
+                    (
+                        Date.now() -
+                        secondAttemptStartTime
+                    ) /
+                    1000;
+
+
+                if(
+                    elapsed >=
+                    20
+                ) {
+
+
+                    clearInterval(
+                        captchaTimer
+                    );
+
+
+                    restartCaptchaBecauseSlow();
+
+                }
+
+
+            },
+            500
+        );
+
+}
+
+
+
+document.getElementById(
+    "captchaInput"
+).addEventListener(
+    "input",
+    function() {
+
+
+        const length =
+            this.value.length;
+
+
+        if(
+            captchaAttempt ===
+            1 &&
+            length >=
+            4 &&
+            !changedAtFourthCharacter
+        ) {
+
+
+            changedAtFourthCharacter =
+                true;
+
+
+            restartCaptchaBecauseSlow();
+
+        }
+
+    }
+);
+
+
+
+document.getElementById(
+    "finalVerify"
+).onclick =
+function() {
+
+
+    const userAnswer =
+        document.getElementById(
+            "captchaInput"
+        ).value;
+
+
+    if(
+        userAnswer ===
+        currentCaptcha
+    ) {
+
+
+        clearInterval(
+            captchaTimer
+        );
+
+
+        confidenceChange(
+            24
+        );
+
+
+        setupConfirmationStage();
+
+
+        setStage(5);
+
+    }
+
+
+    else {
+
+
+        document.getElementById(
+            "message4"
+        ).textContent =
+            "Incorrect security code. New code generated.";
+
+
+        confidenceChange(-8);
+
+
+        restartCaptchaBecauseSlow();
+
+    }
+
+};
+
+
+
+/* ==================================================
+   LEVEL 5
+================================================== */
+
+const confirmArena =
+    document.getElementById(
+        "confirmArena"
+    );
+
+
+const confirmButton =
+    document.getElementById(
+        "confirmButton"
+    );
+
+
+let confirmationClicks =
+    0;
+
+
+
+function setupConfirmationStage() {
+
+    confirmationClicks =
+        0;
+
+
+    confirmButton.style.left =
+        "155px";
+
+
+    confirmButton.style.top =
+        "80px";
+
+
+    confirmButton.textContent =
+        "CONTINUE";
+
+
+    document.getElementById(
+        "confirmCounter"
+    ).textContent =
+        "Confirmations: 0 / 3";
+
+
+    document.getElementById(
+        "message5"
+    ).textContent =
+        "Just three simple confirmations.";
+
+}
+
+
+
+function moveConfirmButton() {
+
+    const maxX =
+        confirmArena.clientWidth -
+        confirmButton.offsetWidth -
+        10;
+
+
+    const maxY =
+        confirmArena.clientHeight -
+        confirmButton.offsetHeight -
+        10;
+
+
+    confirmButton.style.left =
+        Math.random() *
+        maxX +
+        "px";
+
+
+    confirmButton.style.top =
+        Math.random() *
+        maxY +
+        "px";
+
+}
+
+
+
+confirmButton.onclick =
+function() {
+
+
+    confirmationClicks++;
+
+
+    document.getElementById(
+        "confirmCounter"
+    ).textContent =
+        "Confirmations: " +
+        confirmationClicks +
+        " / 3";
+
+
+    if(
+        confirmationClicks ===
+        1
+    ) {
+
+
+        confirmButton.textContent =
+            "CONFIRM AGAIN";
+
+
+        document.getElementById(
+            "message5"
+        ).textContent =
+            "Additional confirmation required.";
+
+
+        moveConfirmButton();
+
+    }
+
+
+    else if(
+        confirmationClicks ===
+        2
+    ) {
+
+
+        confirmButton.textContent =
+            "FINAL CONFIRM";
+
+
+        document.getElementById(
+            "message5"
+        ).textContent =
+            "Confirm your previous confirmation.";
+
+
+        moveConfirmButton();
+
+    }
+
+
+    else if(
+        confirmationClicks >=
+        3
+    ) {
+
+
+        confirmButton.textContent =
+            "CONFIRMED";
+
+
+        document.getElementById(
+            "message5"
+        ).textContent =
+            "Confirmation accepted.";
+
+
+        confidenceChange(8);
+
+
+        setTimeout(
+            function() {
+
+
+                setStage(6);
+
+
+                startMemoryStage();
+
+
+            },
+            700
+        );
+
+    }
+
+};
+
+
+
+/* ==================================================
+   LEVEL 6
+   MEMORY VERIFICATION
+================================================== */
+
+const memoryPool = [
+
+    "◆",
+    "●",
+    "▲",
+    "★",
+    "✦",
+    "⬟",
+    "■",
+    "♥",
+    "☀",
+    "☂",
+    "♣",
+    "⬢",
+    "✚",
+    "☯",
+    "♠",
+    "✿"
+
+];
+
+
+let memorySequence =
+    [];
+
+
+let correctMemorySymbol =
+    "";
+
+
+let memoryTimer =
+    null;
+
+
+
+function getRandomMemorySymbol() {
+
+    return memoryPool[
+        Math.floor(
+            Math.random() *
+            memoryPool.length
+        )
+    ];
+
+}
+
+
+
+function generateMemorySequence() {
+
+    memorySequence =
+        [];
+
+
+    const available =
+        [...memoryPool];
+
+
+    for(
+        let i = 0;
+        i < 7;
+        i++
+    ) {
+
+
+        const index =
+            Math.floor(
+                Math.random() *
+                available.length
+            );
+
+
+        memorySequence.push(
+            available[index]
+        );
+
+
+        available.splice(
+            index,
+            1
+        );
+
+    }
+
+
+    correctMemorySymbol =
+        memorySequence[2];
+
+}
+
+
+
+function displayMemorySequence() {
+
+    const container =
+        document.getElementById(
+            "memorySymbols"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    memorySequence.forEach(
+        function(symbol) {
+
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.className =
+                "memorySymbol";
+
+
+            element.textContent =
+                symbol;
+
+
+            container.appendChild(
+                element
+            );
+
+        }
+    );
+
+}
+
+
+
+function startMemoryStage() {
+
+    clearInterval(
+        memoryTimer
+    );
+
+
+    generateMemorySequence();
+
+
+    displayMemorySequence();
+
+
+    document.getElementById(
+        "memoryQuestion"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "memorySymbols"
+    ).style.display =
+        "flex";
+
+
+    document.getElementById(
+        "memoryStatus"
+    ).textContent =
+        "Security sequence generated";
+
+
+    document.getElementById(
+        "message6"
+    ).textContent =
+        "Memorise the sequence.";
+
+
+    let remaining =
+        3;
+
+
+    document.getElementById(
+        "memoryCountdown"
+    ).textContent =
+        "Sequence will disappear in " +
+        remaining +
+        " seconds";
+
+
+    memoryTimer =
+        setInterval(
+            function() {
+
+
+                remaining--;
+
+
+                if(
+                    remaining >
+                    0
+                ) {
+
+
+                    document.getElementById(
+                        "memoryCountdown"
+                    ).textContent =
+                        "Sequence will disappear in " +
+                        remaining +
+                        " seconds";
+
+                }
+
+
+                else {
+
+
+                    clearInterval(
+                        memoryTimer
+                    );
+
+
+                    hideMemorySequence();
+
+                }
+
+
+            },
+            1000
+        );
+
+}
+
+
+
+function hideMemorySequence() {
+
+    document.getElementById(
+        "memorySymbols"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "memoryCountdown"
+    ).textContent =
+        "Sequence hidden for security";
+
+
+    document.getElementById(
+        "memoryQuestion"
+    ).style.display =
+        "block";
+
+
+    createMemoryChoices();
+
+}
+
+
+
+function createMemoryChoices() {
+
+    const choices =
+        document.getElementById(
+            "memoryChoices"
+        );
+
+
+    choices.innerHTML =
+        "";
+
+
+    let options = [
+        correctMemorySymbol
+    ];
+
+
+    while(
+        options.length <
+        4
+    ) {
+
+
+        const random =
+            getRandomMemorySymbol();
+
+
+        if(
+            !options.includes(
+                random
+            )
+        ) {
+
+            options.push(
+                random
+            );
+
+        }
+
+    }
+
+
+    options.sort(
+        function() {
+
+            return (
+                Math.random() -
+                0.5
+            );
+
+        }
+    );
+
+
+    options.forEach(
+        function(symbol) {
+
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "memoryChoice";
+
+
+            button.textContent =
+                symbol;
+
+
+            button.onclick =
+                function() {
+
+
+                    checkMemoryAnswer(
+                        symbol
+                    );
+
+                };
+
+
+            choices.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+
+function checkMemoryAnswer(
+    symbol
+) {
+
+
+    if(
+        symbol ===
+        correctMemorySymbol
+    ) {
+
+
+        document.getElementById(
+            "message6"
+        ).textContent =
+            "Visual memory response accepted.";
+
+
+        confidenceChange(10);
+
+
+        setTimeout(
+            function() {
+
+
+                setupAccuracyStage();
+
+
+                setStage(7);
+
+
+            },
+            700
+        );
+
+    }
+
+
+    else {
+
+
+        document.getElementById(
+            "message6"
+        ).textContent =
+            "Incorrect. Security sequence invalidated. Generating a new sequence.";
+
+
+        confidenceChange(-5);
+
+
+        setTimeout(
+            function() {
+
+
+                startMemoryStage();
+
+
+            },
+            1100
+        );
+
+    }
+
+}
+
+
+
+/* ==================================================
+   LEVEL 7
+   CURSOR ACCURACY TEST
+================================================== */
+
+const accuracyArena =
+    document.getElementById(
+        "accuracyArena"
+    );
+
+
+const accuracyCircle =
+    document.getElementById(
+        "accuracyCircle"
+    );
+
+
+let accuracyAttempts =
+    1;
+
+
+
+function setupAccuracyStage() {
+
+    accuracyAttempts =
+        1;
+
+
+    document.getElementById(
+        "accuracyAttemptText"
+    ).textContent =
+        "Attempt 1";
+
+
+    document.getElementById(
+        "message7"
+    ).textContent =
+        "Precision tracking enabled.";
+
+
+    moveAccuracyTarget();
+
+}
+
+
+
+function moveAccuracyTarget() {
+
+    const circleSize =
+        110;
+
+
+    const margin =
+        20;
+
+
+    const maxX =
+        accuracyArena.clientWidth -
+        circleSize -
+        margin * 2;
+
+
+    const maxY =
+        accuracyArena.clientHeight -
+        circleSize -
+        margin * 2;
+
+
+    const x =
+        margin +
+        Math.random() *
+        maxX;
+
+
+    const y =
+        margin +
+        Math.random() *
+        maxY;
+
+
+    accuracyCircle.style.left =
+        x +
+        circleSize / 2 +
+        "px";
+
+
+    accuracyCircle.style.top =
+        y +
+        circleSize / 2 +
+        "px";
+
+}
+
+
+
+accuracyArena.onclick =
+function(event) {
+
+
+    const rect =
+        accuracyCircle.getBoundingClientRect();
+
+
+    const centerX =
+        rect.left +
+        rect.width /
+        2;
+
+
+    const centerY =
+        rect.top +
+        rect.height /
+        2;
+
+
+    const distance =
+        Math.sqrt(
+
+            Math.pow(
+                event.clientX -
+                centerX,
+                2
+            )
+
+            +
+
+            Math.pow(
+                event.clientY -
+                centerY,
+                2
+            )
+
+        );
+
+
+    /*
+    Exact centre has 100% accuracy.
+
+    This scaling makes close clicks
+    display irritatingly high values
+    like 99.3%, 99.4%, etc.
+    */
+
+    let accuracy =
+        100 -
+        distance *
+        0.12;
+
+
+    if(
+        accuracy <
+        90
+    ) {
+
+        accuracy =
+            90 +
+            Math.random() *
+            7;
+
+    }
+
+
+    /*
+    Real acceptance radius.
+    Still difficult but possible.
+    */
+
+    if(
+        distance <=
+        4
+    ) {
+
+
+        document.getElementById(
+            "message7"
+        ).textContent =
+            "Accuracy: 99.6%. Required: 99.5%. Accepted.";
+
+
+        confidenceChange(
+            11
+        );
+
+
+        setTimeout(
+            function() {
+
+
+                setupConfirmationLoop();
+
+
+                setStage(8);
+
+
+            },
+            900
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+    Make near misses painfully close.
+    */
+
+    if(
+        distance <=
+        10
+    ) {
+
+
+        accuracy =
+            99.4;
+
+    }
+
+
+    else if(
+        distance <=
+        18
+    ) {
+
+
+        accuracy =
+            99.2;
+
+    }
+
+
+    else {
+
+
+        accuracy =
+            Math.min(
+                accuracy,
+                98.8
+            );
+
+    }
+
+
+    document.getElementById(
+        "message7"
+    ).textContent =
+        "Accuracy: " +
+        accuracy.toFixed(1) +
+        "%. Required: 99.5%. Please try again.";
+
+
+    accuracyAttempts++;
+
+
+    document.getElementById(
+        "accuracyAttemptText"
+    ).textContent =
+        "Attempt " +
+        accuracyAttempts;
+
+
+    confidenceChange(-2);
+
+
+    /*
+    Move target after every miss.
+    */
+
+    setTimeout(
+        function() {
+
+
+            moveAccuracyTarget();
+
+
+        },
+        350
+    );
+
+};
+
+
+
+/* ==================================================
+   LEVEL 8
+   FINAL CONFIRMATION LOOP
+================================================== */
+
+let loopStep =
+    0;
+
+
+const loopQuestions = [
+
+    {
+        question:
+            "Are you sure?",
+
+        button:
+            "YES, CONTINUE"
+    },
+
+    {
+        question:
+            "Are you sure you're sure?",
+
+        button:
+            "YES, I'M SURE"
+    },
+
+    {
+        question:
+            "Confirm previous confirmation.",
+
+        button:
+            "CONFIRM CONFIRMATION"
+    },
+
+    {
+        question:
+            "Cancel confirmation cancellation?",
+
+        button:
+            "DO NOT CANCEL"
+    }
+
+];
+
+
+
+function setupConfirmationLoop() {
+
+    loopStep =
+        0;
+
+
+    updateConfirmationLoop();
+
+}
+
+
+
+function updateConfirmationLoop() {
+
+    const data =
+        loopQuestions[
+            loopStep
+        ];
+
+
+    document.getElementById(
+        "loopQuestion"
+    ).textContent =
+        data.question;
+
+
+    document.getElementById(
+        "loopButton"
+    ).textContent =
+        data.button;
+
+
+    document.getElementById(
+        "loopProgressText"
+    ).textContent =
+        "Confirmation " +
+        (
+            loopStep +
+            1
+        ) +
+        " of " +
+        loopQuestions.length;
+
+
+    const messages = [
+
+        "Final confirmation required.",
+
+        "Additional certainty required.",
+
+        "Previous confirmation needs confirmation.",
+
+        "Cancellation status must be confirmed."
+
+    ];
+
+
+    document.getElementById(
+        "message8"
+    ).textContent =
+        messages[
+            loopStep
+        ];
+
+}
+
+
+
+document.getElementById(
+    "loopButton"
+).onclick =
+function() {
+
+
+    loopStep++;
+
+
+    if(
+        loopStep <
+        loopQuestions.length
+    ) {
+
+
+        updateConfirmationLoop();
+
+    }
+
+
+    else {
+
+
+        document.getElementById(
+            "loopQuestion"
+        ).textContent =
+            "Verification decisions confirmed.";
+
+
+        document.getElementById(
+            "loopButton"
+        ).textContent =
+            "PROCESSING...";
+
+
+        document.getElementById(
+            "loopButton"
+        ).disabled =
+            true;
+
+
+        document.getElementById(
+            "message8"
+        ).textContent =
+            "Finalising verification...";
+
+
+        confidenceChange(10);
+
+
+        document.getElementById(
+            "progressInner"
+        ).style.width =
+            "100%";
+
+
+        setTimeout(
+            function() {
+
+
+                showFakeSuccess();
+
+
+            },
+            900
+        );
+
+    }
+
+};
+
+
+
+/* ==================================================
+   FAKE SUCCESS
+================================================== */
+
+function showFakeSuccess() {
+
+    const fake =
+        document.getElementById(
+            "fakeSuccess"
+        );
+
+
+    document.getElementById(
+        "fakeSuccessIcon"
+    ).textContent =
+        "✓";
+
+
+    document.getElementById(
+        "fakeSuccessIcon"
+    ).style.background =
+        "#27d796";
+
+
+    document.getElementById(
+        "fakeSuccessTitle"
+    ).textContent =
+        "VERIFIED";
+
+
+    document.getElementById(
+        "fakeSuccessNormal"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "fakeSuccessSecondary"
+    ).style.display =
+        "none";
+
+
+    fake.style.display =
+        "flex";
+
+
+    /*
+    Let them believe they won.
+    */
+
+    setTimeout(
+        function() {
+
+
+            document.getElementById(
+                "fakeSuccessIcon"
+            ).textContent =
+                "!";
+
+
+            document.getElementById(
+                "fakeSuccessIcon"
+            ).style.background =
+                "#ffcf3f";
+
+
+            document.getElementById(
+                "fakeSuccessTitle"
+            ).textContent =
+                "WAIT";
+
+
+            document.getElementById(
+                "fakeSuccessNormal"
+            ).style.display =
+                "none";
+
+
+            document.getElementById(
+                "fakeSuccessSecondary"
+            ).style.display =
+                "block";
+
+
+        },
+        2000
+    );
+
+
+    /*
+    Then throw them into final boss.
+    */
+
+    setTimeout(
+        function() {
+
+
+            fake.style.display =
+                "none";
+
+
+            startDotChallenge();
+
+
+        },
+        4000
+    );
+
+}
+
+
+
+/* ==================================================
+   FINAL DOT CHALLENGE
+================================================== */
+
+const dotOverlay =
+    document.getElementById(
+        "dotOverlay"
+    );
+
+
+const tinyDot =
+    document.getElementById(
+        "tinyDot"
+    );
+
+
+const arrow =
+    document.getElementById(
+        "arrow"
+    );
+
+
+const decoyContainer =
+    document.getElementById(
+        "decoyContainer"
+    );
+
+
+let dotMoves =
+    0;
+
+
+let dotTimer;
+
+
+let decoysCreated =
+    false;
+
+
+let dotSurrenderShown =
+    false;
+
+
+
+function randomDotPosition(
+    element
+) {
+
+    const x =
+        20 +
+        Math.random() *
+        (
+            window.innerWidth -
+            60
+        );
+
+
+    const y =
+        100 +
+        Math.random() *
+        (
+            window.innerHeight -
+            170
+        );
+
+
+    element.style.left =
+        x +
+        "px";
+
+
+    element.style.top =
+        y +
+        "px";
+
+}
+
+
+
+/* ==================================================
+   CREATE MANY DECOYS AT 20
+================================================== */
+
+function createDecoyDots() {
+
+    if(decoysCreated) {
+        return;
+    }
+
+
+    decoysCreated =
+        true;
+
+
+    decoyContainer.innerHTML =
+        "";
+
+
+    /*
+    24 fake dots.
+    */
+
+    for(
+        let i = 0;
+        i < 24;
+        i++
+    ) {
+
+
+        const fake =
+            document.createElement(
+                "div"
+            );
+
+
+        fake.className =
+            "decoyDot";
+
+
+        randomDotPosition(
+            fake
+        );
+
+
+        fake.onclick =
+            function(event) {
+
+
+                event.stopPropagation();
+
+
+                confidenceChange(-3);
+
+
+                document.getElementById(
+                    "dotMessage"
+                ).textContent =
+                    "Incorrect verification point. Targets recalibrated.";
+
+
+                randomDotPosition(
+                    tinyDot
+                );
+
+
+                document.querySelectorAll(
+                    ".decoyDot"
+                ).forEach(
+                    function(dot) {
+
+
+                        randomDotPosition(
+                            dot
+                        );
+
+
+                    }
+                );
+
+
+                if(
+                    dotMoves >=
+                    40
+                ) {
+
+
+                    updateArrow();
+
+                }
+
+            };
+
+
+        decoyContainer.appendChild(
+            fake
+        );
+
+    }
+
+}
+
+
+
+function moveAllDecoys() {
+
+    document.querySelectorAll(
+        ".decoyDot"
+    ).forEach(
+        function(dot) {
+
+
+            randomDotPosition(
+                dot
+            );
+
+
+        }
+    );
+
+}
+
+
+
+/* ==================================================
+   ARROW AFTER 40
+================================================== */
+
+function updateArrow() {
+
+    const dotRect =
+        tinyDot.getBoundingClientRect();
+
+
+    let arrowX =
+        dotRect.left -
+        65;
+
+
+    let arrowY =
+        dotRect.top -
+        18;
+
+
+    if(
+        arrowX <
+        5
+    ) {
+
+
+        arrowX =
+            dotRect.left +
+            25;
+
+    }
+
+
+    if(
+        arrowY <
+        80
+    ) {
+
+
+        arrowY =
+            dotRect.top +
+            20;
+
+    }
+
+
+    arrow.style.left =
+        arrowX +
+        "px";
+
+
+    arrow.style.top =
+        arrowY +
+        "px";
+
+
+    if(
+        arrowX <
+        dotRect.left
+    ) {
+
+
+        arrow.style.transform =
+            "rotate(0deg)";
+
+    }
+
+
+    else {
+
+
+        arrow.style.transform =
+            "rotate(180deg)";
+
+    }
+
+}
+
+
+
+/* ==================================================
+   MAIN DOT MOVEMENT
+================================================== */
+
+function moveDot() {
+
+    randomDotPosition(
+        tinyDot
+    );
+
+
+    dotMoves++;
+
+
+    if(decoysCreated) {
+
+
+        moveAllDecoys();
+
+    }
+
+
+    document.getElementById(
+        "dotMessage"
+    ).textContent =
+        "Verification point relocated " +
+        dotMoves +
+        " times.";
+
+
+
+    /*
+    AFTER 20:
+    MANY DOTS APPEAR
+    */
+
+    if(
+        dotMoves >=
+        20
+    ) {
+
+
+        createDecoyDots();
+
+
+        document.getElementById(
+            "dotInstruction"
+        ).textContent =
+            "Find the CORRECT verification point and click it.";
+
+
+        document.getElementById(
+            "dotMessage"
+        ).textContent =
+            "Multiple verification points detected.";
+
+    }
+
+
+
+    /*
+    AFTER 40:
+    ARROW APPEARS
+    */
+
+    if(
+        dotMoves >=
+        40
+    ) {
+
+
+        arrow.style.display =
+            "block";
+
+
+        updateArrow();
+
+
+        document.getElementById(
+            "dotMessage"
+        ).textContent =
+            "Assistance enabled. Follow the indicator.";
+
+    }
+
+
+
+    /*
+    AFTER 50:
+    SURRENDER
+    */
+
+    if(
+        dotMoves >=
+        50 &&
+        !dotSurrenderShown
+    ) {
+
+
+        dotSurrenderShown =
+            true;
+
+
+        clearInterval(
+            dotTimer
+        );
+
+
+        document.getElementById(
+            "dotSurrenderPopup"
+        ).style.display =
+            "flex";
+
+
+        document.getElementById(
+            "dotMessage"
+        ).textContent =
+            "Verification assistance available.";
+
+    }
+
+}
+
+
+
+function startDotChallenge() {
+
+    dotOverlay.style.display =
+        "block";
+
+
+    dotMoves =
+        0;
+
+
+    decoysCreated =
+        false;
+
+
+    dotSurrenderShown =
+        false;
+
+
+    decoyContainer.innerHTML =
+        "";
+
+
+    arrow.style.display =
+        "none";
+
+
+    document.getElementById(
+        "dotInstruction"
+    ).textContent =
+        "FINAL VERIFICATION: Click the verification point.";
+
+
+    document.getElementById(
+        "dotMessage"
+    ).textContent =
+        "Find it before it moves.";
+
+
+    moveDot();
+
+
+    dotTimer =
+        setInterval(
+            function() {
+
+
+                moveDot();
+
+
+            },
+            1200
+        );
+
+}
+
+
+
+/* ==================================================
+   CORRECT DOT
+================================================== */
+
+tinyDot.onclick =
+function(event) {
+
+
+    event.stopPropagation();
+
+
+    clearInterval(
+        dotTimer
+    );
+
+
+    dotOverlay.style.display =
+        "none";
+
+
+    document.getElementById(
+        "dotSurrenderPopup"
+    ).style.display =
+        "none";
+
+
+    showRealSuccess();
+
+};
+
+
+
+/* ==================================================
+   CLICK OUTSIDE DOT
+================================================== */
+
+dotOverlay.onclick =
+function(event) {
+
+
+    if(
+        event.target ===
+        tinyDot ||
+        event.target.classList.contains(
+            "decoyDot"
+        )
+    ) {
+
+
+        return;
+
+    }
+
+
+    moveDot();
+
+
+    confidenceChange(-2);
+
+
+    document.getElementById(
+        "dotMessage"
+    ).textContent =
+        "Verification point missed. Target relocated.";
+
+};
+
+
+
+/* ==================================================
+   SURRENDER YES = SUCCESS
+================================================== */
+
+document.getElementById(
+    "dotSurrenderYes"
+).onclick =
+function() {
+
+
+    clearInterval(
+        dotTimer
+    );
+
+
+    document.getElementById(
+        "dotSurrenderPopup"
+    ).style.display =
+        "none";
+
+
+    dotOverlay.style.display =
+        "none";
+
+
+    showRealSuccess();
+
+};
+
+
+
+/* ==================================================
+   SURRENDER NO
+================================================== */
+
+document.getElementById(
+    "dotSurrenderNo"
+).onclick =
+function() {
+
+
+    document.getElementById(
+        "dotSurrenderPopup"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "dotMessage"
+    ).textContent =
+        "Assistance declined. Verification continuing.";
+
+
+    dotTimer =
+        setInterval(
+            function() {
+
+
+                randomDotPosition(
+                    tinyDot
+                );
+
+
+                moveAllDecoys();
+
+
+                if(
+                    dotMoves >=
+                    40
+                ) {
+
+
+                    updateArrow();
+
+                }
+
+
+                dotMoves++;
+
+
+                document.getElementById(
+                    "dotMessage"
+                ).textContent =
+                    "Verification point relocated " +
+                    dotMoves +
+                    " times.";
+
+
+            },
+            1200
+        );
+
+};
+
+
+
+/* ==================================================
+   REAL SUCCESS
+================================================== */
+
+function showRealSuccess() {
+
+    document.getElementById(
+        "success"
+    ).style.display =
+        "flex";
+
+}
+
+</script>
+
+</body>
+</html>

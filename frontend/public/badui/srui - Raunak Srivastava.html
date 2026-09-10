@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤡 Raunak ka Jaadu</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; user-select:none; }
+  html, body { height:100%; }
+  body {
+    font-family: "Comic Sans MS", "Papyrus", cursive, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: repeating-linear-gradient(45deg, #4a0000, #4a0000 10px, #1a1a00 10px, #1a1a00 20px),
+                radial-gradient(circle at 20% 30%, #ff000077, transparent 60%),
+                radial-gradient(circle at 80% 70%, #00330077, transparent 60%);
+    background-blend-mode: overlay;
+    animation: gross 4s linear infinite;
+    overflow: hidden;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="24" font-size="24">🤮</text></svg>') 16 16, auto;
+    position: relative;
+  }
+  @keyframes gross { 0%{filter:hue-rotate(0deg) saturate(1.5);} 50%{filter:hue-rotate(180deg) saturate(2.5);} 100%{filter:hue-rotate(360deg) saturate(1.5);} }
+  @keyframes screenShake {
+    0%   { transform: translate(0,0) rotate(0deg); }
+    20%  { transform: translate(9px,-7px) rotate(-1deg); }
+    40%  { transform: translate(-9px,7px) rotate(1deg); }
+    60%  { transform: translate(7px,-9px) rotate(-0.8deg); }
+    80%  { transform: translate(-7px,9px) rotate(0.8deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+  }
+
+  /* ===== INTRO / GATE SCREEN ===== */
+  #introScreen {
+    position: fixed; inset: 0; z-index: 999;
+    background: #000;
+    background-image: radial-gradient(circle at 50% 50%, #330000, #000 70%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 2rem;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #introScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .intro-emoji { font-size: 4rem; animation: spin3d 2.5s linear infinite; margin-bottom: 1rem; }
+  @keyframes spin3d { 0%{transform:rotateY(0deg);} 100%{transform:rotateY(360deg);} }
+  #introScreen h2 {
+    font-size: 1.9rem; color: #ff3300; text-shadow: 3px 3px 0 #33ff00, -2px -2px 0 #0000ff;
+    animation: flicker .6s infinite alternate; margin-bottom: .6rem; letter-spacing: 1px;
+  }
+  #introScreen p { color: #ffcc00; font-family: monospace; font-size: .85rem; max-width: 440px; margin-bottom: 1.6rem; line-height: 1.6; }
+  #enterBtn {
+    padding: 1rem 2rem; font-size: 1.05rem; font-weight: 900; cursor: pointer;
+    background: repeating-linear-gradient(45deg,#8b0000,#8b0000 10px,#ffcc00 10px,#ffcc00 20px);
+    border: 4px outset #330000; color:#000; text-shadow:1px 1px white;
+    animation: pulse 1s infinite; border-radius: 8px;
+  }
+  #loadingWrap { display:none; width: 320px; max-width: 80vw; margin-top: 1rem; }
+  #loadingWrap.show { display:block; }
+  .loadbar-outer { background:#111; border:3px solid #ff3300; border-radius: 10px; height: 22px; overflow:hidden; }
+  .loadbar-inner { height:100%; width:0%; background: repeating-linear-gradient(90deg,#ff0000,#ff0000 8px,#ffff00 8px,#ffff00 16px); transition: width .3s ease; }
+  #loadingMsg { color:#ffcc00; font-family:monospace; font-size:.72rem; margin-top:.5rem; min-height: 16px; }
+
+  .card {
+    background: #6e5b2e;
+    background-image: radial-gradient(#4a3a15 15%, transparent 16%), radial-gradient(#4a3a15 15%, transparent 16%);
+    background-size: 12px 12px;
+    background-position: 0 0, 6px 6px;
+    border: 8px double #2a1a00;
+    border-radius: 4px 40px 4px 40px;
+    width: 100%;
+    max-width: 480px;
+    padding: 2rem;
+    box-shadow: 0 0 0 6px #ff3300, 0 0 40px 10px #33ff00, inset 0 0 30px #000;
+    position: relative;
+    animation: wobble 2s ease-in-out infinite;
+  }
+  @keyframes wobble { 0%,100%{transform:rotate(-1deg);} 50%{transform:rotate(1deg);} }
+
+  .badge {
+    display:inline-block; font-size:.65rem; text-transform:uppercase; letter-spacing:.1em;
+    font-weight:900; color:#330000; background:#ffcc00; padding:5px 12px; border-radius:999px;
+    margin-bottom:.8rem; border:2px dashed red; transform: rotate(-2deg);
+  }
+  h1 { font-size:1.5rem; color:#00eaff; text-shadow:3px 3px 0 #ff00cc,-2px -2px 0 #ffee00; margin-bottom:.2rem; animation: flicker .6s infinite alternate; letter-spacing:1px; }
+  @keyframes flicker { 0%{opacity:1;} 50%{opacity:.65;} 100%{opacity:1;} }
+  .subtitle { font-size:.72rem; color:#1a0d00; margin-bottom:1rem; font-weight:bold; }
+
+  .insult-banner {
+    background:black; color:#ff5500; font-family:monospace; font-size:.68rem; padding:6px;
+    border:2px dashed #ffcc00; margin-bottom:1rem; white-space:nowrap; overflow:hidden;
+  }
+  .insult-banner span { display:inline-block; padding-left:100%; animation: scrollit 10s linear infinite; }
+  @keyframes scrollit { 0%{transform:translateX(0);} 100%{transform:translateX(-200%);} }
+
+  .form-group { margin-bottom: 1rem; }
+  label { display:flex; justify-content:space-between; font-size:.68rem; font-weight:800; text-transform:uppercase;
+    color:#3a1a00; margin-bottom:.4rem; text-shadow:1px 1px #ccc; }
+  .input-box {
+    width:100%; background:#fff3cc; color:#000; border:4px ridge #660066; border-radius:0 12px;
+    padding:.7rem 1rem; font-size:.9rem; outline:none;
+  }
+  .input-box:focus { border-color:#ff0000; background:#ffe0cc; }
+  .input-box::placeholder { color:#3a1a00; opacity:1; }
+
+  .rules-box { background:#1a0000; border:3px solid #ff3300; border-radius:10px; padding:.9rem; margin-top:1rem; }
+  .rules-head { font-size:.66rem; font-weight:900; text-transform:uppercase; color:#ff9900; margin-bottom:.5rem; display:flex; justify-content:space-between; }
+  .rule { display:flex; gap:8px; font-size:.7rem; line-height:1.35; margin-bottom:.4rem; font-family: monospace; }
+  .rule.ok { color:#39ff14; }
+  .rule.err { color:#ff3333; text-shadow:0 0 4px red; }
+
+  .submit-zone { position:relative; height: 160px; margin-top:1.4rem; overflow: visible; }
+  .submit-btn {
+    position:absolute; width: 230px; height:56px;
+    background:repeating-linear-gradient(45deg,#ff0000,#ff0000 10px,#ffcc00 10px,#ffcc00 20px);
+    color:#000; font-weight:900; font-size:.88rem; border:4px outset #330000; cursor:pointer;
+    text-shadow:1px 1px white; transition: left .18s cubic-bezier(.34,1.56,.64,1), top .18s cubic-bezier(.34,1.56,.64,1);
+    animation: btnDance .12s ease-in-out infinite;
+  }
+  @keyframes btnDance {
+    0%   { transform: translateY(0) rotate(-6deg) scale(1); }
+    25%  { transform: translateY(-8px) rotate(6deg) scale(1.08); }
+    50%  { transform: translateY(0) rotate(-6deg) scale(1); }
+    75%  { transform: translateY(-8px) rotate(6deg) scale(1.08); }
+    100% { transform: translateY(0) rotate(-6deg) scale(1); }
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
+  .submit-btn:hover { filter:invert(1); }
+
+  .clown-bubble {
+    position:fixed; bottom:20px; right:20px; background:#330011; border:3px solid #ff3300;
+    border-radius:14px; padding:1rem; max-width:260px; box-shadow:0 15px 30px rgba(0,0,0,.7);
+    display:flex; gap:10px; align-items:flex-start; z-index:99; animation:popIn .4s ease;
+  }
+  @keyframes popIn { from{transform:translateY(30px) scale(.8); opacity:0;} to{transform:translateY(0) scale(1); opacity:1;} }
+  .clown-avatar { font-size:1.8rem; animation: shake2 .5s infinite; }
+  @keyframes shake2 { 0%,100%{transform:rotate(-8deg);} 50%{transform:rotate(8deg);} }
+  .clown-text { font-size:.72rem; color:#ffccaa; line-height:1.35; }
+  .clown-title { font-weight:900; color:#39ff14; margin-bottom:2px; }
+
+  .flies { position:absolute; font-size:18px; animation: fly 5s linear infinite; pointer-events:none; }
+  @keyframes fly { 0%{transform:translate(0,0) rotate(0deg);} 25%{transform:translate(40px,-20px) rotate(90deg);} 50%{transform:translate(0,20px) rotate(180deg);} 75%{transform:translate(-40px,-10px) rotate(270deg);} 100%{transform:translate(0,0) rotate(360deg);} }
+
+  .dustbin-corner { position:fixed; bottom:0; left:0; width:110px; height:140px; z-index:60; pointer-events:none; }
+  .dustbin-corner.right { left:auto; right:0; }
+  .dustbin-corner.right svg { transform: scaleX(-1); }
+  .dustbin-corner svg { filter: drop-shadow(0 4px 4px rgba(0,0,0,.5)); }
+  @keyframes lidWobble { 0%,100%{ transform: rotate(-3deg); } 50%{ transform: rotate(3deg); } }
+  .bin-lid { transform-origin: 20px 38px; animation: lidWobble 1.6s ease-in-out infinite; }
+
+  .bin-insect { position:fixed; z-index:61; pointer-events:none; }
+  @keyframes buzzLoop1 { 0%{transform:translate(0,0) rotate(0deg);} 20%{transform:translate(18px,-14px) rotate(40deg);} 40%{transform:translate(6px,-30px) rotate(-20deg);} 60%{transform:translate(-16px,-16px) rotate(30deg);} 80%{transform:translate(-6px,-4px) rotate(-15deg);} 100%{transform:translate(0,0) rotate(0deg);} }
+  @keyframes buzzLoop2 { 0%{transform:translate(0,0) rotate(0deg);} 25%{transform:translate(-14px,-10px) rotate(-35deg);} 50%{transform:translate(-4px,-26px) rotate(15deg);} 75%{transform:translate(14px,-12px) rotate(-25deg);} 100%{transform:translate(0,0) rotate(0deg);} }
+  @keyframes wingBlur { 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
+  .bin-insect .wings { animation: wingBlur .09s linear infinite; }
+
+  .spider { position:fixed; width:34px; height:24px; pointer-events:none; z-index:150; filter: drop-shadow(0 2px 2px rgba(0,0,0,.6)); }
+  .spider .legs { animation: legWiggle .18s ease-in-out infinite alternate; transform-origin: center; }
+  @keyframes legWiggle { 0%{ transform: scaleY(1) rotate(0deg); } 100%{ transform: scaleY(0.88) rotate(2deg); } }
+  @keyframes crawlDown { 0%{transform:translateY(-40px) translateX(0) rotate(0deg);} 20%{transform:translateY(20vh) translateX(15px) rotate(-8deg);} 40%{transform:translateY(40vh) translateX(-15px) rotate(8deg);} 60%{transform:translateY(60vh) translateX(15px) rotate(-8deg);} 80%{transform:translateY(80vh) translateX(-15px) rotate(8deg);} 100%{transform:translateY(105vh) translateX(0) rotate(0deg);} }
+  @keyframes crawlSide { 0%{transform:translateX(-40px) translateY(0) rotate(0deg);} 20%{transform:translateX(20vw) translateY(10px) rotate(6deg);} 40%{transform:translateX(40vw) translateY(-10px) rotate(-6deg);} 60%{transform:translateX(60vw) translateY(10px) rotate(6deg);} 80%{transform:translateX(80vw) translateY(-10px) rotate(-6deg);} 100%{transform:translateX(105vw) translateY(0) rotate(0deg);} }
+  @keyframes crawlUp { 0%{transform:translateY(105vh) translateX(0) rotate(0deg);} 20%{transform:translateY(80vh) translateX(-15px) rotate(8deg);} 40%{transform:translateY(60vh) translateX(15px) rotate(-8deg);} 60%{transform:translateY(40vh) translateX(-15px) rotate(8deg);} 80%{transform:translateY(20vh) translateX(15px) rotate(-8deg);} 100%{transform:translateY(-40px) translateX(0) rotate(0deg);} }
+
+  /* ===== GENERIC WEB-SLINGER HERO (not any copyrighted character) ===== */
+  .webslinger { position:fixed; top:35vh; left:-120px; width:90px; height:90px; z-index:180; pointer-events:none;
+    animation: heroSwing 14s ease-in-out infinite; }
+  @keyframes heroSwing {
+    0%   { left:-120px; top:55vh; transform: rotate(-18deg); }
+    4%   { top:20vh; transform: rotate(10deg); }
+    8%   { top:50vh; transform: rotate(-14deg); }
+    12%  { top:18vh; transform: rotate(12deg); }
+    16%  { top:48vh; transform: rotate(-12deg); }
+    20%  { top:22vh; transform: rotate(10deg); }
+    24%  { top:45vh; transform: rotate(-8deg); }
+    28%  { left:110vw; top:30vh; transform: rotate(0deg); }
+    100% { left:110vw; top:30vh; transform: rotate(0deg); }
+  }
+  .web-strand { position:fixed; z-index:179; pointer-events:none; opacity:0; }
+  .web-strand.shoot1 { animation: webShoot 14s ease-in-out infinite; }
+  .web-strand.shoot2 { animation: webShoot2 14s ease-in-out infinite; }
+  @keyframes webShoot {
+    0%,2% { opacity:0; }
+    3% { opacity:1; }
+    6% { opacity:0; }
+    100% { opacity:0; }
+  }
+  @keyframes webShoot2 {
+    10%,12% { opacity:0; }
+    13% { opacity:1; }
+    16% { opacity:0; }
+    100% { opacity:0; }
+  }
+
+  .shake { animation: shakebig .05s; }
+  @keyframes shakebig { 0%,100%{transform:translateX(0) rotate(-1deg);} 20%{transform:translateX(-10px) rotate(2deg);} 40%{transform:translateX(10px) rotate(-2deg);} 60%{transform:translateX(-10px) rotate(2deg);} 80%{transform:translateX(10px) rotate(-1deg);} }
+
+  #status { margin-top:.8rem; font-size:.78rem; font-weight:800; min-height:20px; color:#ff3300; text-shadow:1px 1px #fff; }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background:#000; color:#39ff14; font-family:monospace; font-weight:bold; font-size:.85rem;
+    padding: 10px 18px; border:2px solid #ff3300; border-radius:10px; z-index: 200;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1); pointer-events:none;
+    max-width: 85vw; text-align:center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ===== INTRO GATE ===== -->
+<div id="introScreen">
+  <div class="intro-emoji">🤮</div>
+  <h2>ARRE RUKO ZARA, SOCH LO BHAI</h2>
+  <p>⚠️ Yeh signup form nautanki hai. Andar ghusne ke baad naa rona, naa kisi ko dosh dena. Har click par ek naya taana milega. Himmat hai toh aage badho, warna wapas ja bhi sakte ho (spoiler: back button bhi kaam nahi karega).</p>
+  <button id="enterBtn" type="button">😤 CHAL, GHUS JA ANDAR 😤</button>
+  <div id="loadingWrap">
+    <div class="loadbar-outer"><div class="loadbar-inner" id="loadbarInner"></div></div>
+    <div id="loadingMsg">Tera naseeb load ho raha hai...</div>
+  </div>
+</div>
+
+<div class="toast" id="toastBox">Sunle bhai...</div>
+
+<span class="spider" style="left:10vw; animation: crawlDown 6s linear infinite;">
+  <svg class="legs" viewBox="0 0 100 60" width="34" height="24" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#0a0a0a" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M40,28 Q20,10 5,4"/><path d="M40,28 Q18,20 2,20"/><path d="M40,28 Q20,32 4,38"/><path d="M40,28 Q22,42 8,52"/>
+      <path d="M55,28 Q75,10 92,4"/><path d="M55,28 Q78,20 96,20"/><path d="M55,28 Q76,32 94,38"/><path d="M55,28 Q74,42 88,52"/>
+    </g>
+    <ellipse cx="47" cy="30" rx="10" ry="8" fill="#0a0a0a"/>
+    <circle cx="60" cy="26" r="6" fill="#0a0a0a"/>
+  </svg>
+</span>
+<span class="spider" style="left:85vw; animation: crawlDown 8s linear infinite 1.5s;">
+  <svg class="legs" viewBox="0 0 100 60" width="30" height="20" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#0a0a0a" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M40,28 Q20,10 5,4"/><path d="M40,28 Q18,20 2,20"/><path d="M40,28 Q20,32 4,38"/><path d="M40,28 Q22,42 8,52"/>
+      <path d="M55,28 Q75,10 92,4"/><path d="M55,28 Q78,20 96,20"/><path d="M55,28 Q76,32 94,38"/><path d="M55,28 Q74,42 88,52"/>
+    </g>
+    <ellipse cx="47" cy="30" rx="10" ry="8" fill="#0a0a0a"/>
+    <circle cx="60" cy="26" r="6" fill="#0a0a0a"/>
+  </svg>
+</span>
+<span class="spider" style="top:15vh; animation: crawlSide 7s linear infinite .8s;">
+  <svg class="legs" viewBox="0 0 100 60" width="34" height="24" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#0a0a0a" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M40,28 Q20,10 5,4"/><path d="M40,28 Q18,20 2,20"/><path d="M40,28 Q20,32 4,38"/><path d="M40,28 Q22,42 8,52"/>
+      <path d="M55,28 Q75,10 92,4"/><path d="M55,28 Q78,20 96,20"/><path d="M55,28 Q76,32 94,38"/><path d="M55,28 Q74,42 88,52"/>
+    </g>
+    <ellipse cx="47" cy="30" rx="10" ry="8" fill="#0a0a0a"/>
+    <circle cx="60" cy="26" r="6" fill="#0a0a0a"/>
+  </svg>
+</span>
+<span class="spider" style="top:70vh; animation: crawlSide 9s linear infinite 2.5s;">
+  <svg class="legs" viewBox="0 0 100 60" width="28" height="18" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#0a0a0a" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M40,28 Q20,10 5,4"/><path d="M40,28 Q18,20 2,20"/><path d="M40,28 Q20,32 4,38"/><path d="M40,28 Q22,42 8,52"/>
+      <path d="M55,28 Q75,10 92,4"/><path d="M55,28 Q78,20 96,20"/><path d="M55,28 Q76,32 94,38"/><path d="M55,28 Q74,42 88,52"/>
+    </g>
+    <ellipse cx="47" cy="30" rx="10" ry="8" fill="#0a0a0a"/>
+    <circle cx="60" cy="26" r="6" fill="#0a0a0a"/>
+  </svg>
+</span>
+<span class="spider" style="left:50vw; animation: crawlUp 10s linear infinite 3s;">
+  <svg class="legs" viewBox="0 0 100 60" width="34" height="24" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#0a0a0a" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M40,28 Q20,10 5,4"/><path d="M40,28 Q18,20 2,20"/><path d="M40,28 Q20,32 4,38"/><path d="M40,28 Q22,42 8,52"/>
+      <path d="M55,28 Q75,10 92,4"/><path d="M55,28 Q78,20 96,20"/><path d="M55,28 Q76,32 94,38"/><path d="M55,28 Q74,42 88,52"/>
+    </g>
+    <ellipse cx="47" cy="30" rx="10" ry="8" fill="#0a0a0a"/>
+    <circle cx="60" cy="26" r="6" fill="#0a0a0a"/>
+  </svg>
+</span>
+
+<!-- Generic masked web-slinger hero, swings across once per intro then repeats every 14s -->
+<svg class="webslinger" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="10" x2="50" y2="35" stroke="#ccc" stroke-width="1.5" opacity=".8"/>
+  <circle cx="50" cy="30" r="14" fill="#1a1a1a"/>
+  <path d="M38,26 Q50,18 62,26" fill="none" stroke="#fff" stroke-width="2"/>
+  <ellipse cx="44" cy="27" rx="4" ry="3" fill="#fff"/>
+  <ellipse cx="56" cy="27" rx="4" ry="3" fill="#fff"/>
+  <rect x="40" y="42" width="20" height="28" rx="6" fill="#222"/>
+  <line x1="40" y1="48" x2="18" y2="38" stroke="#222" stroke-width="7" stroke-linecap="round"/>
+  <line x1="60" y1="48" x2="82" y2="38" stroke="#222" stroke-width="7" stroke-linecap="round"/>
+  <line x1="46" y1="70" x2="40" y2="95" stroke="#222" stroke-width="8" stroke-linecap="round"/>
+  <line x1="54" y1="70" x2="60" y2="95" stroke="#222" stroke-width="8" stroke-linecap="round"/>
+</svg>
+<svg class="web-strand shoot1" style="top:38vh; left:-30px; width:220px; height:60px;" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10,10 Q100,0 210,45" stroke="#eee" stroke-width="2" fill="none"/>
+</svg>
+<svg class="web-strand shoot2" style="top:22vh; left:40vw; width:220px; height:60px;" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10,45 Q100,55 210,5" stroke="#eee" stroke-width="2" fill="none"/>
+</svg>
+
+<!-- Original dustbin illustration with trash + buzzing insects -->
+<div class="dustbin-corner">
+  <svg viewBox="0 0 110 140" width="110" height="140" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="55" cy="132" rx="30" ry="6" fill="#000" opacity=".35"/>
+    <path d="M22,45 L30,125 Q55,132 80,125 L88,45 Z" fill="#3a5a1f" stroke="#1f3310" stroke-width="3"/>
+    <path d="M28,55 L34,120" stroke="#1f3310" stroke-width="2" opacity=".6"/>
+    <path d="M55,52 L57,122" stroke="#1f3310" stroke-width="2" opacity=".6"/>
+    <path d="M82,55 L76,120" stroke="#1f3310" stroke-width="2" opacity=".6"/>
+    <path d="M18,40 Q55,50 92,40 L88,48 Q55,58 22,48 Z" fill="#274a15" stroke="#1f3310" stroke-width="2"/>
+    <g class="bin-lid">
+      <ellipse cx="20" cy="38" rx="9" ry="9" fill="#274a15" stroke="#1f3310" stroke-width="2"/>
+      <path d="M20,30 L58,14 Q64,12 64,18 L64,22 Q64,26 58,27 L20,38 Z" fill="#345f1e" stroke="#1f3310" stroke-width="2"/>
+    </g>
+    <path d="M35,20 Q45,5 60,10" fill="none" stroke="#8a7043" stroke-width="4" stroke-linecap="round"/>
+    <path d="M52,16 L70,26 L58,34 Z" fill="#c9a24b"/>
+    <ellipse cx="46" cy="24" rx="4" ry="9" fill="#e8e8e8" transform="rotate(-25 46 24)"/>
+    <circle cx="50" cy="30" r="5" fill="#7a5230"/>
+  </svg>
+</div>
+
+<span class="bin-insect" style="left:8px; bottom:100px; animation: buzzLoop1 1.1s ease-in-out infinite;">
+  <svg width="14" height="10" viewBox="0 0 14 10" xmlns="http://www.w3.org/2000/svg">
+    <ellipse class="wings" cx="7" cy="4" rx="6" ry="2.4" fill="#cfcfcf" opacity=".7"/>
+    <ellipse cx="7" cy="5.5" rx="3" ry="2" fill="#111"/>
+  </svg>
+</span>
+<span class="bin-insect" style="left:70px; bottom:118px; animation: buzzLoop2 .9s ease-in-out infinite .2s;">
+  <svg width="12" height="9" viewBox="0 0 14 10" xmlns="http://www.w3.org/2000/svg">
+    <ellipse class="wings" cx="7" cy="4" rx="6" ry="2.4" fill="#cfcfcf" opacity=".7"/>
+    <ellipse cx="7" cy="5.5" rx="3" ry="2" fill="#111"/>
+  </svg>
+</span>
+<span class="bin-insect" style="left:35px; bottom:95px; animation: buzzLoop1 1.3s ease-in-out infinite .5s;">
+  <svg width="13" height="9" viewBox="0 0 14 10" xmlns="http://www.w3.org/2000/svg">
+    <ellipse class="wings" cx="7" cy="4" rx="6" ry="2.4" fill="#cfcfcf" opacity=".7"/>
+    <ellipse cx="7" cy="5.5" rx="3" ry="2" fill="#111"/>
+  </svg>
+</span>
+
+<div class="card" id="card">
+  <span class="flies" style="top:-10px; left:-10px;">🪰</span>
+  <span class="flies" style="top:-10px; right:-10px; animation-delay:1.5s;">🪳</span>
+
+  <div class="badge">🤮 Grade-Z "Bhai Yahi Sahi Hai" Signup</div>
+  <h1>Login Raunak Ka Jaadu</h1>
+  <p class="subtitle">Fake ID chalega, dignity nahi chalegi. Terms & Conditions: hum kuch bhi keh sakte hai.</p>
+
+  <div class="insult-banner"><span>🚨 warning: yeh form ek nashe mein tune banaya gaya hai 🚨 tera form bharna already fail ho chuka hai 🚨 abbe form bhar na, drama mat kar 🚨 404: izzat not found 🚨 HAHAHAHA 🚨</span></div>
+
+  <div class="form-group">
+    <label><span>Naam Batao (jhoothi ho toh bhi chalega)</span></label>
+    <input type="text" class="input-box" id="nameInput" placeholder="Chintu / Pintu / Golu, kuch bhi likh de">
+  </div>
+
+  <div class="form-group">
+    <label><span>Mobile Number (hum spam karenge)</span></label>
+    <input type="text" class="input-box" id="phoneInput" placeholder="98XXXXXXXX (fake bhi chalega bhai)">
+  </div>
+
+  <div class="form-group">
+    <label><span>Password (dard sehne ke liye taiyaar ho jao)</span></label>
+    <input type="text" class="input-box" id="pwInput" placeholder="kuch bhi tabaahi machaa de">
+  </div>
+
+  <div class="rules-box">
+    <div class="rules-head"><span>😤 Signup ke Sacred Niyam</span><span id="rulesPassing">0/4</span></div>
+    <div id="r-len" class="rule err"><span class="r-icon">✗</span><span>Password mein kam se kam 8 letters hone chahiye, warna bhaag ja.</span></div>
+    <div id="r-word" class="rule err"><span class="r-icon">✗</span><span>Password mein "BHAI" ya "YAAR" zaroor hona chahiye.</span></div>
+    <div id="r-num" class="rule err"><span class="r-icon">✗</span><span>Ek number hona chahiye, ginti bhool gaya kya?</span></div>
+    <div id="r-emoji" class="rule err"><span class="r-icon">✗</span><span>Naam mein koi emoji ya symbol nahi chalega, seedha likh.</span></div>
+  </div>
+
+  <div class="submit-zone" id="submitZone">
+    <button type="button" class="submit-btn" id="signupBtn" style="left:50%; top:0px; transform:translateX(-50%);">😈 SIGNUP KAR & PACHTA 😈</button>
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<div class="clown-bubble" id="clownBox" style="display:none;">
+  <div class="clown-avatar">🤡</div>
+  <div>
+    <div class="clown-title">Pappu Ustad (IT Wala Bhai)
+      <button type="button" id="muteBtn" style="font-size:.6rem; padding:2px 6px; border-radius:6px; border:1px solid #39ff14; background:#001a00; color:#39ff14; cursor:pointer; margin-left:6px;">🔊 ON</button>
+      <button type="button" id="testVoiceBtn" style="font-size:.6rem; padding:2px 6px; border-radius:6px; border:1px solid #ffcc00; background:#331a00; color:#ffcc00; cursor:pointer; margin-left:4px;">🗣️ TEST</button>
+    </div>
+    <div class="clown-text" id="clownMsg">Aa gaya bhai, ab dekh tera kya hota hai.</div>
+    <div class="clown-text" id="voiceStatus" style="color:#ff6666; font-size:.62rem; margin-top:4px;"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== AUDIO ===================== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function beep(freq, duration = 0.08, type = "sine") {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+  } catch (e) {}
+}
+function laughSound() {
+  [400, 500, 350, 600, 300].forEach((f, i) => setTimeout(() => beep(f, 0.12, "square"), i * 90));
+}
+function funnyClickSound() {
+  try {
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "square";
+    const base = 180 + Math.random() * 60;
+    osc.frequency.setValueAtTime(base, t);
+    osc.frequency.exponentialRampToValueAtTime(base * 4, t + 0.12);
+    gain.gain.setValueAtTime(0.09, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.16);
+  } catch (e) {}
+}
+
+/* ===================== DIFFERENT HINDI/HINGLISH LINE PER BUTTON ===================== */
+const dialogueBank = {
+  spin:   ["Ghoom ghoom ke chakkar aa gaya kya?","Arre yeh koi lottery nahi hai bhai.","Ruk zara, kismat abhi soch rahi hai."],
+  keep:   ["Le liya? Ab pachtayega.","Waah, kya selection hai — bilkul bekaar.","Yeh letter bhi teri tarah bekaar nikla."],
+  name:   ["Naam toh sun liya, yakeen nahi hota.","Itna ajeeb naam maine pehli baar suna.","Chintu ho ya Pintu, form toh reject hi hoga."],
+  phone:  ["Number diya? Spam calls ready hai bhai.","Yeh number kaam ka bhi hai ya bas timepass?","Ek call aayegi, 'aapka signup fail ho gaya' — bolne ke liye."],
+  pw:     ["Yeh password? Bhai himmat hai teri.","Itna kamzor password dekh ke rona aa gaya.","Isse accha toh mera QWERTY hai."],
+  submit_fail: ["Abbe rules toh padh le pehle!","Itni jaldi kya hai, form adhoora hai.","Nautanki band kar, sahi se bhar."],
+  submit_ok:   ["Chal maan gaya, tu jeeta main haara.","Itni mehnat ke baad bhi result wahi bekaar hai.","Signup ho gaya, ab pachtaava mat karna."],
+  generic: ["Kya kar raha hai bhai, seriously?","Yeh sab dekh ke hasi aa rahi hai.","Bas kar pagle, rulayega kya.","Tune socha yeh easy hoga? HAHAHA.","Time waste ho raha hai tera, mera nahi."]
+};
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  funnyClickSound();
+});
+
+function showToast(text) {
+  const toast = document.getElementById("toastBox");
+  toast.textContent = text;
+  toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove("show"), 1800);
+}
+function randomLine(key) {
+  const arr = dialogueBank[key] || dialogueBank.generic;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* ===================== INTRO / GATE SCREEN ===================== */
+const introScreen = document.getElementById("introScreen");
+const enterBtn = document.getElementById("enterBtn");
+const loadingWrap = document.getElementById("loadingWrap");
+const loadbarInner = document.getElementById("loadbarInner");
+const loadingMsg = document.getElementById("loadingMsg");
+
+const loadingLines = [
+  "Tera naseeb load ho raha hai...",
+  "Bhai log ko bulaya ja raha hai...",
+  "Form ko aur bekaar banaya ja raha hai...",
+  "Raccoon se salah li ja rahi hai...",
+  "Izzat ko safely hataya ja raha hai...",
+  "Almost ready to reject you..."
+];
+
+enterBtn.addEventListener("click", () => {
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  showToast(randomLine("generic"));
+  enterBtn.style.display = "none";
+  loadingWrap.classList.add("show");
+  let pct = 0, lineIdx = 0;
+  loadingMsg.textContent = loadingLines[0];
+  const interval = setInterval(() => {
+    pct += Math.random() * 18 + 4;
+    if (pct >= 100) pct = 100;
+    loadbarInner.style.width = pct + "%";
+    lineIdx = Math.min(loadingLines.length - 1, Math.floor((pct / 100) * loadingLines.length));
+    loadingMsg.textContent = loadingLines[lineIdx];
+    beep(300 + pct * 4, 0.04);
+    if (pct >= 100) {
+      clearInterval(interval);
+      laughSound();
+      loadingMsg.textContent = "Ho gaya! (result ki guarantee nahi hai)";
+      setTimeout(() => {
+        introScreen.classList.add("hidden");
+        document.getElementById("clownBox").style.display = "flex";
+        pickHindiVoice();
+        triggerClown("Aa gaya bhai, ab dekh tera kya hota hai.");
+      }, 500);
+    }
+  }, 220);
+});
+
+/* ===================== FORM STATE ===================== */
+const nameInput = document.getElementById("nameInput");
+const phoneInput = document.getElementById("phoneInput");
+const pwInput = document.getElementById("pwInput");
+
+nameInput.addEventListener("input", () => { showToast(randomLine("name")); triggerClown(randomLine("name")); updateForm(); });
+phoneInput.addEventListener("input", () => { showToast(randomLine("phone")); triggerClown(randomLine("phone")); updateForm(); });
+pwInput.addEventListener("input", () => { showToast(randomLine("pw")); triggerClown(randomLine("pw")); updateForm(); });
+
+function updateForm() {
+  const pw = pwInput.value;
+  const name = nameInput.value;
+
+  const okLen = pw.length >= 8;
+  toggleRule("r-len", okLen);
+
+  const okWord = /bhai|yaar/i.test(pw);
+  toggleRule("r-word", okWord);
+
+  const okNum = /[0-9]/.test(pw);
+  toggleRule("r-num", okNum);
+
+  const okEmoji = /^[A-Za-z ]*$/.test(name) && name.length > 0;
+  toggleRule("r-emoji", okEmoji);
+
+  const count = [okLen, okWord, okNum, okEmoji].filter(Boolean).length;
+  document.getElementById("rulesPassing").innerText = `${count}/4`;
+  return okLen && okWord && okNum && okEmoji;
+}
+
+function toggleRule(id, ok) {
+  const el = document.getElementById(id);
+  const icon = el.querySelector(".r-icon");
+  el.className = ok ? "rule ok" : "rule err";
+  icon.innerText = ok ? "✓" : "✗";
+}
+
+/* ===================== EVASIVE, WANDERING SIGNUP BUTTON ===================== */
+const signupBtn = document.getElementById("signupBtn");
+const submitZone = document.getElementById("submitZone");
+
+function randomSpotInZone() {
+  const zoneW = submitZone.clientWidth;
+  const zoneH = submitZone.clientHeight;
+  const btnW = signupBtn.offsetWidth || 230;
+  const btnH = signupBtn.offsetHeight || 56;
+  const x = Math.random() * Math.max(0, zoneW - btnW);
+  const y = Math.random() * Math.max(0, zoneH - btnH);
+  return { x, y };
+}
+function moveButtonRandomly() {
+  const pos = randomSpotInZone();
+  signupBtn.style.transform = "none";
+  signupBtn.style.left = pos.x + "px";
+  signupBtn.style.top = pos.y + "px";
+}
+setInterval(() => {
+  if (document.getElementById("clownBox").style.display === "flex") moveButtonRandomly();
+}, 2600);
+
+signupBtn.addEventListener("mouseenter", () => {
+  const ok = updateForm();
+  moveButtonRandomly();
+  const line = ok ? randomLine("submit_ok") : randomLine("submit_fail");
+  showToast(line);
+  triggerClown(line);
+});
+
+const statusEl = document.getElementById("status");
+const card = document.getElementById("card");
+signupBtn.addEventListener("click", () => {
+  const ok = updateForm();
+  if (!ok) {
+    moveButtonRandomly();
+    const line = randomLine("submit_fail");
+    showToast(line);
+    triggerClown(line);
+    card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+    return;
+  }
+  card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+  laughSound();
+  const line = randomLine("submit_ok");
+  showToast(line);
+  triggerClown(line);
+  statusEl.textContent = "🎉 'Signup successful'?! Review mein 6-8 janam lagenge. Waise bhi lol.";
+});
+
+/* ===================== PAPPU USTAD: SECOND MASCOT VOICE (HINDI TTS) ===================== */
+let voiceOn = true;
+let hindiVoice = null;
+const voiceStatusEl = () => document.getElementById("voiceStatus");
+
+function pickHindiVoice() {
+  if (!('speechSynthesis' in window)) {
+    voiceStatusEl().textContent = "TTS not supported on this browser";
+    hindiVoice = null;
+    return;
+  }
+
+  function selectVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    // Bhojpuri isn't a standard voice on most engines/OSes, so we look for it first,
+    // then fall back to Hindi (closest widely-available relative), then default.
+    hindiVoice = voices.find(v => v.lang === 'bho' || v.lang === 'bho-IN')
+              || voices.find(v => /bhojpuri/i.test(v.name))
+              || voices.find(v => v.lang === 'hi-IN')
+              || voices.find(v => v.lang.startsWith('hi'))
+              || voices.find(v => /hindi/i.test(v.name));
+
+    if (hindiVoice) {
+      voiceStatusEl().textContent = `Voice: ${hindiVoice.name}`;
+    } else {
+      voiceStatusEl().textContent = "Bhojpuri/Hindi voice not found, using default";
+    }
+  }
+
+  selectVoice();
+  // Voices load asynchronously in some browsers (especially Chrome) — retry once ready
+  if (window.speechSynthesis.getVoices().length === 0) {
+    window.speechSynthesis.onvoiceschanged = selectVoice;
+  }
+}
+
+function speakLine(text) {
+  if (!voiceOn || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel(); // stop overlapping lines
+    const utter = new SpeechSynthesisUtterance(text);
+    if (hindiVoice) utter.voice = hindiVoice;
+    utter.lang = hindiVoice ? hindiVoice.lang : 'hi-IN';
+    utter.rate = 1.05;
+    utter.pitch = 1.1;
+    window.speechSynthesis.speak(utter);
+  } catch (e) {}
+}
+
+function triggerClown(msg) {
+  const clownBox = document.getElementById("clownBox");
+  document.getElementById("clownMsg").textContent = msg;
+  speakLine(msg);
+  clownBox.classList.remove("shake"); void clownBox.offsetWidth; clownBox.classList.add("shake");
+}
+
+document.getElementById("muteBtn").addEventListener("click", (e) => {
+  voiceOn = !voiceOn;
+  e.target.textContent = voiceOn ? "🔊 ON" : "🔇 OFF";
+  if (!voiceOn && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+});
+
+document.getElementById("testVoiceBtn").addEventListener("click", () => {
+  speakLine("Aa gaya bhai, ab dekh tera kya hota hai.");
+});
+</script>
+</body>
+</html>

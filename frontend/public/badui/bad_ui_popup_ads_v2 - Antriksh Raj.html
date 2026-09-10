@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🎉🎉 CONGRATULATIONS!!! - TotallyLegitSite.com 🎉🎉</title>
+<style>
+  * { box-sizing: border-box; }
+  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes rainbow {
+    0%{color:red} 16%{color:orange} 33%{color:yellow}
+    50%{color:lime} 66%{color:cyan} 83%{color:blue} 100%{color:magenta}
+  }
+  @keyframes shake {
+    0%,100%{transform:translate(0,0) rotate(0deg)}
+    25%{transform:translate(-6px,3px) rotate(-2deg)}
+    50%{transform:translate(6px,-3px) rotate(2deg)}
+    75%{transform:translate(-3px,-6px) rotate(2deg)}
+  }
+  @keyframes bounceY { 0%,100%{top:0} 50%{top:85vh} }
+  @keyframes bounceX { 0%,100%{left:0} 50%{left:85vw} }
+  @keyframes glitch {
+    0%{ clip-path: inset(10% 0 60% 0); transform: translate(-4px,2px);}
+    20%{ clip-path: inset(60% 0 10% 0); transform: translate(4px,-2px);}
+    40%{ clip-path: inset(30% 0 40% 0); transform: translate(-3px,1px);}
+    60%{ clip-path: inset(70% 0 5% 0); transform: translate(3px,-1px);}
+    80%{ clip-path: inset(15% 0 55% 0); transform: translate(-2px,2px);}
+    100%{ clip-path: inset(45% 0 25% 0); transform: translate(2px,-2px);}
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+  @keyframes fillbar { from{width:0%} to{width:97%} }
+  @keyframes wheelspin { from{transform:rotate(0deg)} to{transform:rotate(1440deg)} }
+
+  body {
+    background: repeating-linear-gradient(45deg,#ff00ff,#ff00ff 10px,#00ffff 10px,#00ffff 20px);
+    font-family:"Comic Sans MS", cursive, sans-serif;
+    margin:0; overflow-x:hidden; min-height:100vh;
+    cursor: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='), auto;
+  }
+  h1 {
+    text-align:center; font-size:56px;
+    animation: rainbow 2s infinite, shake .3s infinite;
+    text-shadow:3px 3px 0 black; margin-top:10px;
+  }
+  marquee { background:yellow; font-size:26px; font-weight:bold; border:5px dashed red; }
+  .content {
+    background:white; margin:20px auto; padding:20px; width:min(600px,85%);
+    border:10px ridge lime; font-size:19px; position:relative; z-index:2;
+  }
+  .stars { color:gold; font-size:26px; animation: pulse 1s infinite; }
+  .flashy-btn {
+    display:block; margin:15px auto; padding:18px 36px; font-size:22px;
+    background:gold; border:5px outset red; animation:shake .15s infinite; cursor:pointer;
+  }
+  .popup {
+    position:fixed; background:#eee; border:6px double red; box-shadow:0 0 30px black;
+    padding:14px; z-index:999; font-weight:bold; text-align:center;
+  }
+  .popup img { width:55px; animation:spin 1s linear infinite; }
+  .close-btn {
+    background:red; color:white; border:2px solid black; padding:5px 12px;
+    margin-top:8px; cursor:pointer; font-weight:bold;
+  }
+  .siren {
+    position:fixed; top:0; left:0; width:100%; height:100%; background:red;
+    opacity:0; pointer-events:none; animation:blink .4s infinite; z-index:1;
+  }
+  .floating-ad {
+    position:fixed; background:orange; padding:10px; border:3px solid black;
+    font-weight:bold; z-index:998; cursor:pointer;
+  }
+  .bounce-y { animation: bounceY 4s linear infinite; }
+  .bounce-x { animation: bounceX 5s linear infinite; }
+  #bottom-banner {
+    position:fixed; bottom:0; left:0; width:100%; background:black; color:lime;
+    text-align:center; padding:14px; font-size:20px; animation:blink 1s infinite; z-index:997;
+  }
+  ::-webkit-scrollbar { width:25px; background:repeating-linear-gradient(red,yellow,green); }
+
+  /* Fake AI chatbot bubble */
+  #chatbot {
+    position:fixed; bottom:60px; right:20px; width:230px; background:#fffbe6;
+    border:4px solid purple; padding:10px; z-index:996; font-size:14px; font-weight:bold;
+  }
+  #chatbot .head { background:purple; color:white; padding:5px; margin:-10px -10px 8px -10px; }
+
+  /* Fake "ad blocker detected" full screen overlay */
+  #blocker-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.92); color:white; z-index:2000;
+    display:none; text-align:center; padding-top:12vh; font-size:22px;
+  }
+  #blocker-overlay button {
+    margin-top:20px; padding:14px 30px; font-size:20px; background:red; color:white;
+    border:4px outset darkred; cursor:pointer;
+  }
+  .glitch-text {
+    display:inline-block; position:relative; color:red;
+  }
+  .glitch-text::before, .glitch-text::after {
+    content: attr(data-text); position:absolute; left:0; top:0; width:100%;
+  }
+  .glitch-text::before { color:cyan; animation:glitch 0.6s infinite; z-index:-1; }
+  .glitch-text::after { color:lime; animation:glitch 0.5s infinite reverse; z-index:-2; }
+
+  /* Fake progress bar that never finishes */
+  #scanbar-wrap { background:#333; height:22px; border:2px solid white; width:90%; margin:10px auto; }
+  #scanbar { background:lime; height:100%; width:0%; animation: fillbar 6s ease-in-out infinite alternate; }
+
+  /* Fake spin-the-wheel */
+  #wheel-container { text-align:center; margin:15px 0; }
+  #wheel {
+    width:110px; height:110px; margin:0 auto; border-radius:50%;
+    background: conic-gradient(red 0 25%, gold 0 50%, lime 0 75%, dodgerblue 0 100%);
+    border:5px solid black; position:relative;
+  }
+  #wheel.spinning { animation: wheelspin 3s ease-out forwards; }
+  #wheel-pointer { font-size:24px; }
+
+  /* cursor trail dot */
+  .trail-dot {
+    position:fixed; width:10px; height:10px; border-radius:50%;
+    background:hotpink; pointer-events:none; z-index:1500; opacity:0.8;
+  }
+
+  /* fake notification stack */
+  #notif-stack { position:fixed; top:70px; left:10px; z-index:995; }
+  .notif {
+    background:#222; color:#0f0; border:2px solid #0f0; padding:8px 12px;
+    margin-bottom:6px; font-size:13px; font-family:monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="siren"></div>
+<div id="blocker-overlay">
+  <p>🚫 <span class="glitch-text" data-text="AD BLOCKER DETECTED!">AD BLOCKER DETECTED!</span></p>
+  <p style="font-size:16px;">Please disable your ad blocker to view this extremely important content.</p>
+  <button onclick="document.getElementById('blocker-overlay').style.display='none'">I have definitely disabled it</button>
+</div>
+
+<h1>⚠️ CONGRATULATIONS VISITOR!!! ⚠️</h1>
+<marquee behavior="alternate" scrollamount="15">🏆 YOU ARE THE 1,000,000th VISITOR!!! CLICK ANYWHERE TO CLAIM YOUR PRIZE!!! 🏆</marquee>
+
+<div class="content">
+  <p class="stars">★★★★★ (Rated #1 Website by 3 anonymous bots)</p>
+  <p>Welcome to our totally legit and trustworthy website. Please enjoy your visit while our system performs an extremely important scan.</p>
+
+  <div id="scanbar-wrap"><div id="scanbar"></div></div>
+  <p id="scan-label" style="text-align:center;font-size:14px;">Scanning device... 97% (this will never actually finish)</p>
+
+  <div id="wheel-container">
+    <div id="wheel"></div>
+    <p id="wheel-pointer">🔻</p>
+    <button class="flashy-btn" onclick="spinWheel()">🎡 SPIN TO WIN (You Won't)</button>
+  </div>
+
+  <button class="flashy-btn" onclick="spawnPopup()">🎁 CLICK HERE TO CLAIM FREE PRIZE 🎁</button>
+  <button class="flashy-btn" onclick="triggerBlocker()">💰 YOU WON $1,000,000 - CLICK NOW 💰</button>
+</div>
+
+<div class="floating-ad bounce-y" style="left:5%;">🔥 HOT SINGLES IN YOUR AREA 🔥</div>
+<div class="floating-ad bounce-x" style="top:15%;" onclick="spawnPopup()">🦠 YOUR DEVICE HAS 5 VIRUSES!! CLICK TO FIX</div>
+
+<div id="chatbot">
+  <div class="head">🤖 LiveChat Assistant (Online)</div>
+  <p id="chat-msg">Hi! I noticed you're browsing. Would you like to subscribe to 47 newsletters?</p>
+  <button class="close-btn" onclick="nextChat()">Reply</button>
+</div>
+
+<div id="notif-stack"></div>
+
+<div id="bottom-banner">🚨 DO NOT CLOSE THIS TAB - SCAN IN PROGRESS 🚨</div>
+
+<div id="popup-container"></div>
+
+<script>
+  const messages = [
+    "⚠️ VIRUS DETECTED! Click OK to remove (Warning: clicking OK does nothing useful)",
+    "🎉 You've won a free vacation to Nowhere! Claim within 0 seconds!",
+    "📉 Your computer is running slow. Download our totally-not-malware Speed Booster!",
+    "💌 Someone in your area wants to chat! (It's a bot)",
+    "🔔 Subscribe to our newsletter for more pop-ups like this one!",
+    "🎰 SPIN THE WHEEL! You already lost.",
+    "📸 Update your Flash Player (it's 2026, Flash doesn't exist)",
+    "🔋 Battery critically low. Click to charge via WiFi (not real)."
+  ];
+
+  const chatLines = [
+    "Hi! I noticed you're browsing. Would you like to subscribe to 47 newsletters?",
+    "Great choice! Now enter your card details to 'verify humanity'.",
+    "Our AI has detected you are a robot. Please prove you're human by clicking 12 ads.",
+    "Thanks! Redirecting you to a survey that will never end...",
+    "Just kidding. Or am I? 🤖"
+  ];
+  let chatIndex = 0;
+  function nextChat(){
+    chatIndex = (chatIndex + 1) % chatLines.length;
+    document.getElementById('chat-msg').textContent = chatLines[chatIndex];
+    pushNotif("New message from LiveChat Assistant 🤖");
+  }
+
+  let popupCount = 0;
+  function spawnPopup() {
+    popupCount++;
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    const top = Math.random()*70+5, left = Math.random()*70+5;
+    popup.style.top = top+'vh'; popup.style.left = left+'vw';
+    popup.style.width = (150+Math.random()*100)+'px';
+    const msg = messages[Math.floor(Math.random()*messages.length)];
+    popup.innerHTML = `
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='28' fill='red' stroke='yellow' stroke-width='4'/%3E%3C/svg%3E" />
+      <p>${msg}</p>
+      <button class="close-btn">✖ Close</button>
+    `;
+    popup.querySelector('.close-btn').addEventListener('click', function(e){
+      e.stopPropagation();
+      spawnPopup(); spawnPopup();
+    });
+    document.getElementById('popup-container').appendChild(popup);
+    pushNotif("New alert opened ("+popupCount+" total)");
+    if (popupCount > 30) {
+      const c = document.getElementById('popup-container');
+      if (c.children.length > 30) c.removeChild(c.children[0]);
+    }
+  }
+
+  function triggerBlocker(){
+    document.getElementById('blocker-overlay').style.display = 'block';
+  }
+
+  function spinWheel(){
+    const wheel = document.getElementById('wheel');
+    wheel.classList.remove('spinning');
+    void wheel.offsetWidth; // restart animation
+    wheel.classList.add('spinning');
+    setTimeout(()=>{ spawnPopup(); pushNotif("Wheel result: You get NOTHING 🎉"); }, 3000);
+  }
+
+  function pushNotif(text){
+    const stack = document.getElementById('notif-stack');
+    const n = document.createElement('div');
+    n.className = 'notif';
+    n.textContent = "> " + text;
+    stack.appendChild(n);
+    if (stack.children.length > 5) stack.removeChild(stack.children[0]);
+    setTimeout(()=>{ if(n.parentNode) n.parentNode.removeChild(n); }, 6000);
+  }
+
+  // Cursor trail of hearts/dots because why not
+  document.addEventListener('mousemove', (e) => {
+    if (Math.random() > 0.7) return; // throttle a bit
+    const dot = document.createElement('div');
+    dot.className = 'trail-dot';
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+    document.body.appendChild(dot);
+    setTimeout(()=> dot.remove(), 500);
+  });
+
+  window.addEventListener('load', () => {
+    setTimeout(spawnPopup, 1500);
+    setTimeout(triggerBlocker, 4000);
+    setTimeout(()=>pushNotif("Your free prize is expiring soon!"), 3000);
+    setTimeout(()=>pushNotif("14 people are viewing this page right now"), 6000);
+  });
+
+  let lastScroll = Date.now();
+  window.addEventListener('scroll', () => {
+    if (Date.now() - lastScroll > 3000) { spawnPopup(); lastScroll = Date.now(); }
+  });
+</script>
+
+</body>
+</html>

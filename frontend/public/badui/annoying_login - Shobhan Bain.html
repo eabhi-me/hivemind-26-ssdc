@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ultimate Annoying Login Page - Bad UI Competition</title>
+  <style>
+    :root {
+      --bg-primary: #0f111a;
+      --bg-card: #1a1d2d;
+      --text-main: #f0f3f8;
+      --text-muted: #8b9bb4;
+      --border-color: #313852;
+      --accent-gold: #ffd166;
+      --accent-red: #ef476f;
+      --accent-green: #06d6a0;
+      --accent-blue: #118ab2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Comic Neue', 'Segoe UI', cursive, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+      transition: background-color 0.3s, filter 0.3s;
+    }
+
+    body.flashbang-mode {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      filter: contrast(180%) brightness(130%);
+    }
+
+    .banner-ticker {
+      width: 100%;
+      max-width: 900px;
+      background: repeating-linear-gradient(
+        45deg,
+        #ffd166,
+        #ffd166 15px,
+        #111 15px,
+        #111 30px
+      );
+      color: #000;
+      padding: 8px;
+      text-align: center;
+      font-weight: 900;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(255, 209, 102, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .main-login-container {
+      width: 100%;
+      max-width: 900px;
+      background: var(--bg-card);
+      border: 3px solid #ff0055;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 71, 111, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed var(--border-color);
+      padding-bottom: 15px;
+    }
+
+    .title-box h1 {
+      font-size: 1.8rem;
+      color: var(--accent-gold);
+      text-shadow: 2px 2px 0px #e63946;
+    }
+
+    .title-box p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .control-btn {
+      background: #252a40;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+
+    .control-btn:hover {
+      background: #323957;
+      transform: translateY(-2px);
+    }
+
+    .section-box {
+      background: #131622;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .section-box.captcha-verified {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 15px rgba(6, 214, 160, 0.3);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      margin-bottom: 6px;
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-hint {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 15px;
+    }
+
+    /* 1. Username Roulette */
+    .roulette-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 320px;
+      height: 320px;
+    }
+
+    #roulette-canvas {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+    }
+
+    .roulette-side-panel {
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .ticker-display-box {
+      background: #000;
+      border: 2px solid #ffd166;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .ticker-label {
+      font-size: 0.75rem;
+      color: #ffd166;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .username-ticker {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #06d6a0;
+      letter-spacing: 4px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-break: break-all;
+    }
+
+    .roulette-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #ef476f, #d62828);
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(239, 71, 111, 0.4);
+      transition: all 0.2s;
+    }
+
+    .primary-btn:hover:not(:disabled) {
+      filter: brightness(1.15);
+      transform: translateY(-2px);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .danger-btn {
+      background: #3a151f;
+      border: 1px solid #ef476f;
+      color: #ef476f;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .danger-btn:hover {
+      background: #ef476f;
+      color: #fff;
+    }
+
+    /* 2. Password Matrix */
+    .password-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .retro-input {
+      flex: 1;
+      background: #080a10;
+      border: 2px solid var(--border-color);
+      color: #fff;
+      padding: 12px 16px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .retro-input:focus {
+      border-color: var(--accent-gold);
+    }
+
+    .strength-meter-container {
+      margin-bottom: 15px;
+    }
+
+    .strength-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: #252a40;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .strength-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #ef476f;
+      transition: width 0.3s, background-color 0.3s;
+    }
+
+    .strength-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .rule-card {
+      padding: 10px 14px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .rule-unmet {
+      background: #24141d;
+      border: 1px solid #5a1d2d;
+      color: #ffb4c6;
+    }
+
+    .rule-met {
+      background: #102a24;
+      border: 1px solid #06d6a0;
+      color: #c0f7e8;
+    }
+
+    .rule-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .rule-desc {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    /* 3. Screaming Captcha */
+    .captcha-words-wrapper {
+      background: #080a10;
+      border: 2px dashed #ef476f;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 20px rgba(239, 71, 111, 0.15);
+    }
+
+    .captcha-word-badge {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #ffd166;
+      text-shadow: 2px 2px 0px #ef476f, 4px 4px 0px #000;
+      letter-spacing: 3px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      font-family: 'Impact', 'Arial Black', sans-serif;
+    }
+
+    .audio-meter-panel {
+      background: #181d2e;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .meter-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .meter-track {
+      width: 100%;
+      height: 18px;
+      background: #090c14;
+      border-radius: 9px;
+      overflow: hidden;
+      border: 1px solid #333;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background: #06d6a0;
+      transition: width 0.05s ease;
+    }
+
+    .scream-progress-track {
+      width: 100%;
+      height: 12px;
+      background: #090c14;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .scream-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd166, #ef476f);
+      transition: width 0.1s ease;
+    }
+
+    .scream-hint {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #ffd166;
+      text-align: center;
+    }
+
+    .captcha-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .mic-btn {
+      background: #118ab2;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .mic-btn.mic-active {
+      background: #ef476f;
+      animation: pulse-border 1s infinite alternate;
+    }
+
+    @keyframes pulse-border {
+      from { box-shadow: 0 0 5px #ef476f; }
+      to { box-shadow: 0 0 20px #ef476f; }
+    }
+
+    .pump-btn {
+      background: #f4a261;
+      color: #111;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 0.95rem;
+      transition: transform 0.05s;
+    }
+
+    .pump-btn.pump-kick {
+      transform: scale(0.92);
+    }
+
+    /* 4. Terms of Service */
+    .terms-container {
+      background: #0d0f17;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .terms-scroll {
+      height: 70px;
+      overflow-y: scroll;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      padding-right: 6px;
+      margin-bottom: 10px;
+    }
+
+    .terms-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+
+    /* 5. Evasive Submit Zone */
+    .submit-zone {
+      position: relative;
+      min-height: 90px;
+      border: 2px dashed #454d6b;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    }
+
+    #btn-submit-login {
+      background: linear-gradient(135deg, #06d6a0, #118ab2);
+      color: #000;
+      font-size: 1.3rem;
+      font-weight: 900;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(6, 214, 160, 0.4);
+      transition: transform 0.1s;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.hidden {
+      display: none !important;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 3px solid var(--accent-gold);
+      border-radius: 14px;
+      padding: 25px;
+      max-width: 440px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      box-shadow: 0 0 30px rgba(255, 209, 102, 0.4);
+    }
+
+    .landed-char-box {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #06d6a0;
+      font-family: 'Courier New', monospace;
+      background: #090c14;
+      border: 2px solid #06d6a0;
+      border-radius: 12px;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .pulse-anim {
+      animation: pulse-scale 0.25s ease;
+    }
+
+    @keyframes pulse-scale {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Caution Ticker -->
+  <div class="banner-ticker">
+    ⚠️ CAUTION: BAD UI COMPETITION CHAMPIONSHIP ENTRY • ZERO REFUNDS • HIGH FRUSTRATION ZONE ⚠️
+  </div>
+
+  <!-- FORM CONTAINER -->
+  <form id="bad-ui-login-form" class="main-login-container" action="#" method="POST" autocomplete="off">
+    <!-- Header -->
+    <header class="header-section">
+      <div class="title-box">
+        <h1>💀 AUTHENTI-PAIN 9000</h1>
+        <p>The Most Inconvenient, Creative &amp; Annoying HTML Login Form Ever Devised</p>
+      </div>
+      <div class="controls-bar">
+        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+          <span id="volume-label" style="font-size: 0.75rem; color: #ffd166;">Annoyance Volume: 80% (Actual: 20%)</span>
+          <input type="range" id="inverted-volume-slider" min="0" max="100" value="80" style="cursor: pointer;">
+        </div>
+        <button type="button" id="btn-toggle-theme" class="control-btn" title="Flashbang Mode">☀️ Flashbang Mode</button>
+        <button type="button" onclick="downloadCurrentHTML()" class="control-btn" style="background: #06d6a0; color: #000; font-weight: bold;" title="Save this form to your computer">💾 Download .HTML</button>
+      </div>
+    </header>
+
+    <!-- STEP 1: USERNAME ROULETTE -->
+    <section class="section-box" id="username-section">
+      <div class="section-title">
+        <span>🎰 STEP 1: USERNAME OF DESTINY (ROULETTE)</span>
+        <span style="font-size: 0.8rem; color: #ffd166;">Min 3 Letters</span>
+      </div>
+      <p class="section-hint">
+        Typing is disabled for enhanced cryptographic entropy. Spin the roulette to select each letter. Wrong letter? Use the painful delete button.
+      </p>
+
+      <div class="roulette-wrapper">
+        <div class="canvas-container">
+          <canvas id="roulette-canvas" width="320" height="320"></canvas>
+        </div>
+
+        <div class="roulette-side-panel">
+          <div class="ticker-display-box">
+            <div class="ticker-label">Current Assembled Username</div>
+            <div id="username-display" class="username-ticker">(empty)</div>
+          </div>
+
+          <div class="roulette-actions">
+            <button id="btn-spin-roulette" class="primary-btn">
+              🎰 SPIN FOR NEXT LETTER
+            </button>
+            <button id="btn-delete-char" class="danger-btn">
+              🗑️ Delete Last Character (Risk of Butterfingers)
+            </button>
+          </div>
+          <input type="hidden" id="final-username-input" value="">
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2: PASSWORD MATRIX -->
+    <section class="section-box" id="password-section">
+      <div class="section-title">
+        <span>🔐 STEP 2: THE SACRED PASSWORD MATRIX</span>
+        <span style="font-size: 0.8rem; color: #ffd166;">6 Absurd Rules</span>
+      </div>
+      <p class="section-hint">
+        Our cyber-overlords require a password of extreme complexity. All 6 rules must be strictly obeyed.
+      </p>
+
+      <div class="password-input-group">
+        <input type="password" id="password-input" class="retro-input" placeholder="Type your impossible password here...">
+        <button id="btn-toggle-mask" class="control-btn">👁️ Reveal Reality</button>
+        <button id="btn-dog-hint" class="control-btn" title="Canine Assistance">🐶 Breed Hint</button>
+      </div>
+
+      <!-- Password Strength Meter -->
+      <div class="strength-meter-container">
+        <div class="strength-bar-bg">
+          <div id="strength-bar-fill" class="strength-bar-fill"></div>
+        </div>
+        <div id="strength-label" class="strength-label">💀 Strength: An unprotected toaster</div>
+      </div>
+
+      <!-- Live Rules Cards -->
+      <div id="password-rules-container" class="rules-grid"><div id="rule-length" class="rule-card rule-unmet">
+            <div class="rule-header">
+              <span class="rule-icon">❌</span>
+              <strong>Rule 1: Length Overkill</strong>
+            </div>
+            <p class="rule-desc">Password must be MORE than 12 characters (&gt;12).</p>
+          </div><div id="rule-caps" class="rule-card rule-unmet">
+            <div class="rule-header">
+              <span class="rule-icon">❌</span>
+              <strong>Rule 2: Loud Typing</strong>
+            </div>
+            <p class="rule-desc">Must contain at least 4 CAPITAL letters (A-Z).</p>
+          </div><div id="rule-symbols" class="rule-card rule-unmet">
+            <div class="rule-header">
+              <span class="rule-icon">❌</span>
+              <strong>Rule 3: Occult Signs</strong>
+            </div>
+            <p class="rule-desc">Must contain at least 3 signs / special symbols (!@#$%...).</p>
+          </div><div id="rule-month" class="rule-card rule-unmet">
+            <div class="rule-header">
+              <span class="rule-icon">❌</span>
+              <strong>Rule 4: The Astrological Calendar</strong>
+            </div>
+            <p class="rule-desc">Must contain the name of at least one MONTH (e.g. "January", "May").</p>
+          </div><div id="rule-day" class="rule-card rule-unmet">
+            <div class="rule-header">
+              <span class="rule-icon">❌</span>
+              <strong>Rule 5: The Daily Grind</strong>
+            </div>
+            <p class="rule-desc">Must contain at least one DAY of the week (e.g. "Monday", "Friday").</p>
+          </div><div id="rule-dog" class="rule-card rule-unmet">
+            <div class="rule-header">
+              <span class="rule-icon">❌</span>
+              <strong>Rule 6: Canine Loyalty Tax</strong>
+            </div>
+            <p class="rule-desc">Must contain the breed of a DOG (e.g. "Chihuahua", "GoldenRetriever", "Beagle", "Pug").</p>
+          </div></div>
+    </section>
+
+    <!-- STEP 3: SCREAMING CAPTCHA -->
+    <section class="section-box" id="captcha-section-card">
+      <div class="section-title">
+        <span>🗣️ STEP 3: THE 4-WORD SCREAMING CAPTCHA</span>
+        <span id="captcha-passed-badge" class="hidden" style="color: #06d6a0; font-weight: bold;">✅ VOCAL AGONY CONFIRMED</span>
+      </div>
+      <p class="section-hint">
+        Text captchas are solved by bots. To prove your biological humanity, loudly SHOUT the 4 captcha words below into your microphone!
+      </p>
+
+      <!-- Captcha Words Display -->
+      <div class="captcha-words-wrapper" id="captcha-words-container"><span class="captcha-word-badge" style="transform: rotate(4deg) translateY(-0.6px);">SCREAM</span><span class="captcha-word-badge" style="transform: rotate(-2.1deg) translateY(-0.8px);">KANGAROO</span><span class="captcha-word-badge" style="transform: rotate(-4.6deg) translateY(2.3px);">CACOPHONY</span><span class="captcha-word-badge" style="transform: rotate(-6.5deg) translateY(-1.8px);">POTATO</span></div>
+
+      <!-- Real-time Decibel Meter -->
+      <div class="audio-meter-panel">
+        <div class="meter-header">
+          <span>🎙️ Real-Time Microphone Scream Volume:</span>
+          <span id="decibel-value-display">30 dB (0%)</span>
+        </div>
+        <div class="meter-track">
+          <div id="decibel-meter-fill" class="meter-fill" style="width: 0%; background: rgb(6, 214, 160);"></div>
+        </div>
+
+        <div class="meter-header" style="margin-top: 8px;">
+          <span>⏳ Agony Duration Sustained (&gt;70% Volume):</span>
+          <span id="scream-hold-percent">0%</span>
+        </div>
+        <div class="scream-progress-track">
+          <div id="scream-hold-fill" class="scream-progress-fill" style="width: 0%;"></div>
+        </div>
+
+        <div id="scream-hint-text" class="scream-hint">💤 Whisper: Unacceptable. My pet goldfish is louder.</div>
+      </div>
+
+      <!-- Captcha Controls -->
+      <div class="captcha-actions">
+        <button id="btn-activate-mic" class="mic-btn">
+          🎤 ACTIVATE MIC &amp; SHOUT
+        </button>
+        <button id="btn-manual-pump" class="pump-btn" title="Mash spacebar or click rapidly to simulate shouting">
+          📢 EMERGENCY MANUAL BELLOW PUMP (Click/Mash)
+        </button>
+        <button id="btn-reroll-captcha" class="control-btn">
+          🎲 Reroll Words
+        </button>
+      </div>
+      <div id="mic-status-label" style="text-align: center; font-size: 0.8rem; color: #8b9bb4; margin-top: 6px;">
+        Microphone standby
+      </div>
+    </section>
+
+    <!-- STEP 4: TERMS OF EXTREME SUFFERING -->
+    <section class="terms-container">
+      <div class="terms-scroll" id="terms-scrollbox">
+        <strong>TERMS OF EXTREME SUFFERING &amp; END-USER TORMENT (EULA v99.4)</strong><br><br>
+        1. By attempting to log in, you surrender your rights to peace and quiet.<br>
+        2. You acknowledge that roulette wheel spins have zero statistical correlation with your desired username.<br>
+        3. You agree that dog breeds must be honored in all passwords across all digital dimensions.<br>
+        4. Any attempt to scroll through these terms faster than 450 pixels per second constitutes an intellectual copyright violation and will reset the scroll bar to the top immediately.<br>
+        5. The developers of this Bad UI competition entry reserve the right to laugh uproariously at your microphone screaming attempts.<br>
+        6. In accordance with Section 89 of the Chaotic Coding Code, your session may time out at any moment without prior notice.<br>
+        7. Congratulations on actually reading this far. You truly have nothing better to do.
+      </div>
+      <div class="terms-checkbox-row">
+        <input type="checkbox" id="terms-checkbox" style="cursor: pointer;">
+        <label for="terms-checkbox" style="cursor: pointer;">I solemnly swear that I have suffered enough and wish to submit this form.</label>
+      </div>
+    </section>
+
+    <!-- Hidden Captcha Verification Field -->
+    <input type="hidden" name="captcha_verified" id="captcha-verified-input" value="0">
+
+    <!-- STEP 5: EVASIVE SUBMIT & TRAP RESET ZONE -->
+    <div class="submit-zone">
+      <button type="submit" id="btn-submit-login">
+        🚀 SUBMIT LOGIN FORM (CATCH ME IF YOU CAN)
+      </button>
+      <button type="button" id="btn-reset-form" class="danger-btn" style="position: absolute; right: 15px; font-size: 0.75rem;">
+        ⚠️ Reset Entire Form
+      </button>
+    </div>
+  </form>
+
+  <!-- MODAL: Roulette Landed Letter Confirmation -->
+  <div id="roulette-result-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 style="color: #ffd166;">🎰 THE WHEEL HAS SPOKEN!</h2>
+      <div id="landed-letter-display" class="landed-char-box">?</div>
+      <p id="landed-letter-msg" style="font-size: 0.95rem; color: #f0f3f8;">
+        Is this letter part of your glorious username?
+      </p>
+      <div class="modal-actions">
+        <button id="btn-accept-letter" class="primary-btn" style="background: #06d6a0; color: #000;">
+          ✅ KEEP THIS LETTER
+        </button>
+        <button id="btn-discard-letter" class="danger-btn">
+          ❌ DISCARD &amp; SPIN AGAIN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Fake Loading Overlay -->
+  <div id="fake-loading-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 style="color: #ef476f;">⏳ VERIFYING EXISTENCE...</h2>
+      <div class="strength-bar-bg" style="height: 18px; margin: 15px 0;">
+        <div id="loading-bar-fill" class="strength-bar-fill" style="background: #ffd166; width: 0%;"></div>
+      </div>
+      <p id="loading-status-text" style="font-size: 0.9rem; color: #8b9bb4;">
+        Transmitting vocal cords to server...
+      </p>
+    </div>
+  </div>
+
+  <!-- MODAL: Victory Screen -->
+  <div id="victory-modal" class="modal-overlay hidden">
+    <div class="modal-content" style="border-color: #06d6a0;">
+      <h1 style="color: #06d6a0; font-size: 2.2rem;">🏆 GLORIOUS VICTORY!</h1>
+      <p style="font-size: 1.1rem;">
+        Welcome aboard, <strong id="victory-username-text" style="color: #ffd166;">User</strong>!
+      </p>
+      <p style="font-size: 0.9rem; color: #8b9bb4; line-height: 1.5;">
+        You conquered the Username Roulette, satisfied the Canine Password Matrix, and screamed your lungs out for the Captcha!
+      </p>
+      <div style="background: #090c14; border: 2px dashed #ffd166; padding: 12px; border-radius: 8px; font-weight: bold; color: #ffd166;">
+        BAD UI COMPETITION SCORE: 100 / 100 🌟
+      </div>
+      <button onclick="location.reload()" class="primary-btn" style="margin-top: 10px;">
+        🔄 PLAY AGAIN / SUFFER AGAIN
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Procedural Web Audio Synthesizer
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.masterGain = null;
+        this.volume = 0.8;
+        this.micStream = null;
+        this.analyser = null;
+        this.micDataArray = null;
+        this.isMicActive = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+            this.masterGain.connect(this.ctx.destination);
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      setVolume(val) {
+        this.volume = Math.max(0, Math.min(1, val));
+        if (this.masterGain && this.ctx) {
+          this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+        }
+      }
+
+      playTick(frequency = 750) {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(frequency + (Math.random() * 80 - 40), this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.12 * this.volume, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.04);
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.045);
+        } catch (e) {}
+      }
+
+      playBuzzer() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(130, this.ctx.currentTime);
+          osc.frequency.setValueAtTime(105, this.ctx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.25 * this.volume, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.36);
+        } catch (e) {}
+      }
+
+      playDelete() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.35);
+          gain.gain.setValueAtTime(0.18 * this.volume, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.36);
+        } catch (e) {}
+      }
+
+      playChime() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const notes = [523.25, 659.25, 783.99];
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.06);
+            gain.gain.setValueAtTime(0, this.ctx.currentTime + idx * 0.06);
+            gain.gain.linearRampToValueAtTime(0.15 * this.volume, this.ctx.currentTime + idx * 0.06 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.06 + 0.25);
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+            osc.start(this.ctx.currentTime + idx * 0.06);
+            osc.stop(this.ctx.currentTime + idx * 0.06 + 0.26);
+          });
+        } catch (e) {}
+      }
+
+      playScreamPulse() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(900 + Math.random() * 400, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.08 * this.volume, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+          osc.connect(gain);
+          gain.connect(this.masterGain);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.11);
+        } catch (e) {}
+      }
+
+      playFanfare() {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            const start = this.ctx.currentTime + idx * 0.09;
+            const dur = idx === notes.length - 1 ? 0.6 : 0.08;
+            osc.frequency.setValueAtTime(freq, start);
+            gain.gain.setValueAtTime(0.15 * this.volume, start);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+            osc.start(start);
+            osc.stop(start + dur + 0.01);
+          });
+        } catch (e) {}
+      }
+
+      async startMicrophone() {
+        this.init();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Microphone API not supported on this browser');
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        this.micStream = stream;
+        const source = this.ctx.createMediaStreamSource(stream);
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.25;
+        source.connect(this.analyser);
+        this.micDataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        this.isMicActive = true;
+        return true;
+      }
+
+      stopMicrophone() {
+        if (this.micStream) {
+          this.micStream.getTracks().forEach(track => track.stop());
+          this.micStream = null;
+        }
+        this.isMicActive = false;
+      }
+
+      getMicLoudness() {
+        if (!this.isMicActive || !this.analyser || !this.micDataArray) {
+          return 0;
+        }
+        this.analyser.getByteFrequencyData(this.micDataArray);
+        let sum = 0;
+        for (let i = 0; i < this.micDataArray.length; i++) {
+          sum += this.micDataArray[i];
+        }
+        const avg = sum / this.micDataArray.length;
+        return Math.min(100, Math.round((avg / 130) * 100));
+      }
+    }
+
+    const soundEngine = new SoundEngine();
+
+    // 1. Username Roulette
+    class UsernameRoulette {
+      constructor() {
+        this.canvas = document.getElementById('roulette-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.usernameDisplay = document.getElementById('username-display');
+
+        this.chars = [
+          'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+          'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+          'u', 'v', 'w', 'x', 'y', 'z',
+          '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+          '_', '-', '.', '@'
+        ];
+        this.numSlices = this.chars.length;
+        this.sliceAngle = (2 * Math.PI) / this.numSlices;
+
+        this.angle = 0;
+        this.angularVelocity = 0;
+        this.isSpinning = false;
+        this.lastPegIndex = -1;
+        this.currentUsername = '';
+        this.pendingLetter = null;
+        this.pointerBend = 0;
+
+        this.colors = [
+          '#e63946', '#1d3557', '#e63946', '#1d3557', '#e63946', '#2a9d8f',
+          '#e63946', '#1d3557', '#e63946', '#1d3557', '#f4a261', '#1d3557',
+          '#e63946', '#1d3557', '#e63946', '#1d3557', '#e63946', '#2a9d8f',
+          '#e63946', '#1d3557', '#e63946', '#1d3557', '#e63946', '#1d3557',
+          '#f4a261', '#1d3557', '#e63946', '#1d3557', '#e63946', '#2a9d8f',
+          '#e63946', '#1d3557', '#e63946', '#1d3557', '#e63946', '#1d3557',
+          '#457b9d', '#e76f51', '#2a9d8f', '#e63946'
+        ];
+
+        this.draw();
+      }
+
+      draw() {
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(centerX, centerY) - 18;
+
+        this.ctx.clearRect(0, 0, width, height);
+
+        this.ctx.save();
+        this.ctx.translate(centerX, centerY);
+        this.ctx.rotate(this.angle);
+
+        for (let i = 0; i < this.numSlices; i++) {
+          const startAngle = i * this.sliceAngle;
+          const endAngle = startAngle + this.sliceAngle;
+
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, 0);
+          this.ctx.arc(0, 0, radius, startAngle, endAngle);
+          this.ctx.closePath();
+
+          this.ctx.fillStyle = this.colors[i % this.colors.length];
+          this.ctx.fill();
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeStyle = '#222';
+          this.ctx.stroke();
+
+          const pegX = (radius - 5) * Math.cos(startAngle);
+          const pegY = (radius - 5) * Math.sin(startAngle);
+          this.ctx.beginPath();
+          this.ctx.arc(pegX, pegY, 3, 0, 2 * Math.PI);
+          this.ctx.fillStyle = '#ffdf00';
+          this.ctx.fill();
+          this.ctx.stroke();
+
+          this.ctx.save();
+          this.ctx.rotate(startAngle + this.sliceAngle / 2);
+          this.ctx.textAlign = 'right';
+          this.ctx.fillStyle = '#ffffff';
+          this.ctx.font = 'bold 15px monospace';
+          this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
+          this.ctx.shadowBlur = 4;
+          this.ctx.fillText(this.chars[i], radius - 15, 5);
+          this.ctx.restore();
+        }
+
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+        this.ctx.lineWidth = 8;
+        this.ctx.strokeStyle = '#d4af37';
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, 28, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#111';
+        this.ctx.fill();
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = '#f4a261';
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, 10, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#e63946';
+        this.ctx.fill();
+
+        this.ctx.restore();
+
+        this.drawPointer(centerX, centerY - radius + 4);
+      }
+
+      drawPointer(x, y) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.rotate((this.pointerBend * Math.PI) / 180);
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(-12, -22);
+        this.ctx.lineTo(12, -22);
+        this.ctx.lineTo(0, 14);
+        this.ctx.closePath();
+        this.ctx.fillStyle = '#ffd166';
+        this.ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        this.ctx.shadowBlur = 6;
+        this.ctx.fill();
+        this.ctx.lineWidth = 2.5;
+        this.ctx.strokeStyle = '#073b4c';
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.arc(0, -14, 4, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#d62828';
+        this.ctx.fill();
+        this.ctx.restore();
+      }
+
+      spin() {
+        if (this.isSpinning) return;
+        soundEngine.init();
+
+        this.isSpinning = true;
+        const spinBtn = document.getElementById('btn-spin-roulette');
+        if (spinBtn) {
+          spinBtn.disabled = true;
+          spinBtn.innerText = '🎲 SPINNING... PRAY FOR VOWELS';
+        }
+
+        this.angularVelocity = 0.35 + Math.random() * 0.3;
+        this.friction = 0.987 + (Math.random() * 0.006 - 0.003);
+
+        this.animateSpin();
+      }
+
+      animateSpin() {
+        if (!this.isSpinning) return;
+
+        this.angle += this.angularVelocity;
+        this.angle = this.angle % (2 * Math.PI);
+
+        const pointerAngle = (3 * Math.PI / 2 - this.angle) % (2 * Math.PI);
+        const normalizedAngle = pointerAngle < 0 ? pointerAngle + 2 * Math.PI : pointerAngle;
+        const currentPeg = Math.floor(normalizedAngle / this.sliceAngle);
+
+        if (currentPeg !== this.lastPegIndex) {
+          this.lastPegIndex = currentPeg;
+          soundEngine.playTick(600 + (this.angularVelocity * 1200));
+          this.pointerBend = -18 * Math.min(1, this.angularVelocity * 4);
+        } else {
+          this.pointerBend *= 0.8;
+        }
+
+        this.angularVelocity *= this.friction;
+        this.draw();
+
+        if (this.angularVelocity < 0.002) {
+          this.angularVelocity = 0;
+          this.isSpinning = false;
+          this.pointerBend = 0;
+          this.draw();
+          this.onSpinComplete();
+          return;
+        }
+
+        requestAnimationFrame(() => this.animateSpin());
+      }
+
+      onSpinComplete() {
+        const spinBtn = document.getElementById('btn-spin-roulette');
+        if (spinBtn) {
+          spinBtn.disabled = false;
+          spinBtn.innerText = '🎰 SPIN FOR NEXT LETTER';
+        }
+
+        const pointerAngle = (3 * Math.PI / 2 - this.angle) % (2 * Math.PI);
+        const normalizedAngle = pointerAngle < 0 ? pointerAngle + 2 * Math.PI : pointerAngle;
+        const landedIndex = Math.floor(normalizedAngle / this.sliceAngle) % this.numSlices;
+        this.pendingLetter = this.chars[landedIndex];
+
+        soundEngine.playChime();
+        this.showLandedLetterModal(this.pendingLetter);
+      }
+
+      showLandedLetterModal(letter) {
+        const modal = document.getElementById('roulette-result-modal');
+        const letterDisplay = document.getElementById('landed-letter-display');
+        const msg = document.getElementById('landed-letter-msg');
+
+        if (letterDisplay) letterDisplay.textContent = letter;
+        if (msg) {
+          msg.textContent = `You spun: "${letter}". Keep this character or spin for eternity?`;
+        }
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      acceptPendingLetter() {
+        if (this.pendingLetter !== null) {
+          this.currentUsername += this.pendingLetter;
+          this.pendingLetter = null;
+          this.updateUsernameDisplay();
+          soundEngine.playChime();
+        }
+        document.getElementById('roulette-result-modal').classList.add('hidden');
+      }
+
+      discardPendingLetter() {
+        this.pendingLetter = null;
+        soundEngine.playBuzzer();
+        document.getElementById('roulette-result-modal').classList.add('hidden');
+      }
+
+      deleteLastCharacter() {
+        if (this.currentUsername.length === 0) {
+          alert('⚠️ Cannot delete! Your username is already completely empty.');
+          return;
+        }
+
+        const lastChar = this.currentUsername[this.currentUsername.length - 1];
+        const confirmation = confirm(
+          `⚠️ EXISTENTIAL WARNING ⚠️\n\nAre you 100% emotionally prepared to permanently delete the character "${lastChar}"?`
+        );
+
+        if (!confirmation) {
+          soundEngine.playBuzzer();
+          return;
+        }
+
+        if (Math.random() < 0.25 && this.currentUsername.length >= 2) {
+          this.currentUsername = this.currentUsername.slice(0, -2);
+          soundEngine.playDelete();
+          alert('💥 BUTTERFINGERS! Your hand slipped and deleted TWO characters instead of one!');
+        } else {
+          this.currentUsername = this.currentUsername.slice(0, -1);
+          soundEngine.playDelete();
+        }
+
+        this.updateUsernameDisplay();
+      }
+
+      updateUsernameDisplay() {
+        if (this.usernameDisplay) {
+          this.usernameDisplay.textContent = this.currentUsername || '(empty)';
+          this.usernameDisplay.classList.add('pulse-anim');
+          setTimeout(() => this.usernameDisplay.classList.remove('pulse-anim'), 300);
+        }
+        const hiddenUser = document.getElementById('final-username-input');
+        if (hiddenUser) hiddenUser.value = this.currentUsername;
+      }
+    }
+
+    // 2. Password Matrix Engine
+    class PasswordEngine {
+      constructor() {
+        this.months = [
+          'january', 'february', 'march', 'april', 'may', 'june',
+          'july', 'august', 'september', 'october', 'november', 'december'
+        ];
+
+        this.days = [
+          'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+        ];
+
+        this.dogBreeds = [
+          'goldenretriever', 'labrador', 'chihuahua', 'poodle', 'beagle',
+          'bulldog', 'pug', 'husky', 'germanshepherd', 'boxer', 'rottweiler',
+          'dachshund', 'corgi', 'dalmatian', 'shibainu', 'shiba', 'maltese',
+          'pomeranian', 'doberman', 'greatdane', 'pitbull', 'mastiff', 'akita',
+          'collie', 'spaniel', 'terrier', 'bichon', 'bordercollie', 'bloodhound',
+          'chowchow', 'samoyed', 'greyhound', 'whippet', 'saintbernard',
+          'basset', 'bernese', 'havanese', 'weimaraner', 'newfoundland',
+          'vizsla', 'papillon', 'cane corso', 'canecorso', 'frenchie',
+          'frenchbulldog', 'yorkie', 'yorkshireterrier'
+        ];
+
+        this.rules = [
+          {
+            id: 'rule-length',
+            title: 'Rule 1: Length Overkill',
+            desc: 'Password must be MORE than 12 characters (>12).',
+            validate: (pwd) => pwd.length > 12
+          },
+          {
+            id: 'rule-caps',
+            title: 'Rule 2: Loud Typing',
+            desc: 'Must contain at least 4 CAPITAL letters (A-Z).',
+            validate: (pwd) => (pwd.match(/[A-Z]/g) || []).length >= 4
+          },
+          {
+            id: 'rule-symbols',
+            title: 'Rule 3: Occult Signs',
+            desc: 'Must contain at least 3 signs / special symbols (!@#$%...).',
+            validate: (pwd) => (pwd.match(/[^A-Za-z0-9\s]/g) || []).length >= 3
+          },
+          {
+            id: 'rule-month',
+            title: 'Rule 4: The Astrological Calendar',
+            desc: 'Must contain the name of at least one MONTH (e.g. "January", "May").',
+            validate: (pwd) => {
+              const lower = pwd.toLowerCase();
+              return this.months.some(m => lower.includes(m));
+            }
+          },
+          {
+            id: 'rule-day',
+            title: 'Rule 5: The Daily Grind',
+            desc: 'Must contain at least one DAY of the week (e.g. "Monday", "Friday").',
+            validate: (pwd) => {
+              const lower = pwd.toLowerCase();
+              return this.days.some(d => lower.includes(d));
+            }
+          },
+          {
+            id: 'rule-dog',
+            title: 'Rule 6: Canine Loyalty Tax',
+            desc: 'Must contain the breed of a DOG (e.g. "Chihuahua", "GoldenRetriever", "Beagle", "Pug").',
+            validate: (pwd) => {
+              const normalized = pwd.toLowerCase().replace(/[\s_-]/g, '');
+              return this.dogBreeds.some(breed => normalized.includes(breed.replace(/[\s_-]/g, '')));
+            }
+          }
+        ];
+
+        this.init();
+      }
+
+      init() {
+        const pwdInput = document.getElementById('password-input');
+        const toggleMaskBtn = document.getElementById('btn-toggle-mask');
+        const hintDogBtn = document.getElementById('btn-dog-hint');
+
+        if (pwdInput) {
+          pwdInput.addEventListener('input', (e) => this.handleInput(e.target.value));
+        }
+
+        if (toggleMaskBtn) {
+          toggleMaskBtn.addEventListener('click', () => {
+            if (pwdInput.type === 'password') {
+              pwdInput.type = 'text';
+              toggleMaskBtn.textContent = '🤡 Hide into Emojis';
+            } else {
+              pwdInput.type = 'password';
+              toggleMaskBtn.textContent = '👁️ Reveal Reality';
+            }
+          });
+        }
+
+        if (hintDogBtn) {
+          hintDogBtn.addEventListener('click', () => {
+            const randomBreeds = ['Chihuahua', 'GoldenRetriever', 'Labrador', 'Poodle', 'Beagle', 'Bulldog', 'Pug', 'Husky', 'Corgi', 'Dachshund', 'Dalmatian', 'ShibaInu'];
+            const picked = randomBreeds[Math.floor(Math.random() * randomBreeds.length)];
+            soundEngine.playChime();
+            alert(`🐶 CANINE INSPIRATION:\nHow about inserting "${picked}" into your password?`);
+          });
+        }
+
+        this.renderRulesList();
+      }
+
+      renderRulesList() {
+        const container = document.getElementById('password-rules-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        this.rules.forEach(rule => {
+          const card = document.createElement('div');
+          card.id = rule.id;
+          card.className = 'rule-card rule-unmet';
+          card.innerHTML = `
+            <div class="rule-header">
+              <span class="rule-icon">❌</span>
+              <strong>${rule.title}</strong>
+            </div>
+            <p class="rule-desc">${rule.desc}</p>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      handleInput(pwd) {
+        this.rules.forEach(rule => {
+          const isMet = rule.validate(pwd);
+          const card = document.getElementById(rule.id);
+          if (card) {
+            const wasMet = card.classList.contains('rule-met');
+            if (isMet) {
+              card.classList.remove('rule-unmet');
+              card.classList.add('rule-met');
+              card.querySelector('.rule-icon').textContent = '✅';
+              if (!wasMet) soundEngine.playChime();
+            } else {
+              card.classList.remove('rule-met');
+              card.classList.add('rule-unmet');
+              card.querySelector('.rule-icon').textContent = '❌';
+            }
+          }
+        });
+
+        this.updateStrengthMeter(pwd);
+      }
+
+      updateStrengthMeter(pwd) {
+        const fill = document.getElementById('strength-bar-fill');
+        const label = document.getElementById('strength-label');
+        if (!fill || !label) return;
+
+        const metCount = this.rules.filter(r => r.validate(pwd)).length;
+        const percentage = Math.round((metCount / this.rules.length) * 100);
+        fill.style.width = `${percentage}%`;
+
+        const insults = [
+          '💀 Strength: An unprotected toaster',
+          '👶 Strength: Decodable by a baby playing with keys',
+          '🥔 Strength: Potato tier security',
+          '📉 Strength: Mildly inconvenient for Soviet hackers',
+          '🐕 Strength: Your dog is proud, but servers are skeptical',
+          '🧙 Strength: Acceptable to the Dark Overlords',
+          '🏆 Strength: MAXIMUM PARANOIA ACHIEVED'
+        ];
+        label.textContent = insults[metCount];
+
+        if (percentage < 40) fill.style.backgroundColor = '#e63946';
+        else if (percentage < 85) fill.style.backgroundColor = '#f4a261';
+        else fill.style.backgroundColor = '#2a9d8f';
+      }
+
+      areAllRulesMet() {
+        const pwdInput = document.getElementById('password-input');
+        const val = pwdInput ? pwdInput.value : '';
+        return this.rules.every(r => r.validate(val));
+      }
+    }
+
+    // 3. Screaming Captcha Engine
+    class ScreamingCaptcha {
+      constructor() {
+        this.wordPool = [
+          'UNHINGED', 'POTATO', 'SCREAM', 'BANANA', 'MEGAPHONE',
+          'EXPLOSION', 'WAFFLE', 'TURBULENCE', 'PENGUIN', 'HYSTERIA',
+          'FLABBERGASTED', 'KANGAROO', 'THUNDER', 'MAYHEM', 'CACOPHONY',
+          'OCTOPUS', 'BELLOW', 'VORTEX', 'BARK', 'QUACK'
+        ];
+        this.currentWords = [];
+        this.isListening = false;
+        this.screamProgress = 0;
+        this.screamThreshold = 70;
+        this.isCompleted = false;
+        this.manualLoudness = 0;
+
+        this.init();
+      }
+
+      init() {
+        this.rerollWords();
+
+        const btnMic = document.getElementById('btn-activate-mic');
+        const btnReroll = document.getElementById('btn-reroll-captcha');
+        const btnPump = document.getElementById('btn-manual-pump');
+
+        if (btnMic) {
+          btnMic.addEventListener('click', () => this.toggleMicrophone());
+        }
+
+        if (btnReroll) {
+          btnReroll.addEventListener('click', () => {
+            this.rerollWords();
+            soundEngine.playBuzzer();
+          });
+        }
+
+        if (btnPump) {
+          btnPump.addEventListener('click', () => this.pumpManualScream());
+        }
+
+        window.addEventListener('keydown', (e) => {
+          if (e.code === 'Space' && document.activeElement.id === 'btn-manual-pump') {
+            e.preventDefault();
+            this.pumpManualScream();
+          }
+        });
+
+        this.startDecibelMonitor();
+      }
+
+      rerollWords() {
+        if (this.isCompleted) return;
+        const shuffled = [...this.wordPool].sort(() => 0.5 - Math.random());
+        this.currentWords = shuffled.slice(0, 4);
+
+        const container = document.getElementById('captcha-words-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+        this.currentWords.forEach(word => {
+          const span = document.createElement('span');
+          span.className = 'captcha-word-badge';
+          span.textContent = word;
+          span.style.transform = `rotate(${(Math.random() * 14 - 7).toFixed(1)}deg) translateY(${(Math.random() * 6 - 3).toFixed(1)}px)`;
+          container.appendChild(span);
+        });
+      }
+
+      async toggleMicrophone() {
+        if (this.isCompleted) return;
+        const btnMic = document.getElementById('btn-activate-mic');
+        const statusLabel = document.getElementById('mic-status-label');
+
+        if (this.isListening) {
+          this.isListening = false;
+          soundEngine.stopMicrophone();
+          if (btnMic) btnMic.textContent = '🎤 ACTIVATE MIC & SHOUT';
+          if (statusLabel) statusLabel.textContent = 'Microphone standby';
+          return;
+        }
+
+        try {
+          if (btnMic) btnMic.textContent = '⏳ REQUESTING PERMISSION...';
+          const success = await soundEngine.startMicrophone();
+          if (success) {
+            this.isListening = true;
+            if (btnMic) {
+              btnMic.textContent = '🛑 STOP LISTENING';
+              btnMic.classList.add('mic-active');
+            }
+            if (statusLabel) statusLabel.textContent = '🎙️ LISTENING! NOW SHOUT THE 4 WORDS!';
+          }
+        } catch (err) {
+          alert(`⚠️ Microphone Access Blocked: ${err.message}\n\nPlease use the "EMERGENCY MANUAL BELLOW PUMP" to simulate shouting by rapid clicking/mashing!`);
+          if (btnMic) btnMic.textContent = '🎤 RETRY MIC ACCESS';
+          if (statusLabel) statusLabel.textContent = '⚠️ Mic unavailable. Use Manual Pump!';
+        }
+      }
+
+      pumpManualScream() {
+        if (this.isCompleted) return;
+        this.manualLoudness = Math.min(100, this.manualLoudness + 18);
+        soundEngine.playScreamPulse();
+        const pumpBtn = document.getElementById('btn-manual-pump');
+        if (pumpBtn) {
+          pumpBtn.classList.add('pump-kick');
+          setTimeout(() => pumpBtn.classList.remove('pump-kick'), 100);
+        }
+      }
+
+      startDecibelMonitor() {
+        const updateLoop = () => {
+          if (!this.isCompleted) {
+            let currentLoudness = 0;
+
+            if (this.isListening) {
+              currentLoudness = soundEngine.getMicLoudness();
+            }
+
+            if (this.manualLoudness > 0) {
+              currentLoudness = Math.max(currentLoudness, this.manualLoudness);
+              this.manualLoudness = Math.max(0, this.manualLoudness - 2.5);
+            }
+
+            this.updateMeterUI(currentLoudness);
+
+            if (currentLoudness >= this.screamThreshold) {
+              this.screamProgress = Math.min(100, this.screamProgress + 1.8);
+              if (Math.random() < 0.2) soundEngine.playScreamPulse();
+            } else {
+              this.screamProgress = Math.max(0, this.screamProgress - 1.2);
+            }
+
+            const progressBar = document.getElementById('scream-hold-fill');
+            const holdPct = document.getElementById('scream-hold-percent');
+            if (progressBar) progressBar.style.width = `${this.screamProgress}%`;
+            if (holdPct) holdPct.textContent = `${Math.round(this.screamProgress)}%`;
+
+            if (this.screamProgress >= 100) {
+              this.completeCaptcha();
+            }
+          }
+
+          requestAnimationFrame(updateLoop);
+        };
+
+        requestAnimationFrame(updateLoop);
+      }
+
+      updateMeterUI(loudness) {
+        const meterFill = document.getElementById('decibel-meter-fill');
+        const meterVal = document.getElementById('decibel-value-display');
+        const statusHint = document.getElementById('scream-hint-text');
+
+        if (meterFill) {
+          meterFill.style.width = `${loudness}%`;
+          if (loudness < 40) meterFill.style.background = '#06d6a0';
+          else if (loudness < 70) meterFill.style.background = '#ffd166';
+          else meterFill.style.background = '#ef476f';
+        }
+
+        if (meterVal) {
+          const db = Math.round(30 + (loudness * 0.85));
+          meterVal.textContent = `${db} dB (${loudness}%)`;
+        }
+
+        if (statusHint) {
+          if (loudness < 30) statusHint.textContent = '💤 Whisper: Unacceptable. My pet goldfish is louder.';
+          else if (loudness < 65) statusHint.textContent = '🗣️ Casual Talk: Still not a scream. PUT SOME SOUL INTO IT!';
+          else if (loudness < 85) statusHint.textContent = '🔥 ALMOST THERE! VOCAL CORDS ENGAGED!';
+          else statusHint.textContent = '💥 DEAFENING AGONY DETECTED! KEEP HOLDING!';
+        }
+      }
+
+      completeCaptcha() {
+        this.isCompleted = true;
+        soundEngine.stopMicrophone();
+        soundEngine.playFanfare();
+
+        const card = document.getElementById('captcha-section-card');
+        const badge = document.getElementById('captcha-passed-badge');
+        const btnMic = document.getElementById('btn-activate-mic');
+        const btnPump = document.getElementById('btn-manual-pump');
+
+        if (card) card.classList.add('captcha-verified');
+        if (badge) badge.classList.remove('hidden');
+        if (btnMic) {
+          btnMic.disabled = true;
+          btnMic.textContent = '✅ SHOUT VERIFIED';
+        }
+        if (btnPump) {
+          btnPump.disabled = true;
+          btnPump.textContent = '✅ LUNGS APPROVED';
+        }
+
+        const hiddenCaptcha = document.getElementById('captcha-verified-input');
+        if (hiddenCaptcha) hiddenCaptcha.value = '1';
+      }
+
+      isPassed() {
+        return this.isCompleted;
+      }
+    }
+
+    // Main Orchestrator
+    document.addEventListener('DOMContentLoaded', () => {
+      const roulette = new UsernameRoulette();
+      const passwordEngine = new PasswordEngine();
+      const captcha = new ScreamingCaptcha();
+
+      document.getElementById('btn-spin-roulette').addEventListener('click', () => roulette.spin());
+      document.getElementById('btn-delete-char').addEventListener('click', () => roulette.deleteLastCharacter());
+      document.getElementById('btn-accept-letter').addEventListener('click', () => roulette.acceptPendingLetter());
+      document.getElementById('btn-discard-letter').addEventListener('click', () => roulette.discardPendingLetter());
+
+      // Inverted volume slider
+      const volSlider = document.getElementById('inverted-volume-slider');
+      const volLabel = document.getElementById('volume-label');
+      if (volSlider) {
+        volSlider.addEventListener('input', (e) => {
+          const rawVal = parseFloat(e.target.value);
+          const invertedGain = (100 - rawVal) / 100;
+          soundEngine.setVolume(invertedGain);
+          if (volLabel) volLabel.textContent = `Annoyance Volume: ${rawVal}% (Actual: ${Math.round(invertedGain * 100)}%)`;
+        });
+      }
+
+      // Terms speeding detector
+      const termsBox = document.getElementById('terms-scrollbox');
+      let lastScrollTop = 0;
+      let lastScrollTime = Date.now();
+      if (termsBox) {
+        termsBox.addEventListener('scroll', () => {
+          const currentScrollTop = termsBox.scrollTop;
+          const currentTime = Date.now();
+          const timeDiff = (currentTime - lastScrollTime) / 1000;
+          const distDiff = Math.abs(currentScrollTop - lastScrollTop);
+
+          if (timeDiff > 0 && (distDiff / timeDiff) > 450 && currentScrollTop > 100) {
+            termsBox.scrollTop = 0;
+            soundEngine.playBuzzer();
+            alert('🚨 SPEEDING VIOLATION IN TERMS OF SERVICE!\nYou scrolled too fast to read paragraph 42 regarding your immortal soul. Resetting scroll to top.');
+          }
+          lastScrollTop = currentScrollTop;
+          lastScrollTime = currentTime;
+        });
+      }
+
+      // Flashbang theme toggle
+      document.getElementById('btn-toggle-theme').addEventListener('click', () => {
+        document.body.classList.toggle('flashbang-mode');
+        soundEngine.playBuzzer();
+        alert('🌞 FLASHBANG MODE ACTIVATED!\nTrue bad UI never lets you rest your eyes.');
+      });
+
+      // Evasive Submit Button
+      const submitBtn = document.getElementById('btn-submit-login');
+      let dodgeCount = 0;
+
+      if (submitBtn) {
+        submitBtn.addEventListener('mouseover', () => {
+          const username = roulette.currentUsername;
+          const pwdMet = passwordEngine.areAllRulesMet();
+          const captchaMet = captcha.isPassed();
+
+          if (username.length >= 3 && pwdMet && captchaMet && dodgeCount < 4) {
+            dodgeCount++;
+            const parent = submitBtn.parentElement;
+            const rect = parent.getBoundingClientRect();
+            const randomX = Math.floor(Math.random() * (rect.width - 160));
+            const randomY = Math.floor(Math.random() * (rect.height - 50));
+
+            submitBtn.style.position = 'absolute';
+            submitBtn.style.left = `${Math.max(10, randomX)}px`;
+            submitBtn.style.top = `${Math.max(10, randomY)}px`;
+
+            soundEngine.playTick(1200);
+
+            const taunts = ['🏃‍♂️ ALMOST HAD IT!', '💨 TOO SLOW!', '⚡ NICE REFLEXES, TRY AGAIN!', '🎯 ONE MORE TIME!'];
+            submitBtn.textContent = taunts[dodgeCount % taunts.length];
+          }
+        });
+      }
+
+      // Form Submission Handler
+      const loginForm = document.getElementById('bad-ui-login-form');
+      if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          const username = roulette.currentUsername;
+          const pwdMet = passwordEngine.areAllRulesMet();
+          const captchaMet = captcha.isPassed();
+          const termsCheckbox = document.getElementById('terms-checkbox');
+
+          if (username.length < 3) {
+            soundEngine.playBuzzer();
+            alert('❌ USERNAME REJECTED: Your roulette-spun username must have at least 3 letters! Spin the wheel of destiny more.');
+            return;
+          }
+
+          if (!pwdMet) {
+            soundEngine.playBuzzer();
+            alert('❌ PASSWORD REJECTED: You have not satisfied all 6 absurd password rules! Check the checklist.');
+            return;
+          }
+
+          if (!captchaMet) {
+            soundEngine.playBuzzer();
+            alert('❌ CAPTCHA INCOMPLETE: You must shout the 4 words into your microphone (or pump the manual bellow pump) until 100%!');
+            return;
+          }
+
+          if (termsCheckbox && !termsCheckbox.checked) {
+            soundEngine.playBuzzer();
+            alert('❌ You forgot to agree to the Terms of Extreme Suffering!');
+            return;
+          }
+
+          // Fake Loading Screen stalling at 99%
+          const loadingOverlay = document.getElementById('fake-loading-modal');
+          const loadProgress = document.getElementById('loading-bar-fill');
+          const loadText = document.getElementById('loading-status-text');
+
+          loadingOverlay.classList.remove('hidden');
+
+          let p = 0;
+          const interval = setInterval(() => {
+            p += Math.floor(Math.random() * 8) + 2;
+            if (p > 99) p = 99;
+            loadProgress.style.width = `${p}%`;
+
+            const stages = [
+              'Transmitting vocal cords to NSA...',
+              'Checking dog breed against Westminster records...',
+              'Auditing username roulette probability...',
+              'Consulting horoscope...',
+              'Stalling at 99% to build dramatic suspense...'
+            ];
+            loadText.textContent = stages[Math.min(stages.length - 1, Math.floor(p / 20))];
+
+            if (p === 99) {
+              clearInterval(interval);
+              setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+                soundEngine.playFanfare();
+                document.getElementById('victory-username-text').textContent = username;
+                document.getElementById('victory-modal').classList.remove('hidden');
+              }, 1800);
+            }
+          }, 120);
+        });
+      }
+
+      // Form Reset Trap Handler
+      const resetBtn = document.getElementById('btn-reset-form');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          const really = confirm('🚨 DANGER! PURGE ALL WORK?\n\nThis will wipe out all your username spins, password progress, and captcha shouting!');
+          if (really) {
+            loginForm.reset();
+            roulette.currentUsername = '';
+            roulette.updateUsernameDisplay();
+            passwordEngine.handleInput('');
+            soundEngine.playDelete();
+            alert('🗑️ The form has been wiped clean! Back to square one!');
+          }
+        });
+      }
+    });
+
+    // One-Click HTML File Downloader
+    function downloadCurrentHTML() {
+      const docHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([docHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'annoying_login.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+
+
+</body></html>

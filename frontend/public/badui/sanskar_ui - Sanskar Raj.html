@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optical Illusion Catch-Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        /* --- CONTINUOUSLY MOVING BACKGROUND --- */
+        @property --bg-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        @keyframes rotateBackground {
+            0% { --bg-angle: 0deg; }
+            100% { --bg-angle: 360deg; }
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: repeating-conic-gradient(
+                from var(--bg-angle),
+                #ff00ff 0deg 15deg,
+                #00ffff 15deg 30deg,
+                #ffff00 30deg 45deg
+            );
+            animation: rotateBackground 8s linear infinite;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+        }
+
+        /* High-contrast optical clash card */
+        .login-card {
+            background-color: #0000ff;
+            border: 8px dashed #ff0000;
+            padding: 25px;
+            width: 420px;
+            box-shadow: 15px 15px 0px #00ff00, -15px -15px 0px #ff00ff;
+            color: #ffff00;
+            position: relative;
+            z-index: 10;
+        }
+
+        h2 {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin-top: 0;
+            color: #00ffff;
+            text-shadow: 3px 3px #ff0000;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background-color: #ff0000;
+            color: #ffffff;
+            padding: 2px 6px;
+            width: max-content;
+            font-size: 12px;
+        }
+
+        /* Standard inputs styling */
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 4px solid #00ff00;
+            background-color: #ffff00;
+            color: #ff00ff;
+            font-weight: bold;
+            font-size: 15px;
+            outline: none;
+        }
+
+        /* Password Display Box */
+        .password-box {
+            width: 100%;
+            height: 40px;
+            border: 4px solid #00ff00;
+            background-color: #ffff00;
+            color: #ff00ff;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 6px;
+            letter-spacing: 4px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* Virtual Keypad Styling */
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin-top: 6px;
+            background-color: #ff0000;
+            padding: 5px;
+        }
+
+        .key-btn {
+            padding: 6px 0;
+            background-color: #00ffff;
+            color: #000000;
+            border: 2px solid #000000;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .key-btn:hover {
+            background-color: #ffffff;
+        }
+
+        .key-btn.clear {
+            background-color: #ff00ff;
+            color: #ffffff;
+        }
+
+        /* --- FALLING BUTTON & PADDLE GAME ARENA --- */
+        .game-arena {
+            height: 180px;
+            position: relative;
+            margin-top: 15px;
+            border: 4px dotted #00ffff;
+            background: #ff00ff;
+            overflow: hidden;
+        }
+
+        /* Falling Log In Block */
+        #falling-btn {
+            position: absolute;
+            top: 0px;
+            left: 140px;
+            padding: 6px 14px;
+            background-color: #00ff00;
+            color: #000000;
+            font-weight: bold;
+            font-size: 13px;
+            border: 3px solid #000000;
+            text-align: center;
+        }
+
+        /* Player Controlled Plank */
+        #paddle {
+            position: absolute;
+            bottom: 5px;
+            left: 140px;
+            width: 90px;
+            height: 15px;
+            background-color: #ffff00;
+            border: 3px solid #000000;
+            box-shadow: 0px 0px 5px #ff0000;
+        }
+
+        .instructions {
+            text-align: center;
+            font-size: 11px;
+            background-color: #000000;
+            color: #00ff00;
+            padding: 4px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>User Login</h2>
+
+    <div class="form-group">
+        <label for="username">Name (Inputs in Reverse)</label>
+        <input type="text" id="username" placeholder="Type your name..." autocomplete="off">
+    </div>
+
+    <div class="form-group">
+        <label>Password (Use On-Screen Keypad)</label>
+        <div class="password-box" id="password-display"></div>
+        <div class="keypad-grid" id="keypad"></div>
+    </div>
+
+    <label>Catch the Falling Button to Login</label>
+    <div class="game-arena" id="arena">
+        <div id="falling-btn">LOG IN</div>
+        <div id="paddle"></div>
+    </div>
+    <div class="instructions">Use LEFT [←] and RIGHT [→] arrows to move paddle!</div>
+</div>
+
+<script>
+    // --- 1. Username Reverse Typing Logic ---
+    const usernameInput = document.getElementById('username');
+    usernameInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        e.target.value = value.split('').reverse().join('');
+    });
+
+    // --- 2. Virtual On-Screen Keypad Logic ---
+    const keys = ['A','B','C','D','E','1','2','3','4','5','!','@','#','$','CLR'];
+    let currentPassword = "";
+    const passwordDisplay = document.getElementById('password-display');
+    const keypadContainer = document.getElementById('keypad');
+
+    function renderKeypad() {
+        keypadContainer.innerHTML = '';
+        const shuffledKeys = [...keys].sort(() => Math.random() - 0.5);
+
+        shuffledKeys.forEach(key => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'key-btn' + (key === 'CLR' ? ' clear' : '');
+            btn.innerText = key;
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (key === 'CLR') {
+                    currentPassword = "";
+                    passwordDisplay.innerText = "";
+                } else {
+                    currentPassword += key;
+                    passwordDisplay.innerText = "•".repeat(currentPassword.length);
+                }
+                renderKeypad();
+            });
+
+            keypadContainer.appendChild(btn);
+        });
+    }
+
+    renderKeypad();
+
+    // --- 3. Paddle & Falling Button Mechanics ---
+    const arena = document.getElementById('arena');
+    const fallingBtn = document.getElementById('falling-btn');
+    const paddle = document.getElementById('paddle');
+
+    let paddleX = 140;
+    const paddleSpeed = 18;
+    const arenaWidth = 362; // Inner arena width
+    const paddleWidth = 90;
+
+    let btnY = 0;
+    let btnX = Math.floor(Math.random() * (arenaWidth - 80));
+    const fallSpeed = 2.5;
+
+    // Control paddle via arrow keys
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            paddleX = Math.max(0, paddleX - paddleSpeed);
+        } else if (e.key === 'ArrowRight') {
+            paddleX = Math.min(arenaWidth - paddleWidth, paddleX + paddleSpeed);
+        }
+        paddle.style.left = `${paddleX}px`;
+    });
+
+    // Game loop for falling element and collision detection
+    function gameLoop() {
+        btnY += fallSpeed;
+
+        // Reset to top if missed
+        if (btnY > 150) {
+            btnY = 0;
+            btnX = Math.floor(Math.random() * (arenaWidth - 80));
+        }
+
+        fallingBtn.style.top = `${btnY}px`;
+        fallingBtn.style.left = `${btnX}px`;
+
+        // Check collision between falling button and paddle
+        const btnBottom = btnY + 28;
+        const btnLeft = btnX;
+        const btnRight = btnX + 70;
+
+        const paddleTop = 155;
+        const paddleLeft = paddleX;
+        const paddleRight = paddleX + paddleWidth;
+
+        if (btnBottom >= paddleTop && btnY <= paddleTop + 15) {
+            if (btnRight >= paddleLeft && btnLeft <= paddleRight) {
+                // Caught successfully! Attempt login validation
+                validateLogin();
+                btnY = 0; // Reset after catch
+                btnX = Math.floor(Math.random() * (arenaWidth - 80));
+            }
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function validateLogin() {
+        if (!usernameInput.value) {
+            alert("CAUGHT IT! But please type a username first!");
+            return;
+        }
+        if (currentPassword.length === 0) {
+            alert("CAUGHT IT! But please enter a password using the on-screen keypad!");
+            return;
+        }
+        
+        alert(`LOGIN SUCCESS!\nUsername (Reversed): ${usernameInput.value}\nPassword Length: ${currentPassword.length}`);
+    }
+
+    // Start falling loop
+    requestAnimationFrame(gameLoop);
+</script>
+
+</body>
+</html>

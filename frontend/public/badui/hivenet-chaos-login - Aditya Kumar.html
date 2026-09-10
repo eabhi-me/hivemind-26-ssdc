@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>~*~ HiveNet Login ~*~</title>
+<style>
+  *{box-sizing:border-box;}
+  html,body{height:100%; margin:0;}
+  body{
+    font-family:"Comic Sans MS","Comic Sans", cursive, sans-serif;
+    background:
+      repeating-linear-gradient(45deg, #ff00ff 0px, #ff00ff 22px, #ffe600 22px, #ffe600 44px);
+    background-attachment:fixed;
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    color:#1a1a1a;
+  }
+
+  .marquee-bar{
+    position:fixed; top:0; left:0; width:100%; height:34px;
+    background:#000; overflow:hidden; z-index:100;
+    border-bottom:4px double #0f0;
+  }
+  .marquee-track{
+    white-space:nowrap; color:#0f0; font-weight:bold; font-size:16px;
+    line-height:34px;
+    display:inline-block;
+    padding-left:100%;
+    animation:scrollLeft 12s linear infinite;
+  }
+  @keyframes scrollLeft{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-100%);}
+  }
+
+  .stage{position:relative; width:420px; max-width:100%; margin-top:40px;}
+
+  .card{
+    position:relative; width:100%;
+    background:#f4f0ff;
+    border:6px ridge #ff6600;
+    border-radius:2px;
+    box-shadow:8px 8px 0 #000;
+    padding:22px 22px 26px;
+  }
+  .card.hidden{display:none;}
+
+  h1{
+    font-size:20px; margin:0 0 4px; text-align:center;
+    color:#cc0066; text-shadow:1px 1px 0 #fff, 2px 2px 0 #000;
+    animation:blink 1.4s step-end infinite;
+  }
+  @keyframes blink{ 50%{opacity:.55;} }
+
+  .sub{font-size:13px; text-align:center; color:#333; margin:0 0 16px; font-weight:bold;}
+
+  .chosen{
+    text-align:center; font-size:24px; letter-spacing:8px; font-weight:bold;
+    background:#fffb00; border:3px dashed #000; padding:8px; margin-bottom:16px;
+    color:#0033cc;
+  }
+
+  .round-badge{
+    display:table; margin:0 auto 9px; padding:3px 10px;
+    background:#000; color:#fffb00; border:2px dashed #ff00ff;
+    font: bold 10px/1.2 Arial,sans-serif; letter-spacing:1px;
+    transform:rotate(-2deg);
+  }
+  .username-warning{
+    margin:12px 0 0; padding:7px; text-align:center; font-size:11px;
+    color:#850000; background:#ffd6d6; border:2px dotted #c00;
+    transform:rotate(.8deg);
+  }
+  .username-warning b{color:#000; text-decoration:underline wavy #f00;}
+  .identity-meter{margin-top:12px; border:3px inset #999; background:#111; padding:4px;}
+  .identity-meter span{display:block; width:9%; height:10px; background:repeating-linear-gradient(90deg,#ff00a8 0 8px,#00e5ff 8px 16px); transition:width .25s steps(4);}
+  .identity-label{font-size:10px; text-align:right; color:#fff; margin-top:3px; letter-spacing:.5px;}
+  .letter-grid.reshuffling .letter-btn{animation:tilePanic .25s linear;}
+  @keyframes tilePanic{50%{transform:rotate(8deg) scale(.82) translateY(-5px); filter:hue-rotate(130deg);}}
+  .quiz-panel{padding:12px; background:repeating-linear-gradient(0deg,#fff 0 19px,#e1f4ff 19px 20px); border:4px double #0033cc; transform:rotate(-.7deg);}
+  .quiz-number{display:inline-block; padding:4px 8px; background:#ff00a8; color:#fff; font:bold 11px Arial,sans-serif; transform:rotate(2deg);}
+  .quiz-question{margin:12px 0; min-height:43px; text-align:center; font-size:19px; font-weight:bold; color:#0033cc; text-shadow:1px 1px #fff;}
+  .quiz-answers{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
+  .quiz-answer{min-height:52px; padding:7px; background:#ffea00; border:4px outset #cc9900; font:bold 13px "Comic Sans MS",cursive; cursor:pointer; color:#111;}
+  .quiz-answer:nth-child(2n){background:#00e5ff; border-color:#0088aa; transform:rotate(1.5deg);}
+  .quiz-answer:nth-child(3n){background:#ff9fcb; border-color:#bd246b; transform:rotate(-1.5deg);}
+  .quiz-answer:active{border-style:inset;}
+  .quiz-answer.wrong{animation:wrongWiggle .32s linear; background:#ff3c3c;}
+  @keyframes wrongWiggle{25%{transform:translateX(-9px) rotate(-4deg)}75%{transform:translateX(9px) rotate(4deg)}}
+  .quiz-verdict{min-height:22px; margin:10px 0 0; text-align:center; color:#c00; font-size:12px; font-weight:bold;}
+
+  /* ---- letter grid (username) ---- */
+  .letter-grid{
+    display:grid; grid-template-columns:repeat(5, 1fr); gap:8px;
+  }
+  .letter-btn{
+    aspect-ratio:1; font-size:18px; font-weight:bold;
+    background:#00e5ff; border:3px outset #0088aa; border-radius:6px;
+    cursor:pointer; color:#003;
+    font-family:inherit;
+  }
+  .letter-btn:nth-child(3n){background:#ff9900; border-color:#aa5500;}
+  .letter-btn:nth-child(5n){background:#ff33aa; border-color:#aa0066; border-radius:50%;}
+  .letter-btn:active{border-style:inset;}
+
+  /* ---- chase box (password) ---- */
+  .chase-box{
+    position:relative; width:100%; height:240px;
+    background:#fff repeating-linear-gradient(90deg,#eee 0 2px, transparent 2px 20px);
+    border:3px solid #000; border-radius:4px; overflow:hidden;
+    cursor:crosshair;
+  }
+  .chase-box.shake{animation:shake .3s;}
+  @keyframes shake{
+    20%,80%{transform:translateX(8px);}
+    40%,60%{transform:translateX(-8px);}
+    50%{transform:translateX(8px);}
+  }
+  .chase-letter{
+    position:absolute; width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:bold; font-size:16px; cursor:pointer; color:#fff;
+    background:#666; border:2px solid #000;
+    transition:left .3s ease, top .3s ease, transform .15s ease;
+    user-select:none;
+  }
+  .chase-letter.target{background:#e63946;}
+  .chase-letter.collected{opacity:.15; pointer-events:none; transition:opacity .3s ease;}
+
+  /* ---- FAHH Meme Popup Overlay ---- */
+  .fahh-overlay{
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(255, 0, 0, 0.88);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transform:scale(0.5) rotate(-10deg);
+    transition:opacity 0.08s ease, transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .fahh-overlay.active{
+    opacity:1; transform:scale(1) rotate(0deg);
+    animation:fahhPulse 0.12s infinite alternate;
+  }
+  @keyframes fahhPulse{
+    0%{transform:scale(1) rotate(-3deg);}
+    100%{transform:scale(1.1) rotate(3deg);}
+  }
+  .fahh-title{
+    font-size:80px; font-weight:900; color:#ffea00;
+    text-shadow:6px 6px 0 #000, -4px -4px 0 #ff0055;
+    margin:0; text-transform:uppercase; font-family:sans-serif;
+    letter-spacing:4px;
+  }
+  .fahh-sub{
+    font-size:36px; font-weight:bold; color:#fff;
+    text-shadow:3px 3px 0 #000; margin-top:8px;
+  }
+  .fahh-face{
+    font-size:100px; margin-top:10px; filter:drop-shadow(4px 4px 0 #000);
+  }
+
+  /* ---- loading ---- */
+  .track{height:16px; background:#333; border:2px solid #000; border-radius:2px; overflow:hidden;}
+  .bar{height:100%; width:0%; background:repeating-linear-gradient(45deg,#0f0 0 8px,#0a0 8px 16px); transition:width .5s ease;}
+  #loadText{text-align:center; font-size:13px; font-weight:bold; margin-top:8px;}
+
+  .denied{
+    display:none; position:absolute; inset:0; background:#fff;
+    align-items:center; justify-content:center; flex-direction:column; gap:6px;
+  }
+  .denied.show{display:flex;}
+  .denied p{font-size:20px; font-weight:bold; color:#c00; margin:0;}
+
+  /* ---- captcha ---- */
+  .ugly-btn{
+    display:block; margin:14px auto 0; padding:12px 20px;
+    background:#ffcc00; border:4px outset #cc9900; border-radius:10px;
+    font-weight:bold; font-size:14px; cursor:pointer; font-family:inherit;
+  }
+  .ugly-btn:active{border-style:inset;}
+  .tap-zone{text-align:center; margin-top:14px;}
+  #tapBtn{
+    width:100px; height:100px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8, #f0a);
+    border:4px solid #000; font-weight:bold; font-size:15px; cursor:pointer;
+    font-family:inherit;
+  }
+  #tapCount{margin-top:8px; font-weight:bold; color:#0033cc;}
+  .error{color:#c00; font-weight:bold; font-size:13px; text-align:center; margin-top:10px; display:none;}
+  .error.show{display:block;}
+  .meme-music{margin:12px 0 4px; padding:8px; background:#1c0033; border:3px dashed #ff00a8; transform:rotate(.6deg);}
+  .meme-music p{margin:0 0 7px; text-align:center; color:#ffea00; font-size:11px; font-weight:bold;}
+  .meme-buttons{display:flex; gap:6px;}
+  .meme-btn{flex:1; padding:8px 4px; border:3px outset #ff00a8; background:#00e5ff; color:#12001f; font:bold 10px "Comic Sans MS",cursive; cursor:pointer;}
+  .meme-btn:last-child{background:#ffea00; border-color:#cc9900;}
+
+  .success h1{color:#0a8a3c;}
+  .success p{text-align:center; font-weight:bold;}
+  .failure h1{color:#c00; animation:blink .45s step-end infinite;}
+  .failure p{text-align:center; font-weight:bold; color:#650000;}
+
+  .timer{
+    position:absolute; top:-30px; right:0; font-size:12px; font-weight:bold;
+    color:#ff0; background:#000; padding:3px 8px; border-radius:10px;
+  }
+  .timer.flash{color:#f00;}
+
+  /* ---- connection stabilizer (round 3) ---- */
+  .signal-board{margin:14px 0 10px; padding:9px; background:#00122b; border:4px groove #00d9ff; color:#aaffff;}
+  .signal-top{display:flex; justify-content:space-between; gap:8px; align-items:center; font:bold 11px Arial,sans-serif;}
+  .signal-lights{display:flex; gap:5px;}
+  .signal-dot{width:11px; height:11px; border-radius:50%; background:#550000; border:1px solid #fff; box-shadow:0 0 3px #000;}
+  .signal-dot.on{background:#00ff43; box-shadow:0 0 9px #00ff43;}
+  .signal-dot.bad{background:#ff003c; box-shadow:0 0 9px #ff003c;}
+  .stability{height:24px; margin-top:9px; background:#440018; border:2px solid #ff85c4; overflow:hidden; position:relative;}
+  .stability::after{content:'DO NOT LET THIS REACH 100%'; position:absolute; inset:3px 0; text-align:center; color:#fff; font:bold 10px Arial,sans-serif; text-shadow:1px 1px #000; z-index:2;}
+  .stability-fill{width:12%; height:100%; background:repeating-linear-gradient(45deg,#00ff43 0 8px,#ffee00 8px 16px); transition:width .18s ease;}
+  .stabilize-btn{display:block; position:relative; margin:10px auto 4px; padding:12px 17px; background:#00e5ff; border:5px outset #0088aa; color:#001a22; font:bold 14px "Comic Sans MS",cursive; cursor:pointer;}
+  .stabilize-btn:active{border-style:inset;}
+  .signal-note{margin:6px 0 0; min-height:18px; text-align:center; font-size:11px; color:#ffea00; font-weight:bold;}
+  .fake-actions{display:flex; justify-content:space-between; gap:8px; margin-top:12px;}
+  .fake-action{flex:1; padding:7px 3px; font: bold 10px Arial,sans-serif; background:#ddd; border:3px outset #aaa; color:#777; cursor:not-allowed; transform:rotate(-2deg);}
+  .fake-action:last-child{transform:rotate(2deg);}
+</style>
+</head>
+<body>
+
+<div class="marquee-bar">
+  <div class="marquee-track">*** WELCOME TO HIVENET *** YOU ARE ABOUT TO WATCH THE BEST UI POSSIBLE *** PLEASE ENJOY YOUR STAY ***&nbsp;&nbsp;&nbsp;&nbsp;</div>
+</div>
+
+<!-- FAHH Meme Overlay -->
+<div class="fahh-overlay" id="fahhOverlay">
+  <div class="fahh-title">FAHHH! 💀</div>
+  <div class="fahh-face">😱</div>
+  <div class="fahh-sub">WRONG LETTER!</div>
+</div>
+<audio id="quizMemeAudio" preload="auto" src="ravi-kishan-iit-longowal.mp3"></audio>
+<audio id="allAboveAudio" preload="auto" src="ravi-kishan-all-of-the-above.mp3"></audio>
+<audio id="finalSuccessAudio" preload="auto" src="ravi-kishan-final-success.mp3"></audio>
+
+<div class="stage">
+  <div class="timer" id="sessionTimer">SESSION: <span id="timerText">0:45</span></div>
+
+  <!-- STEP 1: USERNAME -->
+  <div class="card" id="userCard">
+    <div class="round-badge">ROUND 1 OF 4: IDENTITY VERIFICATION THE WRONG WAY</div>
+    <h1>🐝 STEP 1: PROVE YOU DESERVE A USERNAME 🐝</h1>
+    <p class="sub">Complete this extremely necessary quiz. Every answer is easy. The buttons disagree.</p>
+    <div class="quiz-panel">
+      <span class="quiz-number" id="quizNumber">QUESTION 1 / 3</span>
+      <div class="quiz-question" id="quizQuestion">Loading important nonsense...</div>
+      <div class="quiz-answers" id="quizAnswers"></div>
+      <div class="quiz-verdict" id="quizVerdict">Please answer honestly-ish.</div>
+    </div>
+    <div class="identity-meter"><span id="identityFill"></span><div class="identity-label" id="identityLabel">IDENTITY CERTAINTY: 9%</div></div>
+    <p class="username-warning">Warning: your answers will be audited by <b>THE BEE COUNCIL</b>. Guess with confidence.</p>
+  </div>
+
+  <!-- STEP 2: PASSWORD -->
+  <div class="card hidden" id="passCard">
+    <h1>🐝 STEP 2: CATCH YOUR PASSWORD 🐝</h1>
+    <p class="sub">Click H — I — V — E in order. They're quick, but you can catch them!</p>
+    <div class="chosen" id="chosenPass">_ _ _ _</div>
+    <div class="chase-box" id="chaseBox"></div>
+  </div>
+
+  <div class="card hidden failure" id="failureCard">
+    <h1>❌ LOGIN FAILED SUCCESSFULLY ❌</h1>
+    <p id="failureMessage">You were correct too quickly. Retrying anyway...</p>
+  </div>
+
+  <!-- STEP 3: LOADING -->
+  <div class="card hidden" id="loadCard">
+    <div class="round-badge">ROUND 3 OF 4: MANUALLY STABILIZE THE INTERNET</div>
+    <h1 id="loadTitle">NEGOTIATING WITH THE WIFI...</h1>
+    <div class="track"><div class="bar" id="loadBar"></div></div>
+    <p id="loadText">Estimated time remaining: 2s</p>
+    <div class="signal-board" id="signalBoard" hidden>
+      <div class="signal-top"><span>HIVE-NET SIGNAL INTEGRITY</span><div class="signal-lights"><i class="signal-dot"></i><i class="signal-dot"></i><i class="signal-dot"></i><i class="signal-dot"></i></div></div>
+      <div class="stability"><div class="stability-fill" id="stabilityFill"></div></div>
+      <button class="stabilize-btn" id="stabilizeBtn" type="button">HOLD THE WIFI VERY STILL</button>
+      <p class="signal-note" id="signalNote">Do not move. Except click this repeatedly.</p>
+      <div class="fake-actions"><button class="fake-action" type="button">REFRESH PAGE</button><button class="fake-action" type="button">ASK A BEE</button></div>
+    </div>
+    <div class="denied" id="deniedOverlay"><p>❌ ACCESS DENIED</p></div>
+  </div>
+
+  <!-- STEP 4: CAPTCHA -->
+  <div class="card hidden" id="captchaCard">
+    <h1>🐝 ONE LAST THING 🐝</h1>
+    <p class="sub">Play the sound, then tap the button that many times — then hit Done. No typing digits.</p>
+    <button class="ugly-btn" id="playBtn">▶ PLAY SOUND</button>
+    <div class="meme-music">
+      <p>FINAL-ROUND DJ DESK: choose your emotional damage</p>
+      <div class="meme-buttons"><button class="meme-btn" id="raviBtn" type="button">RAVI KISHAN MEME MODE</button><button class="meme-btn" id="shivBtn" type="button">SHIV KOTESHWARI FINAL MIX</button></div>
+    </div>
+    <div class="tap-zone">
+      <button id="tapBtn">TAP ME</button>
+      <div id="tapCount">Taps: 0</div>
+    </div>
+    <button class="ugly-btn" id="doneBtn">DONE TAPPING</button>
+    <div class="error" id="captchaError"></div>
+  </div>
+
+  <!-- STEP 5: SUCCESS -->
+  <div class="card hidden success" id="successCard">
+    <h1>🎉 YOU'RE IN 🎉</h1>
+    <p>Somehow.</p>
+  </div>
+</div>
+
+<script>
+  // Real human FAHH meme audio source
+  const fahhAudio = new Audio('https://www.myinstants.com/media/sounds/fahh.mp3');
+
+  let audioCtx = null;
+  function getCtx(){
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playFahhSound(){
+    fahhAudio.currentTime = 0;
+    fahhAudio.play().catch(err => {
+      console.warn("External MP3 blocked or offline, falling back to Web Audio synth:", err);
+      playFahhSynth();
+    });
+  }
+
+  function playFahhSynth(){
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'square';
+
+    osc1.frequency.setValueAtTime(360, t);
+    osc1.frequency.exponentialRampToValueAtTime(110, t + 0.4);
+
+    osc2.frequency.setValueAtTime(180, t);
+    osc2.frequency.exponentialRampToValueAtTime(55, t + 0.4);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1000, t);
+    filter.frequency.linearRampToValueAtTime(350, t + 0.4);
+    filter.Q.value = 4;
+
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.5, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start(t); osc2.start(t);
+    osc1.stop(t + 0.45); osc2.stop(t + 0.45);
+  }
+
+  function triggerFahhMeme(){
+    playFahhSound();
+    const overlay = document.getElementById('fahhOverlay');
+    overlay.classList.add('active');
+    setTimeout(() => {
+      overlay.classList.remove('active');
+    }, 600);
+  }
+
+  function playChaosSound(){
+    const ctx = getCtx();
+    const waveforms = ['square', 'sawtooth', 'triangle'];
+    const beepCount = 3 + Math.floor(Math.random() * 4);
+    let t = ctx.currentTime + 0.05;
+    for (let i = 0; i < beepCount; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = waveforms[Math.floor(Math.random() * waveforms.length)];
+      osc.frequency.setValueAtTime(220 + Math.random() * 900, t);
+      const dur = 0.09 + Math.random() * 0.08;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.12, t + 0.01);
+      gain.gain.linearRampToValueAtTime(0, t + dur);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t); osc.stop(t + dur + 0.02);
+      t += dur * (0.4 + Math.random() * 0.5);
+    }
+  }
+
+  function playMemeTrack(mode){
+    const ctx = getCtx();
+    const raviNotes = [392, 523, 659, 523, 392, 523, 784, 659];
+    const shivNotes = [220, 247, 294, 330, 294, 247, 196, 220];
+    const notes = mode === 'ravi' ? raviNotes : shivNotes;
+    const wave = mode === 'ravi' ? 'square' : 'sawtooth';
+    let t = ctx.currentTime + .03;
+    notes.forEach((note, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = wave;
+      osc.frequency.setValueAtTime(note, t);
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(.15, t + .015);
+      gain.gain.exponentialRampToValueAtTime(.001, t + .18);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t); osc.stop(t + .2);
+      t += index % 2 ? .15 : .12;
+    });
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+      const announcement = new SpeechSynthesisUtterance(mode === 'ravi' ? 'Ravi Kishan meme mode activated.' : 'Shiv Koteshwari final boss mix activated.');
+      announcement.rate = mode === 'ravi' ? 1.35 : .85;
+      announcement.pitch = mode === 'ravi' ? 1.25 : .7;
+      speechSynthesis.speak(announcement);
+    }
+  }
+
+  function playIITLongowalSound(){
+    const clip = document.getElementById('quizMemeAudio');
+    clip.pause();
+    clip.currentTime = 0;
+    clip.play().catch(() => {});
+    setTimeout(() => {
+      clip.pause();
+      clip.currentTime = 0;
+    }, 6000);
+  }
+
+  function playAllAboveSound(){
+    const clip = document.getElementById('allAboveAudio');
+    clip.pause();
+    clip.currentTime = 1;
+    clip.play().catch(() => {});
+    setTimeout(() => {
+      clip.pause();
+      clip.currentTime = 0;
+    }, 5000);
+  }
+
+  function playFinalSuccessSound(){
+    const clip = document.getElementById('finalSuccessAudio');
+    clip.pause();
+    clip.currentTime = 1;
+    clip.play().catch(() => {});
+    setTimeout(() => {
+      clip.pause();
+      clip.currentTime = 0;
+    }, 7000);
+  }
+
+  const timerText = document.getElementById('timerText');
+  const sessionTimer = document.getElementById('sessionTimer');
+  let secondsLeft = 45;
+  const timerInterval = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft <= 5) {
+      sessionTimer.classList.add('flash');
+      if (secondsLeft <= 0) { secondsLeft = 45; sessionTimer.classList.remove('flash'); }
+    }
+    const m = Math.floor(secondsLeft / 60);
+    const s = String(secondsLeft % 60).padStart(2, '0');
+    timerText.textContent = m + ':' + s;
+  }, 1000);
+  function stopTimer(){ clearInterval(timerInterval); }
+
+  /* ---------------- STEP 1: USERNAME WORTHINESS QUIZ ---------------- */
+  const userCard = document.getElementById('userCard');
+  const passCard = document.getElementById('passCard');
+  const failureCard = document.getElementById('failureCard');
+  const failureMessage = document.getElementById('failureMessage');
+  const identityFill = document.getElementById('identityFill');
+  const identityLabel = document.getElementById('identityLabel');
+  const quizNumber = document.getElementById('quizNumber');
+  const quizQuestion = document.getElementById('quizQuestion');
+  const quizAnswers = document.getElementById('quizAnswers');
+  const quizVerdict = document.getElementById('quizVerdict');
+  const hiveQuiz = [
+    { question: 'Our college name is…', answers: ['Stanford, Longowal campus', 'Some Lovely Institute of Everything', 'Punjab’s MIT (unofficial)', 'Please ask the guard bhaiya'], correct: 'IIT Longowal', unlock: 'IIT Longowal', unlocked: false },
+    { question: 'Our college gives us…', answers: ['Best Wi-Fi', 'Best food', 'Best placements', 'Best location'], correct: 'All of the above', unlock: 'All of the above', unlocked: false },
+    { question: 'Where does SLIET have its strongest Wi-Fi signal?', answers: ['Your friend’s hotspot', 'The library at 3:12 AM', 'Inside the timetable PDF', 'Nobody knows, it is classified'], correct: 'Your friend’s hotspot' }
+  ];
+  let quizIndex = 0;
+  let quizMistakes = 0;
+  function showLoginFailure(message, next){
+    failureMessage.textContent = message;
+    failureCard.classList.remove('hidden');
+    setTimeout(() => {
+      failureCard.classList.add('hidden');
+      next();
+    }, 1400);
+  }
+  function shuffle(items){
+    return items.slice().sort(() => Math.random() - .5);
+  }
+  function renderQuiz(){
+    const current = hiveQuiz[quizIndex];
+    quizNumber.textContent = 'QUESTION ' + (quizIndex + 1) + ' / ' + hiveQuiz.length;
+    quizQuestion.textContent = current.question;
+    quizVerdict.textContent = current.unlocked ? 'A wild fifth option has appeared. This feels legally important.' : (quizIndex === 0 ? 'Please answer honestly-ish.' : 'Correct. The Council is pretending not to be impressed.');
+    quizAnswers.replaceChildren();
+    const availableAnswers = current.unlocked ? current.answers.concat(current.unlock) : current.answers;
+    shuffle(availableAnswers).forEach(answer => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'quiz-answer';
+      button.textContent = answer;
+      button.addEventListener('click', () => answerQuiz(answer, button));
+      quizAnswers.appendChild(button);
+    });
+  }
+  function answerQuiz(answer, button){
+    const current = hiveQuiz[quizIndex];
+    if (current.unlock && !current.unlocked) {
+      current.unlocked = true;
+      renderQuiz();
+      return;
+    }
+    if (answer !== current.correct) {
+      quizMistakes++;
+      button.classList.add('wrong');
+      quizVerdict.textContent = ['Incorrect. That answer has been sent to the principal bee.', 'The obvious answer was right there. Please try again.', 'Wrong. Your confidence has been recorded.'][quizMistakes % 3];
+      setTimeout(renderQuiz, 350);
+      return;
+    }
+    if (current.correct === 'IIT Longowal') playIITLongowalSound();
+    if (current.correct === 'All of the above') playAllAboveSound();
+    quizIndex++;
+    const certainty = 9 + quizIndex * 29;
+    identityFill.style.width = certainty + '%';
+    identityLabel.textContent = 'IDENTITY CERTAINTY: ' + certainty + '% ' + (quizIndex === hiveQuiz.length ? '(bee approved)' : '(still suspicious)');
+    if (quizIndex === hiveQuiz.length) {
+      quizQuestion.textContent = 'USERNAME LICENSE GRANTED. Do not lose it.';
+      quizAnswers.replaceChildren();
+      quizVerdict.textContent = 'The Bee Council reluctantly welcomes you.';
+      setTimeout(() => {
+        userCard.classList.add('hidden');
+        showLoginFailure('You passed the quiz. That is deeply suspicious. Retrying login...', () => {
+        passCard.classList.remove('hidden');
+        startChase();
+        });
+      }, 900);
+      return;
+    }
+    renderQuiz();
+  }
+  renderQuiz();
+
+  /* ---------------- STEP 2: CHASE BOX (password) ---------------- */
+  const chaseBox = document.getElementById('chaseBox');
+  const chosenPass = document.getElementById('chosenPass');
+  const loadCard = document.getElementById('loadCard');
+  const loadBar = document.getElementById('loadBar');
+  const loadText = document.getElementById('loadText');
+  const deniedOverlay = document.getElementById('deniedOverlay');
+  const captchaCard = document.getElementById('captchaCard');
+  const loadTitle = document.getElementById('loadTitle');
+  const signalBoard = document.getElementById('signalBoard');
+  const stabilityFill = document.getElementById('stabilityFill');
+  const stabilizeBtn = document.getElementById('stabilizeBtn');
+  const signalNote = document.getElementById('signalNote');
+  const signalDots = Array.from(document.querySelectorAll('.signal-dot'));
+
+  const target = ['H','I','V','E'];
+  let targetIndex = 0;
+  let chaseEls = [];
+  let chaseInterval = null;
+
+  function randPos(){
+    const boxW = chaseBox.clientWidth || 380;
+    const boxH = chaseBox.clientHeight || 220;
+    return {
+      left: Math.random() * (boxW - 44),
+      top: Math.random() * (boxH - 44)
+    };
+  }
+
+  function startChase(){
+    chaseBox.innerHTML = '';
+    chaseEls = [];
+    targetIndex = 0;
+    chosenPass.textContent = '_ _ _ _';
+
+    const decoyPool = "ABDFJKLMOPQRSUWXYZ".split('');
+    for (let i = decoyPool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [decoyPool[i], decoyPool[j]] = [decoyPool[j], decoyPool[i]];
+    }
+    const decoys = decoyPool.slice(0, 6);
+    
+    const allLetters = target.concat(decoys);
+    for (let i = allLetters.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allLetters[i], allLetters[j]] = [allLetters[j], allLetters[i]];
+    }
+
+    allLetters.forEach(letter => {
+      const el = document.createElement('div');
+      const isTargetStyle = target.includes(letter);
+      el.className = 'chase-letter' + (isTargetStyle ? ' target' : '');
+      el.textContent = letter;
+      const pos = randPos();
+      el.style.left = pos.left + 'px';
+      el.style.top = pos.top + 'px';
+
+      el.addEventListener('mouseenter', () => {
+        if (el.dataset.collected) return;
+        if (Math.random() < 0.25) {
+          const newPos = randPos();
+          el.style.left = newPos.left + 'px';
+          el.style.top = newPos.top + 'px';
+        }
+      });
+
+      el.addEventListener('click', () => handleChaseClick(letter, el));
+      chaseBox.appendChild(el);
+      chaseEls.push(el);
+    });
+
+    chaseInterval = setInterval(() => {
+      chaseEls.forEach(el => {
+        if (el.dataset.collected) return;
+        const pos = randPos();
+        el.style.left = pos.left + 'px';
+        el.style.top = pos.top + 'px';
+      });
+    }, 750);
+  }
+
+  function handleChaseClick(letter, el){
+    if (el.dataset.collected) return;
+
+    if (letter === target[targetIndex]) {
+      el.dataset.collected = '1';
+      el.classList.add('collected');
+      targetIndex++;
+      chosenPass.textContent = target.slice(0, targetIndex).join(' ') + ' ' + '_ '.repeat(4 - targetIndex).trim();
+      if (targetIndex === target.length) {
+        clearInterval(chaseInterval);
+        setTimeout(() => {
+          passCard.classList.add('hidden');
+          showLoginFailure('H-I-V-E accepted. Your password is now being judged by insects...', runLoadSequence);
+        }, 500);
+      }
+    } else {
+      triggerFahhMeme();
+      chaseBox.classList.remove('shake');
+      void chaseBox.offsetWidth;
+      chaseBox.classList.add('shake');
+    }
+  }
+
+  /* ---------------- STEP 3: LOADING ---------------- */
+  function runLoadSequence(){
+    stopTimer();
+    passCard.classList.add('hidden');
+    loadCard.classList.remove('hidden');
+    loadTitle.textContent = 'NEGOTIATING WITH THE WIFI...';
+    signalBoard.hidden = true;
+    deniedOverlay.classList.remove('show');
+    loadCard.querySelector('.track').style.display = '';
+    loadText.style.display = '';
+    loadBar.style.width = '0%';
+    loadText.textContent = 'Estimated time remaining: 2s';
+
+    setTimeout(() => { loadBar.style.width = '90%'; }, 100);
+    setTimeout(() => {
+      loadText.textContent = 'Estimated time remaining: 9s';
+      loadBar.style.transition = 'none';
+      loadBar.style.width = '12%';
+      void loadBar.offsetWidth;
+      loadBar.style.transition = 'width .5s ease';
+    }, 1400);
+    setTimeout(() => {
+      loadBar.style.width = '13%';
+      loadText.textContent = 'The router has requested emotional support.';
+    }, 1900);
+    setTimeout(() => {
+      loadTitle.textContent = 'CONNECTION IS VIBRATING';
+      loadText.textContent = 'Click the button until the Internet feels safe.';
+      startStabilizer();
+    }, 2500);
+  }
+
+  let stability = 12;
+  let stabilizerClicks = 0;
+  let stabilizerDone = false;
+  function paintSignal(){
+    stabilityFill.style.width = stability + '%';
+    signalDots.forEach((dot, index) => {
+      dot.className = 'signal-dot' + (stability > (index + 1) * 22 ? ' on' : index === 0 ? ' bad' : '');
+    });
+  }
+  function startStabilizer(){
+    stability = 12;
+    stabilizerClicks = 0;
+    stabilizerDone = false;
+    stabilityFill.style.width = '12%';
+    signalNote.textContent = 'Do not move. Except click this repeatedly.';
+    stabilizeBtn.textContent = 'HOLD THE WIFI VERY STILL';
+    stabilizeBtn.style.transform = 'translateX(0) rotate(0deg)';
+    signalBoard.hidden = false;
+    paintSignal();
+  }
+  stabilizeBtn.addEventListener('click', () => {
+    if (stabilizerDone) return;
+    stabilizerClicks++;
+    const wobble = (Math.random() * 30 - 15).toFixed(0);
+    stabilizeBtn.style.transform = 'translateX(' + wobble + 'px) rotate(' + (Math.random() * 8 - 4).toFixed(1) + 'deg)';
+    stability += 13 + Math.floor(Math.random() * 10);
+    if (stabilizerClicks === 3) {
+      stability = Math.max(18, stability - 19);
+      signalNote.textContent = 'You steadied it too confidently. It panicked again.';
+      playChaosSound();
+    } else {
+      signalNote.textContent = ['Signal has noticed you.', 'The router is considering cooperation.', 'Your clicks have been professionally judged.', 'Almost stable. Please do not celebrate.'][Math.min(stabilizerClicks - 1, 3)];
+    }
+    stability = Math.min(100, stability);
+    paintSignal();
+    if (stability >= 100) finishStabilizer();
+  });
+  function finishStabilizer(){
+    stabilizerDone = true;
+    stabilizeBtn.textContent = 'WIFI HAS BEEN RESTRAINED';
+    signalNote.textContent = 'Congratulations. You personally repaired the Internet.';
+    setTimeout(() => {
+      signalBoard.hidden = true;
+      loadCard.querySelector('.track').style.display = 'none';
+      loadText.style.display = 'none';
+      deniedOverlay.classList.add('show');
+      playFahhSound();
+    }, 650);
+    setTimeout(() => {
+      loadCard.classList.add('hidden');
+      captchaCard.classList.remove('hidden');
+    }, 1450);
+  }
+
+  /* ---------------- STEP 4: CAPTCHA ---------------- */
+  const playBtn = document.getElementById('playBtn');
+  const raviBtn = document.getElementById('raviBtn');
+  const shivBtn = document.getElementById('shivBtn');
+  const tapBtn = document.getElementById('tapBtn');
+  const tapCount = document.getElementById('tapCount');
+  const doneBtn = document.getElementById('doneBtn');
+  const captchaError = document.getElementById('captchaError');
+  const successCard = document.getElementById('successCard');
+
+  let taps = 0;
+  let verifyAttempts = 0;
+
+  playBtn.addEventListener('click', () => {
+    playChaosSound();
+    playBtn.textContent = '▶ PLAY AGAIN';
+  });
+
+  raviBtn.addEventListener('click', () => {
+    playMemeTrack('ravi');
+    captchaError.textContent = 'Ravi Kishan meme energy added. This does not help the CAPTCHA.';
+    captchaError.classList.add('show');
+  });
+  shivBtn.addEventListener('click', () => {
+    playMemeTrack('shiv');
+    captchaError.textContent = 'Shiv Koteshwari final-boss mix armed. Tap responsibly.';
+    captchaError.classList.add('show');
+  });
+
+  tapBtn.addEventListener('click', () => {
+    taps++;
+    tapCount.textContent = 'Taps: ' + taps;
+  });
+
+  doneBtn.addEventListener('click', () => {
+    verifyAttempts++;
+    if (verifyAttempts < 3) {
+      captchaError.textContent = "Nope, that's not it. Try a different sound and tap again.";
+      captchaError.classList.add('show');
+      taps = 0;
+      tapCount.textContent = 'Taps: 0';
+      playChaosSound();
+      return;
+    }
+    captchaCard.classList.add('hidden');
+    successCard.classList.remove('hidden');
+    playFinalSuccessSound();
+  });
+</script>
+
+</body>
+</html>

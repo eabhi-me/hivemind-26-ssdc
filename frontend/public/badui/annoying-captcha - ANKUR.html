@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Annoyingly Difficult CAPTCHA</title>
+  <style>
+    :root{--ink:#172033;--muted:#65708a;--accent:#7c3aed;--danger:#dc2626}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);background:radial-gradient(circle at 20% 10%,#ddd6fe,transparent 34%),linear-gradient(135deg,#f8fafc,#e2e8f0)}
+    .card{width:min(480px,100%);background:#fff;border:1px solid #dbe2ef;border-radius:20px;padding:28px;box-shadow:0 18px 55px #33415530}
+    h1{margin:0 0 6px;font-size:1.55rem}.subtitle{margin:0 0 22px;color:var(--muted)}
+    .progress{height:8px;background:#eef2ff;border-radius:99px;overflow:hidden;margin-bottom:24px}.progress span{display:block;width:25%;height:100%;background:linear-gradient(90deg,#8b5cf6,#ec4899)}
+    label{display:block;font-weight:700;margin:14px 0 8px}.fake-checkbox{display:flex;align-items:center;gap:12px;border:1px solid #cbd5e1;border-radius:10px;padding:14px;cursor:pointer;user-select:none}.fake-checkbox input{width:20px;height:20px;accent-color:var(--accent)}
+    input{font:inherit;width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px}button{font:inherit;border:0;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:#fff;width:100%}.muted{background:#f1f5f9;color:#334155}.actions{display:flex;gap:10px;margin-top:18px}.actions button{flex:1}
+    .captcha-box{position:relative;height:122px;overflow:hidden;border-radius:12px;border:2px dashed #94a3b8;background:repeating-linear-gradient(17deg,#faf5ff 0 10px,#ede9fe 10px 12px);display:grid;place-items:center}.captcha-text{font:900 34px Georgia,serif;letter-spacing:9px;color:#312e81;transform:rotate(-7deg) skewX(-14deg);text-shadow:2px 2px #f43f5e,-2px -1px #22c55e;user-select:none}.captcha-box i{position:absolute;width:150%;border-top:3px solid #f43f5eaa;transform:rotate(22deg)}.captcha-box i:nth-child(2){transform:rotate(-31deg);border-color:#0891b2aa}.hint{color:var(--muted);font-size:.88rem;margin-top:8px}.warning{color:var(--danger);font-weight:700}.tiny{margin-top:18px;color:#94a3b8;font-size:.75rem;text-align:center}
+    .trap{position:relative;height:72px}.trap .runaway{position:absolute;right:0;top:0}.trap .runaway:hover{right:55%;top:40px;transform:rotate(8deg)}
+    details{margin-top:18px;border-top:1px solid #e2e8f0;padding-top:14px}summary{cursor:pointer;font-weight:700}
+  </style>
+</head>
+<body>
+  <main class="card" aria-labelledby="title">
+    <h1 id="title">Prove you are probably human</h1>
+    <p class="subtitle">Only four quick steps. Probably.</p>
+    <div class="progress" aria-label="Progress"><span></span></div>
+
+    <section>
+      <label class="fake-checkbox"><input type="checkbox"> I am not a robot (please mean it)</label>
+      <p class="hint">We will inspect your checkbox technique.</p>
+    </section>
+
+    <section>
+      <label>Type the characters, but ignore the obvious decoys</label>
+      <div class="captcha-box" aria-label="CAPTCHA image showing V7mQ2"><span class="captcha-text">V7mQ2</span><i></i><i></i></div>
+      <input type="text" autocomplete="off" placeholder="The answer is V7mQ2, obviously">
+      <p class="hint">Case-sensitive, unless it is not.</p>
+    </section>
+
+    <section>
+      <label for="math">Solve this extremely important equation</label>
+      <p><strong>What is 7 + 8 × 2?</strong></p>
+      <input id="math" type="number" inputmode="numeric" placeholder="Use order of operations">
+      <p class="hint">Do not overthink it. We will still judge you.</p>
+    </section>
+
+    <section>
+      <label>Final question: select the button that definitely works</label>
+      <div class="trap"><button class="primary">This one</button><button class="muted runaway">Not this one</button></div>
+      <p class="hint">The other button is shy.</p>
+    </section>
+
+    <p class="warning">Verification incomplete. Please complete every step, then question your life choices.</p>
+    <details><summary>Why is this CAPTCHA so annoying?</summary><p>Because it combines a checkbox, noisy text, a math trick, and a button that runs away. This is a static, harmless demo: it does not send or collect data.</p></details>
+    <p class="tiny">Static HTML/CSS demo — no data is sent anywhere.</p>
+  </main>
+</body>
+</html>

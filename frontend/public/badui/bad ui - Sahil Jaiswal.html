@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Definitely Normal Login</title>
+  <style>
+    *{box-sizing:border-box} :root{--ink:#1f2937;--acid:#f3f4f6;--pink:#dc2626;--blue:#dbeafe;--violet:#64748b;--cream:#ffffff}
+    body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:var(--ink);overflow-x:hidden;background:radial-gradient(circle at 18% 16%,#2563eb 0,transparent 30%),radial-gradient(circle at 84% 78%,#0ea5e9 0,transparent 28%),linear-gradient(135deg,#020617 0%,#0f1f4a 48%,#061b3d 100%);background-attachment:fixed}
+    body::before{content:"LOGIN? LOGIN? LOGIN? LOGIN?";position:fixed;inset:42% auto auto -8%;width:116%;font-size:clamp(46px,10vw,132px);font-weight:1000;color:#1f293708;letter-spacing:4px;transform:rotate(-9deg);pointer-events:none}
+    body::after{content:"404: COMMON SENSE NOT FOUND";position:fixed;right:-48px;top:22%;padding:8px 55px;background:#fff;border:2px solid var(--ink);font:800 11px monospace;transform:rotate(90deg);box-shadow:4px 4px #94a3b8;z-index:2}
+    .top{height:34px;background:#071a41;color:#dbeafe;border-bottom:2px solid #38bdf8;white-space:nowrap;overflow:hidden;padding:8px;font:700 12px monospace;box-shadow:0 3px 18px #38bdf866}.ticker{display:inline-block;animation:ticker 12s linear infinite}@keyframes ticker{to{transform:translateX(-50%)}}
+    main{min-height:calc(100vh - 34px);display:grid;place-items:center;padding:48px 22px}.card{position:relative;width:min(94vw,540px);padding:34px;border:2px solid #60a5fa;border-radius:14px;background:#fff;box-shadow:0 22px 65px #020617cc,0 0 32px #2563eb66}
+    h1{position:relative;top:-8px;margin:0;font-size:clamp(26px,6vw,36px);line-height:1;letter-spacing:-1px}.sub{margin:2px 0 24px;font:600 14px monospace;color:#64748b}.fine{font-size:10px;color:#64748b}
+    label{font:900 13px monospace;text-transform:uppercase;letter-spacing:.5px;display:block;margin:14px 0 6px}.fake-required{font-weight:600;color:#d60064;font-size:9px;text-transform:none}
+    input{width:100%;padding:13px 14px;border:2px solid #94a3b8;border-radius:8px;background:#fff;font:600 15px monospace;outline:none;transition:.18s}input:focus{border-color:#2563eb;box-shadow:0 0 0 3px #dbeafe}
+    input.char-processing{border-color:#f59e0b;background:#fffbeb;cursor:wait}.input-status{display:none;margin-top:5px;color:#b45309;font:700 10px monospace}.input-status.show{display:flex;align-items:center;gap:6px}.input-status.show::before{content:"";width:10px;height:10px;border:2px solid #fcd34d;border-top-color:#b45309;border-radius:50%;animation:spin .55s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .password-wrap{position:relative}.peek{position:absolute;right:5px;top:5px;width:42px;height:36px;border:1px solid #94a3b8;border-radius:7px;background:#f8fafc;cursor:pointer}
+    .phone-challenge{margin-top:14px;padding:14px;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc}.phone-title{margin:0 0 10px;font:900 13px monospace;text-transform:uppercase}.phone-boxes{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}.phone-digit{display:grid;place-items:center;min-width:0;height:46px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;font:800 19px monospace}.phone-digit.active{border:2px solid #4f46e5;box-shadow:0 0 0 3px #e0e7ff;color:#4f46e5}.phone-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.phone-actions button{padding:11px 6px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#334155;font:800 12px monospace;cursor:pointer}.phone-actions #setDigit{border-color:#4f46e5;background:#4f46e5;color:#fff}.phone-hint{margin:10px 0 0;color:#64748b;font:600 11px monospace}
+    .dob{padding:0}.dob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}.dob-part{text-align:center}.dob-part small{display:block;margin-bottom:6px;font:800 12px monospace;color:#475569}.dob-value{display:grid;place-items:center;height:42px;border:2px solid #94a3b8;border-radius:7px;background:#fff;font:800 16px monospace}.dob-plus{width:100%;margin-top:5px;padding:7px 3px;border:1px solid #1d4ed8;border-radius:6px;background:#2563eb;color:#fff;font:700 10px monospace;cursor:pointer}.dob-plus:hover{background:#1d4ed8}
+    .captcha{margin-top:20px;border:2px dashed #94a3b8;border-radius:10px;padding:14px;background:#f8fafc}.captcha-title{font:800 13px monospace}.math-row{display:grid;grid-template-columns:minmax(0,1fr) 105px 42px;gap:8px;align-items:stretch;margin:11px 0 0}.math-question{display:grid;place-items:center;padding:12px 8px;border:2px solid #94a3b8;border-radius:8px;background:#eef2ff;text-align:center;font:900 20px monospace;letter-spacing:1px}.math-answer{height:100%;min-height:52px;background:#fff!important;text-align:center;font-size:18px!important;padding:8px!important}.math-answer.checking-red{background:#fee2e2!important;border-color:#dc2626!important;color:#991b1b}.math-answer.accepted-green{background:#dcfce7!important;border-color:#16a34a!important;color:#166534}.captcha-message{min-height:20px;margin-top:8px;font:700 12px monospace;color:#b91c1c}.captcha-message.green{color:#15803d}.refresh{width:42px;min-height:52px;padding:0;border:1px solid #1d4ed8;border-radius:7px;background:#2563eb;color:#fff;font:800 20px monospace;cursor:pointer}
+    .terms{margin:13px 0;display:flex;gap:9px;align-items:start;font:600 12px Arial,sans-serif;text-transform:none;letter-spacing:0}.terms span{font:inherit}.terms input{width:21px;height:21px;accent-color:#2563eb;box-shadow:none}.prank-message{display:none;margin:12px 3px;padding:12px;border:2px solid #dc2626;background:#fee2e2;color:#991b1b;text-align:center;font:900 13px monospace;transform:rotate(-1deg)}.prank-message.show{display:block}.arena{height:78px;position:relative;border:2px dotted #94a3b8;border-radius:9px;background:#f8fafc}.login{position:absolute;left:8px;top:12px;width:210px;max-width:calc(100% - 16px);padding:11px 12px;border:2px solid #1e3a8a;border-radius:7px;background:#2563eb;color:white;font:800 13px monospace;cursor:pointer;box-shadow:3px 3px #94a3b8;transition:left .12s,top .12s,transform .15s}.login:hover{transform:rotate(-1deg)}
+    .toast{position:fixed;left:50%;bottom:22px;max-width:90vw;text-align:center;transform:translate(-50%,130px) rotate(2deg);background:var(--ink);color:#fff;border:3px solid var(--acid);border-radius:5px;padding:13px 19px;font:900 13px monospace;box-shadow:6px 6px var(--pink);z-index:60;transition:.25s}.toast.show{transform:translate(-50%,0) rotate(-1deg)}
+    .modal{position:fixed;inset:0;background:#0008;display:none;place-items:center;padding:18px;z-index:20}.modal.show{display:grid}.popup{width:min(92vw,400px);background:#fff;border:5px solid #111;padding:24px;box-shadow:10px 10px var(--acid);position:relative;text-align:center}.popup h2{font-size:27px;margin:5px}.close{position:absolute;right:8px;top:8px;border:0;background:transparent;font-size:17px;cursor:pointer}.popup button:not(.close){padding:10px;border:3px solid #111;background:var(--blue);font-weight:900;cursor:pointer}.tiny-close{position:fixed;width:18px;height:18px;font-size:8px;padding:0!important;background:#fff!important}
+    .success{display:none;text-align:center}.success .giant{font-size:65px}.success button{padding:12px 18px;border:3px solid #111;background:var(--acid);font-weight:900;cursor:pointer}.loader{position:fixed;inset:0;background:#111e;color:#fff;display:none;place-items:center;z-index:50;text-align:center}.loader.show{display:grid}.loadbox{width:min(86vw,420px)}.progress{height:25px;border:3px solid #fff;margin-top:12px}.bar{width:1%;height:100%;background:var(--acid);transition:width .15s}.percent{font-size:48px;font-weight:1000}
+    /* Deliberately frustrating visual decisions */
+    .card{border-radius:5px 26px 8px 20px;border-width:3px 1px 4px 2px}h1{margin-left:13px;transform:rotate(-.7deg)}.sub{margin-left:3px}
+    label[for="email"]{text-align:right;margin-right:19px;transform:rotate(1deg)}#email{border-radius:21px 3px 17px 2px;transform:rotate(.25deg)}
+    label[for="password"]{margin-left:28px;letter-spacing:3px;transform:rotate(-1deg)}.password-wrap{width:calc(100% - 9px);margin-left:9px}.password-wrap input{border-radius:2px 19px 4px 15px}
+    .phone-challenge{margin-left:-7px;margin-right:5px;border-width:1px 4px 2px 1px;border-radius:3px 18px 5px 14px;transform:rotate(-.35deg)}.phone-digit:nth-child(even){transform:translateY(4px);border-radius:3px 11px}.phone-digit:nth-child(3n){height:41px;margin-top:3px}
+    .dob-grid{transform:translateX(4px) rotate(.3deg)}.dob-part:nth-child(2){transform:translateY(5px)}.dob-part:nth-child(3){transform:translateY(-3px)}.dob-value{border-radius:2px 13px 4px 9px}
+    .captcha{margin-left:6px;margin-right:-5px;border-style:dotted dashed solid dotted;border-radius:17px 3px 13px 5px;transform:rotate(.25deg)}.math-question{border-radius:2px 15px 3px 10px}.terms:nth-of-type(1){margin-left:17px}.terms:nth-of-type(2){margin-left:-4px}
+    .card::before{content:"FORM ENDS HERE ↓";position:absolute;right:-40px;top:105px;padding:5px 9px;border:2px solid #dc2626;background:#fff;color:#dc2626;font:900 9px monospace;transform:rotate(86deg);z-index:3}.card::after{content:"SCROLL UP TO CONTINUE ↑";position:absolute;left:-53px;top:48%;padding:5px 8px;border:2px dashed #2563eb;background:#eff6ff;color:#1d4ed8;font:900 8px monospace;transform:rotate(-88deg);z-index:3}.field-badge{display:inline-block;position:relative;z-index:2;margin-top:-6px;padding:3px 7px;border:1px solid #dc2626;background:#fff;color:#b91c1c;font:800 8px Georgia,serif;transform:translateX(12px) rotate(-2deg)}.field-badge.password-badge{float:right;transform:translate(-17px,-2px) rotate(2deg);color:#1d4ed8;border-color:#2563eb}.phone-title{text-align:right;letter-spacing:4px}.captcha-title{text-align:center;letter-spacing:5px;text-decoration:underline wavy #dc2626}.dob> .dob-grid::before{content:"CHOOSE CAREFULLY (NO REASON)";grid-column:1/-1;text-align:right;color:#94a3b8;font:700 8px serif;letter-spacing:2px}
+    .card.jolt{animation:jolt .22s steps(2)}@keyframes jolt{25%{transform:translate(7px,-3px) rotate(.7deg)}50%{transform:translate(-6px,4px) rotate(-.6deg)}75%{transform:translate(4px,2px) rotate(.4deg)}}
+    input.focus-chaos{transform:translateX(9px) rotate(-.6deg)!important}.terms.swap-chaos{flex-direction:row-reverse;justify-content:flex-end;text-align:right}.dob-plus:nth-child(odd){font-family:Georgia,serif}.phone-actions button:first-child:hover{transform:translateX(8px)}
+    @media(max-width:540px){body::after{display:none}main{padding:38px 17px}.card{padding:28px 20px;border-radius:18px 4px}.card::after{left:-15px;top:95px;width:38px;height:38px}.arena{height:100px}.login{width:180px;max-width:80%}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="top"><span class="ticker">⚠ This login page respects your time (probably) — Security level: unnecessarily dramatic — ⚠ This login page respects your time (probably) — Security level: unnecessarily dramatic — </span></div>
+  <main>
+    <section class="card" id="card">
+      <div id="formView">
+        <h1>LOGIN TO YOUR ACCOUNT</h1>
+        <p class="sub">Enter your details to get started.</p>
+        <form id="loginForm" novalidate>
+          <label for="email">Username</label>
+          <input id="email" autocomplete="username" placeholder="???" required>
+          <span class="field-badge">✓ PROBABLY INVALID</span>
+          <div class="input-status" id="emailStatus">Processing character... wait 1 second</div>
+          <label for="password">Password</label>
+          <div class="password-wrap"><input id="password" type="password" autocomplete="current-password" placeholder="???" required><button class="peek" id="peek" type="button">👁</button></div>
+          <span class="field-badge password-badge">8/7 RULES PASSED</span>
+          <div class="input-status" id="passwordStatus">Processing character... wait 1 second</div>
+          <div class="phone-challenge">
+            <div class="phone-title">Phone number</div>
+            <div class="phone-boxes" id="phoneBoxes" aria-label="Phone number selector"></div>
+            <div class="phone-actions"><button id="restartPhone" type="button">Restart</button><button id="setDigit" type="button">Set digit</button></div>
+            <p class="phone-hint">Press Set digit to lock the moving number.</p>
+          </div>
+          <label>Date of Birth</label>
+          <div class="dob">
+            <div class="dob-grid">
+              <div class="dob-part"><small>DAY</small><div class="dob-value" id="dobDay">01</div><button class="dob-plus" type="button" data-dob="day">+1 DAY</button></div>
+              <div class="dob-part"><small>MONTH</small><div class="dob-value" id="dobMonth">JAN</div><button class="dob-plus" type="button" data-dob="month">+1 MONTH</button></div>
+              <div class="dob-part"><small>YEAR</small><div class="dob-value" id="dobYear">1900</div><button class="dob-plus" type="button" data-dob="year">+1 YEAR</button></div>
+            </div>
+          </div>
+          <div class="captcha">
+            <div class="captcha-title">CAPTCHA</div>
+            <div class="math-row">
+              <div class="math-question" id="mathQuestion"></div>
+              <input class="math-answer" id="captchaAnswer" type="number" inputmode="numeric" autocomplete="off" placeholder="Answer" required>
+              <button class="refresh" id="refresh" type="button" title="Reset CAPTCHA" aria-label="Reset CAPTCHA">↻</button>
+            </div>
+            <div class="captcha-message" id="captchaMessage"></div>
+          </div>
+          <label class="terms"><input id="remember" type="checkbox"><span id="rememberText">Remember me</span></label>
+          <label class="terms"><input id="terms" type="checkbox"><span>I disagree to agree with the terms I definitely read.</span></label>
+          <div class="prank-message" id="prankMessage">Just kidding, click login again ☠️</div>
+          <div class="arena" id="arena"><button class="login" id="login" type="submit">LOGIN</button></div>
+        </form>
+      </div>
+      <div class="success" id="success"><div class="giant">🎉</div><h1>Access accidentally granted!</h1><p>You survived the login page. That is the entire achievement.</p><button onclick="location.reload()">Suffer again</button></div>
+    </section>
+  </main>
+  <div class="modal" id="modal"><div class="popup" id="popup"><button class="close" id="closeAd">×</button><div style="font-size:48px">🏆</div><h2>CONGRATULATIONS!</h2><p>You are our <b>9,999,999th visitor</b>. Click below to reject your imaginary prize.</p><button id="rejectAd">REJECT FREE PRIZE</button></div></div>
+  <div class="toast" id="toast"></div>
+  <div class="loader" id="loader"><div class="loadbox"><div id="loadText">Authenticating your questionable decisions...</div><div class="percent" id="percent">1%</div><div class="progress"><div class="bar" id="bar"></div></div></div></div>
+  <script>
+    const $=s=>document.querySelector(s), form=$('#loginForm'), login=$('#login'), arena=$('#arena'), toast=$('#toast');
+    const CORRECT_PASSWORD='DefinitelyCorrect';
+    let escapes=0, adClosed=0, wrongAttempts=0, captchaFillStage=0, captchaInputSession=false, captchaVerified=false, fakeLoadDone=false, loginTextStep=0, captchaResult=0;
+    let phoneDigits=[],phoneIndex=0,movingDigit=0;
+    let dobDay=1,dobMonth=0,dobYear=1900;
+    const monthNames=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const loginTexts=['LOGIN','PLEASE LOGIN','BRO LOGIN','JUST LOGIN 😭'];
+    function newCaptcha(){captchaVerified=false;captchaInputSession=false;let a,b,c,d;do{a=Math.ceil(Math.random()*8)+2;b=Math.ceil(Math.random()*7)+2;c=Math.ceil(Math.random()*15);d=Math.ceil(Math.random()*9);captchaResult=(a*b)+c-d}while(captchaResult<10||captchaResult>99);$('#mathQuestion').textContent=`(${a} × ${b}) + ${c} − ${d} = ?`;$('#captchaAnswer').value='';$('#captchaAnswer').classList.remove('checking-red','accepted-green');$('#captchaMessage').textContent='';$('#captchaMessage').classList.remove('green')}
+    function checkCaptcha(){if(captchaFillStage<3)return false;if(Number($('#captchaAnswer').value)!==captchaResult){newCaptcha();say('Wrong answer. Try the new question.');return false}if(!confirm('CAPTCHA correct... but are you sure?')){newCaptcha();say('Confidence rejected. New question generated.');return false}captchaVerified=true;return true}
+    function say(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('show'),1900)}
+    function addCharacterDelay(input,status){input.addEventListener('paste',e=>{e.preventDefault();say('Pasting is too efficient. Type it painfully.')});input.addEventListener('input',()=>{if(input.readOnly)return;input.readOnly=true;input.classList.add('char-processing');status.classList.add('show');setTimeout(()=>{input.readOnly=false;input.classList.remove('char-processing');status.classList.remove('show');input.focus();input.setSelectionRange(input.value.length,input.value.length)},1000)})}
+    addCharacterDelay($('#email'),$('#emailStatus'));addCharacterDelay($('#password'),$('#passwordStatus'));
+    function renderPhone(){const boxes=$('#phoneBoxes');boxes.innerHTML='';for(let i=0;i<10;i++){const box=document.createElement('div');box.className='phone-digit'+(i===phoneIndex&&phoneIndex<10?' active':'');box.textContent=i<phoneDigits.length?phoneDigits[i]:(i===phoneIndex?movingDigit:'');boxes.appendChild(box)}$('#setDigit').textContent=phoneIndex===10?'Completed':'Set digit';$('#setDigit').disabled=phoneIndex===10}
+    setInterval(()=>{if(phoneIndex<10){movingDigit=(movingDigit+1)%10;renderPhone()}},140);
+    $('#setDigit').onclick=()=>{if(phoneIndex>=10)return;phoneDigits.push(movingDigit);phoneIndex++;renderPhone();if(phoneIndex===10)say('Phone number captured. Eventually.')};
+    $('#restartPhone').onclick=()=>{phoneDigits=[];phoneIndex=0;movingDigit=0;renderPhone();say('Entire phone number deleted. Start suffering again.')};
+    function punishButton(){escapes++;const scale=Math.max(.55,1-wrongAttempts*.12);login.style.width=Math.round(210*scale)+'px';const maxX=Math.max(0,arena.clientWidth-login.offsetWidth-8),maxY=Math.max(0,arena.clientHeight-login.offsetHeight-6);login.style.left=Math.random()*maxX+'px';login.style.top=Math.random()*maxY+'px'}
+    login.addEventListener('mouseenter',()=>{if(loginTextStep<loginTexts.length-1&&escapes<7){wrongAttempts++;punishButton();say('Too slow. The button noticed you.')}});
+    document.querySelectorAll('input:not([type="checkbox"])').forEach(input=>input.addEventListener('focus',()=>{input.classList.toggle('focus-chaos');const label=input.closest('.password-wrap')?.previousElementSibling||document.querySelector(`label[for="${input.id}"]`);if(label){label.style.textAlign=Math.random()>.5?'left':'right';label.style.marginLeft=Math.round(Math.random()*38)+'px'}}));
+    document.querySelectorAll('.terms').forEach(term=>term.addEventListener('click',()=>term.classList.toggle('swap-chaos')));
+    let irritationClicks=0;document.addEventListener('click',()=>{if(++irritationClicks%4)return;const card=$('#card');card.classList.remove('jolt');void card.offsetWidth;card.classList.add('jolt')});
+    $('#peek').onclick=()=>{const p=$('#password');p.type='text';setTimeout(()=>{p.type='password'},500)};
+    document.querySelectorAll('.dob-plus').forEach(button=>button.onclick=()=>{const type=button.dataset.dob;if(type==='day'){dobDay=dobDay===31?1:dobDay+1;$('#dobDay').textContent=String(dobDay).padStart(2,'0')}else if(type==='month'){dobMonth=(dobMonth+1)%12;$('#dobMonth').textContent=monthNames[dobMonth]}else{dobYear=dobYear===2026?1900:dobYear+1;$('#dobYear').textContent=dobYear}});
+    $('#refresh').onclick=()=>{newCaptcha();say('Previous equation has been erased from history.')};
+    $('#captchaAnswer').addEventListener('input',()=>{const answer=$('#captchaAnswer'),digits=answer.value.replace(/\D/g,'');if(digits.length<2)return;if(captchaFillStage>=2){captchaFillStage=3;const isCorrect=Number(answer.value)===captchaResult;answer.classList.toggle('accepted-green',isCorrect);answer.classList.toggle('checking-red',!isCorrect);$('#captchaMessage').textContent=isCorrect?'Just joking':'Wrong answer bro, calculate again 😂';$('#captchaMessage').classList.toggle('green',isCorrect);return}if(captchaInputSession)return;captchaInputSession=true;captchaFillStage++;answer.classList.remove('accepted-green');answer.classList.add('checking-red');$('#captchaMessage').classList.remove('green');if(captchaFillStage===1){$('#captchaMessage').textContent='Struggling with basic mathematics lol 😂'}else{$('#captchaMessage').textContent='It’s easy maths CAPTCHA bro 🤣'}setTimeout(()=>{answer.value='';captchaInputSession=false;answer.focus()},1500)});
+    $('#remember').onchange=()=>{if($('#remember').checked){$('#rememberText').textContent='Remember me (probably)';say("Okay, I’ll remember you. Probably.")}else{$('#rememberText').textContent='Remember me';say('Identity forgotten instantly.')}};
+    function showAd(){if($('#success').style.display==='block')return;$('#modal').classList.add('show')}
+    $('#closeAd').onclick=()=>{adClosed++;if(adClosed===1){$('#popup').style.transform='scale(1.18) rotate(2deg)'}else $('#modal').classList.remove('show')};
+    $('#rejectAd').onclick=()=>{$('#modal').classList.remove('show');say('Prize rejected successfully. We are disappointed.');setTimeout(showAd,8000)};
+    async function fakeLoading(){const loader=$('#loader'),bar=$('#bar'),percent=$('#percent'),loadText=$('#loadText');loadText.textContent='Authenticating your questionable decisions...';loader.classList.add('show');for(let n=1;n<=100;n++){percent.textContent=n+'%';bar.style.width=n+'%';await new Promise(r=>setTimeout(r,100))}loadText.textContent='LOGIN SUCCESSFUL!';await new Promise(r=>setTimeout(r,900));loader.classList.remove('show');bar.style.width='1%';percent.textContent='1%'}
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(loginTextStep<loginTexts.length-1){loginTextStep++;wrongAttempts++;login.textContent=loginTexts[loginTextStep];punishButton();return say('Button understood nothing. Click it again.')}
+      if(!fakeLoadDone){await fakeLoading();fakeLoadDone=true;$('#prankMessage').classList.add('show');return say('Just kidding, click login again ☠️')}
+      $('#formView').style.display='none';$('#success').style.display='block';$('#modal').classList.remove('show');
+    });
+    renderPhone(); newCaptcha(); setTimeout(showAd,8000); setInterval(()=>{if(document.visibilityState==='visible')showAd()},20000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CAPTCHA&trade; — Definitely Human Verification System v6.66</title>
+<style>
+  :root {
+    --bg:#0b0d10; --panel:#14181e; --panel2:#1b212a; --line:#2a323d;
+    --text:#e8e4d8; --dim:#8a93a1; --accent:#ffd23f; --bad:#ff4d4d; --good:#4dff88;
+    --mono:"Courier New",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:Georgia,"Times New Roman",serif;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; overflow:hidden;
+    background-image:
+      radial-gradient(circle at 20% 10%, #1a1420 0%, transparent 40%),
+      radial-gradient(circle at 80% 90%, #101a14 0%, transparent 40%);
+  }
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
+    background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.015) 2px 4px);}
+  #app{width:min(540px,94vw);background:var(--panel);border:1px solid var(--line);
+    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 6px rgba(255,255,255,.02);
+    padding:28px;position:relative;user-select:none}
+  #app.shake{animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-.6deg)}
+    40%{transform:translateX(12px) rotate(.5deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
+  header{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px dashed var(--line);padding-bottom:12px;margin-bottom:16px}
+  header h1{font-size:19px;letter-spacing:.5px;font-style:italic}
+  header h1 span{color:var(--accent);font-style:normal}
+  #risk{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:right}
+  #risk b{color:var(--bad)}
+  .stage{display:none}
+  .stage.active{display:block;animation:fadein .3s}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .prompt{font-size:14px;color:var(--dim);margin-bottom:14px;line-height:1.5}
+  .prompt em{color:var(--text)}
+  .dots{display:flex;gap:6px;margin-bottom:16px}
+  .dots i{width:22px;height:4px;background:var(--line)}
+  .dots i.done{background:var(--good)}
+  .dots i.now{background:var(--accent);animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.3}}
+  .taunt{font-family:var(--mono);font-size:11px;color:var(--bad);min-height:16px;margin-top:12px}
+  footer{margin-top:18px;font-family:var(--mono);font-size:10px;color:#4a525e;
+    display:flex;justify-content:space-between}
+
+  /* STAGE 1 — runaway checkbox */
+  #s1 .arena{position:relative;height:300px;border:1px solid var(--line);background:var(--panel2);overflow:hidden}
+  #s1 .arena::before{content:"VERIFICATION ZONE — THE CHECKBOX IS SHY";
+    position:absolute;bottom:6px;right:8px;font-family:var(--mono);font-size:9px;color:#3a434f}
+  #runner{position:absolute;display:flex;align-items:center;gap:8px;cursor:pointer;
+    padding:6px 10px;background:var(--panel);border:1px solid var(--line);white-space:nowrap;
+    transition:top .12s ease-out,left .12s ease-out}
+  #runner .box{width:16px;height:16px;border:2px solid var(--accent);display:inline-block;flex:none}
+  #runner span{font-size:13px}
+
+  /* STAGE 2 — tile keyboard */
+  #s2 .target{display:flex;gap:10px;justify-content:center;margin:6px 0 16px}
+  #s2 .target .slot{width:44px;height:56px;border-bottom:3px solid var(--accent);
+    display:flex;align-items:center;justify-content:center;font-size:30px;font-family:var(--mono);
+    background:var(--panel2)}
+  #s2 .target .slot.filled{border-bottom-color:var(--good)}
+  #s2 .wheel{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  #s2 .key{width:52px;height:52px;font-size:22px;font-family:var(--mono);cursor:pointer;
+    background:var(--panel2);border:1px solid var(--line);color:var(--text)}
+  #s2 .key:hover{border-color:var(--accent);color:var(--accent)}
+  #s2 .key.fn{width:auto;padding:0 12px;font-size:12px;color:var(--dim)}
+  #s2 .meta{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:12px}
+
+  /* STAGE 3 — image grid */
+  #s3 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  #s3 .cell{aspect-ratio:1;border:2px solid var(--line);cursor:pointer;overflow:hidden;position:relative;background:#0e1216}
+  #s3 .cell.sel{border-color:var(--accent);outline:2px solid var(--accent)}
+  #s3 .cell canvas{width:100%;height:100%;display:block}
+  #s3 button, .btn{margin-top:14px;width:100%;padding:12px;background:var(--accent);border:none;
+    color:#111;font-weight:bold;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:1px}
+  #s3 button:hover{background:#ffdf70}
+
+  /* STAGE 4 — hold to verify */
+  #s4 .holdzone{text-align:center;padding:10px 0}
+  #s4 .ringwrap{position:relative;width:180px;height:180px;margin:10px auto}
+  #s4 svg{transform:rotate(-90deg)}
+  #s4 .holdbtn{position:absolute;inset:34px;border-radius:50%;border:2px solid var(--accent);
+    background:var(--panel2);color:var(--text);font-size:14px;cursor:pointer;font-family:inherit}
+  #s4 .holdbtn:active{background:#2a323d}
+  #s4 .readout{font-family:var(--mono);font-size:12px;color:var(--dim)}
+
+  /* SUCCESS */
+  #done .stamp{border:4px double var(--good);color:var(--good);font-size:26px;font-style:italic;
+    text-align:center;padding:18px;transform:rotate(-3deg);margin:18px 0;letter-spacing:2px}
+  #done .stats{font-family:var(--mono);font-size:12px;color:var(--dim);line-height:1.9;text-align:center}
+  #done .stats b{color:var(--text)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>captcha<span>&trade;</span> v6.66</h1>
+    <div id="risk">RISK SCORE<br><b id="riskVal">12%</b></div>
+  </header>
+  <div class="dots" id="dots"><i class="now"></i><i></i><i></i><i></i></div>
+
+  <!-- STAGE 1 -->
+  <section class="stage active" id="s1">
+    <p class="prompt">Step 1 of 4 — To confirm you are human, please <em>click the checkbox</em>. That is all. It is a very normal checkbox.</p>
+    <div class="arena" id="arena">
+      <div id="runner"><span class="box" id="thebox"></span><span id="runnerLabel">I am not a robot</span></div>
+    </div>
+    <p class="taunt" id="t1"></p>
+  </section>
+
+  <!-- STAGE 2 -->
+  <section class="stage" id="s2">
+    <p class="prompt">Step 2 of 4 — Type the word <em id="wordEcho"></em> using the key tiles below. The tiles <em>rearrange after every press</em>, for security. Backspace deletes two letters, because one would be too easy.</p>
+    <div class="target" id="slots"></div>
+    <div class="wheel" id="wheel"></div>
+    <div class="meta"><span>ERRORS: <b id="s2err">0</b></span><span>HINT: the word is <b id="wordHint"></b></span></div>
+    <p class="taunt" id="t2"></p>
+  </section>
+
+  <!-- STAGE 3 -->
+  <section class="stage" id="s3">
+    <p class="prompt">Step 3 of 4 — Select every square containing a <em>circle</em>. Squares politely swap places when you hover them. Also one of them is lying.</p>
+    <div class="grid" id="grid"></div>
+    <button id="gridSubmit">VERIFY SELECTION</button>
+    <p class="taunt" id="t3"></p>
+  </section>
+
+  <!-- STAGE 4 -->
+  <section class="stage" id="s4">
+    <p class="prompt">Step 4 of 4 — Press and <em>hold the button for exactly 3.00 seconds</em>. Less is suspicious. More is very suspicious. The tolerance is generous: &plusmn;0.15s.</p>
+    <div class="holdzone">
+      <div class="ringwrap">
+        <svg width="180" height="180">
+          <circle cx="90" cy="90" r="80" fill="none" stroke="#2a323d" stroke-width="6"/>
+          <circle id="ring" cx="90" cy="90" r="80" fill="none" stroke="#ffd23f" stroke-width="6"
+            stroke-dasharray="502.6" stroke-dashoffset="502.6"/>
+        </svg>
+        <button class="holdbtn" id="holdbtn">HOLD<br>TO<br>VERIFY</button>
+      </div>
+      <div class="readout" id="readout">0.00s / 3.00s</div>
+    </div>
+    <p class="taunt" id="t4"></p>
+  </section>
+
+  <!-- SUCCESS -->
+  <section class="stage" id="done">
+    <p class="prompt" style="text-align:center">After careful analysis, our system concludes:</p>
+    <div class="stamp">PROBABLY HUMAN</div>
+    <div class="stats" id="stats"></div>
+    <button class="btn" onclick="location.reload()">VERIFY AGAIN (WHY?)</button>
+  </section>
+
+  <footer><span>&copy; CAPTCHA&trade; Industries</span><span id="clock">00:00</span></footer>
+</div>
+
+<script>
+/* ============ shared misery ============ */
+var fails = 0, stageStart = Date.now(), t0 = Date.now();
+var taunts = {
+  1:["too slow. robots are faster.","the checkbox senses fear.","it moved. you saw it move.","clicking is free. catching is not.","have you considered being a robot instead?"],
+  2:["wrong letter. obviously.","the tiles felt like moving. deal with it.","backspace deletes TWO. we mentioned this.","your typing pattern seems... robotic."],
+  3:["that was not a circle.","a robot would have known that.","the squares swapped. you blinked.","selection confidence: low."],
+  4:["too short. weak grip.","TOO LONG. nobody holds that long.","3.00 seconds. not 2.97. not 3.04.","your hand trembles like a robot's."]
+};
+function taunt(n){var arr=taunts[n];var el=document.getElementById("t"+n);el.textContent=arr[Math.floor(Math.random()*arr.length)];}
+function bumpRisk(x){var el=document.getElementById("riskVal");var v=Math.min(99,parseInt(el.textContent)+x);el.textContent=v+"%";}
+function shake(){var a=document.getElementById("app");a.classList.remove("shake");void a.offsetWidth;a.classList.add("shake");}
+function fail(n){fails++;shake();taunt(n);bumpRisk(3+Math.floor(Math.random()*7));}
+function gotoStage(n){
+  document.querySelectorAll(".stage").forEach(function(s){s.classList.remove("active")});
+  var ids={1:"s1",2:"s2",3:"s3",4:"s4",5:"done"};
+  document.getElementById(ids[n]).classList.add("active");
+  var dots=document.querySelectorAll("#dots i");
+  dots.forEach(function(d,i){d.className = i < n-1 ? "done" : (i===n-1 ? "now" : "");});
+  if(n===5){dots.forEach(function(d){d.className="done"});showStats();}
+  stageStart=Date.now();
+}
+setInterval(function(){
+  var s=Math.floor((Date.now()-t0)/1000);
+  document.getElementById("clock").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+},500);
+
+/* ============ STAGE 1: runaway checkbox ============ */
+(function(){
+  var arena=document.getElementById("arena"), runner=document.getElementById("runner"),
+      label=document.getElementById("runnerLabel"), box=document.getElementById("thebox");
+  var x=40,y=120,dodges=0,maxDodges=9;
+  function place(){runner.style.left=x+"px";runner.style.top=y+"px";}
+  place();
+  var labels=["I am not a robot","I am NOT a robot","I am not a robot?","I am not a robo","I am not","I am","please no","ok fine","CLICK ME ALREADY"];
+  arena.addEventListener("mousemove",function(e){
+    var r=runner.getBoundingClientRect(), a=arena.getBoundingClientRect();
+    var mx=e.clientX,my=e.clientY;
+    var cx=r.left+r.width/2, cy=r.top+r.height/2;
+    var dist=Math.hypot(mx-cx,my-cy);
+    if(dist<110){
+      dodges++;
+      var aw=a.width-r.width-10, ah=a.height-r.height-10;
+      // teleport mostly away from cursor, sometimes cruelly close to it
+      x=10+Math.random()*aw; y=10+Math.random()*ah;
+      if(Math.random()<0.25){ x=Math.max(10,Math.min(aw,(mx-a.left)-40)); y=Math.max(10,Math.min(ah,(my-a.top)-10)); }
+      label.textContent=labels[Math.min(dodges,labels.length-1)];
+      runner.style.transform="scale("+(1-Math.min(dodges,6)*0.06)+")";
+      bumpRisk(1);
+      place();
+    }
+  });
+  runner.addEventListener("click",function(){
+    if(dodges<3){ fail(1); document.getElementById("t1").textContent="you caught it too easily. suspicious. try again."; return; }
+    if(dodges<maxDodges){ fail(1); document.getElementById("t1").textContent="checkbox declined. it wants to be chased more ("+dodges+"/"+maxDodges+")."; return; }
+    box.style.background="var(--good)"; label.textContent="I am not a robot \u2713";
+    setTimeout(function(){gotoStage(2);},700);
+  });
+})();
+
+/* ============ STAGE 2: shuffling tile keyboard ============ */
+(function(){
+  var WORD="HUMAN", echo=document.getElementById("wordEcho"), hint=document.getElementById("wordHint");
+  echo.textContent=WORD; hint.textContent=WORD; // the hint is right there. still hard.
+  var slots=document.getElementById("slots"), wheel=document.getElementById("wheel"), errEl=document.getElementById("s2err");
+  var typed=[], errs=0;
+  var letters=WORD.split("").concat(["R","B","T","X","Q"]); // decoys
+  function renderSlots(){
+    slots.innerHTML="";
+    for(var i=0;i<WORD.length;i++){
+      var d=document.createElement("div");
+      d.className="slot"+(typed[i]?" filled":"");
+      d.textContent=typed[i]||"";
+      slots.appendChild(d);
+    }
+  }
+  function renderWheel(){
+    wheel.innerHTML="";
+    var shuffled=letters.slice().sort(function(){return Math.random()-0.5;});
+    shuffled.forEach(function(L){
+      var b=document.createElement("button");
+      b.className="key"; b.textContent=L;
+      b.onclick=function(){ press(L); };
+      wheel.appendChild(b);
+    });
+    var del=document.createElement("button");
+    del.className="key fn"; del.textContent="DEL \u00d72";
+    del.onclick=function(){ typed.pop(); typed.pop(); renderSlots(); renderWheel(); };
+    wheel.appendChild(del);
+  }
+  function press(L){
+    var want=WORD[typed.length];
+    if(L===want){
+      typed.push(L);
+      renderSlots(); renderWheel(); // shuffle even on success. security.
+      if(typed.length===WORD.length){
+        document.getElementById("t2").style.color="var(--good)";
+        document.getElementById("t2").textContent="acceptable. barely.";
+        setTimeout(function(){gotoStage(3);},800);
+      }
+    } else {
+      errs++; errEl.textContent=errs; fail(2); renderWheel();
+    }
+  }
+  renderSlots(); renderWheel();
+})();
+
+/* ============ STAGE 3: hover-swapping circle grid ============ */
+(function(){
+  var grid=document.getElementById("grid"), cells=[];
+  // 9 tiles; exactly 3 contain a circle (indexes chosen once)
+  var circleIdx=[1,4,7].sort(function(){return Math.random()-0.5;});
+  var shapes=["square","triangle","lines","cross","circle","diamond","squiggle","arc"];
+  function draw(cv,kind,lie){
+    var c=cv.getContext("2d"), s=cv.width;
+    c.fillStyle="#0e1216"; c.fillRect(0,0,s,s);
+    // noisy background speckles
+    c.fillStyle="rgba(255,255,255,0.05)";
+    for(var i=0;i<30;i++){ c.fillRect(Math.random()*s,Math.random()*s,2,2); }
+    c.strokeStyle="#e8e4d8"; c.lineWidth=3;
+    var m=s*0.28, w=s-2*m;
+    c.beginPath();
+    switch(kind){
+      case "circle": c.arc(s/2,s/2,w/2,0,Math.PI*2); break;
+      case "square": c.rect(m,m,w,w); break;
+      case "triangle": c.moveTo(s/2,m);c.lineTo(s-m,s-m);c.lineTo(m,s-m);c.closePath(); break;
+      case "lines": for(var j=0;j<4;j++){c.moveTo(m,m+j*w/3);c.lineTo(s-m,m+j*w/3);} break;
+      case "cross": c.moveTo(m,m);c.lineTo(s-m,s-m);c.moveTo(s-m,m);c.lineTo(m,s-m); break;
+      case "diamond": c.moveTo(s/2,m);c.lineTo(s-m,s/2);c.lineTo(s/2,s-m);c.lineTo(m,s/2);c.closePath(); break;
+      case "squiggle": c.moveTo(m,s/2); for(var k=0;k<6;k++){c.quadraticCurveTo(m+k*w/5+w/10,s/2+(k%2?-20:20),m+(k+1)*w/6,s/2);} break;
+      case "arc": c.arc(s/2,s/2,w/2,Math.PI*0.2,Math.PI*1.3); break; // almost a circle. almost.
+    }
+    c.stroke();
+    if(lie){ // the liar: tiny fake circle hiding in a corner of a non-circle tile
+      c.beginPath(); c.strokeStyle="rgba(232,228,216,0.5)"; c.lineWidth=1.5;
+      c.arc(s*0.85,s*0.85,s*0.06,0,Math.PI*2); c.stroke();
+    }
+  }
+  var kinds=[], liarIdx=-1;
+  for(var i=0;i<9;i++){
+    kinds.push(circleIdx.indexOf(i)>=0 ? "circle" : shapes[Math.floor(Math.random()*shapes.length)]);
+    if(kinds[i]==="circle"&&Math.random()<0.5) kinds[i]="circle";
+  }
+  // ensure non-circle tiles aren't accidentally "circle" from shapes pool
+  kinds=kinds.map(function(k,i){ if(circleIdx.indexOf(i)>=0) return "circle"; return k==="circle"?"square":k; });
+  // pick one non-circle tile to be the liar
+  var nonCircles=kinds.map(function(k,i){return k==="circle"?-1:i;}).filter(function(i){return i>=0;});
+  liarIdx=nonCircles[Math.floor(Math.random()*nonCircles.length)];
+
+  for(var i2=0;i2<9;i2++){
+    (function(i){
+      var div=document.createElement("div");
+      div.className="cell";
+      var cv=document.createElement("canvas");
+      cv.width=150; cv.height=150;
+      draw(cv,kinds[i], i===liarIdx);
+      div.appendChild(cv);
+      div.dataset.idx=i;
+      div.addEventListener("click",function(){ div.classList.toggle("sel"); });
+      div.addEventListener("mouseenter",function(){
+        if(Math.random()<0.45){ // hover swaps — sometimes. unpredictability is the feature.
+          var others=cells.filter(function(c){return c!==div;});
+          var other=others[Math.floor(Math.random()*others.length)];
+          swap(div,other);
+        }
+      });
+      cells.push(div); grid.appendChild(div);
+    })(i2);
+  }
+  function swap(a,b){
+    var ka=a.dataset.idx, kb=b.dataset.idx;
+    a.dataset.idx=kb; b.dataset.idx=ka;
+    var sa=a.classList.contains("sel"), sb=b.classList.contains("sel");
+    a.classList.toggle("sel",sb); b.classList.toggle("sel",sa);
+    a.innerHTML=""; b.innerHTML="";
+    var ca=document.createElement("canvas"), cb=document.createElement("canvas");
+    ca.width=cb.width=150; ca.height=cb.height=150;
+    draw(ca,kinds[a.dataset.idx], +a.dataset.idx===liarIdx);
+    draw(cb,kinds[b.dataset.idx], +b.dataset.idx===liarIdx);
+    a.appendChild(ca); b.appendChild(cb);
+  }
+  document.getElementById("gridSubmit").addEventListener("click",function(){
+    var sel=cells.filter(function(c){return c.classList.contains("sel");}).map(function(c){return +c.dataset.idx;}).sort();
+    var want=circleIdx.slice().sort();
+    var ok = sel.length===want.length && sel.every(function(v,i){return v===want[i];});
+    if(ok){
+      document.getElementById("t3").style.color="var(--good)";
+      document.getElementById("t3").textContent="correct. the circle in the corner did not count. obviously.";
+      setTimeout(function(){gotoStage(4);},900);
+    } else {
+      fail(3);
+      // reshuffle positions as punishment
+      for(var r=0;r<4;r++){ swap(cells[Math.floor(Math.random()*9)],cells[Math.floor(Math.random()*9)]); }
+    }
+  });
+})();
+
+/* ============ STAGE 4: hold exactly 3.00s (±0.15s) ============ */
+(function(){
+  var btn=document.getElementById("holdbtn"), ring=document.getElementById("ring"),
+      readout=document.getElementById("readout");
+  var holding=false, start=0, raf=null;
+  var TARGET=3.0, TOL=0.15, CIRC=502.6;
+  function tick(){
+    var t=(Date.now()-start)/1000;
+    readout.textContent=t.toFixed(2)+"s / 3.00s";
+    var p=Math.min(t/TARGET,1);
+    ring.style.strokeDashoffset=CIRC*(1-p);
+    ring.style.stroke = (Math.abs(t-TARGET)<=TOL) ? "var(--good)" : (t>TARGET+TOL ? "var(--bad)" : "var(--accent)");
+    if(holding) raf=requestAnimationFrame(tick);
+  }
+  function down(e){ e.preventDefault(); holding=true; start=Date.now(); tick(); }
+  function up(){
+    if(!holding) return;
+    holding=false; cancelAnimationFrame(raf);
+    var t=(Date.now()-start)/1000;
+    if(Math.abs(t-TARGET)<=TOL){
+      readout.textContent=t.toFixed(2)+"s — acceptable.";
+      ring.style.stroke="var(--good)";
+      setTimeout(function(){gotoStage(5);},700);
+    } else {
+      fail(4);
+      readout.textContent=t.toFixed(2)+"s — "+(t<TARGET?"too short.":"TOO LONG.");
+      ring.style.strokeDashoffset=CIRC; ring.style.stroke="var(--accent)";
+    }
+  }
+  btn.addEventListener("mousedown",down);
+  btn.addEventListener("touchstart",down,{passive:false});
+  window.addEventListener("mouseup",up);
+  window.addEventListener("touchend",up);
+})();
+
+/* ============ verdict ============ */
+function showStats(){
+  var total=Math.floor((Date.now()-t0)/1000);
+  document.getElementById("stats").innerHTML=
+    "TIME WASTED: <b>"+Math.floor(total/60)+"m "+(total%60)+"s</b><br>"+
+    "FAILURES ENDURED: <b>"+fails+"</b><br>"+
+    "FINAL RISK SCORE: <b>"+document.getElementById("riskVal").textContent+"</b><br>"+
+    "ROBOT PROBABILITY: <b>"+(fails>6?"still 50/50":"probably fine")+"</b>";
+}
+</script>
+</body>
+</html>

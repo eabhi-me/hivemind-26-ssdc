@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Worst Login Page Ever</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,sans-serif}
+body{background:#020617;color:#e2e8f0}
+button,input{font:inherit}
+button{cursor:pointer}
+.page{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#020617;padding:40px 16px}
+.bg{pointer-events:none;position:absolute;inset:0}
+.blob{position:absolute;border-radius:50%;filter:blur(70px)}
+.a{width:420px;height:420px;top:-100px;left:-60px;background:radial-gradient(circle,#7c3aed66,#d946ef1a);animation:driftA 14s ease-in-out infinite}
+.b{width:460px;height:460px;right:-80px;bottom:-140px;background:radial-gradient(circle,#2dd4bf4d,#06b6d41a);animation:driftB 17s ease-in-out infinite}
+.grid{position:absolute;inset:0;opacity:.05;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:42px 42px}
+.card{position:relative;z-index:10;width:100%;max-width:448px;background:#ffffff0e;border:1px solid #ffffff1a;backdrop-filter:blur(20px);border-radius:24px;box-shadow:0 25px 70px #0008;padding:36px}
+.wide{max-width:520px}
+h1,h2,h3{font-family:Fraunces,serif;margin:0;color:#f8fafc}
+h1{font-size:34px;line-height:1.1}
+h2{font-size:28px}
+h3{font-size:20px}
+.sub{font-size:14px;color:#94a3b8;margin-top:9px}
+.center{text-align:center}
+.field{margin-bottom:12px}
+label{display:block;font-size:12px;color:#94a3b8;margin-bottom:7px}
+.wrap{position:relative}
+.icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#64748b;font-size:15px}
+input{width:100%;border-radius:12px;background:#ffffff0d;border:1px solid #ffffff1a;color:#f1f5f9;padding:11px 42px 11px 40px;outline:none;transition:.2s}
+input:focus{border-color:#a78bfa99}
+.count{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:10px;color:#64748b}
+.eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);border:0;background:none;color:#94a3b8;padding:4px}
+.hint{height:16px;margin-top:4px;font-size:11px;color:#fcd34d}
+.strength{font-size:11px;color:#5eead4;margin-top:7px}
+ul.req{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:5px}
+.req li{font-size:11.5px;display:flex;gap:8px;align-items:center}
+.dot{width:14px;height:14px;border-radius:50%;border:1px solid #64748b;flex:none}
+.done .dot{background:#2dd4bf;border-color:#2dd4bf}
+.done span:last-child{text-decoration:line-through;color:#94a3b8}
+.row{display:flex;justify-content:space-between;align-items:center;margin:16px 0 24px;font-size:12px}
+.link{border:0;background:none;color:#94a3b8;padding:0}
+.link:hover{color:#e2e8f0}
+.remember{display:flex;align-items:center;gap:8px}
+.check{width:16px;height:16px;border:1px solid #64748b;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.check.on{background:#8b5cf6;border-color:#8b5cf6}
+.check.on:after{content:"";width:6px;height:6px;background:white;border-radius:2px}
+.primary{width:100%;border:0;border-radius:12px;padding:13px;background:linear-gradient(90deg,#8b5cf6,#2dd4bf);color:#020617;font-weight:700;box-shadow:0 10px 25px #8b5cf633;transition:transform .15s}
+.smallnote{font-size:11px;color:#475569;text-align:center;margin:24px 0 0}
+.toast,.ambient{position:fixed;z-index:50;background:#ffffff0e;border:1px solid #ffffff1a;backdrop-filter:blur(20px);box-shadow:0 15px 40px #0009;border-radius:16px}
+.toast{top:24px;left:50%;transform:translateX(-50%);padding:12px 20px;color:#ffe4e6;font-size:13px}
+.ambient{right:24px;bottom:24px;max-width:250px;padding:13px;font-size:12px}
+.notice{color:#fcd34d;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.notice:before{content:"✦ ";font-size:14px}
+.captcha p,.checkscreen p{color:#94a3b8;font-size:14px;margin:7px 0 20px}
+.captcha-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.cbox{aspect-ratio:1;border:1px solid #ffffff1a;background:#ffffff0d;color:#cbd5e1;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.cbox.selected{background:#8b5cf633;border-color:#a78bfa;color:#ddd6fe}
+.svgicon{width:48px;height:48px}
+.dotbox{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;width:100%}
+.dotbox i{width:10px;height:10px;border-radius:50%;background:currentColor;display:block}
+.message{text-align:center;color:#fcd34d;font-size:14px;padding:10px 0}
+.progress{height:10px;border-radius:99px;background:#ffffff12;overflow:hidden;margin-bottom:10px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#2dd4bf);transition:width .3s}
+.percent{text-align:center;color:#94a3b8;font-size:14px}
+.plabel{text-align:center;color:#64748b;font-size:12px;height:16px}
+.icon-success{width:64px;height:64px;border-radius:50%;background:#2dd4bf26;border:1px solid #2dd4bf66;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:#5eead4;font-size:30px}
+.bars{display:grid;gap:16px;margin:30px 0}
+.blabel{display:flex;justify-content:space-between;color:#94a3b8;font-size:11px;margin-bottom:5px;letter-spacing:.04em}
+.barbg{height:10px;background:#ffffff12;border-radius:99px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,#f43f5e,#fbbf24);border-radius:99px}
+.fill.gray{background:linear-gradient(90deg,#64748b,#94a3b8)}
+.modal{position:fixed;z-index:100;inset:0;display:flex;align-items:center;justify-content:center;background:#020617b3;backdrop-filter:blur(5px);padding:16px}
+.modalbox{position:relative;width:100%;max-width:390px;background:#ffffff0e;border:1px solid #ffffff1a;backdrop-filter:blur(20px);border-radius:24px;padding:28px;box-shadow:0 25px 70px #0009}
+.close{position:absolute;right:16px;top:14px;border:0;background:none;color:#64748b;font-size:20px}
+.modal p{color:#94a3b8;font-size:14px;line-height:1.6;margin:12px 0 22px}
+.secondary{width:100%;border-radius:12px;padding:11px;margin-top:10px;border:1px solid #ffffff1a;background:#ffffff0d;color:#e2e8f0;font-weight:600}
+@keyframes driftA{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.08)}}
+@keyframes driftB{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,30px) scale(1.1)}}
+@keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-3px)}40%,60%{transform:translateX(3px)}}
+.shake{animation:shake .45s}
+@media(max-width:520px){.card{padding:28px 22px}.row{font-size:11px}.ambient{right:12px;bottom:12px}.captcha-grid{gap:7px}}
+</style>
+</head>
+<body>
+<div class="page" id="app">
+  <div class="bg"><div class="blob a"></div><div class="blob b"></div><div class="grid"></div></div>
+</div>
+
+<script>
+const ERROR_MESSAGES=[
+"Incorrect password.","Interesting.","That's not what we expected.","We need to talk.",
+"Have you considered using a different password?","Your confidence is admirable.",
+"Error 418: The login page is disappointed."
+];
+const BUTTON_LABELS=["LOGIN","TRY AGAIN","ARE YOU SURE?","THIS BETTER BE RIGHT"];
+const AMBIENT=[
+"Your username has been waiting patiently.","Your password looks nervous.",
+"CAPTCHA is judging you.","Security level increased for no reason.",
+"Your session is having an existential crisis."
+];
+const DOT_COUNTS=[2,3,1,3,4,3,2,5,3];
+const correctDots=new Set([1,3,5,8]);
+
+let state={
+screen:"login",username:"",password:"",focused:false,hint:"",hadUsername:false,
+showPassword:false,eyeClicks:0,niceTry:false,attempt:0,remember:false,
+chair:new Set(),dots:new Set(),chairMsg:"",dotMsg:"",progress:0,label:"",
+loop:0,toast:null,ambient:null,forgot:false,forgotScreen:"ask"
+};
+
+const app=document.getElementById("app");
+let toastTimer, ambientTimers=[];
+
+function esc(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+
+function reqs(){
+ const p=state.password,u=state.username;
+ const has={
+  len8:p.length>=8,upper:/[A-Z]/.test(p),lower:/[a-z]/.test(p),
+  number:/[0-9]/.test(p),special:/[^A-Za-z0-9]/.test(p)
+ };
+ const base=Object.values(has).every(Boolean);
+ const userLetter=u.length>0&&[...u.toLowerCase()].some(c=>/[a-z]/.test(c)&&p.toLowerCase().includes(c));
+ const noE=!/[e]/i.test(p);
+ const two=(p.match(/[0-9]/g)||[]).length===2;
+ const convincing=p.includes("!")||p.length>=14;
+ let r=[
+  ["len8","8 characters",has.len8],["upper","One uppercase letter",has.upper],
+  ["lower","One lowercase letter",has.lower],["number","One number",has.number],
+  ["special","One special character",has.special]
+ ];
+ if(base)r.push(["userletter","Must contain a letter from your username",userLetter]);
+ if(base&&userLetter)r.push(["noe",'Must NOT contain the letter "e"',noE]);
+ if(base&&userLetter&&noE)r.push(["twonums","Must have exactly 2 numbers",two]);
+ if(base&&userLetter&&noE&&two)r.push(["convincing","Must be emotionally convincing",convincing]);
+ return {r,all:r.every(x=>x[2]),count:r.filter(x=>x[2]).length};
+}
+function strength(){
+ if(!state.password)return "";
+ const q=reqs(),ratio=q.count/q.r.length;
+ if(q.all)return "Password strength: unnecessarily complicated";
+ if(ratio<.35)return "Password strength: emotionally unstable";
+ if(ratio<.65)return "Password strength: suspicious";
+ return "Password strength: almost acceptable";
+}
+function toast(msg,ms=2600){
+ state.toast=msg;render();
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>{state.toast=null;render()},ms);
+}
+function svg(type,mirror=false){
+ if(type==="chair")return `<svg class="svgicon" viewBox="0 0 64 64" ${mirror?'style="transform:scaleX(-1)"':''}><rect x="16" y="10" width="26" height="6" rx="2" fill="currentColor"/><rect x="16" y="16" width="6" height="26" fill="currentColor" opacity=".7"/><rect x="18" y="30" width="28" height="6" rx="2" fill="currentColor"/><rect x="20" y="36" width="5" height="18" fill="currentColor" opacity=".8"/><rect x="39" y="36" width="5" height="18" fill="currentColor" opacity=".8"/></svg>`;
+ if(type==="table")return `<svg class="svgicon" viewBox="0 0 64 64"><rect x="10" y="20" width="44" height="6" rx="2" fill="currentColor"/><rect x="14" y="26" width="5" height="24" fill="currentColor" opacity=".75"/><rect x="45" y="26" width="5" height="24" fill="currentColor" opacity=".75"/></svg>`;
+ if(type==="person")return `<svg class="svgicon" viewBox="0 0 64 64"><circle cx="26" cy="14" r="6" fill="currentColor"/><path d="M18 24Q26 18 34 24L34 38H18Z" fill="currentColor" opacity=".85"/><rect x="18" y="38" width="4" height="14" fill="currentColor"/><rect x="30" y="38" width="4" height="14" fill="currentColor"/><rect x="36" y="20" width="18" height="5" rx="2" fill="currentColor" opacity=".6"/><rect x="49" y="20" width="5" height="24" fill="currentColor" opacity=".6"/></svg>`;
+ if(type==="stool")return `<svg class="svgicon" viewBox="0 0 64 64"><ellipse cx="32" cy="18" rx="16" ry="6" fill="currentColor"/><line x1="20" y1="20" x2="14" y2="50" stroke="currentColor" stroke-width="4"/><line x1="44" y1="20" x2="50" y2="50" stroke="currentColor" stroke-width="4"/><line x1="17" y1="36" x2="47" y2="36" stroke="currentColor" stroke-width="3"/></svg>`;
+ return `<svg class="svgicon" viewBox="0 0 64 64"><rect x="4" y="6" width="56" height="52" rx="4" fill="currentColor" opacity=".12" stroke="currentColor" stroke-width="2"/><g transform="translate(32 32)scale(.55)translate(-32 -32)"><rect x="16" y="10" width="26" height="6" rx="2" fill="currentColor"/><rect x="16" y="16" width="6" height="26" fill="currentColor" opacity=".7"/><rect x="18" y="30" width="28" height="6" rx="2" fill="currentColor"/><rect x="20" y="36" width="5" height="18" fill="currentColor"/><rect x="39" y="36" width="5" height="18" fill="currentColor"/></g></svg>`;
+}
+const chairs=[["Object A","chair"],["Object B","table"],["Object C","person"],["Object D","chair",true],["Object E","stool"],["Object F","mirror"]];
+
+function loginHTML(){
+ const q=reqs();
+ return `<div class="card">
+ <div class="center" style="margin-bottom:28px"><h1>Welcome back.</h1><div class="sub">Sign in to continue.</div></div>
+ <div class="field"><label>Username</label><div class="wrap"><span class="icon">♙</span><input id="username" value="${esc(state.username)}" maxlength="23" placeholder="${state.focused?'Enter username... probably.':'Enter username'}"><span class="count">${state.username.length}/23</span></div><div class="hint">${esc(state.hint)}</div></div>
+ <div class="field"><label>Password</label><div class="wrap"><span class="icon">▣</span><input id="password" type="${state.showPassword?'text':'password'}" value="${esc(state.password)}" placeholder="Enter password"><button class="eye" id="eye">${state.showPassword?'◉':'◌'}</button>${state.niceTry?'<div style="position:absolute;right:0;top:-34px;background:#ffffff12;border:1px solid #ffffff1a;border-radius:8px;padding:5px 9px;color:#fcd34d;font-size:11px">Nice try.</div>':''}</div>
+ ${state.password?`<div class="strength">${strength()}</div>`:''}
+ <ul class="req">${q.r.map(x=>`<li class="${x[2]?'done':''}"><i class="dot"></i><span>${x[1]}</span></li>`).join("")}</ul></div>
+ <div class="row"><button class="link remember" id="remember"><i class="check ${state.remember?'on':''}"></i>${state.remember?'Forget me':'Remember me'}</button><button class="link" id="forgot">Forgot password?</button></div>
+ <button class="primary ${state.attempt?'shake':''}" id="login">${BUTTON_LABELS[Math.min(state.attempt,3)]}</button>
+ <p class="smallnote">Designed with absolutely no respect for your time.</p>
+ </div>`;
+}
+function captcha1(){
+ return `<div class="card captcha"><h3>One final security check.</h3><p>Select all images containing a chair.</p><div class="captcha-grid">${chairs.map((c,i)=>`<button class="cbox ${state.chair.has(i)?'selected':''}" data-chair="${i}">${svg(c[1],c[2])}</button>`).join("")}</div>${state.chairMsg?`<div class="message">${state.chairMsg}</div>`:`<button class="primary" id="verifyChair">VERIFY</button>`}</div>`;
+}
+function captcha2(){
+ return `<div class="card captcha"><h3>Almost human.</h3><p>Select every square that contains exactly three objects.</p><div class="captcha-grid">${DOT_COUNTS.map((n,i)=>`<button class="cbox ${state.dots.has(i)?'selected':''}" data-dot="${i}"><span class="dotbox">${Array.from({length:n},()=>'<i></i>').join("")}</span></button>`).join("")}</div>${state.dotMsg?`<div class="message">${state.dotMsg}</div>`:`<button class="primary" id="verifyDots">SUBMIT</button>`}</div>`;
+}
+function checking(){
+ return `<div class="card checkscreen"><div class="center" style="padding:32px 0"><h3>Signing you in.</h3><div style="height:20px"></div><div class="progress"><div class="bar" style="width:${state.progress}%"></div></div><div class="percent">${state.progress}%</div><div class="plabel">${state.label}</div></div></div>`;
+}
+function success(){
+ return `<div class="card center" style="padding:56px 32px"><div class="icon-success">✓</div><h2>Login successful!</h2></div>`;
+}
+function expired(){
+ return `<div class="card center" style="padding:56px 32px"><h2>Session expired.</h2><div class="sub" style="margin:10px 0 28px">Please log in again.</div><button class="primary" id="continue">Log in again</button></div>`;
+}
+function finalScreen(){
+ const bars=[["FRUSTRATION LEVEL",100,""],["UX QUALITY",3,"gray"],["USER PATIENCE",0,"gray"]];
+ return `<div class="card wide center"><h2 style="font-size:40px">CONGRATULATIONS</h2><p class="sub" style="max-width:380px;margin:12px auto 0">You have successfully completed the world's worst login process.</p><div class="bars">${bars.map(b=>`<div style="text-align:left"><div class="blabel"><span>${b[0]}</span><span>${b[1]}%</span></div><div class="barbg"><div class="fill ${b[2]}" style="width:${b[1]}%"></div></div></div>`).join("")}</div><button class="primary" id="replay">Experience It Again</button><p class="smallnote">Designed with absolutely no respect for your time.</p></div>`;
+}
+function modal(){
+ return `<div class="modal"><div class="modalbox"><button class="close" id="close">×</button>${state.forgotScreen==="ask"?`<h3>Forgot your password?</h3><p>You haven't forgotten your password.<br>You simply don't remember it.</p><button class="primary" id="rememberNow">I REMEMBER NOW</button><button class="secondary" id="stillDont">I STILL DON'T</button>`:`<h3>Excellent.</h3><p>Please enter your password.</p><button class="primary" id="back">Back to login</button>`}</div></div>`;
+}
+
+function render(){
+ let content="";
+ if(state.screen==="login")content=loginHTML();
+ else if(state.screen==="captcha1")content=captcha1();
+ else if(state.screen==="captcha2")content=captcha2();
+ else if(state.screen==="checking")content=checking();
+ else if(state.screen==="success")content=success();
+ else if(state.screen==="expired")content=expired();
+ else content=finalScreen();
+ app.innerHTML=`<div class="bg"><div class="blob a"></div><div class="blob b"></div><div class="grid"></div></div>${state.toast?`<div class="toast">${esc(state.toast)}</div>`:""}${state.ambient?`<div class="ambient"><div class="notice">Notice</div>${esc(state.ambient)}</div>`:""}${content}${state.forgot?modal():""}`;
+ bind();
+}
+function bind(){
+ const u=document.getElementById("username");
+ if(u){u.oninput=e=>{let v=e.target.value.slice(0,23);state.username=v;if(v)state.hadUsername=true;
+   if(!v&&state.hadUsername)state.hint="Starting over already?";
+   else if(v.length===23)state.hint="You were so close.";
+   else if(v.length&&v.length%6===0)state.hint="Are you sure that's your username?";
+   else state.hint="";render();document.getElementById("username")?.focus();document.getElementById("username").selectionStart=v.length;document.getElementById("username").selectionEnd=v.length};
+   u.onfocus=()=>{state.focused=true;render();document.getElementById("username")?.focus()};
+   u.onblur=()=>{state.focused=false};
+ }
+ const p=document.getElementById("password");
+ if(p){p.oninput=e=>{state.password=e.target.value;render();document.getElementById("password")?.focus();document.getElementById("password").selectionStart=state.password.length;document.getElementById("password").selectionEnd=state.password.length}};
+ const eye=document.getElementById("eye");
+ if(eye)eye.onclick=()=>{state.eyeClicks++;let m=state.eyeClicks%3;if(m===1)state.showPassword=true;else if(m===2)state.showPassword=false;else{state.showPassword=true;state.niceTry=true;setTimeout(()=>{state.showPassword=false;state.niceTry=false;render()},700)}render()};
+ const rem=document.getElementById("remember");if(rem)rem.onclick=()=>{state.remember=!state.remember;render()};
+ const forgot=document.getElementById("forgot");if(forgot)forgot.onclick=()=>{state.forgot=true;state.forgotScreen="ask";render()};
+ const login=document.getElementById("login");if(login)login.onclick=loginClick;
+ document.querySelectorAll("[data-chair]").forEach(b=>b.onclick=()=>{let i=+b.dataset.chair;state.chair.has(i)?state.chair.delete(i):state.chair.add(i);render()});
+ const vc=document.getElementById("verifyChair");if(vc)vc.onclick=()=>{state.chairMsg="Almost. Unfortunately, you misunderstood the chair.";render();setTimeout(()=>{state.chairMsg="";state.screen="captcha2";render()},1400)};
+ document.querySelectorAll("[data-dot]").forEach(b=>b.onclick=()=>{let i=+b.dataset.dot;state.dots.has(i)?state.dots.delete(i):state.dots.add(i);render()});
+ const vd=document.getElementById("verifyDots");if(vd)vd.onclick=submitDots;
+ const cont=document.getElementById("continue");if(cont)cont.onclick=resetLogin;
+ const replay=document.getElementById("replay");if(replay)replay.onclick=()=>{state.loop=0;resetLogin()};
+ const close=document.getElementById("close");if(close)close.onclick=()=>{state.forgot=false;render()};
+ const rn=document.getElementById("rememberNow"),sd=document.getElementById("stillDont");
+ if(rn)rn.onclick=sd.onclick=()=>{state.forgotScreen="excellent";render()};
+ const back=document.getElementById("back");if(back)back.onclick=()=>{state.forgot=false;render()};
+}
+function loginClick(){
+ const q=reqs();
+ if(!q.all||!state.username.trim()){toast(ERROR_MESSAGES[Math.min(state.attempt,6)]);state.attempt++;render();return}
+ state.screen="captcha1";render();
+}
+function submitDots(){
+ const ok=state.dots.size===correctDots.size&&[...state.dots].every(i=>correctDots.has(i));
+ if(ok){state.dotMsg="Humanity verified.";render();setTimeout(()=>{state.dotMsg="Probably.";render()},900);setTimeout(runProgress,2100)}
+ else{state.dotMsg="Not quite. Look closer.";render();setTimeout(()=>{state.dotMsg="";render()},1600)}
+}
+function runProgress(){
+ state.screen="checking";state.progress=0;state.label="Checking credentials...";render();
+ const steps=[0,12,37,61,83,97,99,100];let i=0;
+ function tick(){if(i<steps.length){state.progress=steps[i];if(state.progress>=40&&state.progress<80)state.label="Checking security...";if(state.progress>=80&&state.progress<100)state.label="Checking whether you deserve access...";if(state.progress===100)state.label="";render();i++;setTimeout(tick,380)}else setTimeout(()=>{state.screen="success";render();setTimeout(()=>{if(state.loop===0){state.loop=1;state.screen="expired"}else state.screen="final";render()},1500)},400)}
+ tick();
+}
+function resetLogin(){state.screen="login";state.username="";state.password="";state.hadUsername=false;state.hint="";state.attempt=0;state.chair=new Set();state.dots=new Set();state.chairMsg="";state.dotMsg="";state.progress=0;state.label="";render();scheduleAmbient()}
+function scheduleAmbient(){
+ ambientTimers.forEach(clearTimeout);ambientTimers=[];
+ [8000,22000,40000].forEach((delay,i)=>ambientTimers.push(setTimeout(()=>{if(state.screen==="login"){state.ambient=AMBIENT[i%AMBIENT.length];render();setTimeout(()=>{state.ambient=null;render()},3200)}},delay)));
+}
+render();scheduleAmbient();
+</script>
+</body>
+</html>

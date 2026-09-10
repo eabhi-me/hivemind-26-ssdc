@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Worst UI Ever</title>
+<style>
+* { outline: none; } /* visual only, doesn't block tab */
+html, body, :root {
+    overflow: hidden;
+    height: 100vh;
+    position: relative;
+    margin: 0;
+    cursor: none; /* new: real cursor hidden, only the laggy fake one shows */
+}
+h1 {
+    margin: 20px 0 0 20px;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    animation: shake 0.1s ease-in-out infinite alternate; /* was 0.2s, now faster/worse */
+}
+@keyframes shake {
+    from { transform: translateX(-14px); }
+    to   { transform: translateX(14px); }
+}
+
+#backgroundColors {
+    position: absolute;
+    width: 300vw;
+    height: 300vh;
+    top: 50%;
+    left: 50%;
+    transform-origin: center center;
+    background:
+        repeating-radial-gradient(
+            circle at 50% 50%,
+            #000 0px, #000 18px,
+            #fff 18px, #fff 36px
+        ),
+        repeating-conic-gradient(
+            from 0deg at 50% 50%,
+            #000 0deg 9deg,
+            #fff 9deg 18deg
+        );
+    background-blend-mode: difference;
+    animation: illusion-spin 1.4s linear infinite,
+               illusion-pulse 0.4s ease-in-out infinite alternate;
+    margin: 0;
+    overflow: hidden;
+}
+@keyframes illusion-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes illusion-pulse {
+    from { filter: contrast(1) invert(0); }
+    to   { filter: contrast(1.8) invert(1); }
+}
+
+#vertical-bar {
+    position: absolute;
+    animation: slide-across 1.1s ease-in-out infinite; /* was 2s */
+    height: 100vh;
+    width: 24px;
+    background-color: #00e5ff;
+    top: 0;
+    z-index: 10;
+}
+@keyframes slide-across {
+  0%   { transform: translateX(-40px); }
+  50%  { transform: translateX(100vw); }
+  100% { transform: translateX(-40px); }
+}
+
+#horizontal-bar {
+    position: absolute;
+    animation: slide-vertically 1.6s ease-in-out infinite; /* was 3s */
+    height: 24px;
+    width: 100vw;
+    background-color: #ff3df9;
+    left: 0;
+    z-index: 10;
+}
+@keyframes slide-vertically {
+  0%   { transform: translateY(-40px); }
+  50%  { transform: translateY(100vh); }
+  100% { transform: translateY(-40px); }
+}
+
+.box-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+}
+.box {
+    border: solid 3px #000;
+    padding: 10px;
+    border-radius: 0 18px 0 18px;
+}
+
+#nameInput {
+    background: repeating-linear-gradient(
+        180deg,
+        #ff0057   0px,
+        #ff8c00  20px,
+        #c6ff00  40px,
+        #00e5ff  60px,
+        #7a00ff  80px,
+        #ff3df9 100px,
+        #ff0057 120px
+    );
+    background-size: 100% 240px;
+    width: 300px;
+    height: 130px;
+    animation: rainbow-scroll2 0.5s linear infinite,
+            wobble 0.9s ease-in-out infinite alternate; /* was 0.8s/1.3s */
+}
+@keyframes rainbow-scroll2 {
+    from { background-position: 0 0; }
+    to   { background-position: 0 240px; }
+}
+@keyframes wobble {
+    0%   { transform: translateX(0px)   translateY(0px); }
+    25%  { transform: translateX(-30px) translateY(20px); }
+    50%  { transform: translateX(15px)  translateY(-15px); }
+    75%  { transform: translateX(-20px) translateY(10px); }
+    100% { transform: translateX(20px)  translateY(-25px); }
+}
+
+#ageInput {
+    background: repeating-linear-gradient(
+        45deg,
+        #ff0057   0px,
+        #ff8c00  20px,
+        #c6ff00  40px,
+        #00e5ff  60px,
+        #7a00ff  80px,
+        #ff3df9 100px,
+        #ff0057 120px
+    );
+    background-size: 240px 240px;
+    width: 300px;
+    height: 420px;
+    animation: rainbow-scroll3 0.4s linear infinite,
+            wobble2 0.9s ease-in-out infinite alternate;
+}
+@keyframes rainbow-scroll3 {
+    from { background-position: 0 0; }
+    to   { background-position: 240px 240px; }
+}
+@keyframes wobble2 {
+    0%   { transform: translateX(0px)   translateY(0px); }
+    20%  { transform: translateX(40px)  translateY(-10px); }
+    40%  { transform: translateX(-15px) translateY(35px); }
+    60%  { transform: translateX(25px)  translateY(-30px); }
+    80%  { transform: translateX(-35px) translateY(15px); }
+    100% { transform: translateX(10px)  translateY(-20px); }
+}
+
+#VolumeSetter {
+    background: repeating-linear-gradient(
+        225deg,
+        #ff0057   0px,
+        #ff8c00  20px,
+        #c6ff00  40px,
+        #00e5ff  60px,
+        #7a00ff  80px,
+        #ff3df9 100px,
+        #ff0057 120px
+    );
+    width: 300px;
+    height: 220px;
+    animation: rainbow-scroll3 0.4s linear infinite;
+}
+#VolumeSetter input {
+    width: 100%;
+}
+
+#challange1 {
+    background: repeating-linear-gradient(
+        225deg,
+        #101010 0px,
+        #7a00ff 40px,
+        #00e5ff 80px,
+        #101010 120px
+    );
+    background-size: 120px 120px;
+    animation: rainbow-scroll4 0.5s linear infinite;
+    width: max-content;
+    max-width: 90vw;
+    height: 460px;
+    padding: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: center;
+    justify-content: center;
+}
+#challange1 span {
+    background: #fff2;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+@keyframes rainbow-scroll4 {
+    from { background-position: 0 0; }
+    to   { background-position: 120px 120px; }
+}
+
+#finished {
+    animation: win-spin 1.2s linear infinite; /* was 4s, now dizzying */
+}
+@keyframes win-spin {
+    from {  transform: rotate(0deg); }
+    to {  transform: rotate(360deg); }
+}
+
+/* new: the fake laggy cursor that trails the real one */
+#fakeCursor {
+    position: fixed;
+    width: 16px; height: 16px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #ff0057aa;
+    pointer-events: none;
+    z-index: 999;
+    transform: translate(-50%, -50%);
+    transition: left 0.28s cubic-bezier(.2,.9,.3,1), top 0.28s cubic-bezier(.2,.9,.3,1);
+}
+</style>
+</head>
+<body>
+<div id="fakeCursor"></div>
+<span class="exclude" id="backgroundColors"></span>
+<span class="exclude" id="vertical-bar"></span>
+<span class="exclude" id="horizontal-bar"></span>
+<h1>The Worst UI Ever</h1>
+
+<div class="box-center exclude" id="box0" style="opacity: 1;">
+  <div class="box" id="nameInput">
+    Name:
+    <br>
+    <input type="text" id="nameField" onkeydown="return false"/>
+    <br>
+    <button onclick="changeKeyIndex(-1)"> <- </button>
+    <button id="addNameButton" onclick="addKey()">a</button>
+    <button onclick="changeKeyIndex(1)"> -> </button>
+    <br><br>
+    <button onclick="NextInput(-1)">next</button>
+    <button id="realNextBtn0" onclick="NextInput(1)" style="display: none;">actually next</button>
+  </div>
+</div>
+
+<div class="box-center exclude" id="box1" style="display: none;">
+  <div class="box" id="ageInput">
+    Enter Birthday (as a number, obviously):
+    <br>
+    <input type="number" onchange="updateBirthday(this.value);" />
+    <p id="BirthDate"></p>
+    <button id="realNextBtn1" onclick="NextInput(1)" style="display: none;">next</button>
+    <button onclick="NextInput(-1)">prev</button>
+  </div>
+</div>
+
+<div class="box-center exclude" id="box2" style="display: none;">
+  <div class="box" id="VolumeSetter">
+    Set volume to exactly 100%
+    <br>
+    <input type="range" id="volSlider" min="0" max="100" value="50" oninput="updateSlider();"
+      onfocus="document.addEventListener('mousemove', moveSlider)"
+      onblur="document.removeEventListener('mousemove', moveSlider)"
+    >
+    <p id="volumeAmt">50</p>
+    <button onclick="NextInput(-1)">next</button>
+    <button id="realNextBtn2" onclick="NextInput(1)" style="display: none;">prev</button>
+  </div>
+</div>
+
+<div class="box-center exclude" id="box3" style="display: none;">
+  <div class="box" id="challange1">
+  </div>
+</div>
+
+<div class="box-center exclude" id="box4" style="display: none;">
+  <div class="box" id="finished">
+    You're Done!!
+    <p id="finishedText"></p>
+    <button onclick="NextInput(1);">Back To Start</button>
+  </div>
+</div>
+
+<script>
+/* ---------- fake laggy cursor ---------- */
+const fakeCursor = document.getElementById('fakeCursor');
+document.addEventListener('mousemove', e => {
+  fakeCursor.style.left = e.clientX + 'px';
+  fakeCursor.style.top = e.clientY + 'px';
+});
+
+/* ---------- state ---------- */
+const boxes = ['box0','box1','box2','box3','box4'];
+let current = 0;
+const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+let letterIndex = 0;
+let nameValue = "";
+
+function showBox(i){
+  boxes.forEach((id,idx)=>{
+    const el = document.getElementById(id);
+    el.style.display = idx===i ? 'block' : 'none';
+    el.style.opacity = idx===i ? 1 : 0;
+  });
+  current = i;
+  if(boxes[i] === 'box3') buildChallenge();
+  if(boxes[i] === 'box4') finishUp();
+}
+
+/* NOTE: exactly like the original file, the visible "next" button on
+   step 1 & 3 is mislabeled and actually calls NextInput(-1). The real
+   forward button only appears once the step is "completed". */
+function NextInput(dir){
+  let target = current + dir;
+  if(target < 0) target = boxes.length - 1;      // wraps around, on purpose
+  if(target > boxes.length - 1) target = 0;
+  showBox(target);
+}
+
+/* ---------- step 0: name ---------- */
+function changeKeyIndex(dir){
+  letterIndex = (letterIndex + dir + alphabet.length) % alphabet.length;
+  document.getElementById('addNameButton').textContent = alphabet[letterIndex];
+}
+function addKey(){
+  nameValue += alphabet[letterIndex];
+  document.getElementById('nameField').value = nameValue;
+  if(nameValue.length >= 1){
+    document.getElementById('realNextBtn0').style.display = 'inline-block';
+  }
+}
+
+/* ---------- step 1: birthday ---------- */
+let birthYear = null;
+function updateBirthday(value){
+  birthYear = value;
+  const guessAge = 2026 - Number(value || 2026);
+  document.getElementById('BirthDate').textContent =
+    isNaN(guessAge) ? "that's not a year, but sure" : `so you're about ${guessAge}, probably`;
+  document.getElementById('realNextBtn1').style.display = 'inline-block';
+}
+
+/* ---------- step 2: volume, must land on exactly 100 ---------- */
+function updateSlider(){
+  const v = document.getElementById('volSlider').value;
+  document.getElementById('volumeAmt').textContent = v;
+  document.getElementById('realNextBtn2').style.display = (Number(v) === 100) ? 'inline-block' : 'none';
+}
+function moveSlider(e){
+  // moving the mouse ANYWHERE on the page nudges the slider randomly
+  const slider = document.getElementById('volSlider');
+  let v = Number(slider.value) + (Math.random() - 0.5) * 18;
+  v = Math.max(0, Math.min(100, Math.round(v)));
+  slider.value = v;
+  updateSlider();
+}
+
+/* ---------- step 3: spot the different word ---------- */
+function buildChallenge(){
+  const box = document.getElementById('challange1');
+  box.innerHTML = "";
+  const words = ["worst","worst","worst","worst","worst","worst","worst","worst",
+                  "worst","worst","worst","worst","worst","worst","worst","worst",
+                  "worst","worst","worst","worst","worst","worst","worst","worst"];
+  const oddIndex = Math.floor(Math.random() * words.length);
+  words[oddIndex] = "wor\u200Bst"; // zero-width space, visually near-identical
+  words.forEach((w, i) => {
+    const span = document.createElement('span');
+    span.textContent = w.replace('\u200B','');
+    span.onclick = () => { if(i === oddIndex) NextInput(1); else box.animate([{transform:'scale(1)'},{transform:'scale(0.9)'},{transform:'scale(1)'}], 150); };
+    box.appendChild(span);
+  });
+}
+
+/* ---------- step 4: finished ---------- */
+function finishUp(){
+  document.getElementById('finishedText').textContent =
+    `Name: ${nameValue || "(you gave up)"} • Birth year: ${birthYear || "?"} • Volume: locked at 100%, finally`;
+}
+
+showBox(0);
+</script>
+</body>
+</html>

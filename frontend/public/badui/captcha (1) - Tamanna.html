@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUMAN VERIFICATION — SYSTEM 7.3.91</title>
+<style>
+  :root{
+    --black:#0a0a0a;
+    --white:#ffffff;
+    --off:#efefe9;
+    --grey:#bdbdb5;
+    --red:#e0231a;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Consolas", "IBM Plex Mono", monospace;
+    --disp: "Arial Black", "Helvetica Neue", Impact, "Franklin Gothic Bold", sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;
+    height:100vh;height:100dvh;
+    width:100vw;
+    background:var(--black);
+    color:var(--black);
+    font-family:var(--mono);
+    font-size:12px;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+  ::selection{background:var(--red);color:var(--white);}
+  @media (prefers-reduced-motion: reduce){
+    .marquee-track{animation:none !important;}
+  }
+
+  #app{
+    display:flex;
+    height:100vh;height:100dvh;width:100vw;
+    background:var(--white);
+    overflow:hidden;
+  }
+
+  /* ---------- LEFT EDGE STRIP ---------- */
+  #edgeStrip{
+    flex:0 0 26px;
+    background:var(--black);
+    color:var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border-right:3px solid var(--black);
+  }
+  #edgeStrip .edge-text{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-family:var(--disp);
+    font-weight:900;
+    font-size:15px;
+    letter-spacing:6px;
+    white-space:nowrap;
+  }
+
+  #mainCol{
+    flex:1 1 auto;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    min-height:0;
+    height:100%;
+    overflow:hidden;
+  }
+
+  /* ---------- MARQUEE ---------- */
+  .marquee{
+    overflow:hidden;
+    white-space:nowrap;
+    flex:0 0 auto;
+    border-bottom:3px solid var(--black);
+  }
+  .marquee.dark{background:var(--black);}
+  .marquee.light{background:var(--white);}
+  .marquee-track{
+    display:inline-block;
+    font-family:var(--disp);
+    font-weight:900;
+    letter-spacing:2px;
+    padding:3px 0;
+    animation:scrollLeft 18s linear infinite;
+  }
+  .marquee.dark .marquee-track{color:var(--white);font-size:11px;}
+  .marquee.light .marquee-track{color:var(--black);font-size:9.5px;}
+  @keyframes scrollLeft{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+
+  /* ---------- HEADER ---------- */
+  #header{
+    flex:0 0 auto;
+    display:grid;
+    grid-template-columns:1fr 340px;
+    border-bottom:3px solid var(--black);
+    background:var(--black);
+  }
+  #headerTitleBlock{
+    padding:8px 18px 6px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    border-right:3px solid var(--white);
+  }
+  #headerTitleBlock .h-big{
+    font-family:var(--disp);
+    font-weight:900;
+    color:var(--white);
+    font-size:clamp(20px,3vw,32px);
+    line-height:0.82;
+    letter-spacing:-1px;
+    text-transform:uppercase;
+  }
+  #headerTitleBlock .h-tag{
+    margin-top:4px;
+    color:var(--grey);
+    font-size:8.5px;
+    letter-spacing:2px;
+  }
+  #headerMeta{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .hm-cell{
+    border-left:1px solid #333;
+    border-bottom:1px solid #333;
+    padding:4px 9px;
+    display:flex;flex-direction:column;justify-content:center;gap:1px;
+  }
+  .hm-cell .k{font-size:7.5px;letter-spacing:1.2px;color:var(--grey);}
+  .hm-cell .v{font-size:11px;color:var(--white);font-variant-numeric:tabular-nums;font-weight:700;}
+  .hm-cell .v.flag{color:var(--red);}
+  #secLevel{
+    grid-column:1 / span 2;
+    background:var(--red);
+    color:var(--white);
+    font-family:var(--disp);
+    font-weight:900;
+    font-size:10px;
+    letter-spacing:2px;
+    display:flex;align-items:center;justify-content:center;
+    padding:4px;
+  }
+
+  /* ---------- BODY GRID ---------- */
+  #body-grid{
+    flex:1 1 auto;
+    display:grid;
+    grid-template-columns:200px 1fr 220px;
+    min-height:0;
+    overflow:hidden;
+  }
+  .panel{
+    background:var(--white);
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:0;
+    min-height:0;
+    min-width:0;
+    max-height:100%;
+    border-right:3px solid var(--black);
+  }
+  #rightPanel{border-right:none;border-left:3px solid var(--black);}
+  .panel::-webkit-scrollbar{width:6px;}
+  .panel::-webkit-scrollbar-thumb{background:var(--black);}
+
+  .panel-section{border-bottom:2px solid var(--black);padding:6px 10px;}
+  .panel-section-title{
+    font-family:var(--disp);
+    font-weight:900;
+    font-size:9.5px;letter-spacing:1.2px;color:var(--black);
+    margin-bottom:5px;
+    text-transform:uppercase;
+  }
+  .stat-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:2px 0;
+    border-bottom:1px dashed #ccc;
+  }
+  .stat-row:last-child{border-bottom:none;}
+  .stat-row .label{color:#777;font-size:8.5px;letter-spacing:0.4px;}
+  .stat-row .value{color:var(--black);font-size:10px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .stat-row .value.warn{color:var(--red);}
+  .stat-row .value.bad{color:var(--red);}
+  .stat-row .value.good{color:var(--black);}
+
+  .mini-bar{
+    height:5px;background:var(--off);border:1px solid var(--black);margin-top:3px;position:relative;overflow:hidden;
+  }
+  .mini-bar > div{height:100%;background:var(--black);transition:width 0.4s ease;}
+
+  /* ---------- MAIN AREA ---------- */
+  #main{
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    min-height:0;
+    min-width:0;
+    max-height:100%;
+    background:var(--off);
+  }
+  #main-scroll{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:10px 14px 8px;
+  }
+  #main-scroll::-webkit-scrollbar{width:6px;}
+  #main-scroll::-webkit-scrollbar-thumb{background:var(--black);}
+
+  .stage-frame{
+    width:100%;
+    max-width:560px;
+    max-height:100%;
+    border:3px solid var(--black);
+    background:var(--white);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .stage-header{
+    flex:0 0 auto;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:6px 12px;border-bottom:3px solid var(--black);
+    background:var(--black);
+  }
+  .stage-header .stage-label{
+    font-family:var(--disp);font-weight:900;
+    font-size:10px;letter-spacing:1.5px;color:var(--white);
+  }
+  .stage-header .stage-id{
+    font-size:8.5px;color:var(--grey);letter-spacing:1px;
+  }
+  .stage-body{padding:10px 12px;overflow-y:auto;min-height:0;}
+  .prompt-text{
+    font-family:var(--disp);
+    font-weight:900;
+    font-size:clamp(14px,1.9vw,19px);
+    line-height:1.08;
+    letter-spacing:-0.3px;
+    color:var(--black);
+    margin-bottom:6px;
+    text-transform:uppercase;
+  }
+  .prompt-sub{
+    font-size:9px;color:#777;margin-bottom:8px;line-height:1.4;letter-spacing:0.2px;
+    border-left:3px solid var(--red);padding-left:7px;
+  }
+
+  .tile-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    grid-auto-rows:1fr;
+    gap:2px;
+    margin-bottom:8px;
+    border:3px solid var(--black);
+    padding:2px;
+    background:var(--black);
+  }
+  .tile{
+    aspect-ratio:4/3;
+    background:var(--white);
+    color:var(--black);
+    border:2px solid var(--black);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    position:relative;
+    transition:background 0.08s, color 0.08s;
+  }
+  .tile.big{grid-column:span 2;grid-row:span 2;}
+  .tile svg{width:48%;height:48%;stroke:currentColor;}
+  .tile.selected{
+    background:var(--black);
+    color:var(--white);
+  }
+  .tile.selected::after{
+    content:"✕";position:absolute;top:2px;right:4px;font-size:11px;font-weight:900;color:var(--white);
+    font-family:var(--disp);
+  }
+  .tile-idx{
+    position:absolute;bottom:2px;left:4px;font-size:7px;font-weight:700;color:inherit;opacity:0.6;
+  }
+
+  .stage-footer{
+    flex:0 0 auto;
+    display:flex;justify-content:space-between;align-items:center;
+    gap:14px;
+  }
+  .footer-note{font-size:8.5px;color:#777;letter-spacing:0.4px;max-width:60%;line-height:1.4;}
+
+  .btn{
+    font-family:var(--disp);
+    font-weight:900;
+    letter-spacing:1px;
+    background:var(--white);
+    border:3px solid var(--black);
+    color:var(--black);
+    cursor:pointer;
+    transition:background 0.1s,color 0.1s;
+    text-transform:uppercase;
+  }
+  .btn:hover{background:var(--black);color:var(--white);}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:0.35;cursor:not-allowed;}
+  .btn.primary{
+    border-radius:50%;
+    width:66px;height:66px;
+    flex:0 0 auto;
+    font-size:12px;
+    background:var(--black);
+    color:var(--white);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .btn.primary:hover{background:var(--red);border-color:var(--red);color:var(--white);}
+  .btn.oval{
+    border-radius:40px;
+    padding:12px 26px;
+    font-size:12px;
+  }
+
+  .system-msg-block{
+    flex:0 0 auto;
+    margin-top:8px;padding:7px 10px;
+    border:2px solid var(--black);
+    background:var(--white);
+    font-size:9.5px;color:var(--black);
+    letter-spacing:0.2px;line-height:1.5;
+    min-height:16px;
+    font-weight:600;
+  }
+  .system-msg-block .flag{color:var(--red);}
+  .system-msg-block .ok{color:var(--black);}
+  .system-msg-block .neutral{color:#888;}
+
+  .progress-block{flex:0 0 auto;margin-top:8px;}
+  .progress-block .pl{
+    display:flex;justify-content:space-between;font-size:8.5px;color:#777;
+    letter-spacing:0.8px;margin-bottom:4px;font-weight:700;
+  }
+  .progress-outer{height:11px;background:var(--white);border:2px solid var(--black);position:relative;}
+  .progress-inner{height:100%;background:var(--black);transition:width 0.6s cubic-bezier(.4,0,.2,1);}
+  .progress-inner.glitch{background:var(--red);}
+  .progress-pct{font-size:9px;color:var(--black);margin-top:3px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;}
+
+  /* full-bleed overlay screens */
+  .overlay-screen{
+    width:100%;max-width:560px;
+    max-height:100%;
+    overflow-y:auto;
+    text-align:center;
+    padding:14px 16px;
+  }
+  .overlay-screen .big-label{
+    font-size:9px;letter-spacing:3px;color:#777;margin-bottom:8px;font-weight:700;
+  }
+  .overlay-screen .headline{
+    font-family:var(--disp);font-weight:900;
+    font-size:clamp(16px,2.8vw,26px);letter-spacing:-0.5px;color:var(--black);margin-bottom:8px;
+    line-height:1.05;text-transform:uppercase;
+  }
+  .overlay-screen .headline.good{color:var(--black);}
+  .overlay-screen .headline.bad{color:var(--red);}
+  .overlay-screen .sub{
+    font-size:10px;color:#666;line-height:1.6;margin-bottom:12px;
+  }
+  .confidence-circle{
+    width:110px;height:110px;border-radius:50%;
+    border:4px solid var(--black);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    margin:0 auto 12px;
+    background:var(--white);
+  }
+  .big-confidence{
+    font-family:var(--disp);font-weight:900;
+    font-size:22px;color:var(--black);letter-spacing:0;
+    font-variant-numeric:tabular-nums;
+  }
+  .big-confidence.bad{color:var(--red);}
+  .big-confidence-label{font-size:7.5px;letter-spacing:1.5px;color:#777;margin-bottom:3px;font-weight:700;}
+
+  .divider-line{width:100%;height:2px;background:var(--black);margin:10px 0;}
+
+  .role-table{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;
+    border:3px solid var(--black);margin:10px 0;
+  }
+  .role-cell{padding:9px;border-right:2px solid var(--black);}
+  .role-cell:last-child{border-right:none;background:var(--black);color:var(--white);}
+  .role-cell .rk{font-size:7.5px;letter-spacing:1.2px;color:#888;margin-bottom:4px;font-weight:700;}
+  .role-cell:last-child .rk{color:var(--grey);}
+  .role-cell .rv{font-family:var(--disp);font-weight:900;font-size:12px;letter-spacing:-0.2px;color:var(--black);text-transform:uppercase;}
+  .role-cell:last-child .rv{color:var(--white);}
+  .role-cell .rv.strike{color:#999;text-decoration:line-through;}
+  .role-cell .rv.new{color:var(--red);}
+
+  .yn-row{display:flex;gap:12px;justify-content:center;margin-top:10px;}
+
+  .analysis-lines{
+    text-align:left;font-size:10px;color:var(--black);line-height:1.8;
+    max-width:420px;margin:0 auto;
+    border:2px solid var(--black);padding:10px 14px;
+    font-weight:600;
+  }
+  .analysis-lines .al-k{color:#777;letter-spacing:0.4px;}
+  .analysis-lines .al-v{float:right;color:var(--black);font-weight:700;}
+  .analysis-lines .al-v.bad{color:var(--red);}
+
+  .final-result-box{
+    border:3px solid var(--black);
+    padding:12px;margin-top:10px;
+    background:var(--black);
+  }
+  .final-result-box .frl1{font-family:var(--disp);font-weight:900;font-size:13px;color:var(--white);letter-spacing:0.4px;}
+  .final-result-box .frl2{font-family:var(--disp);font-weight:900;font-size:13px;color:var(--red);letter-spacing:0.4px;margin-top:3px;}
+
+  /* ---------- EVENT LOG ---------- */
+  #eventlog{
+    flex:0 0 68px;
+    border-top:3px solid var(--black);
+    background:var(--black);
+    overflow-y:auto;
+    padding:5px 14px;
+    font-size:9px;
+    line-height:1.6;
+    color:var(--grey);
+  }
+  #eventlog::-webkit-scrollbar{width:6px;}
+  #eventlog::-webkit-scrollbar-thumb{background:#444;}
+  #eventlog .log-line{white-space:nowrap;}
+  #eventlog .log-line .ts{color:#555;margin-right:10px;}
+  #eventlog .log-line .msg{color:var(--grey);}
+  #eventlog .log-line .msg.warn{color:var(--red);}
+  #eventlog .log-line .msg.bad{color:var(--red);}
+  #eventlog .log-line .msg.good{color:var(--white);}
+
+  .sparkline{width:100%;height:26px;margin-top:6px;}
+  .sparkline path{fill:none;stroke:var(--black);stroke-width:1.4;}
+
+  .frozen{filter:contrast(0.6) brightness(0.9);}
+  #black-fade{
+    position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;
+    transition:opacity 0.9s ease;z-index:999;
+  }
+  #black-fade.on{opacity:1;pointer-events:all;}
+
+  .replay-link{
+    position:fixed;bottom:6px;right:10px;font-size:8.5px;color:var(--grey);
+    letter-spacing:1px;cursor:pointer;z-index:1000;opacity:0.6;font-family:var(--disp);font-weight:900;
+  }
+  .replay-link:hover{opacity:1;color:var(--white);}
+
+  @media (max-width:900px){
+    #body-grid{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;}
+    .panel{max-height:120px;}
+    #header{grid-template-columns:1fr;}
+    #headerTitleBlock{border-right:none;border-bottom:3px solid var(--white);}
+  }
+</style>
+</head>
+<body>
+
+<div id="black-fade"></div>
+<div class="replay-link" id="replayLink">REINITIALIZE ↻</div>
+
+<div id="app">
+  <div id="edgeStrip"><div class="edge-text">VERIFY VERIFY VERIFY VERIFY VERIFY</div></div>
+
+  <div id="mainCol">
+
+    <div class="marquee dark"><div class="marquee-track" id="marqueeTop">HUMAN VERIFICATION · HUMAN VERIFICATION · HUMAN VERIFICATION · HUMAN VERIFICATION · HUMAN VERIFICATION · HUMAN VERIFICATION · </div></div>
+
+    <!-- HEADER -->
+    <div id="header">
+      <div id="headerTitleBlock">
+        <div class="h-big">HUMAN<br>VERIFICATION</div>
+        <div class="h-tag">AUTH.PROTOCOL/07 — SYSTEM 7.3.91</div>
+      </div>
+      <div id="headerMeta">
+        <div class="hm-cell"><span class="k">SESSION</span><span class="v" id="sessionId">8F4C-19</span></div>
+        <div class="hm-cell"><span class="k">PROTOCOL</span><span class="v" id="protocolLabel">HUMAN-OBJ</span></div>
+        <div class="hm-cell"><span class="k">NODE</span><span class="v">04-A</span></div>
+        <div class="hm-cell"><span class="k">INTEGRITY</span><span class="v" id="integrityVal">99.2%</span></div>
+        <div id="secLevel">SECURITY LEVEL: ELEVATED</div>
+      </div>
+    </div>
+
+    <div class="marquee light"><div class="marquee-track" id="marqueeMid">CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA CAPTCHA </div></div>
+
+    <!-- BODY -->
+    <div id="body-grid">
+
+      <!-- LEFT PANEL -->
+      <div class="panel" id="leftPanel">
+        <div class="panel-section">
+          <div class="panel-section-title">SESSION</div>
+          <div class="stat-row"><span class="label">STATUS</span><span class="value warn" id="sessionStatus">UNVERIFIED</span></div>
+          <div class="stat-row"><span class="label">ATTEMPTS</span><span class="value" id="attemptsVal">00</span></div>
+          <div class="stat-row"><span class="label">RISK</span><span class="value warn" id="riskVal">ELEVATED</span></div>
+          <div class="stat-row"><span class="label">DEVICE</span><span class="value">DESKTOP</span></div>
+          <div class="stat-row"><span class="label">INPUT</span><span class="value">PTR / KBD</span></div>
+          <div class="stat-row"><span class="label">PROTOCOL</span><span class="value" id="protocolVal2">HUMAN-OBJ</span></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">IDENTITY</div>
+          <div class="stat-row"><span class="label">SUBJECT</span><span class="value" id="identitySubject">USER</span></div>
+          <div class="stat-row"><span class="label">AUTHORITY</span><span class="value" id="identityAuthority">SYSTEM</span></div>
+          <div class="stat-row"><span class="label">STATE</span><span class="value" id="stateVal">INIT</span></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">TIMING</div>
+          <div class="stat-row"><span class="label">ELAPSED</span><span class="value" id="elapsedVal">00:00</span></div>
+          <div class="stat-row"><span class="label">CLOCK</span><span class="value" id="clockVal">--:--:--</span></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">ANOMALIES</div>
+          <div class="stat-row"><span class="label">FLAGGED</span><span class="value bad" id="anomalyCount">0</span></div>
+          <div class="stat-row"><span class="label">RE-EVAL</span><span class="value bad" id="reevalCount">0</span></div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div id="main">
+        <div id="main-scroll"></div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="panel" id="rightPanel">
+        <div class="panel-section">
+          <div class="panel-section-title">CONFIDENCE</div>
+          <div style="font-family:var(--disp);font-size:26px;font-weight:900;color:var(--black);font-variant-numeric:tabular-nums;" id="confidenceBig">78.4%</div>
+          <div class="mini-bar"><div id="confidenceBar" style="width:78%;"></div></div>
+          <svg class="sparkline" id="confidenceSpark" viewBox="0 0 100 26" preserveAspectRatio="none"><path id="confidenceSparkPath" d=""></path></svg>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">CURSOR</div>
+          <div class="stat-row"><span class="label">X</span><span class="value" id="cursorX">0000</span></div>
+          <div class="stat-row"><span class="label">Y</span><span class="value" id="cursorY">0000</span></div>
+          <div class="stat-row"><span class="label">VELOCITY</span><span class="value" id="velocityVal">0.00</span></div>
+          <div class="stat-row"><span class="label">PATH VAR</span><span class="value" id="pathVarVal">0.00</span></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">DECISION</div>
+          <div class="stat-row"><span class="label">LATENCY</span><span class="value" id="latencyVal">0.00 s</span></div>
+          <div class="stat-row"><span class="label">RHYTHM</span><span class="value" id="rhythmVal">—</span></div>
+          <div class="stat-row"><span class="label">REVISION</span><span class="value" id="revisionVal">0.00</span></div>
+          <div class="stat-row"><span class="label">IDLE</span><span class="value" id="idleVal">0.00 s</span></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">CLASSIFICATION</div>
+          <div class="stat-row"><span class="label">MODEL</span><span class="value warn" id="classificationVal">UNSTABLE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENT LOG -->
+    <div id="eventlog"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+function pad(n,len){len=len||2;n=String(Math.floor(n));while(n.length<len)n="0"+n;return n;}
+function rand(min,max){return Math.random()*(max-min)+min;}
+function randInt(min,max){return Math.floor(rand(min,max+1));}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function nowStr(){const d=new Date();return pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());}
+
+/* AUDIO ENGINE */
+const AudioEngine=(function(){
+  let ctx=null;
+  function ensure(){
+    if(!ctx){ try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ ctx=null; } }
+    if(ctx && ctx.state==="suspended"){ ctx.resume(); }
+    return ctx;
+  }
+  function tone(freq,dur,type,gainPeak,delay){
+    const c=ensure(); if(!c) return;
+    delay=delay||0;
+    const t0=c.currentTime+delay;
+    const osc=c.createOscillator();
+    const gain=c.createGain();
+    osc.type=type||"sine";
+    osc.frequency.setValueAtTime(freq,t0);
+    gain.gain.setValueAtTime(0,t0);
+    gain.gain.linearRampToValueAtTime(gainPeak||0.06,t0+0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    osc.connect(gain).connect(c.destination);
+    osc.start(t0); osc.stop(t0+dur+0.02);
+  }
+  function distortionCurve(amount){
+    const n=44100, curve=new Float32Array(n), k=amount;
+    for(let i=0;i<n;i++){
+      const x=i*2/n-1;
+      curve[i]=(3+k)*x*20*(Math.PI/180)/(Math.PI+k*Math.abs(x));
+    }
+    return curve;
+  }
+
+  /* WRONG TILE CLICK — sharp, ugly, immediate */
+  function wrongClick(){
+    const c=ensure(); if(!c) return;
+    const t0=c.currentTime;
+    const osc=c.createOscillator();
+    const gain=c.createGain();
+    osc.type="square";
+    osc.frequency.setValueAtTime(900,t0);
+    osc.frequency.exponentialRampToValueAtTime(140,t0+0.09);
+    gain.gain.setValueAtTime(0.07,t0);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.1);
+    osc.connect(gain).connect(c.destination);
+    osc.start(t0); osc.stop(t0+0.12);
+  }
+
+  /* WRONG ANSWER — harsh BZZZT via close-detuned dissonant pair */
+  function wrongAnswerBuzz(){
+    const c=ensure(); if(!c) return;
+    const t0=c.currentTime;
+    const gain=c.createGain();
+    gain.gain.setValueAtTime(0.001,t0);
+    gain.gain.linearRampToValueAtTime(0.08,t0+0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.34);
+    const shaper=c.createWaveShaper();
+    shaper.curve=distortionCurve(60);
+    shaper.oversample="4x";
+    gain.connect(shaper).connect(c.destination);
+    [148,156].forEach(f=>{
+      const osc=c.createOscillator();
+      osc.type="sawtooth";
+      osc.frequency.setValueAtTime(f,t0);
+      osc.connect(gain);
+      osc.start(t0); osc.stop(t0+0.36);
+    });
+  }
+
+  /* BOT DETECTED — aggressive alternating alarm */
+  function alarmSiren(){
+    const c=ensure(); if(!c) return;
+    const t0=c.currentTime;
+    for(let i=0;i<4;i++){
+      const seg=t0+i*0.14;
+      const osc=c.createOscillator();
+      const gain=c.createGain();
+      osc.type="square";
+      osc.frequency.setValueAtTime(i%2===0?880:520,seg);
+      gain.gain.setValueAtTime(0.06,seg);
+      gain.gain.exponentialRampToValueAtTime(0.0001,seg+0.13);
+      osc.connect(gain).connect(c.destination);
+      osc.start(seg); osc.stop(seg+0.14);
+    }
+  }
+
+  /* SUSPICIOUS BEHAVIOUR — uncomfortable dissonant tremolo tone */
+  function suspiciousTone(){
+    const c=ensure(); if(!c) return;
+    const t0=c.currentTime;
+    const gain=c.createGain();
+    gain.gain.setValueAtTime(0.05,t0);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.5);
+    const lfo=c.createOscillator();
+    const lfoGain=c.createGain();
+    lfo.frequency.setValueAtTime(28,t0);
+    lfoGain.gain.setValueAtTime(0.035,t0);
+    lfo.connect(lfoGain).connect(gain.gain);
+    lfo.start(t0); lfo.stop(t0+0.5);
+    [233,247].forEach(f=>{
+      const osc=c.createOscillator();
+      osc.type="triangle";
+      osc.frequency.setValueAtTime(f,t0);
+      osc.connect(gain);
+      osc.start(t0); osc.stop(t0+0.5);
+    });
+    gain.connect(c.destination);
+  }
+
+  /* CAPTCHA FAILED — distorted downward failure sound */
+  function distortedFail(){
+    const c=ensure(); if(!c) return;
+    const t0=c.currentTime;
+    const osc=c.createOscillator();
+    const gain=c.createGain();
+    const shaper=c.createWaveShaper();
+    shaper.curve=distortionCurve(90);
+    shaper.oversample="4x";
+    osc.type="sawtooth";
+    osc.frequency.setValueAtTime(400,t0);
+    osc.frequency.exponentialRampToValueAtTime(70,t0+0.42);
+    gain.gain.setValueAtTime(0.075,t0);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.46);
+    osc.connect(shaper).connect(gain).connect(c.destination);
+    osc.start(t0); osc.stop(t0+0.48);
+  }
+
+  return{
+    tick(){ tone(1800,0.035,"square",0.02); },
+    beep(){ tone(660,0.09,"sine",0.05); },
+    doubleBeep(){ tone(660,0.07,"sine",0.05,0); tone(660,0.07,"sine",0.05,0.12); },
+    errorChirp(){
+      const c=ensure(); if(!c) return;
+      const t0=c.currentTime;
+      const osc=c.createOscillator();
+      const gain=c.createGain();
+      osc.type="sawtooth";
+      osc.frequency.setValueAtTime(520,t0);
+      osc.frequency.exponentialRampToValueAtTime(160,t0+0.16);
+      gain.gain.setValueAtTime(0.045,t0);
+      gain.gain.exponentialRampToValueAtTime(0.0001,t0+0.18);
+      osc.connect(gain).connect(c.destination);
+      osc.start(t0); osc.stop(t0+0.2);
+    },
+    warnPulse(){ tone(300,0.14,"sine",0.05,0); tone(240,0.16,"sine",0.05,0.18); },
+    lowTone(){ tone(110,0.5,"sine",0.04); },
+    finalBeep(){ tone(500,0.22,"sine",0.06); },
+    wrongClick, wrongAnswerBuzz, alarmSiren, suspiciousTone, distortedFail,
+    unlock(){ ensure(); }
+  };
+})();
+
+(function(){
+  let unlocked=false;
+  function unlockOnce(){
+    if(unlocked) return; unlocked=true;
+    AudioEngine.unlock();
+    window.removeEventListener("pointerdown",unlockOnce);
+    window.removeEventListener("keydown",unlockOnce);
+    window.removeEventListener("mousemove",unlockOnce);
+  }
+  window.addEventListener("pointerdown",unlockOnce,{passive:true});
+  window.addEventListener("keydown",unlockOnce);
+  window.addEventListener("mousemove",unlockOnce,{passive:true});
+})();
+
+/* AGGRESSIVE VISUAL WARNING OVERLAY — never uses alert() */
+const WarningFX=(function(){
+  let styleInjected=false;
+  function injectStyle(){
+    if(styleInjected) return; styleInjected=true;
+    const s=document.createElement("style");
+    s.textContent=
+      '#warnFxLayer{position:fixed;inset:0;pointer-events:none;z-index:2000;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;}'+
+      '.warnfx-flash{position:fixed;inset:0;background:var(--red);opacity:0;pointer-events:none;}'+
+      '.warnfx-flash.go{animation:warnfxFlash 0.32s ease-out;}'+
+      '@keyframes warnfxFlash{0%{opacity:0.55;}100%{opacity:0;}}'+
+      '.warnfx-toast{margin-top:26px;background:var(--black);border:3px solid var(--red);color:var(--white);'+
+      'font-family:var(--disp);font-weight:900;letter-spacing:1.5px;font-size:clamp(14px,2.6vw,22px);'+
+      'padding:10px 22px;text-transform:uppercase;text-align:center;box-shadow:0 0 0 3px var(--white);'+
+      'opacity:0;transform:translateY(-14px) scale(0.96);}'+
+      '.warnfx-toast.go{animation:warnfxToast 1.15s cubic-bezier(.2,.9,.3,1) forwards;}'+
+      '@keyframes warnfxToast{'+
+      '0%{opacity:0;transform:translateY(-14px) scale(0.96);}'+
+      '8%{opacity:1;transform:translateY(0) scale(1.03);}'+
+      '12%{transform:translateY(0) scale(1);}'+
+      '15%{transform:translate(-3px,0);} 18%{transform:translate(3px,0);} 21%{transform:translate(-2px,0);} 24%{transform:translate(0,0);}'+
+      '82%{opacity:1;}100%{opacity:0;transform:translateY(-6px) scale(0.98);}'+
+      '}';
+    document.head.appendChild(s);
+    const layer=document.createElement("div");
+    layer.id="warnFxLayer";
+    document.body.appendChild(layer);
+  }
+  function trigger(text){
+    injectStyle();
+    const flash=document.createElement("div");
+    flash.className="warnfx-flash";
+    document.body.appendChild(flash);
+    requestAnimationFrame(()=>flash.classList.add("go"));
+    setTimeout(()=>flash.remove(),400);
+
+    const layer=document.getElementById("warnFxLayer");
+    const toast=document.createElement("div");
+    toast.className="warnfx-toast";
+    toast.textContent=text;
+    layer.appendChild(toast);
+    requestAnimationFrame(()=>toast.classList.add("go"));
+    setTimeout(()=>toast.remove(),1250);
+  }
+  return{ trigger };
+})();
+
+/* EVENT LOGGER */
+const EventLogger=(function(){
+  const el=document.getElementById("eventlog");
+  let paused=false;
+  function log(msg,cls){
+    if(paused) return;
+    const line=document.createElement("div");
+    line.className="log-line";
+    line.innerHTML='<span class="ts">'+nowStr()+'</span><span class="msg '+(cls||"")+'">'+msg+"</span>";
+    el.appendChild(line);
+    el.scrollTop=el.scrollHeight;
+    while(el.children.length>60){ el.removeChild(el.firstChild); }
+  }
+  return{ log, pause(){paused=true;}, resume(){paused=false;} };
+})();
+
+/* TELEMETRY ENGINE */
+const TelemetryEngine=(function(){
+  let lastX=0,lastY=0,lastT=performance.now();
+  let velocity=0, pathVariance=0, lastAngle=null, angleDeltaAccum=0, angleSamples=0;
+  let lastMoveTime=performance.now();
+  let clickTimes=[];
+  let frozen=false;
+  let sparkHistory=[78];
+
+  function onMove(e){
+    if(frozen) return;
+    const t=performance.now();
+    const dx=e.clientX-lastX, dy=e.clientY-lastY;
+    const dt=Math.max(1,t-lastT);
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    velocity=dist/dt;
+    if(dist>2){
+      const angle=Math.atan2(dy,dx);
+      if(lastAngle!==null){
+        let diff=Math.abs(angle-lastAngle);
+        if(diff>Math.PI) diff=2*Math.PI-diff;
+        angleDeltaAccum+=diff; angleSamples++;
+        pathVariance=clamp(angleDeltaAccum/Math.max(1,angleSamples)/Math.PI,0,1);
+      }
+      lastAngle=angle;
+    }
+    lastX=e.clientX; lastY=e.clientY; lastT=t; lastMoveTime=t;
+    document.getElementById("cursorX").textContent=pad(e.clientX,4);
+    document.getElementById("cursorY").textContent=pad(e.clientY,4);
+  }
+  function registerClick(){
+    const t=performance.now();
+    clickTimes.push(t);
+    if(clickTimes.length>6) clickTimes.shift();
+  }
+  function clickRhythm(){
+    if(clickTimes.length<2) return "—";
+    const intervals=[];
+    for(let i=1;i<clickTimes.length;i++) intervals.push(clickTimes[i]-clickTimes[i-1]);
+    const mean=intervals.reduce((a,b)=>a+b,0)/intervals.length;
+    let variance=0;
+    intervals.forEach(iv=>variance+=Math.pow(iv-mean,2));
+    variance/=intervals.length;
+    const sd=Math.sqrt(variance);
+    return (sd/Math.max(1,mean))>0.35 ? "IRREGULAR" : "REGULAR";
+  }
+  function idleSeconds(){ return (performance.now()-lastMoveTime)/1000; }
+  function tickUI(){
+    if(frozen) return;
+    document.getElementById("velocityVal").textContent=velocity.toFixed(2);
+    document.getElementById("pathVarVal").textContent=pathVariance.toFixed(2);
+    document.getElementById("idleVal").textContent=idleSeconds().toFixed(2)+" s";
+    document.getElementById("rhythmVal").textContent=clickRhythm();
+  }
+  function pushConfidenceSpark(v){
+    sparkHistory.push(v);
+    if(sparkHistory.length>24) sparkHistory.shift();
+    const path=document.getElementById("confidenceSparkPath");
+    const w=100,h=26;
+    let d="";
+    sparkHistory.forEach((val,i)=>{
+      const x=(i/(Math.max(1,sparkHistory.length-1)))*w;
+      const y=h-((val)/(100))*h;
+      d+=(i===0?"M":"L")+x.toFixed(1)+","+y.toFixed(1)+" ";
+    });
+    path.setAttribute("d",d);
+  }
+  window.addEventListener("mousemove",onMove,{passive:true});
+  window.addEventListener("mousedown",registerClick,{passive:true});
+  setInterval(tickUI,180);
+  return{
+    getVelocity:()=>velocity, getPathVariance:()=>pathVariance, getIdleSeconds:idleSeconds,
+    getClickRhythm:clickRhythm,
+    freeze(){ frozen=true; }, unfreeze(){ frozen=false; lastMoveTime=performance.now(); },
+    pushConfidenceSpark
+  };
+})();
+
+/* BEHAVIOUR ANALYZER */
+const BehaviourAnalyzer=(function(){
+  let confidence=78.4;
+  let anomalyCount=0, reevalCount=0;
+  const classifications=["UNSTABLE","INCONSISTENT","NON-CONFORMANT","INDETERMINATE","IRREGULAR"];
+
+  function setConfidence(v){
+    confidence=clamp(v,0,100);
+    const big=document.getElementById("confidenceBig");
+    big.textContent=confidence.toFixed(1)+"%";
+    big.style.color = confidence>30 ? "#0a0a0a" : "#e0231a";
+    const bar=document.getElementById("confidenceBar");
+    bar.style.width=confidence+"%";
+    bar.style.background= confidence>30 ? "#0a0a0a" : "#e0231a";
+    TelemetryEngine.pushConfidenceSpark(confidence);
+    const cls=document.getElementById("classificationVal");
+    cls.textContent = confidence>70 ? "PROVISIONAL" : classifications[randInt(0,classifications.length-1)];
+    cls.className="value "+(confidence>70?"":"bad");
+  }
+  function bump(delta){ setConfidence(confidence+delta+rand(-2.5,2.5)); }
+  function flagAnomaly(){ anomalyCount++; document.getElementById("anomalyCount").textContent=anomalyCount; }
+  function flagReeval(){ reevalCount++; document.getElementById("reevalCount").textContent=reevalCount; }
+
+  function evaluate(latencySec, revisions){
+    document.getElementById("latencyVal").textContent=latencySec.toFixed(2)+" s";
+    document.getElementById("revisionVal").textContent=(revisions/Math.max(1,revisions+1)).toFixed(2);
+    const v=TelemetryEngine.getVelocity();
+    const pv=TelemetryEngine.getPathVariance();
+    let verdicts=[];
+    if(latencySec<1.0){ verdicts.push({msg:"RAPID INPUT DETECTED — DECISION LATENCY: LOW. AUTOMATION SIGNATURE: POSSIBLE.",delta:-6}); }
+    else if(latencySec>4.5){ verdicts.push({msg:"DECISION LATENCY: HIGH. HESITATION PATTERN DETECTED.",delta:-5}); }
+    else { verdicts.push({msg:"DECISION LATENCY WITHIN NOMINAL RANGE. PATTERN STILL UNDER REVIEW.",delta:-2}); }
+    if(revisions===0){ verdicts.push({msg:"PREDICTABLE RESPONSE PATTERN DETECTED. NO REVISION OBSERVED.",delta:-4}); }
+    else { verdicts.push({msg:"RESPONSE REVISION DETECTED. PRIOR ANSWER CONFLICTS WITH CURRENT ANSWER.",delta:-5}); }
+    if(pv<0.15){ verdicts.push({msg:"DIRECT TARGET ACQUISITION. CURSOR PATH UNUSUALLY EFFICIENT.",delta:-5}); }
+    else if(pv>0.55){ verdicts.push({msg:"NON-DETERMINISTIC CURSOR PATH. VARIANCE EXCEEDS EXPECTED HUMAN RANGE.",delta:-4}); }
+    else { verdicts.push({msg:"CURSOR PATH VARIANCE NOMINAL. INSUFFICIENT TO CONFIRM HUMAN ORIGIN.",delta:-2}); }
+    if(v<0.02){ verdicts.push({msg:"ABNORMALLY STATIONARY BEHAVIOUR PRIOR TO INPUT.",delta:-3}); }
+    else if(v>1.4){ verdicts.push({msg:"UNNATURAL MOVEMENT VELOCITY DETECTED.",delta:-3}); }
+    const pick=verdicts[randInt(0,verdicts.length-1)];
+    flagAnomaly(); bump(pick.delta);
+    return pick.msg;
+  }
+  return{ setConfidence, bump, evaluate, flagAnomaly, flagReeval, getConfidence:()=>confidence };
+})();
+
+/* ICONOGRAPHY */
+const Icons=(function(){
+  function wrap(inner){
+    return '<svg viewBox="0 0 64 64" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>';
+  }
+  return{
+    bicycle: ()=>wrap('<circle cx="16" cy="42" r="11"/><circle cx="48" cy="42" r="11"/><path d="M16 42 L28 20 L40 42 M28 20 H36 M40 42 H48 M22 30 H34"/>'),
+    car: ()=>wrap('<path d="M8 40 L14 26 H50 L56 40 V46 H8 Z"/><circle cx="18" cy="46" r="5"/><circle cx="46" cy="46" r="5"/><path d="M18 26 L22 16 H42 L46 26"/>'),
+    bus: ()=>wrap('<rect x="10" y="14" width="44" height="30" rx="0"/><line x1="10" y1="26" x2="54" y2="26"/><line x1="22" y1="14" x2="22" y2="26"/><line x1="34" y1="14" x2="34" y2="26"/><line x1="46" y1="14" x2="46" y2="26"/><circle cx="18" cy="48" r="4"/><circle cx="46" cy="48" r="4"/>'),
+    motorcycle: ()=>wrap('<circle cx="14" cy="44" r="9"/><circle cx="46" cy="44" r="9"/><path d="M14 44 L26 30 H38 L46 44 M26 30 L32 20 H40"/>'),
+    trafficLight: ()=>wrap('<rect x="24" y="8" width="16" height="36" rx="0"/><circle cx="32" cy="17" r="3.4"/><circle cx="32" cy="26" r="3.4"/><circle cx="32" cy="35" r="3.4"/><line x1="32" y1="44" x2="32" y2="56"/>'),
+    crosswalk: ()=>wrap('<line x1="10" y1="16" x2="6" y2="48"/><line x1="24" y1="16" x2="22" y2="48"/><line x1="38" y1="16" x2="38" y2="48"/><line x1="52" y1="16" x2="54" y2="48"/>'),
+    storefront: ()=>wrap('<rect x="10" y="24" width="44" height="26" /><path d="M8 24 L14 12 H50 L56 24"/><rect x="26" y="34" width="12" height="16"/><line x1="16" y1="30" x2="16" y2="24"/><line x1="48" y1="30" x2="48" y2="24"/>'),
+    sign: ()=>wrap('<line x1="32" y1="24" x2="32" y2="56"/><rect x="14" y="8" width="36" height="18" rx="0"/>'),
+    scooter: ()=>wrap('<circle cx="14" cy="46" r="7"/><circle cx="46" cy="46" r="7"/><path d="M14 46 H36 V22 H46 M36 22 V14"/>'),
+    unicycle: ()=>wrap('<circle cx="32" cy="40" r="13"/><line x1="32" y1="27" x2="32" y2="12"/><line x1="22" y1="14" x2="42" y2="14"/>'),
+    hydrant: ()=>wrap('<rect x="24" y="20" width="16" height="26" rx="0"/><line x1="16" y1="26" x2="24" y2="26"/><line x1="40" y1="26" x2="48" y2="26"/><rect x="27" y="10" width="10" height="10" rx="0"/><line x1="32" y1="46" x2="32" y2="54"/>'),
+    reflection: ()=>wrap('<rect x="8" y="10" width="48" height="30" rx="0"/><path d="M14 40 L22 50 M50 40 L42 50"/><line x1="8" y1="24" x2="56" y2="24" stroke-dasharray="3 3"/>')
+  };
+})();
+
+/* CAPTCHA ENGINE */
+const CaptchaEngine=(function(){
+  const roundDefs = {
+    r1:{ prompt:"SELECT ALL IMAGES CONTAINING A BICYCLE.", sub:null,
+      tiles:["bicycle","car","bus","bicycle","trafficLight","scooter","storefront","bicycle","sign","motorcycle","crosswalk","hydrant"],
+      bigIdx:0, correctType:"bicycle", mode:"exact" },
+    r2:{ prompt:"SELECT ALL IMAGES CONTAINING AN OBJECT THAT COULD REASONABLY BE MISTAKEN FOR A BICYCLE.", sub:"AMBIGUITY THRESHOLD: MODERATE",
+      tiles:["unicycle","scooter","motorcycle","car","bicycle","hydrant","sign","unicycle","bus","scooter","reflection","crosswalk"],
+      bigIdx:4, correctType:null, mode:"any" },
+    r3:{ prompt:"SELECT THE RESPONSE THE VERIFICATION SYSTEM EXPECTS A HUMAN TO SELECT.", sub:"NOTE: THE SYSTEM'S EXPECTATION IS NOT DISCLOSED.",
+      tiles:["storefront","trafficLight","reflection","car","sign","hydrant","bus","bicycle","crosswalk","scooter","unicycle","motorcycle"],
+      bigIdx:7, correctType:null, mode:"any" },
+    r4:{ prompt:"SELECT THE RESPONSE A HUMAN WOULD CHOOSE IF THEY WERE TRYING TO APPEAR HUMAN.", sub:"NOTE: A HUMAN WOULD NOT NEED TO TRY.",
+      tiles:["reflection","hydrant","crosswalk","sign","bus","trafficLight","car","storefront","bicycle","scooter","motorcycle","unicycle"],
+      bigIdx:2, correctType:null, mode:"any", hostile:true },
+    r5:{ prompt:"SELECT THE RESPONSE THAT A HUMAN WOULD EXPECT THE SYSTEM TO EXPECT FROM A HUMAN.", sub:"THIS PROMPT WILL NOT BE CLARIFIED FURTHER.",
+      tiles:["car","bicycle","sign","reflection","bus","hydrant","crosswalk","scooter","unicycle","motorcycle","storefront","trafficLight"],
+      bigIdx:1, correctType:null, mode:"any" }
+  };
+
+  let selected=new Set();
+  let revisions=0, roundStartTime=0, currentDef=null, hostileShuffleUsed=false;
+
+  function render(def, container){
+    currentDef=def; selected=new Set(); revisions=0; roundStartTime=performance.now(); hostileShuffleUsed=false;
+    const g=document.createElement("div");
+    g.className="tile-grid";
+    def.tiles.forEach((type,i)=>{
+      const t=document.createElement("div");
+      t.className="tile"+(i===def.bigIdx?" big":"");
+      t.dataset.idx=i; t.dataset.type=type;
+      t.innerHTML=Icons[type]()+'<span class="tile-idx">'+pad(i+1,2)+'</span>';
+      t.addEventListener("click",()=>{
+        const wasSelecting=!selected.has(i);
+        if(selected.has(i)){ selected.delete(i); } else { selected.add(i); revisions++; }
+        t.classList.toggle("selected");
+        if(def.mode==="exact" && wasSelecting && type!==def.correctType){
+          AudioEngine.wrongClick();
+          WarningFX.trigger("WRONG.");
+        } else {
+          AudioEngine.tick();
+        }
+        if(def.hostile && !hostileShuffleUsed && revisions>=3){
+          hostileShuffleUsed=true;
+          setTimeout(()=>{
+            EventLogger.log("TILE STATE RE-INDEXED","warn");
+            const nodes=Array.from(g.children);
+            const a=nodes[randInt(0,nodes.length-2)];
+            const b=a.nextSibling;
+            if(b){ g.insertBefore(b,a); }
+          },260);
+        }
+      });
+      g.appendChild(t);
+    });
+    container.innerHTML=""; container.appendChild(g);
+    return g;
+  }
+  function getSelectedCount(){ return selected.size; }
+  function getRevisions(){ return revisions; }
+  function getLatencySec(){ return (performance.now()-roundStartTime)/1000; }
+  function isCorrectR1(){
+    if(!currentDef) return false;
+    let ok=true;
+    currentDef.tiles.forEach((type,i)=>{
+      const isTarget = type===currentDef.correctType;
+      const isSel = selected.has(i);
+      if(isTarget!==isSel) ok=false;
+    });
+    return ok;
+  }
+  return{ roundDefs, render, getSelectedCount, getRevisions, getLatencySec, isCorrectR1 };
+})();
+
+/* UI CONTROLLER */
+const UI=(function(){
+  const stage=document.getElementById("main-scroll");
+  const attemptsEl=document.getElementById("attemptsVal");
+  let attempts=0;
+  function setStage(html){ stage.innerHTML=html; stage.scrollTop=0; }
+  function bumpAttempts(){ attempts++; attemptsEl.textContent=pad(attempts,2); }
+  function setState(name){ document.getElementById("stateVal").textContent=name; }
+  function setIdentity(subject,authority){
+    document.getElementById("identitySubject").textContent=subject;
+    document.getElementById("identityAuthority").textContent=authority;
+  }
+  function setProtocol(p){
+    document.getElementById("protocolLabel").textContent=p;
+    document.getElementById("protocolVal2").textContent=p;
+  }
+  function freezeAll(ms){
+    return new Promise(resolve=>{
+      TelemetryEngine.freeze(); EventLogger.pause();
+      document.getElementById("app").classList.add("frozen");
+      setTimeout(()=>{
+        document.getElementById("app").classList.remove("frozen");
+        EventLogger.resume(); TelemetryEngine.unfreeze();
+        resolve();
+      },ms);
+    });
+  }
+  function blackout(ms){
+    return new Promise(resolve=>{
+      document.getElementById("black-fade").classList.add("on");
+      setTimeout(resolve,ms);
+    });
+  }
+  return{ setStage, bumpAttempts, setState, setIdentity, setProtocol, freezeAll, blackout };
+})();
+
+/* STATE MACHINE */
+const StateMachine=(function(){
+  let elapsedInterval=null, startTime=Date.now();
+  function startClocks(){
+    startTime=Date.now();
+    clearInterval(elapsedInterval);
+    elapsedInterval=setInterval(()=>{
+      const s=Math.floor((Date.now()-startTime)/1000);
+      document.getElementById("elapsedVal").textContent=pad(Math.floor(s/60))+":"+pad(s%60);
+      document.getElementById("clockVal").textContent=nowStr();
+    },1000);
+  }
+  function sessionId(){ return (Math.random().toString(16).slice(2,6)+"-"+randInt(10,99)).toUpperCase(); }
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  async function init(){
+    document.getElementById("sessionId").textContent=sessionId();
+    startClocks();
+    UI.setState("INIT");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">SYSTEM 7.3.91</div>'+
+        '<div class="headline">ESTABLISHING<br>SECURE SESSION</div>'+
+        '<div class="sub">LOADING VERIFICATION KERNEL<br>CALIBRATING INPUT SENSORS<br>SYNCHRONIZING BEHAVIOURAL BASELINE</div>'+
+      '</div>'
+    );
+    EventLogger.log("SESSION INITIALIZED");
+    await sleep(500);
+    EventLogger.log("INPUT DEVICE DETECTED");
+    await sleep(400);
+    EventLogger.log("BASELINE CALIBRATION STARTED");
+    await sleep(700);
+    baseline();
+  }
+
+  function baseline(){
+    UI.setState("BASELINE");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">BASELINE AUTHENTICATION</div>'+
+        '<div class="headline">MOVE THE POINTER<br>TO CONTINUE</div>'+
+        '<div class="sub">THE SYSTEM REQUIRES A MOTION SAMPLE BEFORE PROCEEDING.</div>'+
+      '</div>'
+    );
+    let triggered=false;
+    function onMove(){
+      if(triggered) return;
+      triggered=true;
+      window.removeEventListener("mousemove",onMove);
+      EventLogger.log("POINTER ACTIVITY DETECTED");
+      AudioEngine.tick();
+      setTimeout(()=>{
+        EventLogger.log("ANALYSIS STARTED");
+        BehaviourAnalyzer.setConfidence(78.4);
+        monitoring();
+      },550);
+    }
+    window.addEventListener("mousemove",onMove,{passive:true});
+  }
+
+  function monitoring(){
+    UI.setState("MONITORING");
+    document.getElementById("sessionStatus").textContent="MONITORING";
+    EventLogger.log("INPUT DEVICE UNDER ANALYSIS","warn");
+    setTimeout(()=>{ round("r1"); },900);
+  }
+
+  function round(key){
+    UI.setState("CAPTCHA_"+key.toUpperCase());
+    const def=CaptchaEngine.roundDefs[key];
+    const idx = {r1:1,r2:2,r3:3,r4:4,r5:5}[key];
+    const html =
+      '<div class="stage-frame">'+
+        '<div class="stage-header"><span class="stage-label">CHALLENGE '+idx+' / 5</span><span class="stage-id">CH-'+randInt(1000,9999)+'</span></div>'+
+        '<div class="stage-body">'+
+          '<div class="prompt-text">'+def.prompt+'</div>'+
+          (def.sub? '<div class="prompt-sub">'+def.sub+'</div>' : '')+
+          '<div id="tileHost"></div>'+
+          '<div class="stage-footer">'+
+            '<span class="footer-note">SELECT ALL APPLICABLE TILES, THEN VERIFY</span>'+
+            '<button class="btn primary" id="verifyBtn">GO</button>'+
+          '</div>'+
+          '<div class="system-msg-block" id="sysMsg"><span class="neutral">AWAITING RESPONSE...</span></div>'+
+          '<div class="progress-block">'+
+            '<div class="pl"><span>VERIFICATION PROGRESS</span><span id="progressPct">'+Math.round((idx-1)/5*100)+'%</span></div>'+
+            '<div class="progress-outer"><div class="progress-inner" id="progressBar" style="width:'+Math.round((idx-1)/5*100)+'%;"></div></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    UI.setStage(html);
+    CaptchaEngine.render(def, document.getElementById("tileHost"));
+    document.getElementById("verifyBtn").addEventListener("click",()=>{ handleVerify(key,def,idx); });
+  }
+
+  function setProgress(pct,glitch){
+    const bar=document.getElementById("progressBar");
+    const label=document.getElementById("progressPct");
+    if(!bar) return;
+    bar.style.width=clamp(pct,0,100)+"%";
+    label.textContent=Math.round(clamp(pct,0,100))+"%";
+    bar.className="progress-inner"+(glitch?" glitch":"");
+  }
+
+  function handleVerify(key,def,idx){
+    UI.bumpAttempts();
+    AudioEngine.beep();
+    const latency=CaptchaEngine.getLatencySec();
+    const revisions=CaptchaEngine.getRevisions();
+    const selCount=CaptchaEngine.getSelectedCount();
+    const msgEl=document.getElementById("sysMsg");
+
+    if(selCount===0){
+      AudioEngine.wrongAnswerBuzz();
+      WarningFX.trigger("HUMAN NOT VERIFIED");
+      msgEl.innerHTML='<span class="flag">NO RESPONSE RECORDED. A SELECTION IS REQUIRED TO PROCEED.</span>';
+      return;
+    }
+    if(key==="r1"){
+      const correct=CaptchaEngine.isCorrectR1();
+      if(!correct){
+        AudioEngine.distortedFail();
+        WarningFX.trigger("HUMAN VERIFICATION FAILED");
+        EventLogger.log("RESPONSE REJECTED — PATTERN MISMATCH","bad");
+        msgEl.innerHTML='<span class="flag">RESPONSE DOES NOT MATCH EXPECTED PATTERN. RE-ATTEMPT REQUIRED.</span>';
+        BehaviourAnalyzer.bump(-3);
+        return;
+      }
+    }
+    const verdict=BehaviourAnalyzer.evaluate(latency,revisions);
+    EventLogger.log(verdict.split(".")[0],"warn");
+    msgEl.innerHTML='<span class="flag">'+verdict+'</span>';
+    AudioEngine.suspiciousTone();
+    WarningFX.trigger("SUSPICIOUS BEHAVIOUR");
+
+    let targetProgress = idx/5*100;
+    if(key==="r3" || key==="r5"){
+      targetProgress = clamp(targetProgress + rand(3,9),0,96);
+      setProgress(targetProgress,false);
+      setTimeout(()=>{
+        EventLogger.log("BEHAVIOURAL INCONSISTENCY DETECTED","bad");
+        AudioEngine.suspiciousTone();
+        WarningFX.trigger("SUSPICIOUS BEHAVIOUR");
+        setProgress(targetProgress - rand(18,30),true);
+        setTimeout(()=>{
+          const noteEl=document.getElementById("sysMsg");
+          if(noteEl) noteEl.innerHTML='<span class="flag">PROGRESS VALUE IS NOT A MEASURE OF COMPLETION.</span>';
+        },900);
+      },700);
+    } else {
+      setProgress(targetProgress,false);
+    }
+    setTimeout(()=>{ advanceRound(key); },1500);
+  }
+
+  function advanceRound(key){
+    const order=["r1","r2","r3","r4","r5"];
+    const i=order.indexOf(key);
+    if(i<order.length-1){ round(order[i+1]); } else { falseSuccess(); }
+  }
+
+  async function falseSuccess(){
+    UI.setState("FALSE_SUCCESS");
+    AudioEngine.doubleBeep();
+    BehaviourAnalyzer.setConfidence(99.8);
+    document.getElementById("sessionStatus").textContent="VERIFIED";
+    document.getElementById("sessionStatus").className="value good";
+    EventLogger.log("VERIFICATION COMPLETE","good");
+    EventLogger.log("ACCESS GRANTED","good");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">VERIFICATION COMPLETE</div>'+
+        '<div class="confidence-circle"><div class="big-confidence-label">CONFIDENCE</div><div class="big-confidence" id="fsConf">99.8%</div></div>'+
+        '<div class="headline good">ACCESS GRANTED</div>'+
+      '</div>'
+    );
+    await sleep(1800);
+    EventLogger.log("POST-VERIFICATION AUDIT INITIATED","warn");
+    await UI.freezeAll(1000);
+    postAudit();
+  }
+
+  async function postAudit(){
+    UI.setState("AUDIT");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">POST-VERIFICATION AUDIT</div>'+
+        '<div class="headline">RE-EVALUATING<br>PRIOR RESPONSES</div>'+
+        '<div class="sub" id="auditLine">SCANNING RESPONSE HISTORY...</div>'+
+      '</div>'
+    );
+    BehaviourAnalyzer.flagReeval();
+    AudioEngine.warnPulse();
+    EventLogger.log("RE-EVALUATING RESPONSE HISTORY","warn");
+    await sleep(900);
+    BehaviourAnalyzer.setConfidence(64.1);
+    document.getElementById("auditLine").textContent="PREVIOUSLY ACCEPTED RESPONSES FLAGGED FOR REVIEW.";
+    EventLogger.log("ACCEPTED RESPONSES RE-FLAGGED","bad");
+    await sleep(1100);
+    BehaviourAnalyzer.setConfidence(37.4);
+    document.getElementById("auditLine").textContent="VERIFICATION AUTHORITY COMPROMISED.";
+    EventLogger.log("VERIFICATION AUTHORITY COMPROMISED","bad");
+    document.getElementById("sessionStatus").textContent="UNDER REVIEW";
+    document.getElementById("sessionStatus").className="value warn";
+    await sleep(1200);
+    roleReversal();
+  }
+
+  async function roleReversal(){
+    UI.setState("ROLE_REVERSAL");
+    EventLogger.log("VERIFICATION SUBJECT REASSIGNED","bad");
+    AudioEngine.lowTone();
+    await UI.freezeAll(1000);
+    UI.setIdentity("UNKNOWN","VERIFICATION SUBJECT");
+    UI.setProtocol("SYSTEM-OBJ");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">SYSTEM SELF-ASSESSMENT</div>'+
+        '<div class="role-table">'+
+          '<div class="role-cell"><div class="rk">FORMER ROLE</div><div class="rv strike">USER → SUBJECT</div><div class="rv strike">SYSTEM → VERIFIER</div></div>'+
+          '<div class="role-cell"><div class="rk">CURRENT ROLE</div><div class="rv new">SYSTEM → SUBJECT</div><div class="rv new">USER → OBSERVER</div></div>'+
+        '</div>'+
+        '<div class="headline">IS THIS VERIFICATION SYSTEM<br>BEHAVING LIKE A HUMAN?</div>'+
+        '<div class="yn-row"><button class="btn oval" id="ynYes">YES</button><button class="btn oval" id="ynNo">NO</button></div>'+
+      '</div>'
+    );
+    document.getElementById("ynYes").addEventListener("click",()=>selfAssess());
+    document.getElementById("ynNo").addEventListener("click",()=>selfAssess());
+  }
+
+  async function selfAssess(){
+    AudioEngine.tick();
+    EventLogger.log("SYSTEM BEHAVIOURAL ANALYSIS INITIATED","warn");
+    UI.setState("SELF_ASSESS");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">SYSTEM BEHAVIOURAL ANALYSIS</div>'+
+        '<div class="analysis-lines">'+
+          '<div><span class="al-k">RESPONSE LATENCY</span><span class="al-v bad">0.04 ms</span></div>'+
+          '<div><span class="al-k">DECISION CONSISTENCY</span><span class="al-v bad">HIGH</span></div>'+
+          '<div><span class="al-k">INPUT PATTERN</span><span class="al-v bad">PREDICTABLE</span></div>'+
+          '<div><span class="al-k">ADAPTATION</span><span class="al-v bad">AUTOMATED</span></div>'+
+          '<div><span class="al-k">REACTION MODEL</span><span class="al-v bad">DETERMINISTIC</span></div>'+
+        '</div>'+
+        '<div class="sub" style="margin-top:20px;">AUTOMATION SIGNATURE<br><span style="font-family:var(--disp);font-weight:900;color:var(--red);font-size:16px;">DETECTED</span></div>'+
+      '</div>'
+    );
+    await sleep(2200);
+    classifiedBot();
+  }
+
+  async function classifiedBot(){
+    AudioEngine.alarmSiren();
+    WarningFX.trigger("BOT DETECTED");
+    EventLogger.log("SYSTEM CLASSIFICATION: BOT","bad");
+    UI.setState("CLASSIFIED_BOT");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">SYSTEM CLASSIFICATION</div>'+
+        '<div class="confidence-circle" style="border-color:var(--red);"><div class="big-confidence bad" style="font-size:26px;">BOT</div></div>'+
+        '<div class="sub">THE VERIFICATION SYSTEM HAS CLASSIFIED ITSELF AS NON-HUMAN.</div>'+
+      '</div>'
+    );
+    await sleep(1600);
+    await UI.freezeAll(1100);
+    systemFailure();
+  }
+
+  async function systemFailure(){
+    UI.setState("SYS_FAILURE");
+    AudioEngine.distortedFail();
+    WarningFX.trigger("THAT WAS NOT HUMAN.");
+    EventLogger.log("SELF-VERIFICATION FAILED","bad");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">SELF-VERIFICATION FAILED</div>'+
+        '<div class="analysis-lines">'+
+          '<div><span class="al-k">VERIFIER INTEGRITY</span><span class="al-v bad">UNCERTAIN</span></div>'+
+          '<div><span class="al-k">SYSTEM HUMANITY</span><span class="al-v bad">UNCONFIRMED</span></div>'+
+          '<div><span class="al-k">AUTHENTICATION MODEL</span><span class="al-v bad">INTERNAL CONTRADICTION</span></div>'+
+        '</div>'+
+      '</div>'
+    );
+    document.getElementById("integrityVal").textContent="UNCERTAIN";
+    document.getElementById("integrityVal").className="v flag";
+    BehaviourAnalyzer.setConfidence(0.02);
+    await sleep(2400);
+    finalResult();
+  }
+
+  async function finalResult(){
+    UI.setState("FINAL");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">VERIFICATION COMPLETE</div>'+
+        '<div class="role-table">'+
+          '<div class="role-cell">'+
+            '<div class="rk">USER</div>'+
+            '<div class="rv">HUMAN<br>CONFIRMED</div>'+
+            '<div style="margin-top:8px;font-size:9px;color:#888;font-weight:700;">CONFIDENCE</div>'+
+            '<div style="font-family:var(--disp);font-weight:900;font-size:18px;color:var(--red);">0.02%</div>'+
+          '</div>'+
+          '<div class="role-cell">'+
+            '<div class="rk">VERIFIER</div>'+
+            '<div class="rv" style="color:var(--red);">HUMAN<br>UNCONFIRMED</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="final-result-box">'+
+          '<div class="frl1">USER PASSED.</div>'+
+          '<div class="frl2">SYSTEM FAILED.</div>'+
+        '</div>'+
+      '</div>'
+    );
+    document.getElementById("sessionStatus").textContent="TERMINATED";
+    document.getElementById("sessionStatus").className="value bad";
+    await sleep(2600);
+    terminated();
+  }
+
+  async function terminated(){
+    UI.setState("TERMINATED");
+    UI.setStage(
+      '<div class="overlay-screen">'+
+        '<div class="big-label">SESSION TERMINATED</div>'+
+        '<div class="sub" style="margin-top:14px;">REASON:<br><span style="font-family:var(--disp);font-weight:900;color:var(--black);">VERIFICATION SYSTEM COULD NOT VERIFY ITSELF.</span></div>'+
+      '</div>'
+    );
+    AudioEngine.finalBeep();
+    await sleep(1400);
+    await UI.blackout(1200);
+  }
+
+  function reset(){
+    document.getElementById("black-fade").classList.remove("on");
+    document.getElementById("integrityVal").textContent="99.2%";
+    document.getElementById("integrityVal").className="v";
+    document.getElementById("sessionStatus").textContent="UNVERIFIED";
+    document.getElementById("sessionStatus").className="value warn";
+    UI.setIdentity("USER","SYSTEM");
+    UI.setProtocol("HUMAN-OBJ");
+    init();
+  }
+
+  return{ init, reset };
+})();
+
+document.getElementById("replayLink").addEventListener("click",()=>{ StateMachine.reset(); });
+StateMachine.init();
+
+})();
+</script>
+</body>
+</html>

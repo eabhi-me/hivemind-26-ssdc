@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAGEVAULT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+:root{
+  --graphite:#191D24;
+  --panel:#20252D;
+  --panel-2:#262B34;
+  --klaxon:#E8492F;
+  --brass:#D9A340;
+  --moss:#4E9A6E;
+  --ledger:#EDE7DA;
+  --muted:#8A90A0;
+  --line:#333A46;
+  --font-display:'Bitter', Georgia, 'Times New Roman', serif;
+  --font-body:'Public Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2.5rem 1.25rem;
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(217,163,64,.07), transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(232,73,47,.06), transparent 50%),
+    var(--graphite);
+  color:var(--ledger);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  user-select:none;
+}
+
+.card{
+  width:min(500px,100%);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:clamp(1.75rem,4vw,2.5rem);
+  box-shadow:0 30px 70px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.02);
+  position:relative;
+}
+.rivet{ position:absolute; width:8px; height:8px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #545c6b, #262b33 70%); }
+.rivet.tl{ top:14px; left:14px; }
+.rivet.tr{ top:14px; right:14px; }
+.rivet.bl{ bottom:14px; left:14px; }
+.rivet.br{ bottom:14px; right:14px; }
+
+.brand{ text-align:center; font-family:var(--font-display); font-weight:800;
+  font-size:1.7rem; letter-spacing:.5px; color:var(--brass); margin-bottom:.2rem; }
+.tagline{ text-align:center; color:var(--muted); font-size:.82rem; margin-bottom:2rem; }
+
+.stage{ display:none; }
+.stage.active{ display:block; animation:rise .4s ease; }
+@keyframes rise{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+
+.stage h2{ font-family:var(--font-display); font-weight:700; font-size:1.15rem;
+  text-align:center; margin:0 0 .5rem; }
+.stage .sub{ color:var(--muted); font-size:.85rem; text-align:center; line-height:1.55; margin:0 0 1.6rem; }
+
+.target-row{ display:flex; gap:.5rem; justify-content:center; margin-bottom:.55rem; font-family:var(--font-display); }
+.target-row span{ width:48px; text-align:center; font-weight:700; color:var(--muted);
+  border-bottom:2px dashed var(--line); padding-bottom:.3rem; }
+
+.rule-text{ display:none; text-align:center; color:var(--brass); font-size:.78rem;
+  font-style:italic; margin:0 0 1rem; padding:.55rem .7rem; border:1px dashed var(--line);
+  border-radius:8px; }
+.rule-text.show{ display:block; animation:rise .4s ease; }
+
+.captcha-hint{ text-align:center; color:var(--muted); font-size:.7rem; margin:-.6rem 0 1rem; font-style:italic; }
+
+.reels{ display:flex; gap:.5rem; justify-content:center; margin:0 0 1.6rem; }
+.reel{ width:48px; height:64px; border-radius:8px; background:#0d0f13;
+  border:2px solid var(--line); overflow:hidden; position:relative; }
+.reel.active{ border-color:var(--klaxon); box-shadow:0 0 0 4px rgba(232,73,47,.18); }
+.reel.locked{ border-color:var(--brass); box-shadow:0 0 0 4px rgba(217,163,64,.16); }
+.reel .strip{ position:absolute; top:0; left:0; width:100%; }
+.reel .strip div{ height:64px; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-size:1.5rem; font-weight:700; color:var(--brass); }
+
+.controls{ display:flex; flex-direction:column; align-items:center; gap:.65rem; }
+.btn{ border:none; border-radius:9px; padding:.8rem 1.7rem; font-size:.92rem; font-weight:600;
+  font-family:var(--font-body); cursor:pointer; color:var(--ledger);
+  transition:transform .12s ease, box-shadow .12s ease, opacity .2s ease; }
+.btn:active{ transform:scale(.96); }
+.btn-primary{ background:var(--klaxon); box-shadow:0 8px 20px rgba(232,73,47,.28); }
+.btn-lever{ background:var(--line); color:var(--muted); cursor:not-allowed; }
+.btn-lever.ready{ background:var(--brass); color:#241a00; cursor:pointer;
+  box-shadow:0 8px 20px rgba(217,163,64,.32); animation:ready-pulse 1.5s ease-in-out infinite; }
+@keyframes ready-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.035); } }
+.hint{ color:var(--muted); font-size:.72rem; }
+.meta-row{ display:flex; justify-content:space-between; color:var(--muted); font-size:.74rem; margin-top:1.1rem; }
+
+.overlay{ position:fixed; inset:0; background:rgba(10,11,14,.68); backdrop-filter:blur(2px);
+  display:none; align-items:center; justify-content:center; z-index:50; padding:1rem; }
+.overlay.active{ display:flex; }
+.popup{ position:relative; background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+  padding:1.7rem; width:min(340px,100%); text-align:center; box-shadow:0 24px 55px rgba(0,0,0,.5);
+  animation:pop .2s ease; }
+@keyframes pop{ from{ opacity:0; transform:scale(.92); } to{ opacity:1; transform:scale(1); } }
+.popup.shake{ animation:shake .38s ease; }
+@keyframes shake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-7px); } 50%{ transform:translateX(6px); } 75%{ transform:translateX(-4px); } }
+.popup h3{ font-family:var(--font-body); font-weight:700; font-size:1rem; margin:0 0 .55rem; }
+.popup p{ margin:0 0 1.3rem; color:var(--muted); font-size:.83rem; line-height:1.5; }
+.popup-actions{ display:flex; gap:.65rem; justify-content:center; }
+.popup-actions button{ border:none; border-radius:8px; padding:.6rem 1.05rem; font-weight:600;
+  font-family:var(--font-body); font-size:.87rem; cursor:pointer; transition:transform .2s ease; color:var(--ledger); }
+#btnNo{ background:var(--line); }
+#btnYes{ background:var(--klaxon); }
+
+.captcha-box textarea{ width:100%; min-height:88px; border-radius:10px; border:1px solid var(--line);
+  background:#14171d; color:var(--ledger); padding:.8rem; font-size:.88rem; font-family:var(--font-body);
+  resize:vertical; }
+.captcha-box textarea:focus{ outline:none; border-color:var(--brass); }
+.meter-track{ height:10px; border-radius:6px; background:#14171d; overflow:hidden; margin:.7rem 0 .35rem; }
+.meter-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--brass),var(--klaxon)); transition:width .15s ease; }
+.meter-label{ font-size:.72rem; color:var(--muted); text-align:right; margin-bottom:1.1rem; }
+.captcha-status{ min-height:1.2rem; font-size:.78rem; color:var(--klaxon); text-align:center; margin-bottom:.7rem; }
+
+.success-icon{ text-align:center; font-size:2.2rem; margin-bottom:.4rem; }
+.success-title{ text-align:center; font-family:var(--font-display); font-weight:700; color:var(--moss);
+  font-size:1.1rem; margin-bottom:.3rem; }
+.success-sub{ text-align:center; color:var(--muted); font-size:.87rem; margin-bottom:1.4rem; }
+.countdown{ text-align:center; font-family:var(--font-display); font-size:2.4rem; font-weight:800;
+  color:var(--brass); margin-bottom:.4rem; }
+.redirect-count{ text-align:center; color:var(--muted); font-size:.78rem; }
+.truth{ text-align:center; color:var(--muted); font-size:.74rem; margin-top:1.4rem; opacity:0;
+  transition:opacity 1.3s ease; font-style:italic; }
+.truth.show{ opacity:1; }
+
+.confetti{ position:absolute; inset:0; overflow:hidden; pointer-events:none; border-radius:20px; }
+.confetti span{ position:absolute; top:-10px; width:7px; height:12px; border-radius:2px;
+  animation:fall 2.5s linear forwards; }
+@keyframes fall{ to{ transform:translateY(440px) rotate(340deg); opacity:0; } }
+
+.footer-note{ text-align:center; color:var(--muted); font-size:.68rem; margin-top:1.6rem; opacity:.65; }
+
+.suspicion-row{ display:flex; align-items:center; justify-content:center; gap:.5rem;
+  color:var(--muted); font-size:.7rem; margin-bottom:1.75rem; }
+.suspicion-track{ width:70px; height:5px; border-radius:4px; background:#14171d; overflow:hidden; }
+.suspicion-fill{ height:100%; width:0%; background:var(--klaxon); transition:width .3s ease; }
+
+.trap-link{ display:block; margin:.6rem auto 0; background:none; border:none;
+  color:var(--muted); font-size:.72rem; text-decoration:underline; text-underline-offset:2px;
+  font-family:var(--font-body); cursor:pointer; padding:0; }
+.trap-link:hover{ color:var(--ledger); }
+
+.popup-close{ position:absolute; top:8px; right:10px; background:none; border:none;
+  color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; padding:4px; }
+.popup-close:hover{ color:var(--ledger); }
+
+.reel .flicker{ position:absolute; inset:0; background:#0d0f13; display:flex;
+  align-items:center; justify-content:center; font-family:var(--font-display);
+  font-size:1.5rem; font-weight:700; color:var(--brass); }
+
+.cancel-btn{ display:none; margin:1rem auto 0; background:var(--line); color:var(--muted);
+  border:none; border-radius:9px; padding:.6rem 1.3rem; font-size:.82rem; font-weight:600;
+  font-family:var(--font-body); cursor:pointer; }
+.cancel-btn.show{ display:block; }
+
+@media (max-width:420px){
+  .reel{ width:40px; }
+  .target-row span{ width:40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <span class="rivet tl"></span><span class="rivet tr"></span>
+  <span class="rivet bl"></span><span class="rivet br"></span>
+  <div class="confetti" id="confetti"></div>
+
+  <div class="brand">RAGEVAULT</div>
+  <div class="tagline">Emotionally-verified login</div>
+  <div class="suspicion-row">
+    <span>Vault suspicion</span>
+    <div class="suspicion-track"><div class="suspicion-fill" id="suspicionFill"></div></div>
+    <span id="suspicionValue">0%</span>
+  </div>
+
+  <section class="stage active" id="stage1">
+    <h2>Set your password</h2>
+    <p class="sub">Stop each reel to spell the sequence below. They carry momentum, so timing your click for the target usually means missing it.</p>
+    <p class="rule-text" id="roundRuleText"></p>
+    <div class="target-row" id="targetRow"></div>
+    <div class="reels" id="reelsRow"></div>
+    <div class="controls">
+      <button class="btn btn-primary" id="stopBtn">Stop</button>
+      <span class="hint">or press space</span>
+      <button class="btn btn-lever" id="pullLeverBtn" disabled>Pull the lever</button>
+    </div>
+    <div class="meta-row">
+      <span id="quipText"></span>
+      <span id="attemptsText">Attempts: 0</span>
+    </div>
+    <button class="trap-link" id="skipStepBtn" type="button">Skip this step</button>
+  </section>
+
+  <section class="stage" id="stage3">
+    <h2>Prove you're human</h2>
+    <p class="sub">Type a sentence that shows exactly how this login has made you feel. Calm answers get flagged as bot-like.</p>
+    <div class="captcha-box">
+      <textarea id="captchaInput" placeholder="Type your genuine fury here…"></textarea>
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-label" id="meterLabel">0% fury detected</div>
+      <div class="captcha-hint">Generic fury won't pass. Say what's specifically making you furious.</div>
+    </div>
+    <div class="captcha-status" id="captchaStatus"></div>
+    <div class="controls">
+      <button class="btn btn-primary" id="captchaSubmit">Submit</button>
+      <button class="trap-link" id="giveUpBtn" type="button">This feels impossible</button>
+    </div>
+  </section>
+
+  <section class="stage" id="stage4">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Identity verified. Login successful.</div>
+    <div class="success-sub">Redirecting to your dashboard in…</div>
+    <div class="countdown" id="countdown">3</div>
+    <div class="redirect-count">Redirect attempts: <span id="redirectAttempts">0</span></div>
+    <button class="cancel-btn" id="cancelRedirectBtn" type="button">Cancel redirect</button>
+    <div class="truth" id="truthReveal">Between us? There is no dashboard.</div>
+  </section>
+
+  <div class="footer-note">RAGEVAULT is not a real bank. Or a real vault. Or emotionally healthy.</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="popup" id="popup">
+    <button class="popup-close" id="popupClose" aria-label="Close" type="button">×</button>
+    <h3 id="popupTitle"></h3>
+    <p id="popupBody"></p>
+    <div class="popup-actions">
+      <button id="btnNo">No thanks</button>
+      <button id="btnYes">Sure, fine</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- CROSS-CUTTING: VAULT SUSPICION ---------- */
+  /* Every failure or "escape attempt" anywhere in the app raises this.
+     It quietly raises the fury threshold required in Stage 3 later. */
+  let suspicion = 0;
+  function addSuspicion(n){
+    suspicion = Math.min(100, suspicion + n);
+    updateSuspicionUI();
+  }
+  function updateSuspicionUI(){
+    document.getElementById('suspicionFill').style.width = suspicion + '%';
+    document.getElementById('suspicionValue').textContent = suspicion + '%';
+  }
+
+  /* ---------- STAGE 1: SLOT MACHINE PASSWORD (escalating, Password-Game style) ---------- */
+  const BASE_TARGET = ['R','A','G','E','!'];
+  const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?".split('');
+  const ROW_H = 64;
+  const BASE_SPEED = 8;
+  const MAX_SPEED_MULT = 3;
+  let speedMult = 1;
+  let attempts = 0;
+  let round = 1;
+  let confirmedCount = 0;
+
+  const FAIL_QUIPS = [
+    "Not quite. Rage requires precision.",
+    "Close. Statistically speaking, not that close.",
+    "The vault senses hesitation.",
+    "Try funneling more anger into your clicks.",
+    "The reels remain unimpressed."
+  ];
+
+  function weekdayLetterCount(){
+    return new Date().toLocaleDateString('en-US', { weekday: 'long' }).length;
+  }
+
+  function getRoundTargets(rnd){
+    /* Computed fresh every time it's called, never cached, so it can never
+       go stale relative to whatever Suspicion is doing right now. */
+    if(rnd === 1) return BASE_TARGET.slice();
+    if(rnd === 2) return [String(weekdayLetterCount())];
+    if(rnd === 3) return [suspicion > 0 ? '!' : '?'];
+    return [];
+  }
+
+  function getRoundRuleText(rnd){
+    if(rnd === 2) return "New rule: the next character is the number of letters in today's day of the week.";
+    if(rnd === 3) return 'New rule: the next character is "!" if Vault Suspicion is above 0%, otherwise "?".';
+    return '';
+  }
+
+  const reels = [];
+  const targetBoxEls = [];
+
+  function makeReelObject(index){
+    return {
+      index, el: null, stripEl: null,
+      pos: Math.random() * CHARSET.length * ROW_H,
+      speed: 0, decay: 0,
+      state: 'idle', // idle | spinning | decelerating | locked
+      lockedChar: null
+    };
+  }
+
+  function appendReelDOM(reelObj){
+    const container = document.getElementById('reelsRow');
+    const reelDiv = document.createElement('div');
+    reelDiv.className = 'reel';
+    const strip = document.createElement('div');
+    strip.className = 'strip';
+    const repeated = [].concat(CHARSET, CHARSET, CHARSET);
+    repeated.forEach(ch => {
+      const d = document.createElement('div');
+      d.textContent = ch;
+      strip.appendChild(d);
+    });
+    reelDiv.appendChild(strip);
+    container.appendChild(reelDiv);
+    reelObj.el = reelDiv;
+    reelObj.stripEl = strip;
+  }
+
+  function appendTargetBox(){
+    const row = document.getElementById('targetRow');
+    const span = document.createElement('span');
+    span.textContent = '?';
+    row.appendChild(span);
+    targetBoxEls.push(span);
+  }
+
+  function revealTargetBoxes(fromIndex, chars){
+    chars.forEach((ch, i) => { targetBoxEls[fromIndex + i].textContent = ch; });
+  }
+
+  function flickerLie(reelEl, trueChar){
+    /* Purely cosmetic: briefly shows a wrong letter on top of the reel right as
+       it locks, then reveals the true (already-decided) locked letter beneath.
+       Never touches game state, so the outcome is unaffected either way. */
+    let fake = trueChar;
+    while(fake === trueChar){ fake = CHARSET[Math.floor(Math.random() * CHARSET.length)]; }
+    const decoy = document.createElement('div');
+    decoy.className = 'flicker';
+    decoy.textContent = fake;
+    reelEl.appendChild(decoy);
+    setTimeout(() => { decoy.remove(); }, 180);
+  }
+
+  function startReel(r){
+    r.state = 'spinning';
+    r.speed = BASE_SPEED * speedMult;
+    r.el.classList.remove('locked');
+    r.el.classList.add('active');
+  }
+
+  function stopActiveReel(){
+    const active = reels.find(r => r.state === 'spinning');
+    if(!active) return;
+    active.state = 'decelerating';
+    active.decay = 0.90 + Math.random() * 0.05;
+    if(Math.random() < 0.3){
+      active.speed += 2 + Math.random() * 3;
+    }
+  }
+
+  function onReelLocked(r){
+    const nextIdx = r.index + 1;
+    if(nextIdx < reels.length){
+      setTimeout(() => startReel(reels[nextIdx]), 260);
+    } else {
+      const btn = document.getElementById('pullLeverBtn');
+      btn.disabled = false;
+      btn.classList.add('ready');
+    }
+  }
+
+  function animateReels(){
+    reels.forEach(r => {
+      if(r.state === 'spinning' || r.state === 'decelerating'){
+        r.pos += r.speed;
+        if(r.state === 'decelerating'){
+          r.speed *= r.decay;
+          if(r.speed < 0.4){
+            r.pos = Math.round(r.pos / ROW_H) * ROW_H;
+            const idx = Math.round(r.pos / ROW_H) % CHARSET.length;
+            const norm = ((idx % CHARSET.length) + CHARSET.length) % CHARSET.length;
+            r.lockedChar = CHARSET[norm];
+            r.state = 'locked';
+            r.el.classList.remove('active');
+            r.el.classList.add('locked');
+            flickerLie(r.el, r.lockedChar);
+            onReelLocked(r);
+          }
+        }
+        const cycle = CHARSET.length * ROW_H;
+        const mod = ((r.pos % cycle) + cycle) % cycle;
+        r.stripEl.style.transform = 'translateY(-' + mod + 'px)';
+      }
+    });
+    requestAnimationFrame(animateReels);
+  }
+
+  function resetCurrentRoundReels(){
+    for(let i = confirmedCount; i < reels.length; i++){
+      const r = reels[i];
+      r.state = 'idle';
+      r.lockedChar = null;
+      r.pos = Math.random() * CHARSET.length * ROW_H;
+      r.el.classList.remove('locked', 'active');
+    }
+    const btn = document.getElementById('pullLeverBtn');
+    btn.disabled = true;
+    btn.classList.remove('ready');
+    startReel(reels[confirmedCount]);
+  }
+
+  function initStage1(){
+    BASE_TARGET.forEach((ch, i) => {
+      appendTargetBox();
+      const r = makeReelObject(i);
+      reels.push(r);
+      appendReelDOM(r);
+    });
+    revealTargetBoxes(0, BASE_TARGET);
+    startReel(reels[0]);
+  }
+
+  function advanceRound(){
+    round++;
+    document.getElementById('quipText').textContent = "Correct. The vault isn't done with you.";
+    const ruleEl = document.getElementById('roundRuleText');
+    ruleEl.textContent = getRoundRuleText(round);
+    ruleEl.classList.add('show');
+    getRoundTargets(round).forEach(() => {
+      appendTargetBox();
+      const r = makeReelObject(reels.length);
+      reels.push(r);
+      appendReelDOM(r);
+      startReel(r);
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if(e.code === 'Space' && document.getElementById('stage1').classList.contains('active')){
+      e.preventDefault();
+      stopActiveReel();
+    }
+  });
+  document.getElementById('stopBtn').addEventListener('click', stopActiveReel);
+
+  document.getElementById('pullLeverBtn').addEventListener('click', () => {
+    const currentBatch = reels.slice(confirmedCount);
+    const expected = getRoundTargets(round);
+    const allCorrect = currentBatch.length === expected.length &&
+      currentBatch.every((r, i) => r.lockedChar === expected[i]);
+    if(allCorrect){
+      revealTargetBoxes(confirmedCount, expected);
+      confirmedCount = reels.length;
+      if(round < 3){
+        advanceRound();
+      } else {
+        openPopup();
+      }
+    } else {
+      attempts++;
+      speedMult = Math.min(MAX_SPEED_MULT, 1 + attempts * 0.12);
+      addSuspicion(3);
+      document.getElementById('quipText').textContent = FAIL_QUIPS[Math.floor(Math.random() * FAIL_QUIPS.length)];
+      document.getElementById('attemptsText').textContent = 'Attempts: ' + attempts;
+      resetCurrentRoundReels();
+    }
+  });
+
+  document.getElementById('skipStepBtn').addEventListener('click', () => {
+    /* The "skip" link doesn't skip anything. It makes the reels faster instead. */
+    speedMult = Math.min(MAX_SPEED_MULT, speedMult + 0.3);
+    addSuspicion(4);
+    document.getElementById('quipText').textContent = 'Nice try. Reels sped up instead.';
+  });
+
+  /* ---------- STAGE 2: PARITY POPUP ---------- */
+  let popupClickCount = 0;
+  let closeFlickerTimeout = null;
+  const POPUP_MESSAGES = [
+    { title: "Enable rage notifications?", body: "We'll remind you how mad you are, on a schedule that works for us." },
+    { title: "Still no rage notifications?", body: "They're proven to help you process feelings. On our timeline, not yours." },
+    { title: "You really don't want rage notifications?", body: "Studies show zero out of zero people who declined felt better afterward." },
+    { title: "Last chance on rage notifications.", body: "We need the engagement metrics. I mean, your wellbeing." }
+  ];
+
+  function openPopup(){
+    /* Arrive further down the guilt-trip ladder if you've already struggled,
+       as if the vault remembers. Still fully deterministic from here. */
+    popupClickCount = Math.min(2, Math.floor(suspicion / 15));
+    document.getElementById('overlay').classList.add('active');
+    updatePopupContent();
+  }
+
+  function updatePopupContent(){
+    const idx = Math.min(popupClickCount, POPUP_MESSAGES.length - 1);
+    const m = POPUP_MESSAGES[idx];
+    document.getElementById('popupTitle').textContent = m.title;
+    document.getElementById('popupBody').textContent = m.body;
+    document.title = popupClickCount > 0 ? '(' + popupClickCount + ') RAGEVAULT' : 'RAGEVAULT';
+    const shrink = Math.min(popupClickCount * 6, 24);
+    document.getElementById('btnNo').style.transform = 'scale(' + (1 - shrink / 100) + ')';
+    document.getElementById('btnYes').style.transform = 'scale(' + (1 + shrink / 150) + ')';
+  }
+
+  function handlePopupClick(which){
+    popupClickCount++;
+    const isOdd = popupClickCount % 2 === 1;
+    const dismissButton = isOdd ? 'no' : 'yes';
+    if(which === dismissButton){
+      closePopupAndProceed();
+    } else {
+      addSuspicion(2);
+      const popupEl = document.getElementById('popup');
+      popupEl.classList.remove('shake');
+      void popupEl.offsetWidth;
+      popupEl.classList.add('shake');
+      updatePopupContent();
+    }
+  }
+
+  document.getElementById('btnNo').addEventListener('click', () => handlePopupClick('no'));
+  document.getElementById('btnYes').addEventListener('click', () => handlePopupClick('yes'));
+
+  document.getElementById('popupClose').addEventListener('click', () => {
+    /* The corner "x" looks like the standard close button. It is not. */
+    addSuspicion(5);
+    const popupEl = document.getElementById('popup');
+    popupEl.classList.remove('shake');
+    void popupEl.offsetWidth;
+    popupEl.classList.add('shake');
+    const titleEl = document.getElementById('popupTitle');
+    titleEl.textContent = "That's decorative.";
+    clearTimeout(closeFlickerTimeout);
+    closeFlickerTimeout = setTimeout(() => {
+      titleEl.textContent = POPUP_MESSAGES[Math.min(popupClickCount, POPUP_MESSAGES.length - 1)].title;
+    }, 900);
+  });
+
+  function closePopupAndProceed(){
+    document.getElementById('overlay').classList.remove('active');
+    document.title = 'RAGEVAULT';
+    goToStage(3);
+  }
+
+  /* ---------- STAGE 3: PROVE YOU'RE MAD CAPTCHA ---------- */
+  const RAGE_KEYWORDS = ["hate","stupid","ridiculous","annoying","argh","ugh","rage","angry",
+    "furious","terrible","worst","why","frustrat","insane","unaccept","nonsense","idiotic",
+    "infuriat","broken","awful","garbage"];
+  const SPECIFICITY_WORDS = ["reel","popup","vault","captcha","password","lever","suspicion","spin","letter","ragevault"];
+  let nearMissCount = 0;
+  let giveUpPenalty = 0;
+  let lastRejectedText = '';
+
+  function getRequiredThreshold(){
+    /* Base 65%, plus up to +20 from accumulated suspicion, plus whatever
+       "This feels impossible" clicks have added. Capped at 95 so it never
+       becomes truly unwinnable. */
+    const suspicionBonus = Math.min(20, suspicion);
+    return Math.min(95, 65 + suspicionBonus + giveUpPenalty);
+  }
+
+  function scoreRage(text){
+    /* Returns both a numeric score AND whether the rant is actually about
+       THIS experience. Hitting the score alone is no longer enough. */
+    if(!text) return { score: 0, specific: false };
+    const trimmed = text.trim();
+    const words = trimmed.split(/\s+/).filter(Boolean);
+    const lower = trimmed.toLowerCase();
+    const specific = SPECIFICITY_WORDS.some(w => lower.includes(w));
+
+    if(words.length < 4 || trimmed.length < 15){
+      return { score: Math.min(15, trimmed.length), specific };
+    }
+    let score = 0;
+    RAGE_KEYWORDS.forEach(k => { if(lower.includes(k)) score += 12; });
+    score = Math.min(score, 55);
+
+    const exclaims = (trimmed.match(/!/g) || []).length;
+    score += Math.min(exclaims, 5) * 7;
+
+    const letters = trimmed.replace(/[^a-zA-Z]/g, '');
+    const caps = letters.replace(/[^A-Z]/g, '');
+    const capsRatio = letters.length ? caps.length / letters.length : 0;
+    if(capsRatio > 0.25){
+      score += Math.min((capsRatio - 0.25) * 80, 25);
+    }
+
+    const specificityHits = SPECIFICITY_WORDS.filter(w => lower.includes(w)).length;
+    score += Math.min(specificityHits * 10, 20);
+
+    return { score: Math.min(Math.round(score), 100), specific };
+  }
+
+  const captchaInput = document.getElementById('captchaInput');
+  captchaInput.addEventListener('input', () => {
+    const result = scoreRage(captchaInput.value);
+    document.getElementById('meterFill').style.width = result.score + '%';
+    document.getElementById('meterLabel').textContent = result.score + '% fury detected';
+  });
+
+  document.getElementById('captchaSubmit').addEventListener('click', () => {
+    const trimmedNow = captchaInput.value.trim();
+    const statusEl = document.getElementById('captchaStatus');
+    const submitBtn = document.getElementById('captchaSubmit');
+
+    if(trimmedNow && trimmedNow === lastRejectedText){
+      statusEl.textContent = 'You already tried that. Feel something new.';
+      return;
+    }
+
+    const result = scoreRage(captchaInput.value);
+    const required = getRequiredThreshold();
+
+    if(result.score < required){
+      statusEl.textContent = 'Too calm to be organic. Fury detected: ' + result.score + '%. Minimum required: ' + required + '%.';
+      lastRejectedText = trimmedNow;
+      return;
+    }
+    if(!result.specific){
+      statusEl.textContent = "That's generic fury. This vault wants to know it did this to you, specifically.";
+      lastRejectedText = trimmedNow;
+      return;
+    }
+    statusEl.textContent = 'Analyzing tone…';
+    submitBtn.disabled = true;
+    setTimeout(() => {
+      const forceAccept = nearMissCount >= 2;
+      if(!forceAccept && Math.random() < 0.25){
+        nearMissCount++;
+        statusEl.textContent = 'Your rage seems… rehearsed. Please try again with more authentic frustration.';
+        lastRejectedText = trimmedNow;
+        submitBtn.disabled = false;
+      } else {
+        goToStage(4);
+      }
+    }, 1200 + Math.random() * 600);
+  });
+
+  document.getElementById('giveUpBtn').addEventListener('click', () => {
+    /* "Giving up" doesn't lower the bar. It raises it. */
+    giveUpPenalty += 5;
+    addSuspicion(4);
+    document.getElementById('captchaStatus').textContent = "Skipping isn't very angry of you. The bar just moved.";
+  });
+
+  /* ---------- STAGE 4: THE SUCCESS THAT NEVER ARRIVES ---------- */
+  function spawnConfettiOnce(){
+    const container = document.getElementById('confetti');
+    const colors = ['#E8492F', '#D9A340', '#4E9A6E', '#EDE7DA'];
+    for(let i = 0; i < 26; i++){
+      const s = document.createElement('span');
+      s.style.left = Math.random() * 100 + '%';
+      s.style.background = colors[i % colors.length];
+      s.style.animationDelay = (Math.random() * 0.4) + 's';
+      container.appendChild(s);
+    }
+    setTimeout(() => { container.innerHTML = ''; }, 3200);
+  }
+
+  let successLoopStarted = false;
+  function startSuccessLoop(){
+    if(successLoopStarted) return;
+    successLoopStarted = true;
+    let count = 3;
+    let loops = 0;
+    let cancelling = false;
+    const el = document.getElementById('countdown');
+    const loopsEl = document.getElementById('redirectAttempts');
+    const truthEl = document.getElementById('truthReveal');
+    const cancelBtn = document.getElementById('cancelRedirectBtn');
+    spawnConfettiOnce();
+
+    cancelBtn.addEventListener('click', () => {
+      /* "Cancel" doesn't cancel. It resets the loop counter and starts over. */
+      cancelling = true;
+      el.textContent = 'Cancelling…';
+      truthEl.classList.remove('show');
+      setTimeout(() => {
+        cancelling = false;
+        count = 3;
+        loops = 0;
+        loopsEl.textContent = '0';
+      }, 1100);
+    });
+
+    setInterval(() => {
+      if(cancelling) return;
+      if(loops >= 3) cancelBtn.classList.add('show');
+      el.textContent = count;
+      count--;
+      if(count < 0){
+        count = 3;
+        loops++;
+        loopsEl.textContent = loops;
+        if(loops >= 8) truthEl.classList.add('show');
+      }
+    }, 700);
+  }
+
+  /* ---------- STAGE ROUTING ---------- */
+  function goToStage(n){
+    document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+    document.getElementById('stage' + n).classList.add('active');
+    if(n === 4) startSuccessLoop();
+  }
+
+  /* ---------- INIT ---------- */
+  updateSuspicionUI();
+  initStage1();
+  requestAnimationFrame(animateReels);
+
+})();
+</script>
+</body>
+</html>

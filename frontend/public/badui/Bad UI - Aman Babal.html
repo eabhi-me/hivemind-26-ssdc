@@ -1,0 +1,3183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Login</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+:root{
+    --bg:#07080c;
+    --panel:#15171e;
+    --panel2:#0c0e13;
+    --border:rgba(255,255,255,.10);
+    --text:#f4f4f5;
+    --muted:#9296a3;
+    --purple:#8b5cf6;
+    --purple-dark:#6d28d9;
+    --green:#34d399;
+    --red:#fb7185;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    min-height:100%;
+}
+
+body{
+    min-height:100vh;
+    overflow:hidden;
+    color:var(--text);
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 12% 15%,
+            rgba(139,92,246,.17),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 88% 85%,
+            rgba(59,130,246,.10),
+            transparent 30%
+        ),
+        var(--bg);
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.18;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:40px 40px;
+}
+
+
+/* =====================================================
+   USERNAME CHARACTER CLOUD
+===================================================== */
+
+#characterLayer{
+    position:fixed;
+    inset:0;
+    z-index:2;
+    overflow:hidden;
+    pointer-events:none;
+}
+
+.char{
+    position:absolute;
+    display:block;
+
+    line-height:1;
+
+    color:#d7d9e0;
+    font-weight:900;
+
+    user-select:none;
+    pointer-events:auto;
+
+    cursor:pointer;
+
+    text-shadow:
+        0 2px 8px rgba(0,0,0,.95),
+        0 0 4px rgba(255,255,255,.08);
+
+    transition:
+        transform .1s,
+        opacity .1s,
+        filter .1s;
+}
+
+.char:hover{
+    opacity:.65;
+
+    filter:
+        drop-shadow(
+            0 0 9px
+            rgba(167,139,250,.95)
+        );
+}
+
+.characterHint{
+    position:fixed;
+
+    top:8px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    color:#50545f;
+
+    font-size:9px;
+    font-weight:800;
+
+    letter-spacing:.15em;
+    text-transform:uppercase;
+
+    pointer-events:none;
+}
+
+
+/* =====================================================
+   LOGIN WINDOW
+===================================================== */
+
+#app{
+    position:relative;
+    z-index:10;
+
+    width:min(
+        680px,
+        calc(100vw - 28px)
+    );
+
+    max-height:calc(100vh - 40px);
+
+    margin:20px auto;
+
+    padding:28px;
+
+    padding-bottom:110px;
+
+    overflow:auto;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            transparent 42%
+        ),
+        var(--panel);
+
+    border:1px solid var(--border);
+
+    border-radius:24px;
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.65),
+        inset 0 1px 0 rgba(255,255,255,.04);
+
+    backdrop-filter:blur(24px);
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+}
+
+.logo{
+    width:40px;
+    height:40px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            #6366f1
+        );
+
+    box-shadow:
+        0 10px 30px
+        rgba(139,92,246,.28);
+}
+
+h1{
+    margin:0;
+
+    font-size:
+        clamp(28px,6vw,40px);
+
+    letter-spacing:-1.8px;
+
+    background:
+        linear-gradient(
+            120deg,
+            #fff,
+            #d7d7df,
+            #a78bfa
+        );
+
+    color:transparent;
+
+    -webkit-background-clip:text;
+    background-clip:text;
+}
+
+.subtitle{
+    margin:9px 0 27px;
+
+    color:var(--muted);
+
+    font-size:13px;
+
+    text-align:center;
+}
+
+
+/* =====================================================
+   SECTIONS
+===================================================== */
+
+.section{
+    margin-top:24px;
+}
+
+.sectionHeader{
+    display:flex;
+
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:9px;
+}
+
+.label{
+    font-size:12px;
+    font-weight:850;
+
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.hint{
+    color:#666a76;
+    font-size:11px;
+}
+
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+.field{
+    width:100%;
+    min-height:51px;
+
+    padding:13px 15px;
+
+    outline:none;
+
+    color:var(--text);
+
+    background:var(--panel2);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:11px;
+
+    font-size:14px;
+
+    box-shadow:
+        inset 0 1px 3px
+        rgba(0,0,0,.35);
+
+    transition:
+        border-color .2s,
+        box-shadow .2s;
+}
+
+.field::placeholder{
+    color:#60646f;
+}
+
+.field:focus{
+    border-color:
+        rgba(167,139,250,.65);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139,92,246,.10),
+        inset 0 1px 3px
+        rgba(0,0,0,.4);
+}
+
+#usernameInput{
+    user-select:none;
+    caret-color:transparent;
+    cursor:default;
+}
+
+.controls{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+}
+
+.smallBtn{
+    padding:7px 12px;
+
+    color:#d1d3da;
+
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:8px;
+
+    cursor:pointer;
+}
+
+.smallBtn:hover{
+    background:
+        rgba(255,255,255,.085);
+}
+
+
+/* =====================================================
+   PASSWORD RULES
+===================================================== */
+
+#rules{
+    display:grid;
+    gap:6px;
+    margin-top:10px;
+}
+
+.rule{
+    min-height:35px;
+
+    display:flex;
+    align-items:center;
+
+    padding:8px 11px;
+
+    color:#c8cad1;
+
+    background:
+        rgba(5,7,11,.65);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:9px;
+
+    font-size:12px;
+}
+
+.rule.good{
+    color:var(--green);
+
+    border-color:
+        rgba(52,211,153,.25);
+
+    background:
+        rgba(52,211,153,.055);
+}
+
+.rule.bad{
+    color:var(--red);
+
+    border-color:
+        rgba(251,113,133,.20);
+
+    background:
+        rgba(251,113,133,.045);
+}
+
+
+/* =====================================================
+   CAPTCHA
+===================================================== */
+
+#captcha{
+    padding:17px;
+
+    background:
+        rgba(5,7,11,.72);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:16px;
+}
+
+.captchaTop{
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:12px;
+}
+
+.captchaTitle{
+    font-size:13px;
+    font-weight:800;
+}
+
+#captchaStage{
+    padding:5px 9px;
+
+    color:#a78bfa;
+
+    background:
+        rgba(139,92,246,.10);
+
+    border:
+        1px solid
+        rgba(139,92,246,.20);
+
+    border-radius:999px;
+
+    font-size:10px;
+    font-weight:800;
+}
+
+#captchaInstruction{
+    margin-bottom:13px;
+
+    color:#c2c5cd;
+
+    font-size:13px;
+}
+
+#captchaGrid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+}
+
+.captchaItem{
+    min-height:56px;
+
+    display:grid;
+    place-items:center;
+
+    color:#f4f4f5;
+
+    background:
+        linear-gradient(
+            145deg,
+            #292c34,
+            #181a20
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.09);
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:
+        transform .12s,
+        border-color .12s,
+        background .12s;
+}
+
+.captchaItem:hover{
+    border-color:
+        rgba(167,139,250,.5);
+
+    background:
+        linear-gradient(
+            145deg,
+            #32353e,
+            #202229
+        );
+
+    transform:scale(1.045);
+}
+
+.captchaItem:active{
+    transform:scale(.94);
+}
+
+#captchaStatus{
+    min-height:18px;
+    margin-top:9px;
+
+    color:var(--muted);
+
+    font-size:11px;
+}
+
+
+/* =====================================================
+   VIEWPORT FLOATING LAYER
+===================================================== */
+
+/*
+   CRITICAL FIX
+
+   This layer is a direct child of BODY.
+
+   It is NOT inside #app.
+
+   Therefore overflow:auto and backdrop-filter on #app
+   cannot clip the moving checkbox or login button.
+*/
+
+#floatingLayer{
+    position:fixed;
+    inset:0;
+    z-index:50000;
+    pointer-events:none;
+    overflow:visible;
+}
+
+/* =====================================================
+   HUMAN VERIFICATION
+===================================================== */
+
+#human{
+    position:fixed;
+
+    z-index:50001;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:11px 15px;
+
+    color:#e6e6e8;
+
+    background:
+        linear-gradient(
+            145deg,
+            #292c34,
+            #181a20
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.14);
+
+    border-radius:10px;
+
+    font-size:13px;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    white-space:nowrap;
+
+    pointer-events:auto;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.55);
+
+    /*
+       Start at center.
+       JS immediately places it in the normal
+       login-window position.
+    */
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    visibility:visible;
+    opacity:1;
+
+    transition:
+        left .08s linear,
+        top .08s linear,
+        transform .08s linear,
+        box-shadow .15s,
+        border-color .15s;
+}
+
+#human input{
+    width:17px;
+    height:17px;
+
+    margin:0;
+
+    accent-color:var(--purple);
+
+    cursor:pointer;
+}
+
+#human:hover{
+    border-color:
+        rgba(167,139,250,.65);
+
+    box-shadow:
+        0 15px 45px
+        rgba(0,0,0,.7);
+}
+
+
+/* =====================================================
+   MOVING LOGIN BUTTON
+===================================================== */
+
+#login{
+    position:fixed;
+
+    z-index:50000;
+
+    min-width:110px;
+
+    padding:13px 28px;
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--purple-dark)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.17);
+
+    border-radius:11px;
+
+    font-size:13px;
+    font-weight:850;
+
+    cursor:pointer;
+
+    pointer-events:auto;
+
+    box-shadow:
+        0 12px 30px
+        rgba(76,29,149,.35),
+        inset 0 1px 0
+        rgba(255,255,255,.16);
+
+    left:50%;
+    top:50%;
+
+    width:130px;
+    height:48px;
+
+    transform:
+        translate(-50%,-50%);
+
+    transition:
+        left .07s linear,
+        top .07s linear,
+        width .07s linear,
+        height .07s linear,
+        transform .07s linear;
+}
+
+#login:hover{
+    filter:brightness(1.15);
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+#status{
+    min-height:20px;
+
+    color:var(--muted);
+
+    text-align:center;
+
+    font-size:12px;
+}
+
+
+/* =====================================================
+   POPUPS
+===================================================== */
+
+#popups{
+    position:fixed;
+
+    inset:0;
+
+    z-index:100000;
+
+    pointer-events:none;
+}
+
+.popup{
+    position:absolute;
+
+    width:
+        min(
+            340px,
+            calc(100vw - 24px)
+        );
+
+    padding:17px;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(36,38,47,.98),
+            rgba(17,19,25,.98)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.14);
+
+    border-radius:13px;
+
+    box-shadow:
+        0 25px 70px
+        rgba(0,0,0,.75);
+
+    pointer-events:auto;
+
+    animation:
+        popupIn .16s ease-out;
+}
+
+.popup::before{
+    content:"";
+
+    display:block;
+
+    width:28px;
+    height:3px;
+
+    margin-bottom:11px;
+
+    background:var(--purple);
+
+    border-radius:999px;
+}
+
+.popupTitle{
+    margin-bottom:6px;
+
+    font-size:13px;
+    font-weight:800;
+}
+
+.popupText{
+    color:#c6c9d1;
+
+    font-size:12px;
+    line-height:1.5;
+}
+
+.popup button{
+    margin-top:12px;
+
+    padding:6px 14px;
+
+    color:#e4e4e7;
+
+    background:
+        rgba(255,255,255,.055);
+
+    border:
+        1px solid
+        rgba(255,255,255,.11);
+
+    border-radius:7px;
+
+    cursor:pointer;
+}
+
+.popup button:hover{
+    background:
+        rgba(255,255,255,.1);
+}
+
+@keyframes popupIn{
+    from{
+        opacity:0;
+        transform:
+            scale(.75)
+            translateY(12px);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            scale(1)
+            translateY(0);
+    }
+}
+
+
+/* =====================================================
+   SHAKE
+===================================================== */
+
+.shake{
+    animation:
+        shake .25s ease;
+}
+
+@keyframes shake{
+    0%,100%{
+        transform:translateX(0);
+    }
+
+    25%{
+        transform:translateX(-7px);
+    }
+
+    50%{
+        transform:translateX(7px);
+    }
+
+    75%{
+        transform:translateX(-4px);
+    }
+}
+
+
+/* =====================================================
+   SUCCESS
+===================================================== */
+
+#success{
+    position:fixed;
+
+    inset:0;
+
+    z-index:200000;
+
+    display:none;
+
+    place-items:center;
+
+    padding:20px;
+
+    background:
+        rgba(0,0,0,.86);
+
+    backdrop-filter:blur(12px);
+}
+
+.successBox{
+    width:min(460px,100%);
+
+    padding:45px 32px;
+
+    text-align:center;
+
+    background:
+        linear-gradient(
+            145deg,
+            #25282f,
+            #121419
+        );
+
+    border:
+        1px solid
+        rgba(52,211,153,.3);
+
+    border-radius:21px;
+
+    box-shadow:
+        0 35px 110px
+        rgba(0,0,0,.8);
+
+    animation:
+        successIn .4s ease;
+}
+
+.successIcon{
+    width:62px;
+    height:62px;
+
+    margin:0 auto 17px;
+
+    display:grid;
+    place-items:center;
+
+    color:var(--green);
+
+    background:
+        rgba(52,211,153,.1);
+
+    border:
+        1px solid
+        rgba(52,211,153,.25);
+
+    border-radius:50%;
+
+    font-size:29px;
+}
+
+.successBox h2{
+    margin:0 0 8px;
+
+    color:var(--green);
+
+    font-size:32px;
+}
+
+.successBox p{
+    margin:0;
+
+    color:var(--muted);
+
+    font-size:13px;
+}
+
+@keyframes successIn{
+    from{
+        opacity:0;
+        transform:scale(.8);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+
+@media(max-width:560px){
+
+    #app{
+        width:calc(100vw - 18px);
+        margin:9px auto;
+        padding:20px 15px;
+        border-radius:18px;
+    }
+
+    #captchaGrid{
+        grid-template-columns:
+            repeat(4,1fr);
+    }
+
+    .captchaItem{
+        min-height:52px;
+    }
+
+    .characterHint{
+        display:none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+
+<!-- =====================================================
+     USERNAME CHARACTER CLOUD
+===================================================== -->
+
+<div id="characterLayer">
+
+    <div class="characterHint">
+        Click characters to construct username
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     LOGIN WINDOW
+===================================================== -->
+
+<main id="app">
+
+    <header>
+
+        <div class="brand">
+
+            <div class="logo">
+                🔐
+            </div>
+
+            <h1>
+                Secure Login
+            </h1>
+
+        </div>
+
+        <p class="subtitle">
+            Please complete the completely normal
+            verification process.
+        </p>
+
+    </header>
+
+
+    <!-- USERNAME -->
+
+    <section class="section">
+
+        <div class="sectionHeader">
+
+            <span class="label">
+                Username
+            </span>
+
+            <span class="hint">
+                8–20 characters
+            </span>
+
+        </div>
+
+        <input
+            id="usernameInput"
+            class="field"
+            type="text"
+            readonly
+            autocomplete="off"
+            placeholder="Select characters around the screen"
+        >
+
+        <div class="controls">
+
+            <button
+                id="backspace"
+                class="smallBtn"
+                type="button"
+            >
+                ⌫ Backspace
+            </button>
+
+            <button
+                id="clear"
+                class="smallBtn"
+                type="button"
+            >
+                Clear
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- PASSWORD -->
+
+    <section class="section">
+
+        <div class="sectionHeader">
+
+            <span class="label">
+                Password
+            </span>
+
+            <span class="hint">
+                Progressive rules
+            </span>
+
+        </div>
+
+        <input
+            id="password"
+            class="field"
+            type="text"
+            autocomplete="off"
+            placeholder="Satisfy every revealed rule..."
+        >
+
+        <div id="rules"></div>
+
+    </section>
+
+
+    <!-- CAPTCHA -->
+
+    <section class="section">
+
+        <div class="sectionHeader">
+
+            <span class="label">
+                CAPTCHA
+            </span>
+
+            <span class="hint">
+                15 stages
+            </span>
+
+        </div>
+
+        <div id="captcha">
+
+            <div class="captchaTop">
+
+                <span class="captchaTitle">
+                    Visual verification
+                </span>
+
+                <span id="captchaStage">
+                    1 / 15
+                </span>
+
+            </div>
+
+            <div id="captchaInstruction"></div>
+
+            <div id="captchaGrid"></div>
+
+            <div id="captchaStatus"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Status remains in card -->
+
+    <div id="status"></div>
+
+</main>
+
+
+<!-- =====================================================
+     IMPORTANT:
+     MOVABLE ELEMENTS ARE OUTSIDE #app
+===================================================== -->
+
+<div id="floatingLayer">
+
+    <label id="human">
+
+        <input
+            id="humanCheck"
+            type="checkbox"
+        >
+
+        <span>
+            I AM HUMAN
+        </span>
+
+    </label>
+
+
+    <button
+        id="login"
+        type="button"
+    >
+        LOGIN
+    </button>
+
+</div>
+
+
+<!-- POPUPS -->
+
+<div id="popups"></div>
+
+
+<!-- SUCCESS -->
+
+<div id="success">
+
+    <div class="successBox">
+
+        <div class="successIcon">
+            ✓
+        </div>
+
+        <h2>
+            LOGIN SUCCESSFUL
+        </h2>
+
+        <p>
+            Authentication finally accepted.
+        </p>
+
+    </div>
+
+</div>
+
+
+<script>
+"use strict";
+
+
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const VALID_ATTEMPTS_REQUIRED = 10;
+const CAPTCHA_STAGES = 15;
+
+const CHARACTER_SET =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+const state = {
+
+    username:"",
+
+    validAttempts:0,
+
+    revealedRules:1,
+
+    captchaStage:0,
+
+    captchaValid:false,
+
+    humanVerified:false,
+
+    processing:false
+
+};
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const app =
+    document.getElementById("app");
+
+const characterLayer =
+    document.getElementById("characterLayer");
+
+const usernameInput =
+    document.getElementById("usernameInput");
+
+const passwordInput =
+    document.getElementById("password");
+
+const rulesContainer =
+    document.getElementById("rules");
+
+const backspace =
+    document.getElementById("backspace");
+
+const clear =
+    document.getElementById("clear");
+
+const captchaStage =
+    document.getElementById("captchaStage");
+
+const captchaInstruction =
+    document.getElementById("captchaInstruction");
+
+const captchaGrid =
+    document.getElementById("captchaGrid");
+
+const captchaStatus =
+    document.getElementById("captchaStatus");
+
+const human =
+    document.getElementById("human");
+
+const humanCheck =
+    document.getElementById("humanCheck");
+
+const login =
+    document.getElementById("login");
+
+const status =
+    document.getElementById("status");
+
+const popups =
+    document.getElementById("popups");
+
+const success =
+    document.getElementById("success");
+
+
+/* =====================================================
+   RANDOM HELPERS
+===================================================== */
+
+function randomInt(min,max){
+
+    return Math.floor(
+        Math.random() *
+        (max-min+1)
+    ) + min;
+}
+
+
+function randomFloat(min,max){
+
+    return Math.random() *
+        (max-min) + min;
+}
+
+
+/* =====================================================
+   USERNAME CHARACTER CLOUD
+===================================================== */
+
+const characters=[];
+
+
+function getLoginRect(){
+
+    return app.getBoundingClientRect();
+}
+
+
+function intersects(
+    x,
+    y,
+    width,
+    height,
+    rect
+){
+
+    return (
+        x < rect.right &&
+        x + width > rect.left &&
+        y < rect.bottom &&
+        y + height > rect.top
+    );
+}
+
+
+function getCharacterPosition(
+    width,
+    height
+){
+
+    const loginRect =
+        getLoginRect();
+
+
+    for(
+        let attempt=0;
+        attempt<800;
+        attempt++
+    ){
+
+        const x =
+            randomInt(
+                4,
+                Math.max(
+                    4,
+                    window.innerWidth -
+                    width -
+                    4
+                )
+            );
+
+        const y =
+            randomInt(
+                4,
+                Math.max(
+                    4,
+                    window.innerHeight -
+                    height -
+                    4
+                )
+            );
+
+
+        if(
+            !intersects(
+                x,
+                y,
+                width,
+                height,
+                loginRect
+            )
+        ){
+
+            return {x,y};
+        }
+    }
+
+
+    /*
+       Fallback position.
+       Never intentionally place a character inside
+       the login window.
+    */
+
+    return {
+        x:4,
+        y:4
+    };
+}
+
+
+function positionCharacter(node){
+
+    const size =
+        randomInt(7,44);
+
+    node.style.fontSize =
+        size+"px";
+
+
+    const width =
+        Math.max(
+            size,
+            node.offsetWidth
+        );
+
+    const height =
+        Math.max(
+            size,
+            node.offsetHeight
+        );
+
+
+    const pos =
+        getCharacterPosition(
+            width,
+            height
+        );
+
+
+    node.style.left =
+        pos.x+"px";
+
+    node.style.top =
+        pos.y+"px";
+
+    node.style.transform =
+        `rotate(${randomFloat(-40,40)}deg)`;
+}
+
+
+function createCharacterCloud(){
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    for(
+        const character
+        of CHARACTER_SET
+    ){
+
+        const node =
+            document.createElement("span");
+
+
+        node.className="char";
+
+        node.textContent=
+            character;
+
+        node.dataset.character=
+            character;
+
+
+        fragment.appendChild(node);
+
+        characters.push(node);
+    }
+
+
+    characterLayer.appendChild(
+        fragment
+    );
+
+
+    for(
+        const node
+        of characters
+    ){
+
+        positionCharacter(node);
+    }
+}
+
+
+createCharacterCloud();
+
+
+window.addEventListener(
+    "resize",
+    ()=>{
+        for(
+            const node
+            of characters
+        ){
+            positionCharacter(node);
+        }
+
+        /*
+           Keep floating controls inside viewport
+           after browser resizing.
+        */
+
+        if(!state.humanVerified){
+            keepHumanOnScreen();
+        }
+
+        keepLoginOnScreen();
+    }
+);
+
+
+/* =====================================================
+   USERNAME
+===================================================== */
+
+characterLayer.addEventListener(
+    "click",
+    event=>{
+
+        const char =
+            event.target.closest(".char");
+
+
+        if(!char){
+            return;
+        }
+
+
+        if(
+            state.username.length>=20
+        ){
+
+            status.textContent =
+                "Username maximum length reached.";
+
+            return;
+        }
+
+
+        state.username +=
+            char.dataset.character;
+
+
+        usernameInput.value =
+            state.username;
+    }
+);
+
+
+backspace.addEventListener(
+    "click",
+    ()=>{
+        state.username =
+            state.username.slice(0,-1);
+
+        usernameInput.value =
+            state.username;
+    }
+);
+
+
+clear.addEventListener(
+    "click",
+    ()=>{
+        state.username="";
+        usernameInput.value="";
+    }
+);
+
+
+/* =====================================================
+   PASSWORD RULES
+===================================================== */
+
+const passwordRules=[
+
+    {
+        text:"At least 5 characters",
+        test:p=>p.length>=5
+    },
+
+    {
+        text:"Contains a number",
+        test:p=>/\d/.test(p)
+    },
+
+    {
+        text:"Contains an uppercase letter",
+        test:p=>/[A-Z]/.test(p)
+    },
+
+    {
+        text:"Contains a lowercase letter",
+        test:p=>/[a-z]/.test(p)
+    },
+
+    {
+        text:"Contains a special character",
+        test:p=>/[^A-Za-z0-9]/.test(p)
+    },
+
+    {
+        text:"Contains a Roman numeral",
+        test:p=>/[IVXLCDM]/.test(p)
+    },
+
+    {
+        text:"The sum of all numbers is at least 15",
+
+        test:p=>{
+
+            return [...p]
+                .filter(c=>/\d/.test(c))
+                .map(Number)
+                .reduce(
+                    (a,b)=>a+b,
+                    0
+                )>=15;
+        }
+    },
+
+    {
+        text:"Contains at least 3 different digits",
+
+        test:p=>{
+
+            return new Set(
+                [...p].filter(
+                    c=>/\d/.test(c)
+                )
+            ).size>=3;
+        }
+    },
+
+    {
+        text:"Contains 123",
+        test:p=>p.includes("123")
+    },
+
+    {
+        text:"Contains HTML",
+        test:p=>p.includes("HTML")
+    },
+
+    {
+        text:"Contains Z",
+        test:p=>p.includes("Z")
+    },
+
+    {
+        text:"Contains a mathematical symbol",
+        test:p=>/[+\-*=/<>]/.test(p)
+    },
+
+    {
+        text:"Contains ?",
+        test:p=>p.includes("?")
+    },
+
+    {
+        text:"Contains an emoji",
+        test:p=>
+            /[\u{1F300}-\u{1FAFF}]/u.test(p)
+    },
+
+    {
+        text:"Contains at least 5 vowels",
+        test:p=>
+            (p.match(/[aeiou]/gi)||[]).length>=5
+    },
+
+    {
+        text:"Contains exactly 2 ! characters",
+        test:p=>
+            (p.match(/!/g)||[]).length===2
+    },
+
+    {
+        text:"At least 35 characters",
+        test:p=>p.length>=35
+    },
+
+    {
+        text:"Contains 9",
+        test:p=>p.includes("9")
+    },
+
+    {
+        text:"Contains 7",
+        test:p=>p.includes("7")
+    },
+
+    {
+        text:"Ends with X",
+        test:p=>p.endsWith("X")
+    }
+
+];
+
+
+function renderRules(){
+
+    const password =
+        passwordInput.value;
+
+
+    /*
+       Rules reveal progressively.
+
+       Once revealed, they remain visible.
+    */
+
+    while(
+        state.revealedRules<
+        passwordRules.length
+    ){
+
+        const previous =
+            state.revealedRules-1;
+
+
+        if(
+            passwordRules[
+                previous
+            ].test(password)
+        ){
+
+            state.revealedRules++;
+
+        }else{
+
+            break;
+        }
+    }
+
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    for(
+        let i=0;
+        i<state.revealedRules;
+        i++
+    ){
+
+        const valid =
+            passwordRules[i]
+                .test(password);
+
+
+        const row =
+            document.createElement("div");
+
+
+        row.className =
+            "rule "+
+            (
+                valid
+                    ? "good"
+                    : "bad"
+            );
+
+
+        row.textContent =
+            (
+                valid
+                    ? "✓ "
+                    : "✗ "
+            )+
+            passwordRules[i].text;
+
+
+        fragment.appendChild(row);
+    }
+
+
+    rulesContainer.replaceChildren(
+        fragment
+    );
+}
+
+
+passwordInput.addEventListener(
+    "input",
+    renderRules
+);
+
+
+renderRules();
+
+
+/* =====================================================
+   CAPTCHA
+===================================================== */
+
+const shapes=[
+    "●",
+    "■",
+    "▲",
+    "◆",
+    "★",
+    "⬟"
+];
+
+
+function baseItems(){
+
+    return Array.from(
+        {length:15},
+        ()=>{
+            return{
+
+                symbol:
+                    shapes[
+                        randomInt(
+                            0,
+                            shapes.length-1
+                        )
+                    ],
+
+                size:randomInt(20,38),
+
+                rotation:0,
+
+                border:1
+            };
+        }
+    );
+}
+
+
+const captchaGenerators=[
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="◆"
+        );
+
+        items[2].symbol="●";
+        items[5].symbol="●";
+        items[9].symbol="●";
+
+        return{
+            items,
+            target:9,
+            instruction:
+                "Click the 3rd circle."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="●"
+        );
+
+        items[3].symbol="■";
+        items[8].symbol="■";
+
+        items[8].size=62;
+
+        return{
+            items,
+            target:8,
+            instruction:
+                "Click the largest square."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="●"
+        );
+
+        items[4].symbol="★";
+        items[11].symbol="★";
+
+        return{
+            items,
+            target:4,
+            instruction:
+                "Click a symbol that appears exactly twice."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="■"
+        );
+
+        items[1].symbol="▲";
+        items[6].symbol="▲";
+        items[12].symbol="▲";
+
+        items[1].size=39;
+        items[6].size=31;
+        items[12].size=14;
+
+        return{
+            items,
+            target:12,
+            instruction:
+                "Click the smallest triangle."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>{
+                x.symbol="●";
+                x.rotation=0;
+            }
+        );
+
+        items[7].rotation=37;
+
+        return{
+            items,
+            target:7,
+            instruction:
+                "Click the only rotated symbol."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>{
+                x.symbol="◆";
+                x.border=1;
+            }
+        );
+
+        items[5].border=5;
+
+        return{
+            items,
+            target:5,
+            instruction:
+                "Click the symbol with the different border."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="■"
+        );
+
+        [2,5,8,11].forEach(
+            i=>items[i].symbol="▲"
+        );
+
+        return{
+            items,
+            target:11,
+            instruction:
+                "Click the 4th triangle."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="●"
+        );
+
+        items[7].symbol="★";
+
+        return{
+            items,
+            target:7,
+            instruction:
+                "Click the only different symbol."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="◆"
+        );
+
+        [1,6,13].forEach(
+            i=>items[i].symbol="⬟"
+        );
+
+        return{
+            items,
+            target:1,
+            instruction:
+                "Click a symbol appearing exactly 3 times."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="●"
+        );
+
+        items[10].symbol="★";
+
+        return{
+            items,
+            target:10,
+            instruction:
+                "Click the unique symbol."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="■"
+        );
+
+        items[1].symbol="◆";
+        items[1].size=65;
+
+        return{
+            items,
+            target:1,
+            instruction:
+                "Click the largest symbol."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="●"
+        );
+
+        items[12].symbol="▲";
+        items[12].size=13;
+
+        return{
+            items,
+            target:12,
+            instruction:
+                "Click the smallest symbol."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>x.symbol="●"
+        );
+
+        items[5].symbol="■";
+
+        return{
+            items,
+            target:5,
+            instruction:
+                "Click the different shape."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>{
+                x.symbol="●";
+                x.size=27;
+            }
+        );
+
+        items[11].symbol="◆";
+        items[11].size=56;
+
+        return{
+            items,
+            target:11,
+            instruction:
+                "Click the large symbol that isn't a circle."
+        };
+    },
+
+    ()=>{
+        const items=baseItems();
+
+        items.forEach(
+            x=>{
+                x.symbol="◆";
+                x.size=27;
+                x.rotation=0;
+            }
+        );
+
+        items[6].symbol="★";
+        items[6].size=55;
+        items[6].rotation=25;
+
+        return{
+            items,
+            target:6,
+            instruction:
+                "Click the largest rotated symbol."
+        };
+    }
+
+];
+
+
+let captchaChallenge=null;
+
+
+function renderCaptcha(){
+
+    captchaChallenge =
+        captchaGenerators[
+            state.captchaStage
+        ]();
+
+
+    state.captchaValid=false;
+
+
+    captchaStage.textContent =
+        `${state.captchaStage+1} / ${CAPTCHA_STAGES}`;
+
+
+    captchaInstruction.textContent =
+        captchaChallenge.instruction;
+
+
+    captchaStatus.textContent="";
+
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    captchaChallenge.items.forEach(
+        (item,index)=>{
+
+            const button =
+                document.createElement("button");
+
+
+            button.type="button";
+
+            button.className=
+                "captchaItem";
+
+            button.dataset.index=
+                index;
+
+            button.textContent=
+                item.symbol;
+
+            button.style.fontSize=
+                item.size+"px";
+
+            button.style.transform=
+                `rotate(${item.rotation}deg)`;
+
+            button.style.borderWidth=
+                item.border+"px";
+
+
+            fragment.appendChild(
+                button
+            );
+        }
+    );
+
+
+    captchaGrid.replaceChildren(
+        fragment
+    );
+}
+
+
+captchaGrid.addEventListener(
+    "click",
+    event=>{
+
+        const button =
+            event.target.closest(
+                ".captchaItem"
+            );
+
+
+        if(!button){
+            return;
+        }
+
+
+        const selected =
+            Number(
+                button.dataset.index
+            );
+
+
+        if(
+            selected !==
+            captchaChallenge.target
+        ){
+
+            captchaStatus.textContent =
+                "❌ Incorrect. CAPTCHA restarted.";
+
+            state.captchaStage=0;
+
+            renderCaptcha();
+
+            return;
+        }
+
+
+        state.captchaStage++;
+
+
+        if(
+            state.captchaStage>=
+            CAPTCHA_STAGES
+        ){
+
+            state.captchaValid=true;
+
+            captchaStage.textContent=
+                "VERIFIED";
+
+            captchaInstruction.textContent=
+                "✓ All 15 CAPTCHA stages completed.";
+
+            captchaStatus.textContent=
+                "Human verification completed.";
+
+            captchaGrid.replaceChildren();
+
+            return;
+        }
+
+
+        renderCaptcha();
+    }
+);
+
+
+renderCaptcha();
+
+
+/* =====================================================
+   HUMAN VERIFICATION
+===================================================== */
+
+/*
+   Find the normal position relative to the login card.
+   This is ONLY the starting position.
+*/
+
+function placeHumanInitially(){
+
+    const card =
+        app.getBoundingClientRect();
+
+    const humanRect =
+        human.getBoundingClientRect();
+
+
+    const x =
+        card.left +
+        card.width / 2;
+
+    const y =
+        card.bottom -
+        65;
+
+
+    human.style.left=
+        x+"px";
+
+    human.style.top=
+        y+"px";
+
+    human.style.transform=
+        "translate(-50%,-50%)";
+
+    human.style.visibility=
+        "visible";
+
+    human.style.opacity=
+        "1";
+}
+
+
+/*
+   Keep the human checkbox fully visible.
+*/
+
+function keepHumanOnScreen(){
+
+    const rect =
+        human.getBoundingClientRect();
+
+
+    let x=rect.left;
+    let y=rect.top;
+
+
+    if(x<4){
+        x=4;
+    }
+
+    if(y<4){
+        y=4;
+    }
+
+    if(
+        x+rect.width>
+        window.innerWidth-4
+    ){
+
+        x=
+            window.innerWidth-
+            rect.width-
+            4;
+    }
+
+
+    if(
+        y+rect.height>
+        window.innerHeight-4
+    ){
+
+        y=
+            window.innerHeight-
+            rect.height-
+            4;
+    }
+
+
+    human.style.left=
+        x+"px";
+
+    human.style.top=
+        y+"px";
+
+    human.style.transform=
+        "none";
+}
+
+
+/*
+   Move human verification anywhere on screen.
+
+   It NEVER gets display:none.
+   It NEVER gets opacity:0.
+   It NEVER gets visibility:hidden.
+*/
+
+function relocateHuman(){
+
+    if(state.humanVerified){
+        return;
+    }
+
+
+    const rect =
+        human.getBoundingClientRect();
+
+
+    const maxX =
+        Math.max(
+            4,
+            window.innerWidth -
+            rect.width -
+            4
+        );
+
+
+    const maxY =
+        Math.max(
+            4,
+            window.innerHeight -
+            rect.height -
+            4
+        );
+
+
+    const x =
+        randomInt(4,maxX);
+
+
+    const y =
+        randomInt(4,maxY);
+
+
+    human.style.left=
+        x+"px";
+
+    human.style.top=
+        y+"px";
+
+    human.style.transform=
+        "none";
+
+    human.style.visibility=
+        "visible";
+
+    human.style.opacity=
+        "1";
+}
+
+
+/*
+   Hover makes it relocate.
+*/
+
+human.addEventListener(
+    "mouseenter",
+    relocateHuman
+);
+
+
+/*
+   Additional movement if the pointer gets close.
+*/
+
+human.addEventListener(
+    "mousemove",
+    event=>{
+
+        if(state.humanVerified){
+            return;
+        }
+
+
+        const rect =
+            human.getBoundingClientRect();
+
+
+        const centerX =
+            rect.left +
+            rect.width/2;
+
+        const centerY =
+            rect.top +
+            rect.height/2;
+
+
+        const distance =
+            Math.hypot(
+                event.clientX-centerX,
+                event.clientY-centerY
+            );
+
+
+        if(distance<25){
+
+            relocateHuman();
+        }
+    }
+);
+
+
+/*
+   Clicking the checkbox still works.
+*/
+
+humanCheck.addEventListener(
+    "change",
+    ()=>{
+
+        if(
+            !humanCheck.checked
+        ){
+            return;
+        }
+
+
+        state.humanVerified=true;
+
+
+        human.innerHTML=
+            "☑ HUMAN VERIFIED";
+
+
+        human.style.position=
+            "fixed";
+
+
+        human.style.left=
+            "50%";
+
+
+        human.style.top=
+            "50%";
+
+
+        human.style.transform=
+            "translate(-50%,-50%)";
+
+
+        human.style.cursor=
+            "default";
+
+
+        human.style.background=
+            "linear-gradient(145deg,#123326,#10231b)";
+
+
+        human.style.borderColor=
+            "rgba(52,211,153,.35)";
+    }
+);
+
+
+/* =====================================================
+   LOGIN BUTTON
+===================================================== */
+
+function moveLoginButton(){
+
+    if(state.processing){
+        return;
+    }
+
+
+    /*
+       Randomize size every relocation.
+    */
+
+    const width =
+        randomInt(80,240);
+
+
+    const height =
+        randomInt(38,90);
+
+
+    /*
+       IMPORTANT:
+       Use viewport coordinates because the button
+       lives directly inside #floatingLayer.
+    */
+
+    const maxX =
+        Math.max(
+            5,
+            window.innerWidth -
+            width -
+            5
+        );
+
+
+    const maxY =
+        Math.max(
+            5,
+            window.innerHeight -
+            height -
+            5
+        );
+
+
+    const x =
+        randomInt(5,maxX);
+
+
+    const y =
+        randomInt(5,maxY);
+
+
+    login.style.width=
+        width+"px";
+
+    login.style.height=
+        height+"px";
+
+    login.style.left=
+        x+"px";
+
+    login.style.top=
+        y+"px";
+
+    login.style.transform=
+        `rotate(${randomFloat(-10,10)}deg)`;
+
+    login.style.visibility=
+        "visible";
+
+    login.style.opacity=
+        "1";
+}
+
+
+/*
+   Make sure the login button cannot leave
+   the viewport after resizing.
+*/
+
+function keepLoginOnScreen(){
+
+    const rect =
+        login.getBoundingClientRect();
+
+
+    let x=rect.left;
+    let y=rect.top;
+
+
+    if(x<5){
+        x=5;
+    }
+
+    if(y<5){
+        y=5;
+    }
+
+    if(
+        x+rect.width>
+        window.innerWidth-5
+    ){
+
+        x=
+            window.innerWidth-
+            rect.width-
+            5;
+    }
+
+
+    if(
+        y+rect.height>
+        window.innerHeight-5
+    ){
+
+        y=
+            window.innerHeight-
+            rect.height-
+            5;
+    }
+
+
+    login.style.left=
+        x+"px";
+
+    login.style.top=
+        y+"px";
+
+    login.style.transform=
+        "none";
+
+    login.style.visibility=
+        "visible";
+
+    login.style.opacity=
+        "1";
+}
+
+
+login.addEventListener(
+    "mouseenter",
+    moveLoginButton
+);
+
+
+/* =====================================================
+   VALIDATION
+===================================================== */
+
+function usernameValid(){
+
+    return (
+        state.username.length>=8 &&
+        state.username.length<=20
+    );
+}
+
+
+function passwordValid(){
+
+    const password =
+        passwordInput.value;
+
+
+    /*
+       EVERY revealed rule must remain satisfied.
+    */
+
+    for(
+        let i=0;
+        i<state.revealedRules;
+        i++
+    ){
+
+        if(
+            !passwordRules[i].test(password)
+        ){
+
+            return false;
+        }
+    }
+
+
+    /*
+       Valid attempt only when every rule
+       has been revealed and satisfied.
+    */
+
+    return (
+        state.revealedRules ===
+        passwordRules.length
+    );
+}
+
+
+function allCriteriaValid(){
+
+    return (
+        usernameValid() &&
+        passwordValid() &&
+        state.captchaValid &&
+        state.humanVerified
+    );
+}
+
+
+function failureReason(){
+
+    if(!usernameValid()){
+        return "Username must be 8–20 characters.";
+    }
+
+    if(!passwordValid()){
+        return "Every revealed password rule must remain satisfied.";
+    }
+
+    if(!state.captchaValid){
+        return "Complete all 15 CAPTCHA stages.";
+    }
+
+    if(!state.humanVerified){
+        return "Complete human verification.";
+    }
+
+    return "Verification failed.";
+}
+
+
+/* =====================================================
+   POPUPS
+===================================================== */
+
+const invalidMessages=[
+
+    "❌ Login failed.",
+    "Checking username...",
+    "Username inspection failed.",
+    "Checking password...",
+    "Password inspection continues.",
+    "Checking CAPTCHA...",
+    "CAPTCHA status: questionable.",
+    "Checking human verification...",
+    "Human status remains uncertain.",
+    "Rechecking username...",
+    "Rechecking password...",
+    "Rechecking CAPTCHA...",
+    "Still not convinced.",
+    "Performing unnecessary verification...",
+    "Verification was probably unnecessary.",
+    "Checking again anyway.",
+    "Almost finished...",
+    "Actually, no.",
+    "One final check...",
+    "❌ Access denied."
+];
+
+
+const validMessages=[
+
+    "✓ Everything appears correct.",
+    "Credentials accepted. Suspiciously.",
+    "Performing an unnecessary verification.",
+    "Checking whether the check was checked.",
+    "Everything still looks correct.",
+    "You may continue. Probably."
+];
+
+
+function popupPosition(popup){
+
+    const width =
+        popup.offsetWidth;
+
+    const height =
+        popup.offsetHeight;
+
+
+    popup.style.left =
+        randomInt(
+            8,
+            Math.max(
+                8,
+                window.innerWidth-
+                width-
+                8
+            )
+        )+"px";
+
+
+    popup.style.top =
+        randomInt(
+            8,
+            Math.max(
+                8,
+                window.innerHeight-
+                height-
+                8
+            )
+        )+"px";
+}
+
+
+function createPopup(
+    message,
+    index,
+    total
+){
+
+    return new Promise(
+        resolve=>{
+
+            const popup =
+                document.createElement(
+                    "div"
+                );
+
+
+            popup.className="popup";
+
+
+            const title =
+                document.createElement(
+                    "div"
+                );
+
+            title.className=
+                "popupTitle";
+
+            title.textContent=
+                `System Message`;
+
+
+            const text =
+                document.createElement(
+                    "div"
+                );
+
+            text.className=
+                "popupText";
+
+            text.textContent=
+                message;
+
+
+            const close =
+                document.createElement(
+                    "button"
+                );
+
+            close.type="button";
+
+            close.textContent="OK";
+
+
+            popup.append(
+                title,
+                text,
+                close
+            );
+
+
+            popups.appendChild(
+                popup
+            );
+
+
+            popupPosition(
+                popup
+            );
+
+
+            close.addEventListener(
+                "click",
+                ()=>{
+                    popup.remove();
+                    resolve();
+                },
+                {once:true}
+            );
+
+        }
+    );
+}
+
+
+async function showPopups(messages){
+
+    for(
+        let i=0;
+        i<messages.length;
+        i++
+    ){
+
+        await createPopup(
+            messages[i],
+            i+1,
+            messages.length
+        );
+    }
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+login.addEventListener(
+    "click",
+    async()=>{
+
+        if(state.processing){
+            return;
+        }
+
+
+        state.processing=true;
+
+
+        const valid =
+            allCriteriaValid();
+
+
+        /*
+           ONLY a completely valid attempt counts.
+        */
+
+        if(valid){
+
+            state.validAttempts++;
+
+
+            const popupCount =
+                randomInt(5,6);
+
+
+            await showPopups(
+                validMessages.slice(
+                    0,
+                    popupCount
+                )
+            );
+
+
+            if(
+                state.validAttempts>=
+                VALID_ATTEMPTS_REQUIRED
+            ){
+
+                success.style.display=
+                    "grid";
+
+                state.processing=false;
+
+                return;
+            }
+
+
+            status.textContent=
+                "Valid attempt accepted. Continue.";
+
+        }
+
+        else{
+
+            /*
+               Invalid attempts do NOT count.
+            */
+
+            status.textContent=
+                "❌ "+
+                failureReason();
+
+
+            document.body.classList.remove(
+                "shake"
+            );
+
+            void document.body.offsetWidth;
+
+            document.body.classList.add(
+                "shake"
+            );
+
+
+            /*
+               Exactly 20 popups.
+            */
+
+            await showPopups(
+                invalidMessages
+            );
+        }
+
+
+        state.processing=false;
+    }
+);
+
+
+/* =====================================================
+   INITIALIZE FLOATING CONTROLS
+===================================================== */
+
+function initializeFloatingControls(){
+
+    requestAnimationFrame(()=>{
+
+        const captchaRect =
+            document.getElementById("captcha")
+                .getBoundingClientRect();
+
+        const cardRect =
+            app.getBoundingClientRect();
+
+        const humanRect =
+            human.getBoundingClientRect();
+
+        const loginRect =
+            login.getBoundingClientRect();
+
+
+        /*
+         * Put both controls below the CAPTCHA,
+         * inside the login window.
+         */
+
+        const controlsY =
+            captchaRect.bottom + 55;
+
+
+        /*
+         * Human verification:
+         * left side of the controls row.
+         */
+
+        human.style.left =
+            (
+                cardRect.left +
+                20 +
+                humanRect.width / 2
+            ) + "px";
+
+        human.style.top =
+            controlsY + "px";
+
+        human.style.transform =
+            "translate(-50%, -50%)";
+
+        human.style.visibility =
+            "visible";
+
+        human.style.opacity =
+            "1";
+
+
+        /*
+         * Login button:
+         * right side of the same row.
+         */
+
+        login.style.left =
+            (
+                cardRect.right -
+                20 -
+                loginRect.width / 2
+            ) + "px";
+
+        login.style.top =
+            controlsY + "px";
+
+        login.style.transform =
+            "translate(-50%, -50%)";
+
+        login.style.visibility =
+            "visible";
+
+        login.style.opacity =
+            "1";
+    });
+}
+
+
+initializeFloatingControls();
+
+
+/*
+   Extra safety:
+   if anything causes the controls to get outside
+   the viewport, bring them back instead of letting
+   them disappear.
+*/
+
+setInterval(
+    ()=>{
+        if(!state.humanVerified){
+            keepHumanOnScreen();
+        }
+
+        keepLoginOnScreen();
+    },
+    1000
+);
+
+</script>
+
+</body>
+</html>
